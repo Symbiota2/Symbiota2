@@ -10,13 +10,15 @@ export class LanguageController {
 
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: LanguageOutputDto, isArray: true })
-    findAll() {
-        return this.languageService.findAll();
+    async findAll() {
+        const languages = await this.languageService.findAll();
+        return languages.map((l) => new LanguageOutputDto(l));
     }
 
     @Get('/:id')
     @ApiResponse({ status: HttpStatus.OK, type: LanguageOutputDto })
-    findByID(@Param('id') id: number) {
-        return this.languageService.findByID(id);
+    async findByID(@Param('id') id: number) {
+        const lang = await this.languageService.findByID(id);
+        return new LanguageOutputDto(lang);
     }
 }

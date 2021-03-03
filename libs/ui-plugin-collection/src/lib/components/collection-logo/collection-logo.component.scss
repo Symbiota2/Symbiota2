@@ -1,0 +1,14 @@
+// TODO: This is just copy/pasted from the global theme: How can we export the site theme to plugins?
+$primaryColor: #0e6b88;
+$accentColor: #882a0e;
+
+.collection-logo {
+    display: block;
+    background: scale-color($primaryColor, $alpha: -80%);
+
+    padding: 0.2rem;
+
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: -0.1rem 0.1rem 0.2rem 0.1rem rgba(0, 0, 0, 0.3);
+}

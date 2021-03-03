@@ -1,0 +1,88 @@
+<!-- Catalog number -->
+<div fxLayout="row">
+    <mat-form-field>
+        <mat-label>Catalog number</mat-label>
+        <input
+            matInput
+            [ngModel]="catalogNumber"
+            (ngModelChange)="catalogNumberChange.emit($event)"
+        >
+    </mat-form-field>
+</div>
+<!-- Taxonomy -->
+<div fxLayout="row">
+    <div fxLayout="column">
+        <occurrence-search-select
+            title="Taxon search type"
+            [options]="TaxonSearchOpts"
+            [(value)]="taxonSearchType"
+        >
+        </occurrence-search-select>
+    </div>
+    <div fxLayout="column">
+        <mat-form-field>
+            <mat-label>Taxon</mat-label>
+            <input
+                matInput
+                [disabled]="taxonSearchType === ''"
+                [(ngModel)]="taxonSearchStr"
+            >
+        </mat-form-field>
+    </div>
+</div>
+<!-- Location -->
+<div fxLayout="row">
+    <div fxLayout="column">
+        <mat-form-field>
+            <mat-label>Country</mat-label>
+            <input
+                matInput
+                [(ngModel)]="country"
+            >
+        </mat-form-field>
+    </div>
+    <div fxLayout="column">
+        <mat-form-field>
+            <mat-label>State/Province</mat-label>
+            <input
+                matInput
+                [(ngModel)]="province"
+            >
+        </mat-form-field>
+    </div>
+    <div fxLayout="column">
+        <mat-form-field>
+            <mat-label>Locality</mat-label>
+            <input
+                matInput
+                [(ngModel)]="locality"
+            >
+        </mat-form-field>
+    </div>
+</div>
+<!-- Collection event details -->
+<div fxLayout="row">
+    <mat-form-field>
+        <mat-label>Collector</mat-label>
+        <input
+            matInput
+            [(ngModel)]="collector"
+        >
+    </mat-form-field>
+</div>
+<div fxLayout="row">
+    <div fxLayout="column">
+        <occurrence-search-date-picker
+            placeholder="Collection start date"
+            [(value)]="collectionDateStart"
+        >
+        </occurrence-search-date-picker>
+    </div>
+    <div fxLayout="column">
+        <occurrence-search-date-picker
+            placeholder="Collection end date"
+            [(value)]="collectionDateEnd"
+        >
+        </occurrence-search-date-picker>
+    </div>
+</div>

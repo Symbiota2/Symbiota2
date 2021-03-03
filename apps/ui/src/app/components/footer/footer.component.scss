@@ -1,0 +1,5 @@
+@import "../../../styles/mixins.import";
+
+#footer-logo, #footer-text {
+    @include mx(0.5rem);
+}

@@ -1,1 +1,135 @@
-/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/theming";
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+@import "./styles/_palette-gen.import";
+@import "./styles/theme.import";
+
+// ----- Build the custom theme
+@include mat-core();
+
+$primaryPalette: mat-palette(createPalette($primaryColor));
+$accentPalette: mat-palette(createPalette($accentColor));
+$warnPalette: mat-palette(createPalette($warnColor));
+$backgroundPalette: mat-palette(createPalette($backgroundColor));
+
+$app-theme: mat-light-theme((
+    color: (
+        primary: $primaryPalette,
+        accent: $accentPalette,
+        warn: $warnPalette,
+        background: $backgroundPalette
+    )
+));
+
+@include angular-material-theme($app-theme);
+// -----
+
+* {
+    font-family: $font;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    background-color: $backgroundColor;
+}
+
+.mat-typography {
+    font: initial;
+}
+
+label {
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: bold;
+    display: block;
+}
+
+fieldset {
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+legend {
+    padding: 0 5px;
+    color: grey;
+}
+
+.error-snackbar {
+    background-color: $warnColor;
+}
+
+.dynamic-tab-content {
+    padding: 20px;
+}
+
+.flex-container {
+    display: flex;
+}
+
+.error-text {
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+    line-height: 1;
+    background: #B52D30;
+    color: #fff;
+    border-radius: 0 0 3px 3px;
+    padding: 6px 10px;
+}
+
+.input-hint-text {
+    line-height: 1.1em;
+    font-size: 75%;
+}
+
+.clear {
+    clear: both;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.v-align-center {
+    vertical-align: middle;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-start {
+    text-align: start;
+}
+
+.text-end {
+    text-align: end;
+}
+
+.text-danger {
+    color: $warnColor;
+}
+
+.text-gray {
+    color: gray;
+}
+
+.text-ok {
+    color: $primaryColor;
+}
+
+.invisible-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &:focus {
+        outline: none;
+    }
+}

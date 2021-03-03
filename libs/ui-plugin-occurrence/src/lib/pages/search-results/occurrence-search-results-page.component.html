@@ -1,0 +1,43 @@
+<div id="header">
+    <div fxLayout="row" fxLayoutAlign="start center">
+        <div fxLayout="column">
+            <h1>Search results</h1>
+            <div>
+                Showing {{ getFirstIndexOnPage() | number }}
+                through {{ getLastIndexOnPage() | number }}
+                of {{ totalResults | number }} total results
+            </div>
+        </div>
+        <div fxLayout="column" class="ml-auto">
+            <div>
+                <mat-form-field>
+                    <mat-label>Results per page</mat-label>
+                    <mat-select
+                        [value]="itemsPerPage.toString()"
+                        (valueChange)="onItemsPerPageChanged($event)"
+                    >
+                        <mat-option value="25">25</mat-option>
+                        <mat-option value="50">50</mat-option>
+                        <mat-option value="100">100</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div id="result-nav-btns">
+                <button mat-raised-button color="primary">
+                    <mat-icon>chevron_left</mat-icon>
+                </button>
+                <button mat-raised-button color="primary">
+                    <mat-icon>chevron_right</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <div *ngFor="let occurrence of occurrences">
+        <div class="result-card">
+            <occurrence-search-search-result [occurrence]="occurrence">
+            </occurrence-search-search-result>
+        </div>
+    </div>
+</div>

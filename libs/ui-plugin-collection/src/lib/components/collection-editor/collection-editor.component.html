@@ -1,0 +1,100 @@
+<div id="window" *ngIf="collection">
+    <div fxLayout="row" fxLayoutAlign="start center">
+        <div class="invisible-btn" id="logo" (click)="onEditLogo()">
+            <lib-collection-logo src="{{ collection.icon }}" size="3rem"></lib-collection-logo>
+            <div id="editLogo">Edit</div>
+        </div>
+        <h1>Edit Collection</h1>
+        <button id="closeBtn" class="invisible-btn" (click)="onClose()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div id="fields">
+        <div fxLayout="row wrap">
+            <mat-form-field class="w-75">
+                <mat-label>Collection Name</mat-label>
+                <input [formControl]="controlName" matInput>
+            </mat-form-field>
+            <mat-form-field class="w-25">
+                <mat-label>Collection Code</mat-label>
+                <input [formControl]="controlCode" matInput>
+            </mat-form-field>
+        </div>
+        <div fxLayout="row wrap">
+            <mat-form-field class="w-50">
+                <mat-label>Home Page</mat-label>
+                <input matInput type="url" [formControl]="controlHomePage">
+            </mat-form-field>
+            <mat-form-field class="w-50">
+                <mat-label>Individual URL</mat-label>
+                <input matInput type="url" [formControl]="controlUrl">
+            </mat-form-field>
+        </div>
+        <div fxLayout="row wrap">
+            <mat-form-field class="w-50">
+                <mat-label>Contact</mat-label>
+                <input matInput [formControl]="controlContact">
+            </mat-form-field>
+            <mat-form-field class="w-50">
+                <mat-label>Email</mat-label>
+                <input matInput type="email" [formControl]="controlEmail">
+            </mat-form-field>
+        </div>
+        <div fxLayout="row wrap">
+            <mat-form-field class="w-50">
+                <mat-label>Latitude</mat-label>
+                <input matInput type="number" step="0.000001" [formControl]="controlLat">
+            </mat-form-field>
+            <mat-form-field class="w-50">
+                <mat-label>Longitude</mat-label>
+                <input matInput type="number" step="0.000001" [formControl]="controlLng">
+            </mat-form-field>
+        </div>
+        <div fxLayout="row wrap">
+            <mat-form-field class="w-50">
+                <mat-label>Type</mat-label>
+                <input matInput [formControl]="controlType">
+            </mat-form-field>
+            <mat-form-field class="w-50">
+                <mat-label>Management Type</mat-label>
+                <input matInput [formControl]="controlMgmtType">
+            </mat-form-field>
+        </div>
+        <div fxLayout="row wrap">
+            <mat-form-field class="w-50">
+                <mat-label>Rights Holder</mat-label>
+                <input matInput [formControl]="controlRightsHolder">
+            </mat-form-field>
+            <mat-form-field class="w-50">
+                <mat-label>Rights</mat-label>
+                <input matInput [formControl]="controlRights">
+            </mat-form-field>
+        </div>
+        <div fxLayout="row wrap">
+            <mat-form-field class="w-50">
+                <mat-label>Usage Term</mat-label>
+                <input matInput [formControl]="controlUsage">
+            </mat-form-field>
+            <mat-form-field class="w-50">
+                <mat-label>Access Rights</mat-label>
+                <input matInput [formControl]="controlAccessRights">
+            </mat-form-field>
+        </div>
+        <div fxLayout="row">
+            <mat-form-field class="w-100">
+                <mat-label>Full Description</mat-label>
+                <textarea
+                    matInput
+                    [formControl]="controlDesc"
+                    [cdkTextareaAutosize]="true"
+                    [cdkAutosizeMinRows]="3"
+                >
+                </textarea>
+            </mat-form-field>
+        </div>
+    </div>
+    <div id="buttons" fxLayout="row wrap">
+        <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!form.valid">Submit</button>
+        <button mat-raised-button (click)="onReset()">Reset</button>
+    </div>
+</div>

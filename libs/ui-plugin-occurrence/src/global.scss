@@ -1,0 +1,25 @@
+.ml-auto {
+    margin-left: auto;
+}
+
+.mr-auto {
+    margin-right: auto;
+}
+
+.mt-auto {
+    margin-top: auto;
+}
+
+.mb-auto {
+    margin-bottom: auto;
+}
+
+@mixin mx($margin) {
+    margin-left: $margin;
+    margin-right: $margin;
+}
+
+@mixin my($margin) {
+    margin-top: $margin;
+    margin-bottom: $margin;
+}

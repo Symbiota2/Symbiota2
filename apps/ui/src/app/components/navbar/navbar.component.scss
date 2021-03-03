@@ -1,0 +1,47 @@
+@import "../../../styles/mixins.import";
+@import "../../../styles/theme.import";
+
+#navbar {
+    width: 100%;
+    height: 100%;
+
+    background-color: $primaryColor;
+    color: white;
+    font-size: 0.8rem;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+
+    &:hover, &:active {
+        color: lightgray;
+    }
+}
+
+.navigation-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#right-links, #left-links {
+    @include mx(1.1rem);
+}
+
+#navigation-items-sub {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    a {
+        color: black;
+    }
+}
+
+#side-nav-toggle {
+    height: 100%;
+    margin-left: 20px;
+    color: white;
+}

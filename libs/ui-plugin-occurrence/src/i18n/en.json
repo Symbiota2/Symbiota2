@@ -1,0 +1,15 @@
+{
+  "plugins.occurrence.fields.associatedCollectors": "Associated collectors",
+  "plugins.occurrence.fields.catalogNumber": "Catalog Number",
+  "plugins.occurrence.fields.eventDate": "Date",
+  "plugins.occurrence.fields.otherCatalogNumbers": "Other catalog numbers",
+  "plugins.occurrence.fields.recordedBy": "Collector",
+  "plugins.occurrence.fields.recordNumber": "Record number",
+  "plugins.occurrence.fields.verbatimEventDate": "Verbatim date",
+  "plugins.occurrence.fields.sciname": "Scientific name",
+  "plugins.occurrence.fields.scientificNameAuthorship": "Author",
+  "plugins.occurrence.fields.identificationQualifier": "ID Qualifier",
+  "plugins.occurrence.fields.family": "Family",
+  "plugins.occurrence.fields.identifiedBy": "Identified by",
+  "plugins.occurrence.fields.dateIdentified": "Date identified"
+}

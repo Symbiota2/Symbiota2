@@ -8,5 +8,8 @@ module.exports = {
     '<rootDir>/libs/api-database',
     '<rootDir>/libs/api-plugin-occurrence',
     '<rootDir>/libs/api-plugin-collection',
+    '<rootDir>/libs/ui-common',
+    '<rootDir>/libs/ui-plugin-occurrence',
+    '<rootDir>/libs/ui-plugin-collection',
   ],
 };

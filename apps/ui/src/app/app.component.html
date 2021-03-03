@@ -1,8 +1,28 @@
-<div style="text-align: center">
-  <h1>Welcome to ui!</h1>
-  <img
-    width="450"
-    src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png"
-  />
-</div>
-<div>Message: {{ hello$ | async | json }}</div>
+<mat-card id="app">
+    <mat-card-content fxLayout="column" fxLayoutAlign="start stretch">
+        <!-- Banner w/ logo -->
+        <div id="site-banner" fxHide.xs>
+            <app-banner></app-banner>
+        </div>
+
+        <!-- Navbar -->
+        <div id="navbar">
+            <app-navbar></app-navbar>
+        </div>
+
+        <!-- Page display area -->
+        <div id="router-outlet" fxFlex="1 1">
+            <router-outlet></router-outlet>
+        </div>
+
+        <!-- Footer -->
+        <div id="site-footer" fxHide.xs>
+            <app-footer></app-footer>
+        </div>
+    </mat-card-content>
+</mat-card>
+
+<!-- Loading overlay -->
+<app-loading-overlay
+    [isLoading]="isLoading">
+</app-loading-overlay>

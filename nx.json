@@ -16,14 +16,17 @@
     }
   },
   "projects": {
-    "ui": { "tags": [] },
-    "ui-e2e": { "tags": [], "implicitDependencies": ["ui"] },
-    "api": { "tags": [] },
     "api-common": { "tags": [] },
     "api-auth": { "tags": [] },
     "api-config": { "tags": [] },
     "api-database": { "tags": [] },
     "api-plugin-occurrence": { "tags": [] },
-    "api-plugin-collection": { "tags": [] }
+    "api-plugin-collection": { "tags": [] },
+    "ui-common": { "tags": [] },
+    "ui-plugin-occurrence": { "tags": [] },
+    "ui-plugin-collection": { "tags": [] },
+    "ui": { "tags": [] },
+    "ui-e2e": { "tags": [], "implicitDependencies": ["ui"] },
+    "api": { "tags": [] }
   }
 }

@@ -1,0 +1,35 @@
+<div>
+    <h1>Occurrence Search</h1>
+</div>
+
+<!-- Collection select -->
+<div class="expansion-panel">
+    <mat-accordion>
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Collection select
+                    <span [ngClass]="{ 'required-asterisk': true, hide: collectionIDs.length > 0 }">*</span>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <collection-collection-checkbox-selector
+                [(collectionIDs)]="collectionIDs"
+            >
+            </collection-collection-checkbox-selector>
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>
+
+<!-- Search criteria -->
+<div class="expansion-panel">
+    <lib-expansion-panel title="Search criteria" expanded="true">
+        <occurrence-search-search-criteria
+            [(catalogNumber)]="catalogNumber"
+        >
+        </occurrence-search-search-criteria>
+    </lib-expansion-panel>
+</div>
+
+<div id="buttons">
+    <button mat-flat-button color="primary" [disabled]="searchDisabled" (click)="onSearch()">Search</button>
+</div>

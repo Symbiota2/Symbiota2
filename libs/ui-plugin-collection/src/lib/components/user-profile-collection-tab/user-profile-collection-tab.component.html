@@ -1,0 +1,21 @@
+<div fxLayout="row wrap">
+    <div *ngFor="let collection of collections">
+        <a routerLink="/collections/{{ collection.id }}">
+            <mat-card title="{{ collection.collectionName }} at {{ collection.institution.name }}">
+                <mat-card-content fxLayout="row" fxLayoutAlign="center start">
+                    <lib-collection-logo
+                        id="logo"
+                        src="{{ collection.icon }}"
+                        *ngIf="collection.icon"
+                    >
+                    </lib-collection-logo>
+                    <div id="text">
+                        {{ collection.collectionName }}
+                        <br>
+                        <span id="institution">at {{ collection.institution.name }}</span>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </a>
+    </div>
+</div>

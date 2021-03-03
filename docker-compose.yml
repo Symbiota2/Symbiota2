@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  mariadb:
+    image: mariadb:10.5
+    container_name: s2-mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
+      - "s2-db:/var/lib/mysql"
+    ports: ["3306:3306"]
+
+volumes:
+  s2-db: { name: s2-db-dev }
+  s2-redis: { name: s2-redis-dev }

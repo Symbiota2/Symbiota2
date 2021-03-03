@@ -1,0 +1,56 @@
+<div *ngIf="collection">
+    <div fxLayout="row" fxLayoutAlign="start center">
+        <lib-collection-logo
+            id="collectionLogo"
+            src="{{ collection.icon }}"
+            size="5rem"
+            *ngIf="collection.icon"
+        >
+        </lib-collection-logo>
+        <div fxLayout="column" fxLayoutAlign="center start">
+            <div fxLayout="row">
+                <h1 id="collectionName">{{ collection.collectionName }}</h1>
+                <button
+                    *ngIf="currentUser && currentUser.canEditCollection(collection.id)"
+                    class="invisible-btn"
+                    (click)="onEdit()"
+                >
+                    <mat-icon>edit</mat-icon>
+                </button>
+            </div>
+            <div id="links">
+                <ng-container *ngFor="let link of links">
+                    <span>
+                        <a
+                            [routerLink]="link.routerLink"
+                            [queryParams]="link.queryParams">{{ link.text }}</a>
+                    </span>
+                    <span class="pipe">|</span>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+    <div id="collectionContent">
+        <!-- TODO: i18n -->
+        <div id="collectionDescription">
+            <lib-collection-field [value]="collection.fullDescription"></lib-collection-field>
+        </div>
+
+        <lib-collection-field label="Contact" [value]="collection.contact"></lib-collection-field>
+        <lib-collection-field label="Home page" [href]="collectionHomePage()" [value]="collection.homePage"></lib-collection-field>
+        <lib-collection-field label="Collection type" [value]="collection.type"></lib-collection-field>
+        <lib-collection-field label="Management" [value]="collection.managementType"></lib-collection-field>
+        <lib-collection-field label="Last update" [value]="collection.stats.lastModifiedTimestamp | date"></lib-collection-field>
+        <lib-collection-field label="Usage rights" [value]="collection.usageTerm"></lib-collection-field>
+    </div>
+    <div id="collectionStats">
+        <b>Collection Stats</b>
+        <ul>
+            <li>{{ collection.stats.recordCount }} occurrences</li>
+            <li>{{ collection.stats.georeferencedCount }} ({{ georeferencedPercent() }}%) georeferenced</li>
+            <li>{{ collection.stats.familyCount }} families</li>
+            <li>{{ collection.stats.genusCount }} genera</li>
+            <li>{{ collection.stats.speciesCount }} species</li>
+        </ul>
+    </div>
+</div>

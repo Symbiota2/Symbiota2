@@ -1,0 +1,40 @@
+@import "../../../styles/mixins.import";
+
+.mat-form-field {
+    @include mx(1rem);
+
+    min-width: 10rem;
+    width: 100%;
+}
+
+form {
+    margin-top: 2rem;
+}
+
+#password-reset {
+    .mat-form-field {
+        max-width: 50%;
+    }
+}
+
+#edit-btns, #reset-btns {
+    margin: 1rem;
+}
+
+#edit-btns {
+    text-align: end;
+
+    button {
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+    }
+}
+
+#isPublic {
+    @include mx(1rem);
+    @include my(1.5rem);
+}
+
+#role-tab div {
+    @include my(1rem);
+}

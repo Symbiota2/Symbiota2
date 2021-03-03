@@ -12,7 +12,7 @@ This project was uses [Nx](https://nx.dev), [Angular](https://angular.io), and [
 
 ## Generate a plugin
 
-Run `ng g @nrwl/angular:lib <my-plugin>` to generate a UI plugin.
+Run `ng g @nrwl/angular:lib <my-plugin> --buildable` to generate a UI plugin.
 
 Run `nx generate @nrwl/nest:library <my-plugin> --buildable` to generate an API plugin.
 

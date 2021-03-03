@@ -1,0 +1,15 @@
+@import "../../../styles/mixins.import";
+
+#container {
+    @include px(2rem);
+    @include py(1.5ex);
+}
+
+#links {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.mat-form-field {
+    width: 100%;
+}

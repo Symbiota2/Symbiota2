@@ -1,0 +1,42 @@
+#collectionLogo {
+    margin-right: 1rem;
+}
+
+#collectionName {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-right: 1rem;
+}
+
+#links {
+    margin-top: 0.5rem;
+    font-size: 75%;
+
+    .pipe {
+        font-weight: bold;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+
+        &:last-child {
+            display: none;
+        }
+    }
+}
+
+#collectionContent {
+    margin-top: 1.5rem;
+}
+
+#collectionDescription {
+    margin-bottom: 1.5rem;
+}
+
+#collectionStats {
+    margin-top: 2rem;
+
+    background: rgba(0, 0, 0, 0.1);
+
+    border-radius: 1rem;
+    padding: 1rem;
+    max-width: 30rem;
+}

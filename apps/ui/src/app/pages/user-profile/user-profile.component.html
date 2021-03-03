@@ -1,0 +1,266 @@
+<mat-tab-group (selectedIndexChange)="onTabChanged($event)" [selectedIndex]="currentTab">
+    <!-- Edit profile -->
+    <mat-tab [label]="'core.user.edit_profile.edit_profile_box_title' | translate">
+        <form [formGroup]="profileFormGroup">
+            <div>
+                <div fxLayout="row">
+                    <mat-form-field>
+                        <mat-label>
+                            {{ "core.user.user_metadata.first_name_box" | translate }}
+                        </mat-label>
+                        <input
+                            matInput
+                            required
+                            [formControlName]="FC_FIRST_NAME"
+                        >
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>
+                            {{ "core.user.user_metadata.last_name_box" | translate }}
+                        </mat-label>
+                        <input
+                            matInput
+                            required
+                            [formControlName]="FC_LAST_NAME"
+                        >
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row">
+                    <mat-form-field>
+                        <mat-label>
+                            {{ "core.user.user_metadata.email_address_box" | translate }}
+                        </mat-label>
+                        <input
+                            matInput
+                            required
+                            type="email"
+                            [formControlName]="FC_EMAIL"
+                        >
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row">
+                    <mat-form-field id="address">
+                        <mat-label>
+                            {{ "core.user.user_metadata.street_address_box" | translate }}
+                        </mat-label>
+                        <input
+                            matInput
+                            [formControlName]="FC_ADDR"
+                        >
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row">
+                    <mat-form-field>
+                        <mat-label>
+                            {{ "core.user.user_metadata.city_box" | translate }}
+                        </mat-label>
+                        <input
+                            matInput
+                            [formControlName]="FC_CITY"
+                        >
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>
+                            {{ "core.user.user_metadata.state_box" | translate }}
+                        </mat-label>
+                        <input
+                            matInput
+                            [formControlName]="FC_STATE"
+                        >
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>
+                            {{ "core.user.user_metadata.country_box" | translate }}
+                        </mat-label>
+                        <input
+                            matInput
+                            [formControlName]="FC_COUNTRY"
+                        >
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>
+                            {{ "core.user.user_metadata.zip_code_box" | translate }}
+                        </mat-label>
+                        <input
+                            matInput
+                            [formControlName]="FC_ZIP"
+                        >
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row">
+                    <mat-form-field>
+                        <mat-label>
+                            {{ "core.user.user_metadata.title_box" | translate }}
+                        </mat-label>
+                        <input
+                            matInput
+                            [formControlName]="FC_TITLE"
+                        >
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>
+                            {{ "core.user.user_metadata.institution_box" | translate }}
+                        </mat-label>
+                        <input
+                            matInput
+                            [formControlName]="FC_INSTITUTION"
+                        >
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>
+                            {{ "core.user.user_metadata.department_box" | translate }}
+                        </mat-label>
+                        <input
+                            matInput
+                            [formControlName]="FC_DEPT"
+                        >
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row">
+                    <mat-form-field>
+                        <mat-label>
+                            {{ "core.user.user_metadata.url_box" | translate }}
+                        </mat-label>
+                        <input
+                            matInput
+                            [formControlName]="FC_URL"
+                        >
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row">
+                    <mat-form-field id="bio">
+                        <mat-label>
+                            {{ "core.user.user_metadata.biography_box" | translate }}
+                        </mat-label>
+                        <textarea
+                            matInput
+                            type="text"
+                            cdkTextareaAutosize
+                            maxlength="{{ BIO_MAX_LEN }}"
+                            [formControlName]="FC_BIO"
+                        >
+                    </textarea>
+                        <mat-hint align="start">{{ bioLength }}/{{ BIO_MAX_LEN }}</mat-hint>
+                    </mat-form-field>
+                </div>
+                <div id="isPublic" fxLayout="row">
+                    <mat-checkbox [formControlName]="FC_PUBLIC">
+                        {{ "core.user.user_metadata.is_public_text" | translate }}
+                    </mat-checkbox>
+                </div>
+            </div>
+            <div id="edit-btns">
+                <button
+                    mat-raised-button
+                    color="primary"
+                    [disabled]="!profileFormGroup.valid"
+                    (click)="onApplyProfile()"
+                >
+                    {{ "core.user.user_metadata.apply_button" | translate }}
+                </button>
+                <button
+                    mat-raised-button
+                    (click)="onRevertProfile()"
+                >
+                    {{ "core.user.user_metadata.reset_button" | translate }}
+                </button>
+            </div>
+        </form>
+    </mat-tab>
+    <!-- Reset password -->
+    <mat-tab [label]="'core.user.edit_profile.reset_password_button' | translate">
+        <form
+            id="password-reset"
+            checkPasswords
+            [formGroup]="passwordFormGroup"
+            (ngSubmit)="onChangePassword($event)"
+        >
+            <div>
+                <mat-form-field>
+                    <mat-label>
+                        {{ "core.user.edit_profile.old_password_box" | translate }}
+                    </mat-label>
+                    <input
+                        matInput
+                        type="password"
+                        required
+                        [formControlName]="FC_PWD_CURRENT"
+                    >
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>
+                        {{ "core.user.user_password.new_password_box" | translate }}
+                    </mat-label>
+                    <input
+                        matInput
+                        type="password"
+                        required
+                        [formControlName]="FC_PWD"
+                    >
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>
+                        {{ "core.user.user_password.new_password_again_box" | translate }}
+                    </mat-label>
+                    <input
+                        matInput
+                        type="password"
+                        required
+                        [formControlName]="FC_PWD_CONFIRM"
+                    >
+                </mat-form-field>
+            </div>
+
+            <!-- Password errors -->
+            <div *ngIf="passwordFormGroup.touched && passwordFormGroup.dirty">
+                <div *ngFor="let err of PWD_ERRORS">
+                    <!-- Gray text -->
+                    <small class="text-danger" *ngIf="passwordFormGroup.hasError(err)">
+                        <mat-icon class="v-align-center">warning</mat-icon>
+                        {{ err | translate }}
+                    </small>
+                </div>
+            </div>
+
+            <div id="reset-btns">
+                <button
+                    mat-raised-button
+                    [disabled]="!passwordFormGroup.valid"
+                    color="primary"
+                    type="submit"
+                >
+                    {{ "core.user.edit_profile.reset_password_button" | translate }}
+                </button>
+            </div>
+        </form>
+    </mat-tab>
+    <mat-tab id="role-tab" label="Roles">
+        <div>
+            <b>Global</b>
+            <ul>
+                <li *ngFor="let role of globalRoles">{{ role.name }}</li>
+            </ul>
+        </div>
+        <div>
+            <b>Collection</b>
+            <ul>
+                <li *ngFor="let role of collectionRoles">{{ role.name }}</li>
+            </ul>
+        </div>
+        <div>
+            <b>Checklist</b>
+            <ul>
+                <li *ngFor="let role of checklistRoles">{{ role.name }}</li>
+            </ul>
+        </div>
+        <div>
+            <b>Project</b>
+            <ul>
+                <li *ngFor="let role of projectRoles">{{ role.name }}</li>
+            </ul>
+        </div>
+    </mat-tab>
+    <mat-tab *ngFor="let tab of pluginTabs" label="{{ tab.name | translate }}">
+        <ng-template #extraTabs></ng-template>
+    </mat-tab>
+</mat-tab-group>

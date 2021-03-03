@@ -4,9 +4,9 @@
     "outDir": "../../dist/out-tsc",
     "types": ["node"],
     "emitDecoratorMetadata": true,
-    "esModuleInterop": true,
+    "target": "es2017",
     "module": "commonjs",
-    "target": "es2017"
+    "esModuleInterop": true
   },
   "exclude": ["**/*.spec.ts"],
   "include": ["**/*.ts"]

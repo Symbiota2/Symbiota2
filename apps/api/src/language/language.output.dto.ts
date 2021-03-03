@@ -1,9 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AdminLanguage } from '@symbiota2/api-database';
-import { Exclude, Expose, plainToClass } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 
 @Exclude()
 export class LanguageOutputDto {
+    constructor(language: AdminLanguage) {
+        Object.assign(this, language);
+    }
+
     @ApiProperty()
     @Expose()
     id: number;
@@ -23,8 +27,4 @@ export class LanguageOutputDto {
     @ApiProperty()
     @Expose()
     notes: string;
-
-    static fromEntity(language: AdminLanguage) {
-        return plainToClass(LanguageOutputDto, language);
-    }
 }

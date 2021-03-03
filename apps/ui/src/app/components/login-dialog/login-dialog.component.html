@@ -1,0 +1,53 @@
+<div id="container">
+    <h1 mat-dialog-title>{{ "core.user.signup.login_box" | translate }}</h1>
+    <div mat-dialog-content>
+        <mat-form-field>
+            <mat-label>
+                {{ "core.user.user_list.username_filter_box" | translate }}
+            </mat-label>
+            <input
+                matInput
+                required
+                [(ngModel)]="username"
+                (keyup.enter)="onEnter()"
+            >
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <mat-label>
+                {{ "core.user.user_password.new_password_box" | translate }}
+            </mat-label>
+            <input
+                matInput
+                required
+                type="password"
+                [(ngModel)]="password"
+                (keyup.enter)="onEnter()"
+            >
+        </mat-form-field>
+    </div>
+    <div class="mt-2" fxLayoutAlign="space-around">
+        <button
+            mat-raised-button
+            color="primary"
+            [disabled]="username === '' || password === ''"
+            (click)="onSubmit()"
+        >
+            {{ "app.auth.submit" | translate }}
+        </button>
+        <button mat-raised-button (click)="onCancel()">
+            {{ "app.auth.cancel" | translate }}
+        </button>
+    </div>
+    <div id="links">
+        <div>
+            <a href="#">{{ 'symbiota-auth.login.no_account_text' | translate }}</a>
+        </div>
+        <div>
+            <a href="#">{{ 'symbiota-auth.login.cant_remember_password' | translate }}</a>
+        </div>
+        <div>
+            <a href="#">{{ 'symbiota-auth.login.cant_remember_login' | translate }}</a>
+        </div>
+    </div>
+</div>

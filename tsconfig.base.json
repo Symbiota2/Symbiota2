@@ -25,6 +25,13 @@
       ],
       "@symbiota2/api-plugin-collection": [
         "libs/api-plugin-collection/src/index.ts"
+      ],
+      "@symbiota2/ui-common": ["libs/ui-common/src/index.ts"],
+      "@symbiota2/ui-plugin-occurrence": [
+        "libs/ui-plugin-occurrence/src/index.ts"
+      ],
+      "@symbiota2/ui-plugin-collection": [
+        "libs/ui-plugin-collection/src/index.ts"
       ]
     }
   },

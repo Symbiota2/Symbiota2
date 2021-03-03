@@ -1,0 +1,55 @@
+<mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+    <!-- Leaf nodes -->
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
+        <!-- Fake button for padding -->
+        <button mat-icon-button disabled></button>
+        <mat-checkbox
+            [checked]="collectionSelections.isSelected(node.id)"
+            (change)="toggleCollection($event.source, node.id)"
+        >
+            <div class="v-middle">
+                <img
+                    class="collection-icon"
+                    *ngIf="node.icon"
+                    [src]="node.icon"
+                    alt="collection icon"
+                >
+                {{ node.name }}
+            </div>
+        </mat-checkbox>
+    </mat-tree-node>
+
+    <!-- Expandable nodes -->
+    <mat-nested-tree-node *matTreeNodeDef="let node; when: nodeHasChildren">
+        <div class="mat-tree-node">
+            <button
+                mat-icon-button
+                matTreeNodeToggle
+                [disabled]="node.isRootNode()"
+            >
+                <!-- ngIf b/c root node doesn't need to collapse -->
+                <mat-icon
+                    *ngIf="!node.isRootNode()"
+                    class="mat-icon-rtl-mirror"
+                >
+                    {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+                </mat-icon>
+            </button>
+            <mat-checkbox
+                i18n
+                [checked]="nodeAllChildrenSelected(node)"
+                [indeterminate]="nodeSomeChildrenSelected(node)"
+                (change)="toggleCategory($event.source, node)"
+            >
+                {{(
+                    node.isRootNode() ?
+                    ("collection.collection_checkbox_selector.select_all" | translate) :
+                    node.name
+                )}}
+            </mat-checkbox>
+        </div>
+        <ul *ngIf="treeControl.isExpanded(node)">
+            <ng-container matTreeNodeOutlet></ng-container>
+        </ul>
+    </mat-nested-tree-node>
+</mat-tree>
