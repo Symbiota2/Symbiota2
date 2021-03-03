@@ -15,7 +15,17 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@symbiota2/api-interfaces": ["libs/api-interfaces/src/index.ts"]
+      "@symbiota2/api-interfaces": ["libs/api-interfaces/src/index.ts"],
+      "@symbiota2/api-common": ["libs/api-common/src/index.ts"],
+      "@symbiota2/api-auth": ["libs/api-auth/src/index.ts"],
+      "@symbiota2/api-config": ["libs/api-config/src/index.ts"],
+      "@symbiota2/api-database": ["libs/api-database/src/index.ts"],
+      "@symbiota2/api-plugin-occurrence": [
+        "libs/api-plugin-occurrence/src/index.ts"
+      ],
+      "@symbiota2/api-plugin-collection": [
+        "libs/api-plugin-collection/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

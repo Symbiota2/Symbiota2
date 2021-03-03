@@ -1,0 +1,10 @@
+{
+  "name": "@symbiota2/api-config",
+  "version": "0.0.1",
+  "dependencies": {
+    "@nestjs/common": "^7.6.13",
+    "@nestjs/config": "^0.6.3",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^6.6.6"
+  }
+}

@@ -1,0 +1,7 @@
+export * from './SpeciesProcessorNLP.entity'
+export * from './SpeciesProcessorNLPFrag.entity'
+export * from './SpeciesProcessorNLPVersion.entity'
+export * from './SpeciesProcessorOCRFragment.entity'
+export * from './SpeciesProcessorProject.entity'
+export * from './SpeciesProcessorRawLabel.entity'
+export * from './SpeciesProcessorRawLabelsFullText.entity'

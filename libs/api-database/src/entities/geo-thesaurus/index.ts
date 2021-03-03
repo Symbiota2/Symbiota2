@@ -1,0 +1,5 @@
+export * from './GeoThesaurusContinent.entity'
+export * from './GeoThesaurusCountry.entity'
+export * from './GeoThesaurusCounty.entity'
+export * from './GeoThesaurusMunicipality.entity'
+export * from './GeoThesuarusStateProvince.entity'

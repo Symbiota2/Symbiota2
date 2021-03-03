@@ -154,7 +154,7 @@
             "outputPath": "dist/apps/api",
             "main": "apps/api/src/main.ts",
             "tsConfig": "apps/api/tsconfig.app.json",
-            "assets": ["apps/api/src/assets"]
+            "assets": []
           },
           "configurations": {
             "production": {
@@ -192,15 +192,194 @@
         }
       }
     },
-    "api-interfaces": {
-      "root": "libs/api-interfaces",
-      "sourceRoot": "libs/api-interfaces/src",
+    "api-common": {
+      "root": "libs/api-common",
+      "sourceRoot": "libs/api-common/src",
       "projectType": "library",
       "architect": {
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-interfaces/**/*.ts"]
+            "lintFilePatterns": ["libs/api-common/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/api-common"],
+          "options": {
+            "jestConfig": "libs/api-common/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/api-common",
+            "tsConfig": "libs/api-common/tsconfig.lib.json",
+            "packageJson": "libs/api-common/package.json",
+            "main": "libs/api-common/src/index.ts",
+            "assets": ["libs/api-common/*.md"]
+          }
+        }
+      }
+    },
+    "api-auth": {
+      "root": "libs/api-auth",
+      "sourceRoot": "libs/api-auth/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/api-auth/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/api-auth"],
+          "options": {
+            "jestConfig": "libs/api-auth/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/api-auth",
+            "tsConfig": "libs/api-auth/tsconfig.lib.json",
+            "packageJson": "libs/api-auth/package.json",
+            "main": "libs/api-auth/src/index.ts",
+            "assets": ["libs/api-auth/*.md"]
+          }
+        }
+      }
+    },
+    "api-config": {
+      "root": "libs/api-config",
+      "sourceRoot": "libs/api-config/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/api-config/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/api-config"],
+          "options": {
+            "jestConfig": "libs/api-config/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/api-config",
+            "tsConfig": "libs/api-config/tsconfig.lib.json",
+            "packageJson": "libs/api-config/package.json",
+            "main": "libs/api-config/src/index.ts",
+            "assets": ["libs/api-config/*.md"]
+          }
+        }
+      }
+    },
+    "api-database": {
+      "root": "libs/api-database",
+      "sourceRoot": "libs/api-database/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/api-database/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/api-database"],
+          "options": {
+            "jestConfig": "libs/api-database/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/api-database",
+            "tsConfig": "libs/api-database/tsconfig.lib.json",
+            "packageJson": "libs/api-database/package.json",
+            "main": "libs/api-database/src/index.ts",
+            "assets": ["libs/api-database/*.md"]
+          }
+        }
+      }
+    },
+    "api-plugin-occurrence": {
+      "root": "libs/api-plugin-occurrence",
+      "sourceRoot": "libs/api-plugin-occurrence/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/api-plugin-occurrence/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/api-plugin-occurrence"],
+          "options": {
+            "jestConfig": "libs/api-plugin-occurrence/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/api-plugin-occurrence",
+            "tsConfig": "libs/api-plugin-occurrence/tsconfig.lib.json",
+            "packageJson": "libs/api-plugin-occurrence/package.json",
+            "main": "libs/api-plugin-occurrence/src/index.ts",
+            "assets": ["libs/api-plugin-occurrence/*.md"]
+          }
+        }
+      }
+    },
+    "api-plugin-collection": {
+      "root": "libs/api-plugin-collection",
+      "sourceRoot": "libs/api-plugin-collection/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/api-plugin-collection/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/api-plugin-collection"],
+          "options": {
+            "jestConfig": "libs/api-plugin-collection/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/api-plugin-collection",
+            "tsConfig": "libs/api-plugin-collection/tsconfig.lib.json",
+            "packageJson": "libs/api-plugin-collection/package.json",
+            "main": "libs/api-plugin-collection/src/index.ts",
+            "assets": ["libs/api-plugin-collection/*.md"]
           }
         }
       }
