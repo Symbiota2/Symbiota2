@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import path from 'path';
+import * as path from 'path';
 import * as entities from './libs/api-database/src/entities';
 import * as migrations from './libs/api-database/src/migrations';
 import { ConnectionOptions } from 'typeorm';

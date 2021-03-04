@@ -11,4 +11,4 @@ services:
     ports: ["3306:3306"]
 
 volumes:
-  s2-db: { name: s2-db-dev }
+  s2-db: { name: s2-db }
