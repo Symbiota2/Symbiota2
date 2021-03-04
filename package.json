@@ -72,6 +72,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1102.0",
+    "@angular-eslint/eslint-plugin": "^1.2.0",
     "@angular/compiler-cli": "^11.2.0",
     "@angular/language-service": "^11.2.0",
     "@nestjs/schematics": "^7.0.0",

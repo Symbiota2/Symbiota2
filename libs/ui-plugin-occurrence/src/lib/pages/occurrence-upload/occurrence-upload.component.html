@@ -1,0 +1,6 @@
+<div class='my2'>
+    <input [formControl]='fileInput' type='file' accept='text/csv'>
+</div>
+<div class='my2'>
+    <button mat-flat-button color='primary' (click)='onUpload()' [disabled]='!fileInput.value'>Upload</button>
+</div>

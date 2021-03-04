@@ -33,6 +33,7 @@ import { FlexModule } from "@angular/flex-layout";
 import { MatExpansionModule } from '@angular/material/expansion';
 import { OccurrenceService } from './services/occurrence.service';
 import { ExpansionPanelComponent } from './components/expansion-panel/expansion-panel.component';
+import { OccurrenceUploadComponent } from './pages/occurrence-upload/occurrence-upload.component';
 
 @NgModule({
     imports: [
@@ -70,7 +71,7 @@ import { ExpansionPanelComponent } from './components/expansion-panel/expansion-
         OccurrenceSearchResultsPage,
         SelectComponent,
         ExpansionPanelComponent,
-        ExpansionPanelComponent
+        OccurrenceUploadComponent
     ],
     entryComponents: [
         OccurrenceSearchCollectionsPage,
@@ -81,6 +82,7 @@ import { ExpansionPanelComponent } from './components/expansion-panel/expansion-
 export class OccurrencePlugin extends SymbiotaPlugin {
     private static SEARCH_OCCURRENCES_ROUTE = "occurrences/search";
     private static SEARCH_RESULTS_ROUTE = "occurrences/search/results";
+    private static UPLOAD_ROUTE = "occurrences/upload";
 
     constructor(private readonly collectionProfile: CollectionProfileService) {
         super();
@@ -90,6 +92,14 @@ export class OccurrencePlugin extends SymbiotaPlugin {
                 text: "Search Occurrences",
                 routerLink: `/${OccurrencePlugin.SEARCH_OCCURRENCES_ROUTE}`,
                 queryParams: { 'collectionID[]': collectionID }
+            };
+        });
+
+        collectionProfile.putLink((collectionID) => {
+            return {
+                text: "Upload occurrences",
+                routerLink: `/${OccurrencePlugin.UPLOAD_ROUTE}`,
+                queryParams: { 'collectionID': collectionID }
             };
         });
     }
@@ -103,6 +113,10 @@ export class OccurrencePlugin extends SymbiotaPlugin {
             {
                 path: OccurrencePlugin.SEARCH_RESULTS_ROUTE,
                 component: OccurrenceSearchResultsPage
+            },
+            {
+                path: OccurrencePlugin.UPLOAD_ROUTE,
+                component: OccurrenceUploadComponent
             }
         ];
     }
