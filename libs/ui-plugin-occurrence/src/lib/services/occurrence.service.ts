@@ -46,6 +46,10 @@ export class OccurrenceService {
             .pipe(map((o) => Occurrence.fromJSON(o)));
     }
 
+    // postCsv(csv: File): Observable<void> {
+    //     const url = this.createQueryBuilder()
+    // }
+
     private createQueryBuilder(): OccurrenceQueryBuilder {
         return new OccurrenceQueryBuilder(this.appConfig.apiUri());
     }
