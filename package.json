@@ -8,6 +8,7 @@
     "start:api": "nx serve api",
     "start:ui": "nx serve ui",
     "build": "nx build",
+    "sql": "node --require ts-node/register --require typeorm --require glob bin/run-sql.ts",
     "test": "nx test",
     "lint": "nx workspace-lint && nx lint",
     "e2e": "nx e2e",
