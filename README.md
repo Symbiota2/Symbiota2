@@ -37,6 +37,14 @@ a lack of support for spatial indexes. MariaDB is the only database that has bee
 For development purposes, `docker-compose up -d` will start a mariadb server on port 3306 compatible with the
 DATABASE_* defaults. This database loads the initialization scripts in [docker-entrypoint-initdb.d](./docker-entrypoint-initdb.d/)
 to initialize a [Symbiota v1 database](https://github.com/Symbiota/Symbiota/blob/f158b1651632ecfe018d7c5d578e7fa8d904fb04/docs/INSTALL.txt#L26).
+This repo also provides a convenience script for running a sql file or directory of sql files. This script utilizes the environment
+variables above to connect to the database:
+
+`npm run sql my-script.sql`
+
+or
+
+`npm run sql my/dir/with/sql/scripts`
 
 Symbiota2 has been written under the assumption that most users will be upgrading from a Symbiota v1 database. Any new databases
 should first run the initialization scripts in docker-entrypoint-initdb.d. When ready to upgrade to the Symbiota2 schema, run
@@ -48,7 +56,6 @@ During development, if any [entities](./libs/api-database/src/entities) are chan
 A key requirement of Symbiota2 is backward-compatibility with Symbiota v1 databases. For this reason, care should be taken
 that any migrations do not result in data loss. However, **all users need to back up their data prior to upgrading to Symbiota2** as 
 it's always possible that data loss could occur.
-
 
 ## Generate a plugin
 
