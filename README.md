@@ -46,7 +46,7 @@ During development, if any [entities](./libs/api-database/src/entities) are chan
 `npm run typeorm migration:generate -n MyMigration`.
 
 A key requirement of Symbiota2 is backward-compatibility with Symbiota v1 databases. For this reason, care should be taken
-that any migrations do not result in data loss. However, all users need to back up their data prior to upgrading to Symbiota2 as 
+that any migrations do not result in data loss. However, **all users need to back up their data prior to upgrading to Symbiota2** as 
 it's always possible that data loss could occur.
 
 
