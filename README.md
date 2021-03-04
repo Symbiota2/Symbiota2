@@ -36,7 +36,7 @@ Run `nx g @nrwl/nest:<resource type> --sourceRoot=<api or my-plugin> <my-resourc
 
 The UI uses [ngx-translate's http loader](http://www.ngx-translate.com/) to load internationization files as JSON.
 
-1. Run `npm run i18n:init libs/my-plugin/src/i18n` to initialize an internationalization directory.
+1. Run `npm run i18n:init libs/<my-plugin>/src/i18n` to initialize an internationalization directory.
 
 2. Edit the internationalization files based on language
 
