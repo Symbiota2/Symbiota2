@@ -2,7 +2,16 @@
 
 This project was uses [Nx](https://nx.dev), [Angular](https://angular.io), and [Nest](https://nestjs.com).
 
+## Quick Start & Documentation
+
+[Nx Documentation](https://nx.dev/angular)
+
+[Angular Documentation](https://angular.io/docs)
+
+[Nest Documentation](https://docs.nestjs.com/)
+
 ## Environment
+
 Any variable without a default is required for the Symbiota2 API to run. 
 For development, a [.env file](https://www.npmjs.com/package/dotenv) can be used.
 
@@ -11,7 +20,7 @@ For development, a [.env file](https://www.npmjs.com/package/dotenv) can be used
 | NODE_ENV | 'development' or 'production', determines log level, etc. | 'production'
 | APP_PORT | The port the the API server will run on | 8080 |
 | APP_DATA_DIR | The data directory for the API server | './data' |
-| DATABASE_TYPE | The [type of database](https://typeorm.io) to that will be used any will work in theory, but currently only mariadb has been tested | 'mariadb' |
+| DATABASE_TYPE | The scheme for the database uri | 'mariadb' |
 | DATABASE_HOST | The database host | '127.0.0.1' |
 | DATABASE_PORT | The database port | 3306 |
 | DATABASE_NAME | The name of the database on DATABASE_HOST | 'symbiota' |
@@ -19,13 +28,15 @@ For development, a [.env file](https://www.npmjs.com/package/dotenv) can be used
 | DATABASE_PASSPORT | The password for DATABASE_USER | 'password' |
 | ENABLE_AUTH | FOR DEBUGGING ONLY: Set to 0 to disable API authentication | 1 |
 
-## Quick Start & Documentation
+## Database
 
-[Nx Documentation](https://nx.dev/angular)
+For development purposes, `docker-compose up -d` will start a mariadb server on port 3306 compatible with the
+DATABASE_* defaults.
 
-[Angular Documentation](https://angular.io/docs)
+The Symbiota2 API uses [TypeORM](https://typeorm.io) to manage databases connections and entities, so in theory any
+database that's compatible with TypeORM is compatible with Symbiota2. However, currently SQLite experiences issues due to
+a lack of support for spatial indexes. MariaDB is the only database that has been tested.
 
-[Nest Documentation](https://docs.nestjs.com/)
 
 ## Generate a plugin
 
