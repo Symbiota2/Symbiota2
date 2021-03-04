@@ -30,12 +30,24 @@ For development, a [.env file](https://www.npmjs.com/package/dotenv) can be used
 
 ## Database
 
-For development purposes, `docker-compose up -d` will start a mariadb server on port 3306 compatible with the
-DATABASE_* defaults.
-
-The Symbiota2 API uses [TypeORM](https://typeorm.io) to manage databases connections and entities, so in theory any
+The Symbiota2 API uses [TypeORM](https://typeorm.io) to manage databases migrations and entities, so in theory any
 database that's compatible with TypeORM is compatible with Symbiota2. However, currently SQLite experiences issues due to
 a lack of support for spatial indexes. MariaDB is the only database that has been tested.
+
+For development purposes, `docker-compose up -d` will start a mariadb server on port 3306 compatible with the
+DATABASE_* defaults. This database loads the initialization scripts in [docker-entrypoint-initdb.d](./docker-entrypoint-initdb.d/)
+to initialize a [Symbiota v1 database](https://github.com/Symbiota/Symbiota/blob/f158b1651632ecfe018d7c5d578e7fa8d904fb04/docs/INSTALL.txt#L26).
+
+Symbiota2 has been written under the assumption that most users will be upgrading from a Symbiota v1 database. Any new databases
+should first run the initialization scripts in docker-entrypoint-initdb.d. When ready to upgrade to the Symbiota2 schema, run
+`npm run typeorm migration:run`. This will load the schema updates from the [migrations directory](./libs/api-database/src/migrations).
+
+During development, if any [entities](./libs/api-database/src/entities) are changed, a migration should be generated using 
+`npm run typeorm migration:generate -n MyMigration`.
+
+A key requirement of Symbiota2 is backward-compatibility with Symbiota v1 databases. For this reason, care should be taken
+that any migrations do not result in data loss. However, we still recommend that all users back up their data prior to
+upgrading to Symbiota2 as it's always possible that data loss could occur.
 
 
 ## Generate a plugin
