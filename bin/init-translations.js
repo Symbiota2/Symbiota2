@@ -23,6 +23,11 @@ if (process.argv.length < 3) {
 }
 
 const outDir = path.resolve(process.argv[process.argv.length - 1]);
+
+if (!fs.existsSync(outDir)) {
+    fs.mkdirSync(outDir);
+}
+
 langs.forEach((lang) => {
     const outFile = path.join(outDir, `${lang}.json`);
     if (!fs.existsSync(outFile)) {

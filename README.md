@@ -20,9 +20,11 @@ Plugins are shareable across plugins and applications. They can be imported from
 
 ## Development server
 
-Run `nx serve ui` for a UI dev server. 
+Run `nx serve ui` for a UI dev server in 'watch' mode. 
 
-Run `nx serve api` for an API dev server.
+Run `nx serve api` for an API dev server in 'watch' mode.
+
+Run `npm run start:dev` to start both servers in 'watch' mode.
 
 ## Code scaffolding
 
@@ -30,6 +32,22 @@ Run `nx g @nrwl/angular:<resource type> --project=<ui or my-plugin> <my-resource
 
 Run `nx g @nrwl/nest:<resource type> --sourceRoot=<api or my-plugin> <my-resource>` to generate a new API resource.
 
+## Internationalization
+
+The UI uses [ngx-translate's http loader](http://www.ngx-translate.com/) to load internationization files as JSON.
+
+1. Run `npm run i18n:init libs/my-plugin/src/i18n` to initialize an internationalization directory.
+
+2. Edit the internationalization files based on language
+
+3. Use ngx-translate's 
+   [translate pipe or translation service](https://github.com/ngx-translate/core#5-use-the-service-the-pipe-or-the-directive)
+   to create language-independent text in the UI.
+   
+4. Run `npm run i18n` to merge all core & plugin internationalization files into [apps/ui/src/assets/i18n](./apps/ui/src/assets/i18n) 
+where angular can serve them.
+
+Run `npm run i18n:clean` to delete all merged translation files.
 
 ## Build
 
