@@ -12,23 +12,23 @@ This project was uses [Nx](https://nx.dev), [Angular](https://angular.io), and [
 
 ## Generate a plugin
 
-Run `ng g @nrwl/angular:lib <my-plugin> --buildable` to generate a UI plugin.
+Run `nx g @nrwl/angular:lib --buildable --publishable --importPath @<my-org>/<my-plugin> <my-plugin> ` to generate a UI plugin.
 
-Run `nx generate @nrwl/nest:library <my-plugin> --buildable` to generate an API plugin.
+Run `nx g @nrwl/nest:library --buildable --publishable --importPath @<my-org>/<my-plugin> <my-plugin>` to generate an API plugin.
 
-Plugins are shareable across plugins and applications. They can be imported from `@symbiota2/<my-plugin>`.
+Plugins are shareable across plugins and applications. They can be imported from `@<my-org>/<my-plugin>`.
 
 ## Development server
 
-Run `ng serve ui` for a UI dev server. 
+Run `nx serve ui` for a UI dev server. 
 
 Run `nx serve api` for an API dev server.
 
 ## Code scaffolding
 
-Run `ng g <resource type> my-component --project=<ui or my-plugin>` to generate a new UI resource.
+Run `nx g @nrwl/angular:<resource type> --project=<ui or my-plugin> <my-resource>` to generate a new UI resource.
 
-Run `nx generate @nrwl/nest:<resource type> --sourceRoot=<api or my-plugin> ` to generate a new API resource.
+Run `nx g @nrwl/nest:<resource type> --sourceRoot=<api or my-plugin> <my-resource>` to generate a new API resource.
 
 
 ## Build

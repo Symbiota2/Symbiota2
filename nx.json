@@ -1,14 +1,14 @@
 {
+  "npmScope": "symbiota2",
+  "affected": { "defaultBase": "master" },
   "implicitDependencies": {
-    "angular.json": "*",
+    "workspace.json": "*",
     "package.json": { "dependencies": "*", "devDependencies": "*" },
     "tsconfig.base.json": "*",
     "tslint.json": "*",
     ".eslintrc.json": "*",
     "nx.json": "*"
   },
-  "affected": { "defaultBase": "master" },
-  "npmScope": "symbiota2",
   "tasksRunnerOptions": {
     "default": {
       "runner": "@nrwl/workspace/tasks-runners/default",
@@ -16,17 +16,17 @@
     }
   },
   "projects": {
-    "api-common": { "tags": [] },
-    "api-auth": { "tags": [] },
-    "api-config": { "tags": [] },
-    "api-database": { "tags": [] },
-    "api-plugin-occurrence": { "tags": [] },
-    "api-plugin-collection": { "tags": [] },
+    "api": { "tags": [] },
+    "ui": { "tags": [] },
+    "ui-e2e": { "tags": [], "implicitDependencies": ["ui"] },
     "ui-common": { "tags": [] },
     "ui-plugin-occurrence": { "tags": [] },
     "ui-plugin-collection": { "tags": [] },
-    "ui": { "tags": [] },
-    "ui-e2e": { "tags": [], "implicitDependencies": ["ui"] },
-    "api": { "tags": [] }
+    "api-common": { "tags": [] },
+    "api-config": { "tags": [] },
+    "api-database": { "tags": [] },
+    "api-auth": { "tags": [] },
+    "api-plugin-collection": { "tags": [] },
+    "api-plugin-occurrence": { "tags": [] }
   }
 }

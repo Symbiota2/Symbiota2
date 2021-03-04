@@ -10,6 +10,9 @@ import csv from 'csv-parser';
 import { parse as pathParse, join as pathJoin } from 'path';
 import JSONStream from 'JSONStream';
 
+// This is a hack to make Multer available in the Express namespace
+import { Multer } from 'multer';
+
 const fsPromises = fs.promises;
 type File = Express.Multer.File;
 

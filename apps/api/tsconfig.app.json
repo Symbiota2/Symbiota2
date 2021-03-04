@@ -6,7 +6,8 @@
     "emitDecoratorMetadata": true,
     "target": "es2017",
     "module": "commonjs",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "exclude": ["**/*.spec.ts"],
   "include": ["**/*.ts"]

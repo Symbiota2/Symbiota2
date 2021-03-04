@@ -5,8 +5,9 @@
     "outDir": "../../dist/out-tsc",
     "declaration": true,
     "types": ["node"],
-    "target": "es6",
-    "esModuleInterop": true
+    "target": "es2017",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "exclude": ["**/*.spec.ts"],
   "include": ["**/*.ts"]

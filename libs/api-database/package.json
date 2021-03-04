@@ -1,4 +1,16 @@
 {
   "name": "@symbiota2/api-database",
-  "version": "0.0.1"
+  "version": "0.0.3",
+  "peerDependencies": {
+    "@nestjs/common": "^7.6.13",
+    "@nestjs/core": "^7.6.13",
+    "@nestjs/swagger": "^4.7.15",
+    "class-transformer": "~0.3.1",
+    "class-validator": "^0.13.1",
+    "mysql": "^2.18.1",
+    "typeorm": "^0.2.31"
+  },
+  "devDependencies": {
+    "typescript": "~4.1.0"
+  }
 }
