@@ -57,6 +57,10 @@ A key requirement of Symbiota2 is backward-compatibility with Symbiota v1 databa
 that any migrations do not result in data loss. However, **all users need to back up their data prior to upgrading to Symbiota2** as 
 it's always possible that data loss could occur.
 
+More information on the database schema can be found here:
+- [Institutions/Collections/Occurrences/Taxa](./docs/occurrences.md)
+
+
 ## Generate a plugin
 
 Run `nx g @nrwl/angular:lib --buildable --publishable --importPath @<my-org>/<my-plugin> <my-plugin> ` to generate a UI plugin.
