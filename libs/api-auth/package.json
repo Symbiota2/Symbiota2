@@ -1,6 +1,7 @@
 {
   "name": "@symbiota2/api-auth",
   "version": "0.0.3",
+  "license": "GPL-3.0-or-later",
   "peerDependencies": {
     "@nestjs/common": "^7.6.13",
     "@nestjs/jwt": "^7.2.0",
