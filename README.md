@@ -66,7 +66,7 @@ More information on the database schema can be found here:
 
 Run `nx g @nrwl/angular:lib --buildable --publishable --importPath @<my-org>/<my-plugin> <my-plugin> ` to generate a UI plugin.
 
-Run `nx g @nrwl/nest:library --buildable --publishable --importPath @<my-org>/<my-plugin> <my-plugin>` to generate an API plugin.
+Run `nx workspace-generator api-plugin @<my-org>/<my-plugin>` to generate an API plugin.
 
 Plugins are shareable across plugins and applications. They can be imported from `@<my-org>/<my-plugin>`.
 
