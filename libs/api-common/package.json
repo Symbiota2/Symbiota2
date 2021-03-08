@@ -7,7 +7,8 @@
     "csv-parser": "^3.0.0",
     "multer": "^1.4.2",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^6.6.6"
+    "rxjs": "^6.6.6",
+    "typeorm": "~0.2.31"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",

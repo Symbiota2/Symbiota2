@@ -1,2 +1,2 @@
-export * from './plugin.module';
+export * from './api-plugin.module';
 export * from './symbiota-api-plugin';
