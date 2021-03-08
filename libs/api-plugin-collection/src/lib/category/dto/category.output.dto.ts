@@ -4,7 +4,7 @@ import {
     CollectionCategory
 } from '@symbiota2/api-database';
 import { ApiProperty } from '@nestjs/swagger';
-import { CollectionListItem } from '../../collection/dto/CollectionListItem.output.dto';
+import { CollectionListItem } from '../../dto/CollectionListItem.output.dto';
 
 @Exclude()
 export class CategoryOutputDto {

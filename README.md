@@ -82,7 +82,7 @@ Run `npm run start:dev` to start both servers in 'watch' mode.
 
 Run `nx g @nrwl/angular:<resource type> --project=<ui or my-plugin> <my-resource>` to generate a new UI resource.
 
-Run `nx g @nrwl/nest:<resource type> --sourceRoot=<api or my-plugin> <my-resource>` to generate a new API resource.
+Run `nx g @nrwl/nest:<resource type> --project=<api or my-plugin> <my-resource>` to generate a new API resource.
 
 ## Internationalization
 

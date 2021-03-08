@@ -6,7 +6,7 @@ import {
     CollectionOutputDto, CollectionStatsOutputDto
 } from './dto/Collection.output.dto';
 import { CollectionFindAllParams } from './dto/coll-find-all.input.dto';
-import { InstitutionService } from '../institution/institution.service';
+import { InstitutionService } from './institution/institution.service';
 import {
     CollectionInputDto,
     UpdateCollectionInputDto

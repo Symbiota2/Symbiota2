@@ -4,8 +4,8 @@ import {
     CategoryOutputDto
 } from './dto/category.output.dto';
 import { CategoryService } from './category.service';
-import { CollectionService } from '../collection/collection.service';
-import { CollectionListItem } from '../collection/dto/CollectionListItem.output.dto';
+import { CollectionService } from '../collection.service';
+import { CollectionListItem } from '../dto/CollectionListItem.output.dto';
 
 @ApiTags('Collections')
 @Controller('collections/categories')

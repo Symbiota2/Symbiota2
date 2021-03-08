@@ -1,2 +1,4 @@
-// Add the public-api.ts for each module in src
-export * from './collection/public-api';
+export * from './lib/category/category.service';
+export * from './lib/collection.module';
+export * from './lib/collection.service';
+export * from './lib/institution/institution.service';

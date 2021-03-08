@@ -58,16 +58,15 @@ function updatePackageJson(host: Tree, schema: ApiPluginSchema): Rule {
                     {},
                     json,
                     {
-                        "license": "GPL-3.0-or-later",
-                        "peerDependencies": {
+                        license: "GPL-3.0-or-later",
+                        peerDependencies: {
                             "@nestjs/common": "^7.6.13",
-                            "@nestjs/config": "^0.6.3",
-                            "reflect-metadata": "^0.1.13",
-                            "rxjs": "^6.6.6",
-                            "typeorm": "~0.2.31"
+                            'reflect-metadata': "^0.1.13",
+                            rxjs: "^6.6.6",
+                            typeorm: "~0.2.31"
                         },
-                        "devDependencies": {
-                            "typescript": "~4.1.0"
+                        devDependencies: {
+                            typescript: "~4.1.0"
                         }
                     }
                 );

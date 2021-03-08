@@ -6,6 +6,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { AppConfigModule, AppConfigService } from '@symbiota2/api-config';
 import { join as pathJoin } from 'path';
 import { promises as fsPromises } from 'fs';
+import { SymbiotaApiPlugin } from '@symbiota2/api-common';
 
 @Module({
     imports: [
@@ -34,4 +35,4 @@ import { promises as fsPromises } from 'fs';
     providers: [OccurrenceService],
     controllers: [OccurrenceController]
 })
-export class OccurrenceModule { }
+export class OccurrenceModule extends SymbiotaApiPlugin { }
