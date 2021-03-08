@@ -59,6 +59,7 @@ it's always possible that data loss could occur.
 
 More information on the database schema can be found here:
 - [Institutions/Collections/Occurrences/Taxa](./docs/occurrences.md)
+- [Occurrences/Taxa/Images](./docs/images.md)
 
 
 ## Generate a plugin
