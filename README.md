@@ -70,7 +70,7 @@ Run `nx workspace-generator api-plugin @<my-org>/<my-plugin>` to generate an API
 
 Plugins are shareable across plugins and applications. They can be imported from `@<my-org>/<my-plugin>`.
 
-All UI plugins should extend the [SymbiotaUiPlugin class](./libs/ui-common/src/lib/plugin/symbiota-plugin.class.ts) and can be
+All UI plugins should extend the [SymbiotaUiPlugin class](./libs/ui-common/src/lib/plugin/symbiota-ui-plugin.class.ts) and can be
 activated by adding them to the [UiPluginModule's](./libs/ui-common/src/lib/plugin/ui-plugin.module.ts) `configure()` method
 in the UI core [AppModule](./apps/ui/src/app/app.module.ts). The SymbiotaUiPlugin base class provides methods that are used
 to inject routes and UI components within the core app.
