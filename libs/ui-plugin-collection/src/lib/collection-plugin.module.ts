@@ -4,9 +4,9 @@ import { CollectionCheckboxSelectorComponent } from './components/collection-che
 import { MatTreeModule } from '@angular/material/tree';
 import {
     AppTranslationModule,
-    PluginModule,
+    UiPluginModule,
     SymbiotaComponentModule,
-    SymbiotaPlugin,
+    SymbiotaUiPlugin,
     UserProfileTab
 } from '@symbiota2/ui-common';
 import { MatIconModule } from '@angular/material/icon';
@@ -45,7 +45,7 @@ import { CollectionFieldComponent } from './components/collection-field/collecti
         CommonModule,
         MatButtonModule,
         MatTabsModule,
-        PluginModule,
+        UiPluginModule,
         FlexModule,
         MatCardModule,
         RouterModule,
@@ -64,15 +64,15 @@ import { CollectionFieldComponent } from './components/collection-field/collecti
         CollectionLogoComponent
     ]
 })
-export class CollectionPlugin extends SymbiotaPlugin {
-    static getRoutes(): Route[] {
+export class CollectionPlugin extends SymbiotaUiPlugin {
+    static routes(): Route[] {
         return [{
             path: "collections/:id",
             component: CollectionPage
         }];
     }
 
-    static getUserProfileTabs(): UserProfileTab[] {
+    static userProfileTabs(): UserProfileTab[] {
         // TODO: i18n
         return [{
             name: 'Collections',

@@ -2,16 +2,16 @@ import { Route } from "@angular/router";
 import { NavBarLink } from "./nav-bar-link.interface";
 import { UserProfileTab } from "./user-profile-tab.interface";
 
-export abstract class SymbiotaPlugin {
-    static getRoutes(): Route[] {
+export abstract class SymbiotaUiPlugin {
+    static routes(): Route[] {
         return [];
     }
 
-    static getNavBarLinks(): NavBarLink[] {
+    static navBarLinks(): NavBarLink[] {
         return [];
     }
 
-    static getUserProfileTabs(): UserProfileTab[] {
+    static userProfileTabs(): UserProfileTab[] {
         return [];
     }
 }

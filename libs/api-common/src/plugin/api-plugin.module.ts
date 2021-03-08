@@ -6,7 +6,7 @@ import { EntityTarget } from 'typeorm';
 export class ApiPluginModule {
     private static _entities: EntityTarget<any>[] = [];
 
-    static register(plugins: Array<typeof SymbiotaApiPlugin>): DynamicModule {
+    static configure(plugins: Array<typeof SymbiotaApiPlugin>): DynamicModule {
         plugins.forEach((p) => this._entities.push(...p.entities()));
         return {
             module: ApiPluginModule,

@@ -9,7 +9,7 @@ import {
     AlertModule,
     AppConfigModule,
     AppTranslationModule,
-    PluginModule, SymbiotaPlugin,
+    UiPluginModule, SymbiotaUiPlugin,
     UserModule
 } from "@symbiota2/ui-common";
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -53,7 +53,7 @@ const PLUGINS = [
         FlexLayoutModule,
         FormsModule,
         MaterialModule,
-        PluginModule.configure(PLUGINS.map((p) => p as (typeof SymbiotaPlugin))),
+        UiPluginModule.configure(PLUGINS.map((p) => p as (typeof SymbiotaUiPlugin))),
         ReactiveFormsModule,
         UserModule,
         ...PLUGINS

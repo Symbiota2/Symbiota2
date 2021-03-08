@@ -1,5 +1,5 @@
-export * from './plugin.module';
+export * from './ui-plugin.module';
 export * from './plugin.service';
 export * from './nav-bar-link.interface';
-export * from './symbiota-plugin.class';
+export * from './symbiota-ui-plugin.class';
 export * from './user-profile-tab.interface';

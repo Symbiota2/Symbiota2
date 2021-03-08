@@ -1,23 +1,23 @@
 import { ModuleWithProviders, NgModule } from "@angular/core";
-import { SymbiotaPlugin } from "./symbiota-plugin.class";
+import { SymbiotaUiPlugin } from "./symbiota-ui-plugin.class";
 import { PluginService } from "./plugin.service";
 import { Router } from "@angular/router";
 
-function pluginServiceFactory(plugins: typeof SymbiotaPlugin[], router: Router) {
+function pluginServiceFactory(plugins: typeof SymbiotaUiPlugin[], router: Router) {
     const pluginSvc = new PluginService(router);
     plugins.forEach((plugin) => {
-        plugin.getRoutes().forEach((route) => pluginSvc.putRoute(route));
-        plugin.getNavBarLinks().forEach((link) => pluginSvc.putNavBarLink(link));
-        plugin.getUserProfileTabs().forEach((tab) => pluginSvc.putProfileTab(tab));
+        plugin.routes().forEach((route) => pluginSvc.putRoute(route));
+        plugin.navBarLinks().forEach((link) => pluginSvc.putNavBarLink(link));
+        plugin.userProfileTabs().forEach((tab) => pluginSvc.putProfileTab(tab));
     });
     return pluginSvc;
 }
 
 @NgModule()
-export class PluginModule {
-    static configure(plugins: typeof SymbiotaPlugin[]): ModuleWithProviders<PluginModule> {
+export class UiPluginModule {
+    static configure(plugins: typeof SymbiotaUiPlugin[]): ModuleWithProviders<UiPluginModule> {
         return {
-            ngModule: PluginModule,
+            ngModule: UiPluginModule,
             providers: [{
                 provide: PluginService,
                 useFactory: (router: Router) => {

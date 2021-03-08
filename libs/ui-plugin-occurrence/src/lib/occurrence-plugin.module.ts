@@ -4,7 +4,7 @@ import { TranslateModule } from "@ngx-translate/core";
 import {
     ApiClientModule,
     NavBarLink,
-    SymbiotaPlugin
+    SymbiotaUiPlugin
 } from "@symbiota2/ui-common";
 
 import { OccurrenceSearchCriteria } from "./components/search-criteria/occurrence-search-criteria.component";
@@ -79,7 +79,7 @@ import { OccurrenceUploadComponent } from './pages/occurrence-upload/occurrence-
         OccurrenceSearchResultsPage
     ]
 })
-export class OccurrencePlugin extends SymbiotaPlugin {
+export class OccurrencePlugin extends SymbiotaUiPlugin {
     private static SEARCH_OCCURRENCES_ROUTE = "occurrences/search";
     private static SEARCH_RESULTS_ROUTE = "occurrences/search/results";
     private static UPLOAD_ROUTE = "occurrences/upload";
@@ -104,7 +104,7 @@ export class OccurrencePlugin extends SymbiotaPlugin {
         });
     }
 
-    static getRoutes(): Route[] {
+    static routes(): Route[] {
         return [
             {
                 path: OccurrencePlugin.SEARCH_OCCURRENCES_ROUTE,
@@ -121,7 +121,7 @@ export class OccurrencePlugin extends SymbiotaPlugin {
         ];
     }
 
-    static getNavBarLinks(): NavBarLink[] {
+    static navBarLinks(): NavBarLink[] {
         return [
             {
                 url: `/${OccurrencePlugin.SEARCH_OCCURRENCES_ROUTE}`,

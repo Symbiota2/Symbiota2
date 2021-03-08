@@ -14,7 +14,7 @@ import { CollectionModule } from '@symbiota2/api-plugin-collection';
         LanguageModule,
         UserModule,
         AuthModule,
-        ApiPluginModule.register([
+        ApiPluginModule.configure([
             CollectionModule,
             OccurrenceModule
         ])
