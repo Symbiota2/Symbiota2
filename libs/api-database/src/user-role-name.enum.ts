@@ -11,6 +11,6 @@ export enum UserRoleName {
     ROLE_PROJECT_ADMIN = 'ProjectAdmin',
     ROLE_RARE_SPECIES_ADMIN = 'RareSppAdmin',
     ROLE_RARE_SPECIES_READER = 'RareSppReader',
-    ROLE_TAXON_EDITOR = 'TaxonEditor',
+    ROLE_TAXON_EDITOR = 'Taxonomy',
     ROLE_TAXON_PROFILE = 'TaxonProfile'
 }

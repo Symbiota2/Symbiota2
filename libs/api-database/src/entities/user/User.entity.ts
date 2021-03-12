@@ -98,6 +98,14 @@ export class User extends EntityProvider {
         return isRareSppAdmin || isRareSppEditor;
     }
 
+    async isTaxonEditor(): Promise<boolean> {
+        return this.hasRole(UserRoleName.ROLE_TAXON_EDITOR);
+    }
+
+    async isTaxonProfileEditor(): Promise<boolean> {
+        return this.hasRole(UserRoleName.ROLE_TAXON_PROFILE);
+    }
+
     private async hasRole(name: string, resourcePrimaryKey: number = null): Promise<boolean> {
         const roles = await this.roles;
         const matchingRoles = roles.filter((r) => {
