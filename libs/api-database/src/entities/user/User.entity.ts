@@ -38,89 +38,11 @@ import { TraitAttribute } from '../trait/TraitAttribute.entity';
 import { Unknown } from '../unknown-taxon/Unknown.entity';
 import { UserAccessToken } from './UserAccessToken.entity';
 import { UserRole } from './UserRole.entity';
-import { UserRoleName } from '../../user-role-name.enum';
 
 @Index('Index_email', ['email', 'lastName'], { unique: true })
 @Index('Index_username_password', ['username', 'password'])
 @Entity('users')
 export class User extends EntityProvider {
-    async isSuperAdmin(): Promise<boolean> {
-        return this.hasRole(UserRoleName.ROLE_SUPER_ADMIN);
-    }
-
-    async isChecklistAdmin(checklistID: number): Promise<boolean> {
-        return this.hasRole(UserRoleName.ROLE_CHECKLIST_ADMIN, checklistID);
-    }
-
-    async isCollectionAdmin(collectionID: number): Promise<boolean> {
-        return this.hasRole(UserRoleName.ROLE_COLLECTION_ADMIN, collectionID);
-    }
-
-    async isCollectionEditor(collectionID: number): Promise<boolean> {
-        return this.hasRole(UserRoleName.ROLE_COLLECTION_EDITOR, collectionID);
-    }
-
-    async canEditCollection(collectionID: number): Promise<boolean> {
-        const promises: Promise<boolean>[] = [
-            this.isCollectionAdmin(collectionID),
-            this.isCollectionEditor(collectionID)
-        ];
-
-        const [isCollAdmin, isCollEditor] = await Promise.all(promises);
-        return isCollAdmin || isCollEditor;
-    }
-
-    async isProjectAdmin(projectID: number): Promise<boolean> {
-        return this.hasRole(UserRoleName.ROLE_PROJECT_ADMIN, projectID);
-    }
-
-    async isRareSpeciesAdmin(collectionID: number): Promise<boolean> {
-        return this.hasRole(
-            UserRoleName.ROLE_RARE_SPECIES_ADMIN,
-            collectionID
-        );
-    }
-
-    async isRareSpeciesReader(collectionID: number): Promise<boolean> {
-        return this.hasRole(
-            UserRoleName.ROLE_RARE_SPECIES_READER,
-            collectionID
-        );
-    }
-
-    async canReadRareSpecies(collectionID: number): Promise<boolean> {
-        const promises: Promise<boolean>[] = [
-            this.isRareSpeciesAdmin(collectionID),
-            this.isRareSpeciesReader(collectionID)
-        ];
-
-        const [isRareSppAdmin, isRareSppEditor] = await Promise.all(promises);
-        return isRareSppAdmin || isRareSppEditor;
-    }
-
-    async isTaxonEditor(): Promise<boolean> {
-        return this.hasRole(UserRoleName.ROLE_TAXON_EDITOR);
-    }
-
-    async isTaxonProfileEditor(): Promise<boolean> {
-        return this.hasRole(UserRoleName.ROLE_TAXON_PROFILE);
-    }
-
-    private async hasRole(name: string, resourcePrimaryKey: number = null): Promise<boolean> {
-        const roles = await this.roles;
-        const matchingRoles = roles.filter((r) => {
-            const nameMatches = r.name === name;
-
-            if (resourcePrimaryKey === null) {
-                return nameMatches;
-            }
-
-            return nameMatches && r.tablePrimaryKey == resourcePrimaryKey;
-        });
-
-        return matchingRoles.length > 0;
-    }
-
     @PrimaryGeneratedColumn({ type: 'int', name: 'uid', unsigned: true })
     uid: number;
 

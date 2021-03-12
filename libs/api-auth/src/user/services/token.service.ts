@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
-    RefreshToken, User,
+    RefreshToken, User, UserRoleName
 } from '@symbiota2/api-database';
 import { Repository } from 'typeorm';
 import { BaseService } from '@symbiota2/api-common';
@@ -80,7 +80,6 @@ export class TokenService extends BaseService<RefreshToken> {
         const minRoles: AuthRole[] = roles.map((role) => {
             return {
                 role: role.name,
-                tableName: role.tableName,
                 tableKey: role.tablePrimaryKey
             }
         });
@@ -99,11 +98,88 @@ export class TokenService extends BaseService<RefreshToken> {
         return this.jwt.signAsync(payload, signOpts);
     }
 
+    static async isSuperAdmin(jwt: UserJwtPayload): Promise<boolean> {
+        return TokenService.hasRole(jwt, UserRoleName.ROLE_SUPER_ADMIN);
+    }
+
+    static async isChecklistAdmin(jwt: UserJwtPayload, checklistID: number): Promise<boolean> {
+        return TokenService.hasRole(jwt, UserRoleName.ROLE_CHECKLIST_ADMIN, checklistID);
+    }
+
+    static async isCollectionAdmin(jwt: UserJwtPayload, collectionID: number): Promise<boolean> {
+        return TokenService.hasRole(jwt, UserRoleName.ROLE_COLLECTION_ADMIN, collectionID);
+    }
+
+    static async isCollectionEditor(jwt: UserJwtPayload, collectionID: number): Promise<boolean> {
+        return TokenService.hasRole(jwt, UserRoleName.ROLE_COLLECTION_EDITOR, collectionID);
+    }
+
+    static async canEditCollection(jwt: UserJwtPayload, collectionID: number): Promise<boolean> {
+        const promises: Promise<boolean>[] = [
+            TokenService.isCollectionAdmin(jwt, collectionID),
+            TokenService.isCollectionEditor(jwt, collectionID)
+        ];
+
+        const [isCollAdmin, isCollEditor] = await Promise.all(promises);
+        return isCollAdmin || isCollEditor;
+    }
+
+    static async isProjectAdmin(jwt: UserJwtPayload, projectID: number): Promise<boolean> {
+        return TokenService.hasRole(jwt, UserRoleName.ROLE_PROJECT_ADMIN, projectID);
+    }
+
+    static async isRareSpeciesAdmin(jwt: UserJwtPayload, collectionID: number): Promise<boolean> {
+        return TokenService.hasRole(
+            jwt,
+            UserRoleName.ROLE_RARE_SPECIES_ADMIN,
+            collectionID
+        );
+    }
+
+    static async isRareSpeciesReader(jwt: UserJwtPayload, collectionID: number): Promise<boolean> {
+        return TokenService.hasRole(
+            jwt,
+            UserRoleName.ROLE_RARE_SPECIES_READER,
+            collectionID
+        );
+    }
+
+    static async canReadRareSpecies(jwt: UserJwtPayload, collectionID: number): Promise<boolean> {
+        const promises: Promise<boolean>[] = [
+            TokenService.isRareSpeciesAdmin(jwt, collectionID),
+            TokenService.isRareSpeciesReader(jwt, collectionID)
+        ];
+
+        const [isRareSppAdmin, isRareSppEditor] = await Promise.all(promises);
+        return isRareSppAdmin || isRareSppEditor;
+    }
+
+    static async isTaxonEditor(jwt: UserJwtPayload): Promise<boolean> {
+        return TokenService.hasRole(jwt, UserRoleName.ROLE_TAXON_EDITOR);
+    }
+
+    static async isTaxonProfileEditor(jwt: UserJwtPayload): Promise<boolean> {
+        return this.hasRole(jwt, UserRoleName.ROLE_TAXON_PROFILE);
+    }
+
     private encodeRefreshToken(token: RefreshToken): Promise<string> {
         return this.jwt.signAsync({}, {
             subject: String(token.uid),
             jwtid: token.token,
             audience: token.clientID
         });
+    }
+
+    private static async hasRole(payload: UserJwtPayload, role: UserRoleName, tablePrimaryKey: number = null): Promise<boolean> {
+        const matchingRoles = payload.roles.filter((r) => {
+            const nameMatches = r.role === role.toString();
+            if (tablePrimaryKey === null) {
+                return nameMatches;
+            }
+
+            return nameMatches && r.tableKey === tablePrimaryKey;
+        });
+
+        return matchingRoles.length > 0;
     }
 }

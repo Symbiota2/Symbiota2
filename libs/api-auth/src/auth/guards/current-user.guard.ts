@@ -1,12 +1,11 @@
 import { Injectable, ExecutionContext, CanActivate } from '@nestjs/common';
 import { AppConfigService } from '@symbiota2/api-config';
 import { AuthenticatedRequest } from '../dto/interfaces';
-import { UserService } from '../../user/services/user.service';
+import { TokenService } from '../../user/services/token.service';
 
 @Injectable()
 export class CurrentUserGuard implements CanActivate {
     constructor(
-        private readonly users: UserService,
         private readonly configService: AppConfigService) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -14,14 +13,12 @@ export class CurrentUserGuard implements CanActivate {
             return true;
         }
 
-        const request: AuthenticatedRequest = context.switchToHttp().getRequest();
-        const uid = request.user.uid;
+        const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
 
-        if (uid === parseInt(request.params.id)) {
+        if (request.user.uid === parseInt(request.params.id)) {
             return true;
         }
 
-        const user = await this.users.findByID(uid);
-        return user.isSuperAdmin();
+        return TokenService.isSuperAdmin(request.user);
     }
 }

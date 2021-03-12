@@ -2,7 +2,6 @@ import { Request } from 'express';
 
 export interface AuthRole {
     role: string;
-    tableName: string;
     tableKey: number | null;
 }
 
