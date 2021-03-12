@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { RefreshToken, User } from '@symbiota2/api-database';
 import { Repository } from 'typeorm';
 import { BaseService } from '@symbiota2/api-common';
-import { AuthRole } from '../../auth/dto/interfaces';
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -52,32 +51,5 @@ export class UserService extends BaseService<User> {
             .execute();
 
         return updateResult.affected > 0;
-    }
-
-    async hasRole(uidOrUser: number | User, role: AuthRole): Promise<boolean> {
-
-        let user;
-
-        if (uidOrUser instanceof User) {
-            user = uidOrUser;
-        }
-        else {
-            user = await this.findByID(uidOrUser);
-        }
-
-        if (!user) {
-            return false;
-        }
-
-        const userRoles = await user.roles;
-        const requestedRole = userRoles.find((userRole) => {
-            return (
-                userRole.name === role.role &&
-                userRole.tableName === role.tableName &&
-                userRole.tablePrimaryKey === role.tableKey
-            );
-        });
-
-        return !!requestedRole;
     }
 }

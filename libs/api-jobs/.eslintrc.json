@@ -1,5 +1,7 @@
 {
   "extends": ["../../.eslintrc.json"],
   "ignorePatterns": ["!**/*"],
-  "rules": {}
+  "rules": {
+    "@typescript-eslint/no-empty-interface": "off"
+  }
 }

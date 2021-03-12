@@ -18,9 +18,5 @@ export class RoleOutputDto {
 
     @ApiProperty()
     @Expose()
-    tableName: string;
-
-    @ApiProperty()
-    @Expose()
     tablePrimaryKey: number;
 }

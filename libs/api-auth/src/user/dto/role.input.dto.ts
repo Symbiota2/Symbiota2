@@ -1,15 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
-import { IsNotEmpty, IsString } from 'class-validator';
+import {
+    IsEnum,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+} from 'class-validator';
+import { UserRoleName } from '@symbiota2/api-database';
 
 export class RoleInputDto {
     @ApiProperty()
+    @IsEnum(UserRoleName)
     @IsNotEmpty()
-    @IsString()
-    @Expose()
-    name: string;
+    name: UserRoleName;
 
     @ApiProperty({ required: false })
-    @Expose()
+    @IsNumber()
+    @IsOptional()
     tablePrimaryKey?: number;
 }

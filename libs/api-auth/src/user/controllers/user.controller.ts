@@ -16,11 +16,10 @@ import {
     UserOutputDto
 } from '../dto/user.output.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { Roles, RoleGuard } from '../../auth/guards/role.guard';
 import { CurrentUserGuard } from '../../auth/guards/current-user.guard';
-import { UserRole } from '@symbiota2/api-database';
 import { UserInputDto } from "../dto/user.input.dto";
 import { ChangePasswordInputDto } from '../dto/changePassword.input.dto';
+import { SuperAdminGuard } from '../../auth/guards/super-admin/super-admin.guard';
 
 class FindAllParams {
     @ApiProperty({ required: false })
@@ -51,8 +50,7 @@ export class UserController {
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: UserOutputDto, isArray: true })
     @SerializeOptions({ groups: [UserOutputDto.GROUP_LIST] })
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Roles({ role: UserRole.ROLE_SUPER_ADMIN, tableName: null, tableKey: null })
+    @UseGuards(JwtAuthGuard, SuperAdminGuard)
     async findAll(@Query() params?: FindAllParams): Promise<UserOutputDto[]> {
         const users = await this.userService.findAll();
         return users.map((user) => new UserOutputDto(user));

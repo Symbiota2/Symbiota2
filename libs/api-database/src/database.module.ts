@@ -1,10 +1,12 @@
-import {Module} from '@nestjs/common';
+import { Module, OnApplicationBootstrap } from '@nestjs/common';
 import { AppConfigModule } from '@symbiota2/api-config';
 import {DatabaseProvider} from './database.provider';
 import { entityProviders } from './providers';
 import * as entities from './entities';
 import * as migrations from './migrations';
 import { ApiPluginModule } from '@symbiota2/api-common';
+import { isInstance } from 'class-validator';
+import { EntitySchema } from 'typeorm';
 
 @Module({
     imports: [
@@ -25,4 +27,8 @@ import { ApiPluginModule } from '@symbiota2/api-common';
     ],
     exports: entityProviders
 })
-export class DatabaseModule { }
+export class DatabaseModule implements OnApplicationBootstrap {
+    onApplicationBootstrap() {
+
+    }
+}

@@ -24,12 +24,10 @@ import JSONStream from 'JSONStream';
 import {
     ApiBodyOneOrMany,
     ApiFileInput,
-    ApiResponseOneOrMany,
     CsvInterceptor
 } from '@symbiota2/api-common';
 import { DeepPartial } from 'typeorm';
 import { Occurrence } from '@symbiota2/api-database';
-import * as os from 'os';
 import { plainToClass } from 'class-transformer';
 import { OccurrenceOutputDto } from './dto/occurrence.output.dto';
 

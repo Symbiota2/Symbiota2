@@ -15,13 +15,11 @@ import {
 import { RoleOutputDto } from '../dto/role.output.dto';
 import { Repository } from 'typeorm';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { Roles, RoleGuard } from '../../auth/guards/role.guard';
 import { RoleInputDto } from '../dto/role.input.dto';
 import { CurrentUserGuard } from '../../auth/guards/current-user.guard';
 import { UserRole } from '@symbiota2/api-database';
 
 @ApiTags('Users')
-@Roles({ role: UserRole.ROLE_SUPER_ADMIN, tableName: null, tableKey: null })
 @UseGuards(JwtAuthGuard, CurrentUserGuard)
 @ApiBearerAuth()
 @Controller('users/:id/roles')
@@ -38,20 +36,18 @@ export class UserRoleController {
     }
 
     @Post()
-    @UseGuards(RoleGuard)
     @ApiResponse({ status: HttpStatus.OK, type: RoleOutputDto, isArray: true })
     async addRole(
         @Param('id') uid: number,
         @Body() roleData: RoleInputDto): Promise<RoleOutputDto[]> {
 
-        await this.roleRepo.save({ uid, ...roleData });
+        await this.roleRepo.create({ uid, ...roleData });
 
         const allRoles = await this.roleRepo.find({ uid });
         return allRoles.map((role) => new RoleOutputDto(role));
     }
 
     @Delete(':roleID')
-    @UseGuards(RoleGuard)
     @ApiResponse({ status: HttpStatus.OK, type: RoleOutputDto, isArray: true })
     async removeRole(
         @Param('id') uid: number,

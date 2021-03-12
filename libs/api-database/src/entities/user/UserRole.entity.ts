@@ -8,14 +8,13 @@ import {
 } from 'typeorm';
 import { User } from './User.entity';
 import { EntityProvider } from '../../entity-provider.class';
+import { UserRoleName } from '../../user-role-name.enum';
 
 @Index(['uid'])
 @Index(['assignedByUID'])
 @Index('Index_userroles_table', ['tableName', 'tablePrimaryKey'])
 @Entity('userroles')
 export class UserRole extends EntityProvider {
-    public static readonly ROLE_SUPER_ADMIN = 'SuperAdmin';
-
     @PrimaryGeneratedColumn({ type: 'int', name: 'userroleid', unsigned: true })
     id: number;
 
@@ -24,7 +23,7 @@ export class UserRole extends EntityProvider {
 
     // Role name
     @Column('varchar', { name: 'role', length: 45 })
-    name: string;
+    name: UserRoleName;
 
     // TODO: What're these?
     @Column('varchar', { name: 'tablename', nullable: true, length: 45 })

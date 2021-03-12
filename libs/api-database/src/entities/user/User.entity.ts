@@ -3,45 +3,116 @@ import {
     Entity,
     Index,
     OneToMany,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 
 import { ActionRequest } from '../action-request/ActionRequest.entity';
 import { AdminStat } from '../AdminStat.entity';
-import { Checklist } from '../checklist';
-import { ChecklistTaxonComment } from '../checklist';
-import { CollectionContact } from '../collection';
-import { CrowdSourceQueue } from '../crowd-source';
+import { Checklist } from '../checklist/Checklist.entity';
+import { ChecklistTaxonComment } from '../checklist/ChecklistTaxonComment.entity';
+import { CollectionContact } from '../collection/CollectionContact.entity';
+import { CrowdSourceQueue } from '../crowd-source/CrowdSourceQueue.entity';
 import { EntityProvider } from '../../entity-provider.class';
-import { Glossary } from '../glossary';
-import { GlossaryImage } from '../glossary';
+import { Glossary } from '../glossary/Glossary.entity';
+import { GlossaryImage } from '../glossary/GlossaryImage.entity';
 import { Image } from '../image/Image.entity';
-import { ImageKeyword } from '../image';
+import { ImageKeyword } from '../image/ImageKeyword.entity';
 import { Institution } from '../Institution.entity';
 import { Medium } from '../Medium.entity';
 import { Occurrence } from '../occurrence/Occurrence.entity';
-import { OccurrenceAssociation } from '../occurrence';
-import { OccurrenceComment } from '../occurrence';
+import { OccurrenceAssociation } from '../occurrence/OccurrenceAssociation.entity';
+import { OccurrenceComment } from '../occurrence/OccurrenceComment.entity';
+import { OccurrenceEdit } from '../occurrence/OccurrenceEdit.entity';
+import { OccurrenceRevision } from '../occurrence/OccurrenceRevision.entity';
+import { OccurrenceVerification } from '../occurrence/OccurrenceVerification.entity';
 import { OccurrenceDataset } from '../occurrence/OccurrenceDataset.entity';
-import { OccurrenceEdit } from '../occurrence';
-import { OccurrenceRevision } from '../occurrence';
-import { OccurrenceVerification } from '../occurrence';
 import { RefreshToken } from './RefreshToken.entity';
 import { Taxon } from '../taxonomy/Taxon.entity';
-import { TaxonDescriptionBlock, UserTaxonomy } from '../taxonomy';
-import { TaxonProfilePublication } from '../taxonomy';
-import { Trait } from '../trait';
+import { TaxonDescriptionBlock } from '../taxonomy/TaxonDescriptionBlock.entity';
+import { TaxonProfilePublication } from '../taxonomy/TaxonProfilePublication.entity';
+import { UserTaxonomy } from '../taxonomy/UserTaxonomy.entity';
+import { Trait } from '../trait/Trait.entity';
+import { TraitState } from '../trait/TraitState.entity';
 import { TraitAttribute } from '../trait/TraitAttribute.entity';
-import { TraitState } from '../trait';
-import { Unknown } from '../unknown-taxon';
+import { Unknown } from '../unknown-taxon/Unknown.entity';
 import { UserAccessToken } from './UserAccessToken.entity';
 import { UserRole } from './UserRole.entity';
+import { UserRoleName } from '../../user-role-name.enum';
 
 @Index('Index_email', ['email', 'lastName'], { unique: true })
 @Index('Index_username_password', ['username', 'password'])
 @Entity('users')
 export class User extends EntityProvider {
+    async isSuperAdmin(): Promise<boolean> {
+        return this.hasRole(UserRoleName.ROLE_SUPER_ADMIN);
+    }
+
+    async isChecklistAdmin(checklistID: number): Promise<boolean> {
+        return this.hasRole(UserRoleName.ROLE_CHECKLIST_ADMIN, checklistID);
+    }
+
+    async isCollectionAdmin(collectionID: number): Promise<boolean> {
+        return this.hasRole(UserRoleName.ROLE_COLLECTION_ADMIN, collectionID);
+    }
+
+    async isCollectionEditor(collectionID: number): Promise<boolean> {
+        return this.hasRole(UserRoleName.ROLE_COLLECTION_EDITOR, collectionID);
+    }
+
+    async canEditCollection(collectionID: number): Promise<boolean> {
+        const promises: Promise<boolean>[] = [
+            this.isCollectionAdmin(collectionID),
+            this.isCollectionEditor(collectionID)
+        ];
+
+        const [isCollAdmin, isCollEditor] = await Promise.all(promises);
+        return isCollAdmin || isCollEditor;
+    }
+
+    async isProjectAdmin(projectID: number): Promise<boolean> {
+        return this.hasRole(UserRoleName.ROLE_PROJECT_ADMIN, projectID);
+    }
+
+    async isRareSpeciesAdmin(collectionID: number): Promise<boolean> {
+        return this.hasRole(
+            UserRoleName.ROLE_RARE_SPECIES_ADMIN,
+            collectionID
+        );
+    }
+
+    async isRareSpeciesReader(collectionID: number): Promise<boolean> {
+        return this.hasRole(
+            UserRoleName.ROLE_RARE_SPECIES_READER,
+            collectionID
+        );
+    }
+
+    async canReadRareSpecies(collectionID: number): Promise<boolean> {
+        const promises: Promise<boolean>[] = [
+            this.isRareSpeciesAdmin(collectionID),
+            this.isRareSpeciesReader(collectionID)
+        ];
+
+        const [isRareSppAdmin, isRareSppEditor] = await Promise.all(promises);
+        return isRareSppAdmin || isRareSppEditor;
+    }
+
+    private async hasRole(name: string, resourcePrimaryKey: number = null): Promise<boolean> {
+        const roles = await this.roles;
+        const matchingRoles = roles.filter((r) => {
+            const nameMatches = r.name === name;
+
+            if (resourcePrimaryKey === null) {
+                return nameMatches;
+            }
+
+            return nameMatches && r.tablePrimaryKey == resourcePrimaryKey;
+        });
+
+        return matchingRoles.length > 0;
+    }
+
     @PrimaryGeneratedColumn({ type: 'int', name: 'uid', unsigned: true })
     uid: number;
 
