@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-    IsEnum,
+    IsEnum, IsInt,
     IsNotEmpty,
-    IsNumber,
-    IsOptional,
+    IsOptional
 } from 'class-validator';
 import { UserRoleName } from '@symbiota2/api-database';
+import { Type } from 'class-transformer';
 
 export class RoleInputDto {
     @ApiProperty()
@@ -14,7 +14,8 @@ export class RoleInputDto {
     name: UserRoleName;
 
     @ApiProperty({ required: false })
-    @IsNumber()
+    @Type(() => Number)
+    @IsInt()
     @IsOptional()
     tablePrimaryKey?: number;
 }

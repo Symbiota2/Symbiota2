@@ -6,13 +6,13 @@ import {
     HttpCode,
     HttpStatus,
     Logger,
-    Param,
+    Param, ParseArrayPipe,
     Post,
     Query,
-    UploadedFile,
+    UploadedFile, UseGuards,
     UseInterceptors
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { OccurrenceListOutputDto } from './dto/occurrence-list-output.dto';
 import { OccurrenceService } from './occurrence.service';
 import { FindAllParams } from './dto/find-all-input.dto';
@@ -30,6 +30,7 @@ import { DeepPartial } from 'typeorm';
 import { Occurrence } from '@symbiota2/api-database';
 import { plainToClass } from 'class-transformer';
 import { OccurrenceOutputDto } from './dto/occurrence.output.dto';
+import { ProtectCollection } from '@symbiota2/api-plugin-collection';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -58,23 +59,30 @@ export class OccurrenceController {
     }
 
     @Post(':collectionID')
+    @ProtectCollection('collectionID')
     @HttpCode(HttpStatus.OK)
-    @ApiBodyOneOrMany(OccurrenceInputDto)
+    @ApiBody({ type: OccurrenceInputDto, isArray: true })
     async createOccurrence(
-        @Param('collectionID') collectionID: number,
-        @Body() occurrenceData: OccurrenceInputDto | OccurrenceInputDto[]): Promise<OccurrenceListOutputDto | number[]> {
+        @Param('collectionID')
+        collectionID: number,
+        @Body(new ParseArrayPipe({ items: OccurrenceInputDto }))
+        occurrenceData: OccurrenceInputDto[]): Promise<OccurrenceListOutputDto> {
 
         // TODO: This returns nothing if input is array & something if it's a single occurrence
-        if (Array.isArray(occurrenceData)) {
+        if (occurrenceData.length > 1) {
             await this.occurrenceService.createMany(collectionID, occurrenceData);
         }
         else {
-            const occurrence = await this.occurrenceService.create(collectionID, occurrenceData);
+            const occurrence = await this.occurrenceService.create(
+                collectionID,
+                occurrenceData[0]
+            );
             return new OccurrenceListOutputDto(occurrence);
         }
     }
 
     @Post(':collectionID/upload')
+    @ProtectCollection('collectionID')
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor('file'), CsvInterceptor)
     @ApiFileInput('file')

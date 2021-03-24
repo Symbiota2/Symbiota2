@@ -10,6 +10,7 @@ import { SymbiotaApiPlugin } from '@symbiota2/api-common';
 
 @Module({
     imports: [
+        AppConfigModule,
         DatabaseModule,
         MulterModule.registerAsync({
             imports: [AppConfigModule],

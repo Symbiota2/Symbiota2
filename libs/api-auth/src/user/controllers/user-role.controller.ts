@@ -1,7 +1,7 @@
 import {
     Body,
     Controller, Delete,
-    Get, HttpStatus,
+    Get, HttpCode, HttpStatus,
     Inject, NotFoundException,
     Param,
     Post,
@@ -16,11 +16,12 @@ import { RoleOutputDto } from '../dto/role.output.dto';
 import { Repository } from 'typeorm';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RoleInputDto } from '../dto/role.input.dto';
-import { CurrentUserGuard } from '../../auth/guards/current-user.guard';
 import { UserRole } from '@symbiota2/api-database';
+import { CurrentUserGuard } from '../../auth/guards/current-user.guard';
+import { SuperAdminGuard } from '../../auth/guards/super-admin/super-admin.guard';
 
 @ApiTags('Users')
-@UseGuards(JwtAuthGuard, CurrentUserGuard)
+@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @Controller('users/:id/roles')
 export class UserRoleController {
@@ -29,6 +30,7 @@ export class UserRoleController {
         private readonly roleRepo: Repository<UserRole>) { }
 
     @Get()
+    @UseGuards(CurrentUserGuard)
     @ApiResponse({ status: HttpStatus.OK, type: RoleOutputDto, isArray: true })
     async findAll(@Param('id') uid: number): Promise<RoleOutputDto[]> {
         const roles = await this.roleRepo.find({ uid });
@@ -36,18 +38,22 @@ export class UserRoleController {
     }
 
     @Post()
+    @UseGuards(SuperAdminGuard)
+    @HttpCode(HttpStatus.OK)
     @ApiResponse({ status: HttpStatus.OK, type: RoleOutputDto, isArray: true })
     async addRole(
         @Param('id') uid: number,
         @Body() roleData: RoleInputDto): Promise<RoleOutputDto[]> {
 
-        await this.roleRepo.create({ uid, ...roleData });
+        const role = await this.roleRepo.create({ uid, ...roleData });
+        await this.roleRepo.save(role);
 
         const allRoles = await this.roleRepo.find({ uid });
         return allRoles.map((role) => new RoleOutputDto(role));
     }
 
     @Delete(':roleID')
+    @UseGuards(SuperAdminGuard)
     @ApiResponse({ status: HttpStatus.OK, type: RoleOutputDto, isArray: true })
     async removeRole(
         @Param('id') uid: number,

@@ -20,25 +20,54 @@ import { CurrentUserGuard } from '../../auth/guards/current-user.guard';
 import { UserInputDto } from "../dto/user.input.dto";
 import { ChangePasswordInputDto } from '../dto/changePassword.input.dto';
 import { SuperAdminGuard } from '../../auth/guards/super-admin/super-admin.guard';
+import {
+    IsArray, IsInt,
+    IsNumber, IsNumberString,
+    IsOptional,
+    IsString, Max,
+    Min
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
-class FindAllParams {
+class FindAllQuery {
     @ApiProperty({ required: false })
+    @IsString()
+    @IsOptional()
     username?: string;
 
     @ApiProperty({ required: false, type: String, isArray: true })
+    @IsArray()
+    @IsString({ each: true })
+    @IsOptional()
     'username[]'?: string[];
 
     @ApiProperty({ required: false })
+    @IsString()
+    @IsOptional()
     lastName?: string;
 
     @ApiProperty({ required: false })
+    @IsString()
+    @IsOptional()
     email?: string;
 
     @ApiProperty({ required: false, type: String, isArray: true })
     'email[]'?: string[];
 
-    @ApiProperty({ required: false })
-    page?: number;
+    @ApiProperty({ type: 'number', required: false, default: 10 })
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @Max(25)
+    @IsOptional()
+    limit = 10;
+
+    @ApiProperty({ type: 'number', required: false, default: 0 })
+    @Type(() => Number)
+    @IsInt()
+    @Min(0)
+    @IsOptional()
+    offset = 0;
 }
 
 @ApiTags('Users')
@@ -51,7 +80,14 @@ export class UserController {
     @ApiResponse({ status: HttpStatus.OK, type: UserOutputDto, isArray: true })
     @SerializeOptions({ groups: [UserOutputDto.GROUP_LIST] })
     @UseGuards(JwtAuthGuard, SuperAdminGuard)
-    async findAll(@Query() params?: FindAllParams): Promise<UserOutputDto[]> {
+    async findAll(@Query() query?: FindAllQuery): Promise<UserOutputDto[]> {
+        if (query) {
+            if (query.username) {
+                const user = await this.userService.findByLogin(query.username);
+                return [new UserOutputDto(user)];
+            }
+        }
+
         const users = await this.userService.findAll();
         return users.map((user) => new UserOutputDto(user));
     }

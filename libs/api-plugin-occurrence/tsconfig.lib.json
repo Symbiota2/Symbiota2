@@ -7,7 +7,7 @@
     "types": ["node"],
     "target": "es2017",
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
   },
   "exclude": ["**/*.spec.ts"],
   "include": ["**/*.ts"]

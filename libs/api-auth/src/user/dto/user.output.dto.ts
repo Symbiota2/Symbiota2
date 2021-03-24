@@ -1,4 +1,4 @@
-import { Exclude, Expose, Transform, TransformPlainToClass, TransformClassToPlain } from 'class-transformer';
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@symbiota2/api-database';
 
@@ -13,7 +13,7 @@ export class UserOutputDto {
 
     @ApiProperty()
     @Expose({ groups: [UserOutputDto.GROUP_SINGLE, UserOutputDto.GROUP_LIST] })
-    id: number;
+    uid: number;
 
     @ApiProperty()
     @Expose({ groups: [UserOutputDto.GROUP_SINGLE, UserOutputDto.GROUP_LIST] })

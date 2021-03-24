@@ -1,12 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsOptional, IsString, IsNumber } from "class-validator";
-
+import {
+    IsDateString,
+    IsInt,
+    IsOptional,
+    IsString,
+    IsNumber,
+    IsDate
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class OccurrenceInputDto {
-    @ApiProperty()
-    @IsInt()
-    collectionID: number;
-
     @ApiProperty({ required: false })
     @IsString()
     @IsOptional()
@@ -42,10 +45,11 @@ export class OccurrenceInputDto {
     @IsOptional()
     identifiedBy: string = null;
 
-    @ApiProperty({ required: false })
-    @IsDateString()
+    @ApiProperty({ type: Date, required: false })
+    @Type(() => Date)
+    @IsDate()
     @IsOptional()
-    dateIdentified: string = null;
+    dateIdentified: Date = null;
 
     @ApiProperty({ required: false })
     @IsString()
@@ -82,10 +86,11 @@ export class OccurrenceInputDto {
     @IsOptional()
     associatedCollectors: string = null;
 
-    @ApiProperty({ required: false })
-    @IsDateString()
+    @ApiProperty({ type: Date, required: false })
+    @Type(() => Date)
+    @IsDate()
     @IsOptional()
-    eventDate: string = null;
+    eventDate: Date = null;
 
     @ApiProperty({ required: false })
     @IsString()
@@ -233,9 +238,9 @@ export class OccurrenceInputDto {
     footprintWKT: string = null;
 
     @ApiProperty({ required: false })
-    @IsString()
+    @IsNumber()
     @IsOptional()
-    coordinatePrecision: string = null;
+    coordinatePrecision: number = null;
 
     @ApiProperty({ required: false })
     @IsString()

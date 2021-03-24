@@ -6,9 +6,13 @@ import { CollectionController } from './collection.controller';
 import { CategoryController } from './category/category.controller';
 import { InstitutionModule } from './institution/institution.module';
 import { SymbiotaApiPlugin } from '@symbiota2/api-common';
+import { AuthModule } from '@symbiota2/api-auth';
+import { AppConfigModule } from '@symbiota2/api-config';
 
 @Module({
     imports: [
+        AppConfigModule,
+        AuthModule,
         InstitutionModule,
         DatabaseModule
     ],

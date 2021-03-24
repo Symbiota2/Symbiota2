@@ -35,6 +35,7 @@ export class AuthController {
         private readonly tokens: TokenService) { }
 
     @Post('login')
+    @HttpCode(HttpStatus.OK)
     @UseGuards(LoginAuthGuard)
     @ApiBody({ type: UserLoginInputDto })
     @ApiResponse({ status: HttpStatus.OK, type: AccessTokenOutputDto })

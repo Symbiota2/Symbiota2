@@ -170,7 +170,7 @@ export class Occurrence extends EntityProvider {
     identifiedBy: string;
 
     @Column('varchar', { name: 'dateIdentified', nullable: true, length: 45 })
-    dateIdentified: string;
+    dateIdentified: Date | null;
 
     @Column('text', { name: 'identificationReferences', nullable: true })
     identificationReferences: string;
@@ -217,7 +217,7 @@ export class Occurrence extends EntityProvider {
     associatedCollectors: string;
 
     @Column('date', { name: 'eventDate', nullable: true })
-    eventDate: string;
+    eventDate: Date | null;
 
     @Column('date', { name: 'latestDateCollected', nullable: true })
     latestDateCollected: string;
@@ -416,7 +416,7 @@ export class Occurrence extends EntityProvider {
         precision: 9,
         scale: 7,
     })
-    coordinatePrecision: string;
+    coordinatePrecision: number;
 
     @Column('text', { name: 'locationRemarks', nullable: true })
     locationRemarks: string;
