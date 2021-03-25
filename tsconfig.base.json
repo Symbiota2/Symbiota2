@@ -35,5 +35,5 @@
       "@symbiota2/api-jobs": ["libs/api-jobs/src/index.ts"]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": ["node_modules", "tmp", "data"]
 }
