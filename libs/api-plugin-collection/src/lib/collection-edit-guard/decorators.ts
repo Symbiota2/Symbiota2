@@ -9,7 +9,6 @@ import {
     CollectionEditGuard,
     META_KEY_COLLID_ROUTE_PARAM
 } from './collection-edit.guard';
-import { CollectionRequest } from './collection-request';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 export function ProtectCollection(collectionIDParam: string) {
@@ -19,10 +18,3 @@ export function ProtectCollection(collectionIDParam: string) {
         UseGuards(JwtAuthGuard, CollectionEditGuard)
     );
 }
-
-export const ProtectedCollectionParam = createParamDecorator(
-    (data: string, ctx: ExecutionContext) => {
-        const request = ctx.switchToHttp().getRequest<CollectionRequest>();
-        return request.collectionID;
-    }
-);

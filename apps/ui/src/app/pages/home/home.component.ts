@@ -7,6 +7,7 @@ import { AppConfigService } from "@symbiota2/ui-common";
     styleUrls: ["./home.component.scss"]
 })
 export class HomeComponent implements OnInit {
+    static readonly ROUTE = "";
     title = "";
 
     constructor(private readonly appConfig: AppConfigService) { }

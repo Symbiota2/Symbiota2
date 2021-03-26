@@ -1,0 +1,31 @@
+<!-- TODO: i18n -->
+<h1>Create an account</h1>
+<div>
+    <mat-form-field>
+        <mat-label>Username</mat-label>
+        <input required matInput>
+    </mat-form-field>
+</div>
+<div>
+    <mat-form-field class='wide'>
+        <mat-label>Password</mat-label>
+        <input required matInput type='password'>
+    </mat-form-field>
+</div>
+<div>
+    <mat-form-field class='wide'>
+        <mat-label>Repeat Password</mat-label>
+        <input required matInput type='password'>
+    </mat-form-field>
+</div>
+
+<div id='buttons'>
+    <button
+        mat-flat-button
+        color='primary'
+        (click)='onSubmit()'
+        [disabled]='!form.valid'
+    >
+        Submit
+    </button>
+</div>

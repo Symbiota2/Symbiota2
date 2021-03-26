@@ -22,7 +22,7 @@
     >
         <ul fxLayout fxLayoutGap="40px" class="navigation-items">
             <li>
-                <a routerLink="/">
+                <a [routerLink]="ROUTE_HOME">
                     {{ 'core.layout.header.topnav.home_link' | translate }}
                 </a>
             </li>
@@ -57,7 +57,7 @@
                 {{ 'core.layout.header.topnav.welcome_line' | translate:{ 'firstName': user.firstName } }}
             </li>
             <li *ngIf="user">
-                <a routerLink="/viewprofile">
+                <a [routerLink]='ROUTE_PROFILE'>
                     {{ 'core.layout.header.topnav.my_profile_link' | translate }}
                 </a>
             </li>
@@ -68,12 +68,12 @@
                 <a>{{ 'core.layout.header.topnav.login_link' | translate }}</a>
             </li>
             <li *ngIf="!user">
-                <a routerLink="/signup">
+                <a [routerLink]='ROUTE_CREATE_PROFILE'>
                     {{ 'core.layout.header.topnav.new_account_link' | translate }}
                 </a>
             </li>
             <li>
-                <a routerLink="/sitemap">
+                <a [routerLink]="ROUTE_SITEMAP">
                     {{ 'core.layout.header.topnav.sitemap_link' | translate }}
                 </a>
             </li>
