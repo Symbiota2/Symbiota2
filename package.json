@@ -34,8 +34,10 @@
     "start:dev:api": "nx serve api",
     "start:prod:ui": "nx serve ui --prod --watch=false --liveReload=false",
     "start:prod:api": "nx serve api --watch=false",
-    "test": "nx test",
-    "test:cov": "nx test --codeCoverage",
+    "test": "nx run-many --target=test --all",
+    "test:api": "nx run-many --target=test --projects=api --with-deps",
+    "test:ui": "nx run-many --target=test --projects=ui --with-deps",
+    "test:cov": "nx run-many --target=test --all",
     "typeorm": "TS_NODE_PROJECT=tsconfig.cli.json node -r ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f ormconfig.ts",
     "update": "nx migrate latest",
     "workspace-generator": "nx workspace-generator"

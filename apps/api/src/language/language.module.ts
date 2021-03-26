@@ -8,5 +8,4 @@ import { DatabaseModule } from '@symbiota2/api-database';
     providers: [LanguageService],
     controllers: [LanguageController]
 })
-export class LanguageModule {
-}
+export class LanguageModule { }
