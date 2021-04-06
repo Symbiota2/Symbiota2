@@ -24,6 +24,7 @@ stages:
         - printf '\tIdentityFile ~/.ssh/id_ed25519\n' >> ~/.ssh/config
     script:
         - ssh demo.symbiota2.org 'cd app && git pull'
+        - "scp $PROD_UI_ENVIRON demo.symbiota2.org:app/apps/ui/src/environments/environment.prod.ts"
         - ssh demo.symbiota2.org 'sudo systemctl restart symbiota2'
 
     # Don't build on tags or merge requests, and only on the master branch
