@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+/// <reference types="@types/grecaptcha" />
+
+import { Component, Inject, OnInit } from '@angular/core';
 import {
     FormControl,
     FormGroup,
-    ValidationErrors, ValidatorFn,
     Validators
 } from '@angular/forms';
 import { UserService } from '@symbiota2/ui-common';
@@ -10,14 +11,17 @@ import {
     passwordContainsCharClasses,
     passwordsMatch
 } from './validators';
+import { DOCUMENT } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'symbiota2-create-user-profile',
     templateUrl: './create-user-profile.component.html',
     styleUrls: ['./create-user-profile.component.scss']
 })
-export class CreateUserProfileComponent {
+export class CreateUserProfileComponent implements OnInit {
     static readonly ROUTE = "createprofile";
+
     readonly PASSWORD_MIN_CHARS = 8;
 
     readonly usernameField = new FormControl('', [Validators.required]);
@@ -49,7 +53,32 @@ export class CreateUserProfileComponent {
         'email': this.emailAddressField
     });
 
-    constructor(private readonly users: UserService) { }
+    recaptchaOK = false;
+
+    constructor(
+        @Inject(DOCUMENT) private readonly document: Document,
+        private readonly users: UserService) { }
+
+    ngOnInit() {
+        const googleScript = document.createElement("script");
+        googleScript.src = `https://www.google.com/recaptcha/api.js`;
+        googleScript.async = true;
+        googleScript.defer = true;
+        document.body.append(googleScript);
+
+        googleScript.addEventListener('load', () => {
+            grecaptcha.ready(() => {
+                grecaptcha.render('recaptcha', {
+                    sitekey: environment.recaptchaSiteKey,
+                    callback: this.onRecaptchaOK.bind(this)
+                });
+            });
+        }, { once: true });
+    }
+
+    onRecaptchaOK() {
+        this.recaptchaOK = true;
+    }
 
     onSubmit() {
         console.log(this.form.getRawValue());

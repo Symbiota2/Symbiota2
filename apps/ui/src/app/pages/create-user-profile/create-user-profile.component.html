@@ -39,12 +39,14 @@
             </mat-form-field>
         </div>
 
+        <div id='recaptcha'></div>
+
         <div id='buttons'>
             <button
                 mat-flat-button
                 color='primary'
                 (click)='onSubmit()'
-                [disabled]='!form.valid'
+                [disabled]='!(recaptchaOK && form.valid)'
             >
                 Submit
             </button>
