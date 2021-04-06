@@ -6,6 +6,10 @@ import {
     Validators
 } from '@angular/forms';
 import { UserService } from '@symbiota2/ui-common';
+import {
+    passwordContainsCharClasses,
+    passwordsMatch
+} from './validators';
 
 @Component({
     selector: 'symbiota2-create-user-profile',
@@ -14,40 +18,40 @@ import { UserService } from '@symbiota2/ui-common';
 })
 export class CreateUserProfileComponent {
     static readonly ROUTE = "createprofile";
+    readonly PASSWORD_MIN_CHARS = 8;
 
-    readonly usernameField = new FormControl('');
+    readonly usernameField = new FormControl('', [Validators.required]);
+    readonly firstNameField = new FormControl('', [Validators.required]);
+    readonly lastNameField = new FormControl('', [Validators.required]);
     readonly passwordField = new FormControl(
         '',
         [
             Validators.required,
-            Validators.min(8)
+            Validators.minLength(this.PASSWORD_MIN_CHARS),
+            passwordContainsCharClasses
         ]
     );
     readonly passwordAgainField = new FormControl(
         '',
-        [
-            this.checkPasswordsMatch.bind(this)
-        ]
+        [(passwordAgainField) => passwordsMatch(this.passwordField, passwordAgainField as FormControl)]
+    );
+    readonly emailAddressField = new FormControl(
+        '',
+        [Validators.required, Validators.email]
     );
 
     readonly form = new FormGroup({
         'username': this.usernameField,
+        'firstName': this.firstNameField,
+        'lastName': this.lastNameField,
         'password': this.passwordField,
-        'passwordAgain': this.passwordAgainField
+        'passwordAgain': this.passwordAgainField,
+        'email': this.emailAddressField
     });
 
     constructor(private readonly users: UserService) { }
 
-    checkPasswordsMatch(): ValidatorFn {
-        return (control: FormControl): Record<string, unknown> | null => {
-            if (control.value === this.passwordField.value) {
-                return null;
-            }
-            return { passwordMatch: 'Passwords do not match' };
-        }
-    }
-
     onSubmit() {
-
+        console.log(this.form.getRawValue());
     }
 }

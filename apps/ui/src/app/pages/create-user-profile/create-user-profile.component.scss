@@ -2,6 +2,36 @@
     margin-top: 2rem;
 }
 
-.mat-form-field.wide {
-    width: 25rem;
+#errors {
+    symbiota2-signup-error {
+        margin-top: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+}
+
+.errors-lg {
+    margin-left: 10rem;
+}
+
+.errors-sm {
+    margin-top: 2rem;
+
+    symbiota2-signup-error {
+        display: block;
+    }
+}
+
+.mat-form-field {
+    margin-left: 1rem;
+    margin-right: 1rem;
+
+    &.wide {
+        width: 25rem;
+    }
+
+    &.sm {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
 }

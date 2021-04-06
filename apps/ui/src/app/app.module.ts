@@ -26,6 +26,7 @@ import { BannerComponent } from './components/banner/banner.component';
 import { CollectionPlugin } from "@symbiota2/ui-plugin-collection";
 import { OccurrencePlugin } from '@symbiota2/ui-plugin-occurrence';
 import { CreateUserProfileComponent } from './pages/create-user-profile/create-user-profile.component';
+import { ErrorComponent } from './pages/create-user-profile/error-component/error.component';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -42,7 +43,8 @@ const PLUGINS = [
         LoginDialog,
         FooterComponent,
         BannerComponent,
-        CreateUserProfileComponent
+        CreateUserProfileComponent,
+        ErrorComponent,
     ],
     imports: [
         AlertModule,

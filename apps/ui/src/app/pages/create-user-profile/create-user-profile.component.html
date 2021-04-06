@@ -1,31 +1,110 @@
 <!-- TODO: i18n -->
 <h1>Create an account</h1>
-<div>
-    <mat-form-field>
-        <mat-label>Username</mat-label>
-        <input required matInput>
-    </mat-form-field>
-</div>
-<div>
-    <mat-form-field class='wide'>
-        <mat-label>Password</mat-label>
-        <input required matInput type='password'>
-    </mat-form-field>
-</div>
-<div>
-    <mat-form-field class='wide'>
-        <mat-label>Repeat Password</mat-label>
-        <input required matInput type='password'>
-    </mat-form-field>
-</div>
+<div fxLayout.gt-sm='row'>
+    <div fxLayout.gt-sm='column'>
+        <div>
+            <mat-form-field [ngClass.lt-md]='{ "sm": true }'>
+                <mat-label>First name</mat-label>
+                <input [formControl]='firstNameField' required matInput>
+            </mat-form-field>
 
-<div id='buttons'>
-    <button
-        mat-flat-button
-        color='primary'
-        (click)='onSubmit()'
-        [disabled]='!form.valid'
-    >
-        Submit
-    </button>
+            <mat-form-field [ngClass.lt-md]='{ "sm": true }'>
+                <mat-label>Last name</mat-label>
+                <input [formControl]='lastNameField' required matInput>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <mat-form-field [ngClass.lt-md]='{ "sm": true }'>
+                <mat-label>Username</mat-label>
+                <input [formControl]='usernameField' required matInput>
+            </mat-form-field>
+
+            <mat-form-field [ngClass.lt-md]='{ "sm": true }'>
+                <mat-label>Email address</mat-label>
+                <input [formControl]='emailAddressField' required matInput type='email'>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <mat-form-field class='wide' [ngClass.lt-md]='{ "wide": false, "sm": true }'>
+                <mat-label>Password</mat-label>
+                <input [formControl]='passwordField' required matInput type='password'>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field class='wide' [ngClass.lt-md]='{ "wide": false, "sm": true }'>
+                <mat-label>Repeat Password</mat-label>
+                <input [formControl]='passwordAgainField' required matInput type='password'>
+            </mat-form-field>
+        </div>
+
+        <div id='buttons'>
+            <button
+                mat-flat-button
+                color='primary'
+                (click)='onSubmit()'
+                [disabled]='!form.valid'
+            >
+                Submit
+            </button>
+        </div>
+    </div>
+
+    <div id='errors' fxLayout.gt-sm='column' class='errors-lg' [ngClass.lt-md]='{ "errors-lg": false, "errors-sm": true }'>
+        <symbiota2-signup-error
+            [formControlInput]='firstNameField'
+            errorName='required'
+            displayText='First name is required'
+        >
+        </symbiota2-signup-error>
+        <symbiota2-signup-error
+            [formControlInput]='lastNameField'
+            errorName='required'
+            displayText='Last name is required'
+        >
+        </symbiota2-signup-error>
+        <symbiota2-signup-error
+            [formControlInput]='usernameField'
+            errorName='required'
+            displayText='Username is required'
+        >
+        </symbiota2-signup-error>
+        <symbiota2-signup-error
+            [formControlInput]='emailAddressField'
+            errorName='required'
+            displayText='Email address is required'
+        >
+        </symbiota2-signup-error>
+        <symbiota2-signup-error
+            [formControlInput]='emailAddressField'
+            errorName='email'
+            displayText='Email address is valid'
+        >
+        </symbiota2-signup-error>
+        <symbiota2-signup-error
+            [formControlInput]='passwordField'
+            errorName='required'
+            displayText='Password is required'
+        >
+        </symbiota2-signup-error>
+        <symbiota2-signup-error
+            [formControlInput]='passwordField'
+            errorName='minlength'
+            displayText='Password is at least {{ PASSWORD_MIN_CHARS }} characters'
+        >
+        </symbiota2-signup-error>
+        <symbiota2-signup-error
+            [formControlInput]='passwordField'
+            errorName='passwordChars'
+            displayText='Password contains an uppercase letter, lowercase letter, number, and special character'
+        >
+        </symbiota2-signup-error>
+        <symbiota2-signup-error
+            [formControlInput]='passwordAgainField'
+            errorName='passwordsMatch'
+            displayText='Passwords match'
+        >
+        </symbiota2-signup-error>
+    </div>
 </div>
