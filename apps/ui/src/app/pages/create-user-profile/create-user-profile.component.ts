@@ -1,6 +1,13 @@
 /// <reference types="@types/grecaptcha" />
 
-import { Component, Inject, OnInit } from '@angular/core';
+import {
+    ChangeDetectorRef,
+    Component, Directive,
+    EventEmitter,
+    Inject,
+    OnInit,
+    ViewChild
+} from '@angular/core';
 import {
     FormControl,
     FormGroup,
@@ -13,11 +20,10 @@ import {
 } from './validators';
 import { DOCUMENT } from '@angular/common';
 import { environment } from '../../../environments/environment';
-import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { UserProfileComponent } from '../user-profile/user-profile.component';
-import { of } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { combineAll, map, startWith, switchMap, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'symbiota2-create-user-profile',
@@ -79,10 +85,20 @@ export class CreateUserProfileComponent implements OnInit {
         isPublic: this.isPublicField
     });
 
-    recaptchaOK = false;
+    readonly recaptchaOk$ = new BehaviorSubject<boolean>(false);
+    readonly submitDisabled$ = combineLatest([
+        this.recaptchaOk$,
+        this.form.statusChanges.pipe(startWith(this.form.status))
+    ]).pipe(
+        map(([recaptchaOK, formStatus]) => {
+            return !(recaptchaOK && formStatus === "VALID");
+        }),
+        startWith(true)
+    );
 
     constructor(
         @Inject(DOCUMENT) private readonly document: Document,
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly users: UserService,
         private readonly router: Router) { }
 
@@ -97,14 +113,15 @@ export class CreateUserProfileComponent implements OnInit {
             grecaptcha.ready(() => {
                 grecaptcha.render('recaptcha', {
                     sitekey: environment.recaptchaSiteKey,
-                    callback: this.onRecaptchaOK.bind(this)
+                    callback: this.onRecaptchaChange.bind(this)
                 });
             });
         }, { once: true });
     }
 
-    onRecaptchaOK() {
-        this.recaptchaOK = true;
+    onRecaptchaChange() {
+        this.recaptchaOk$.next(true);
+        this.changeDetector.detectChanges();
     }
 
     onSubmit() {

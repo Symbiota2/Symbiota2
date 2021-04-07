@@ -150,17 +150,17 @@
                 </mat-form-field>
             </div>
             <div class='mt-2'>
+                <mat-form-field id='biography' [ngClass.lt-md]='{ "wide": false, "sm": true }'>
+                    <mat-label>Biography</mat-label>
+                    <textarea [formControl]='bioField' matInput></textarea>
+                </mat-form-field>
+            </div>
+            <div class='mt-2'>
                 <div [ngClass.lt-md]='{ "sm": true }'>
                     <mat-checkbox [formControl]='isPublicField'>
                         Allow other users to search for me
                     </mat-checkbox>
                 </div>
-            </div>
-            <div class='mt-2'>
-                <mat-form-field id='biography' [ngClass.lt-md]='{ "wide": false, "sm": true }'>
-                    <mat-label>Biography</mat-label>
-                    <textarea [formControl]='bioField' matInput></textarea>
-                </mat-form-field>
             </div>
         </div>
     </div>
@@ -174,7 +174,7 @@
                 mat-flat-button
                 color='primary'
                 (click)='onSubmit()'
-                [disabled]='!(recaptchaOK && form.valid)'
+                [disabled]='submitDisabled$ | async'
             >
                 Submit
             </button>
