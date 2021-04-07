@@ -6,6 +6,7 @@ import {
     Type
 } from 'class-transformer';
 import { Role, RoleTypes, UserRole } from './user-role.class';
+import { ApiInputUser, ApiOutputUser } from '@symbiota2/data-access';
 
 export class User {
     @Expose({ name: "sub" })
@@ -26,6 +27,18 @@ export class User {
     public readonly firstName: string;
     public readonly lastName: string;
     public readonly token: string;
+
+    static fromJSON(obj: Record<string, unknown>): User {
+        return plainToClass(User, obj);
+    }
+
+    private static checkHasRole(roles: UserRole[], reqRole: Role, reqRoleTgt: number): boolean {
+        const roleObjs = roles.filter((roleObj) => roleObj.name === reqRole);
+        if (reqRoleTgt) {
+            return roleObjs.filter((role) => role.target === reqRoleTgt).length > 0;
+        }
+        return roleObjs.length > 0;
+    }
 
     canEditCollection(id: number): boolean {
         const isGlobalEditor = this.hasRole(
@@ -121,10 +134,6 @@ export class User {
         return Math.round(this.exp.getTime() - new Date().getTime());
     }
 
-    static fromJSON(obj: Record<string, unknown>): User {
-        return plainToClass(User, obj);
-    }
-
     hasRole(
         role: Role,
         roleType = RoleTypes.ROLE_TYPE_GLOBAL,
@@ -143,18 +152,10 @@ export class User {
                 return false;
         }
     }
-
-    private static checkHasRole(roles: UserRole[], reqRole: Role, reqRoleTgt: number): boolean {
-        const roleObjs = roles.filter((roleObj) => roleObj.name === reqRole);
-        if (reqRoleTgt) {
-            return roleObjs.filter((role) => role.target === reqRoleTgt).length > 0;
-        }
-        return roleObjs.length > 0;
-    }
 }
 
 @Exclude()
-export class UserProfileData {
+export class UserProfileData implements ApiInputUser {
     @Expose()
     firstName: string;
 
@@ -177,6 +178,9 @@ export class UserProfileData {
     address: string;
 
     @Expose()
+    phone: string;
+
+    @Expose()
     city: string;
 
     @Expose()
@@ -196,10 +200,10 @@ export class UserProfileData {
 
     @Expose()
     @Transform((isPublic) => {
-        if (Number.isInteger(isPublic)) {
-            return isPublic === 1;
+        if (typeof isPublic === 'boolean') {
+            return isPublic ? 1 : 0;
         }
         return isPublic;
     })
-    isPublic: boolean;
+    isPublic: number;
 }

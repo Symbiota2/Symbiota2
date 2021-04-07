@@ -1,4 +1,5 @@
 import { Exclude, Expose } from "class-transformer";
+import { ApiInputUserRole } from '@symbiota2/data-access';
 
 export enum Role {
     ROLE_CHECKLIST_ADMIN = "ClAdmin",
@@ -24,15 +25,12 @@ export enum RoleTypes {
 }
 
 @Exclude()
-export class ApiUserRole {
+export class ApiUserRole implements ApiInputUserRole {
     @Expose()
-    role: string;
+    name: string;
 
     @Expose()
-    tableName: string;
-
-    @Expose()
-    tableKey: number;
+    tablePrimaryKey: number;
 }
 
 /**
@@ -45,7 +43,7 @@ export class UserRole {
     readonly target: number;
 
     constructor(role: ApiUserRole) {
-        this.name = role.role as Role;
-        this.target = role.tableKey;
+        this.name = role.name as Role;
+        this.target = role.tablePrimaryKey;
     }
 }

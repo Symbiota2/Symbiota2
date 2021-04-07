@@ -1,9 +1,10 @@
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@symbiota2/api-database';
+import { ApiOutputUser } from '@symbiota2/data-access';
 
 @Exclude()
-export class UserOutputDto {
+export class UserOutputDto implements ApiOutputUser {
     public static readonly GROUP_SINGLE = 'single';
     public static readonly GROUP_LIST = 'list';
 

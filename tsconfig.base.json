@@ -32,7 +32,8 @@
       "@symbiota2/api-plugin-occurrence": [
         "libs/api-plugin-occurrence/src/index.ts"
       ],
-      "@symbiota2/api-jobs": ["libs/api-jobs/src/index.ts"]
+      "@symbiota2/api-jobs": ["libs/api-jobs/src/index.ts"],
+      "@symbiota2/data-access": ["libs/data-access/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "data"]

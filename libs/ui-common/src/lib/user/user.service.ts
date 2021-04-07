@@ -17,6 +17,11 @@ import { AlertService } from "../alert";
 import { HttpErrorResponse } from "@angular/common/http";
 import { UserModule } from "./user.module";
 import jwtDecode from "jwt-decode";
+import {
+    ApiInputCreateUser,
+    ApiInputUser,
+    ApiOutputUser
+} from '@symbiota2/data-access';
 
 type AuthData = { username?: string, password?: string };
 
@@ -58,9 +63,40 @@ export class UserService {
         shareReplay(1)
     );
 
+    private static userFromJwt(jsonResponse: LoginResponseData): User {
+        if (jsonResponse === null) {
+            return null;
+        }
+        const jwtData = jwtDecode(jsonResponse.accessToken) as Record<string, unknown>;
+        return User.fromJSON({ ...jwtData, token: jsonResponse.accessToken });
+    }
+
     constructor(
         private readonly alert: AlertService,
         private readonly api: ApiClientService) { }
+
+    create(userData: ApiInputCreateUser): Observable<User> {
+        const createReq = this.api.queryBuilder(this.usersUrl)
+            .post()
+            .body(userData)
+            .build();
+
+        return this.api.send(createReq).pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.error && err.error.message) {
+                    return of(`Account creation failed: ${err.error.message}`);
+                }
+                return of('Account creation failed');
+            }),
+            switchMap((userOrError: ApiOutputUser | string) => {
+                if (typeof userOrError !== 'string') {
+                    this.alert.showMessage('Account created successfully');
+                    return this.login(userData.username, userData.password);
+                }
+                return of(null);
+            })
+        )
+    }
 
     login(username: string, password: string): Observable<User> {
         return this.authenticate(this.loginUrl, { username, password }).pipe(
@@ -182,13 +218,5 @@ export class UserService {
 
     private get usersUrl() {
         return `${this.api.apiRoot()}/users`;
-    }
-
-    private static userFromJwt(jsonResponse: LoginResponseData): User {
-        if (jsonResponse === null) {
-            return null;
-        }
-        const jwtData = jwtDecode(jsonResponse.accessToken) as Record<string, unknown>;
-        return User.fromJSON({ ...jwtData, token: jsonResponse.accessToken });
     }
 }

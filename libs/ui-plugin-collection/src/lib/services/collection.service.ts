@@ -69,6 +69,10 @@ export class CollectionService {
     }
 
     findByIDs(ids: number[]): Observable<Collection[]> {
+        if (ids.length === 0) {
+            return of([]);
+        }
+
         const url = new URL(this.baseUrl);
         const qParams = new HttpParams(
             { fromObject: { id: ids.map((id) => id.toString()) } }

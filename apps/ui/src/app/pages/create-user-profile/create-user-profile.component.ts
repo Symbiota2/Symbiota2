@@ -6,13 +6,18 @@ import {
     FormGroup,
     Validators
 } from '@angular/forms';
-import { UserService } from '@symbiota2/ui-common';
+import { AlertService, UserService } from '@symbiota2/ui-common';
 import {
     passwordContainsCharClasses,
     passwordsMatch
 } from './validators';
 import { DOCUMENT } from '@angular/common';
 import { environment } from '../../../environments/environment';
+import { catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { UserProfileComponent } from '../user-profile/user-profile.component';
+import { of } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'symbiota2-create-user-profile',
@@ -44,20 +49,42 @@ export class CreateUserProfileComponent implements OnInit {
         [Validators.required, Validators.email]
     );
 
+    readonly titleField = new FormControl('');
+    readonly institutionField = new FormControl('');
+    readonly departmentField = new FormControl('');
+    readonly addressField = new FormControl('');
+    readonly cityField = new FormControl('');
+    readonly stateField = new FormControl('');
+    readonly zipField = new FormControl('');
+    readonly countryField = new FormControl('');
+    readonly phoneField = new FormControl('');
+    readonly urlField = new FormControl('');
+    readonly bioField = new FormControl('');
+    readonly isPublicField = new FormControl(false);
+
     readonly form = new FormGroup({
-        'username': this.usernameField,
-        'firstName': this.firstNameField,
-        'lastName': this.lastNameField,
-        'password': this.passwordField,
-        'passwordAgain': this.passwordAgainField,
-        'email': this.emailAddressField
+        username: this.usernameField,
+        firstName: this.firstNameField,
+        lastName: this.lastNameField,
+        password: this.passwordField,
+        passwordAgain: this.passwordAgainField,
+        email: this.emailAddressField,
+        title: this.titleField,
+        city: this.cityField,
+        state: this.stateField,
+        country: this.countryField,
+        zip: this.zipField,
+        url: this.urlField,
+        biography: this.bioField,
+        isPublic: this.isPublicField
     });
 
     recaptchaOK = false;
 
     constructor(
         @Inject(DOCUMENT) private readonly document: Document,
-        private readonly users: UserService) { }
+        private readonly users: UserService,
+        private readonly router: Router) { }
 
     ngOnInit() {
         const googleScript = document.createElement("script");
@@ -81,6 +108,9 @@ export class CreateUserProfileComponent implements OnInit {
     }
 
     onSubmit() {
-        console.log(this.form.getRawValue());
+        const { passwordAgain, ...formData } = this.form.getRawValue();
+        this.users.create(formData).subscribe(() => {
+            return this.router.navigate([UserProfileComponent.ROUTE])
+        });
     }
 }

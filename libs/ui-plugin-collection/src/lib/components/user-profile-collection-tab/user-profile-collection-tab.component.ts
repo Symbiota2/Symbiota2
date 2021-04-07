@@ -5,7 +5,7 @@ import { switchMap } from 'rxjs/operators';
 import { Collection } from '../../dto/Collection.output.dto';
 
 @Component({
-    selector: "lib-user-profile-collection-tab",
+    selector: 'lib-user-profile-collection-tab',
     templateUrl: "./user-profile-collection-tab.component.html",
     styleUrls: ["./user-profile-collection-tab.component.scss"]
 })

@@ -6,8 +6,9 @@ import {
 } from 'class-validator';
 import { UserRoleName } from '@symbiota2/api-database';
 import { Type } from 'class-transformer';
+import { ApiInputUserRole } from '@symbiota2/data-access';
 
-export class RoleInputDto {
+export class RoleInputDto implements ApiInputUserRole {
     @ApiProperty()
     @IsEnum(UserRoleName)
     @IsNotEmpty()

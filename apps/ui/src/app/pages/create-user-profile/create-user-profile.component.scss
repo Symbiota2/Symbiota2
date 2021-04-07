@@ -1,4 +1,4 @@
-#buttons, #recaptcha {
+.mt-2 {
     margin-top: 2rem;
 }
 
@@ -7,6 +7,15 @@
         margin-top: 0.25rem;
         margin-bottom: 0.25rem;
     }
+}
+
+#biography {
+    width: 100%;
+}
+
+.mat-checkbox {
+    margin-left: 1rem;
+    margin-right: 1rem;
 }
 
 .errors-lg {

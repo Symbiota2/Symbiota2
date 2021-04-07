@@ -2,6 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { RefreshToken, User } from '@symbiota2/api-database';
 import { Repository } from 'typeorm';
 import { BaseService } from '@symbiota2/api-common';
+import { UserInputDto } from '../dto/user.input.dto';
+import { CreateUserInputDto } from '../dto';
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -51,5 +53,15 @@ export class UserService extends BaseService<User> {
             .execute();
 
         return updateResult.affected > 0;
+    }
+
+    async createProfile(userData: CreateUserInputDto): Promise<User> {
+        const { password, ...profileData } = userData;
+        await this.userRepo.createQueryBuilder()
+            .insert()
+            .values({ ...profileData, password: () => `PASSWORD('${password}')` })
+            .execute();
+
+        return this.userRepo.findOne({ username: profileData.username });
     }
 }

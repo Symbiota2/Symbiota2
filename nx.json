@@ -28,6 +28,7 @@
     "api-auth": { "tags": [] },
     "api-plugin-collection": { "tags": [] },
     "api-plugin-occurrence": { "tags": [] },
-    "api-jobs": { "tags": [] }
+    "api-jobs": { "tags": [] },
+    "data-access": { "tags": [] }
   }
 }

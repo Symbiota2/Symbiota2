@@ -38,19 +38,6 @@
                 <input [formControl]='passwordAgainField' required matInput type='password'>
             </mat-form-field>
         </div>
-
-        <div id='recaptcha'></div>
-
-        <div id='buttons'>
-            <button
-                mat-flat-button
-                color='primary'
-                (click)='onSubmit()'
-                [disabled]='!(recaptchaOK && form.valid)'
-            >
-                Submit
-            </button>
-        </div>
     </div>
 
     <div id='errors' fxLayout.gt-sm='column' class='errors-lg' [ngClass.lt-md]='{ "errors-lg": false, "errors-sm": true }'>
@@ -108,5 +95,89 @@
             displayText='Passwords match'
         >
         </symbiota2-signup-error>
+    </div>
+</div>
+
+<div fxLayout.gt-sm='row'>
+    <div fxLayout.gt-sm='column'>
+        <div class='mt-2'>
+            <div>
+                <mat-form-field class='wide' [ngClass.lt-md]='{ "wide": false, "sm": true }'>
+                    <mat-label>Institution</mat-label>
+                    <input [formControl]='institutionField' matInput>
+                </mat-form-field>
+                <mat-form-field class='wide' [ngClass.lt-md]='{ "wide": false, "sm": true }'>
+                    <mat-label>Department</mat-label>
+                    <input [formControl]='departmentField' matInput>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field [ngClass.lt-md]='{ "sm": true }'>
+                    <mat-label>Title</mat-label>
+                    <input [formControl]='titleField' matInput>
+                </mat-form-field>
+                <mat-form-field class='wide' [ngClass.lt-md]='{ "wide": false, "sm": true }'>
+                    <mat-label>URL</mat-label>
+                    <input [formControl]='urlField' matInput>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field class='wide' [ngClass.lt-md]='{ "wide": false, "sm": true }'>
+                    <mat-label>Address</mat-label>
+                    <input [formControl]='addressField' matInput>
+                </mat-form-field>
+                <mat-form-field [ngClass.lt-md]='{ "sm": true }'>
+                    <mat-label>City</mat-label>
+                    <input [formControl]='cityField' matInput>
+                </mat-form-field>
+                <mat-form-field [ngClass.lt-md]='{ "sm": true }'>
+                    <mat-label>State/Province</mat-label>
+                    <input [formControl]='stateField' matInput>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field [ngClass.lt-md]='{ "sm": true }'>
+                    <mat-label>Country</mat-label>
+                    <input [formControl]='countryField' matInput>
+                </mat-form-field>
+                <mat-form-field [ngClass.lt-md]='{ "sm": true }'>
+                    <mat-label>Zip Code</mat-label>
+                    <input [formControl]='zipField' matInput>
+                </mat-form-field>
+                <mat-form-field [ngClass.lt-md]='{ "sm": true }'>
+                    <mat-label>Contact phone number</mat-label>
+                    <input [formControl]='phoneField' matInput>
+                </mat-form-field>
+            </div>
+            <div class='mt-2'>
+                <div [ngClass.lt-md]='{ "sm": true }'>
+                    <mat-checkbox [formControl]='isPublicField'>
+                        Allow other users to search for me
+                    </mat-checkbox>
+                </div>
+            </div>
+            <div class='mt-2'>
+                <mat-form-field id='biography' [ngClass.lt-md]='{ "wide": false, "sm": true }'>
+                    <mat-label>Biography</mat-label>
+                    <textarea [formControl]='bioField' matInput></textarea>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div fxLayout.gt-sm='row'>
+    <div fxLayout.gt-sm='column'>
+        <div id='recaptcha' class='mt-2'></div>
+        <div class='mt-2'>
+            <button
+                mat-flat-button
+                color='primary'
+                (click)='onSubmit()'
+                [disabled]='!(recaptchaOK && form.valid)'
+            >
+                Submit
+            </button>
+        </div>
     </div>
 </div>
