@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { RefreshToken, User } from '@symbiota2/api-database';
 import { Repository } from 'typeorm';
 import { BaseService } from '@symbiota2/api-common';
-import { UserInputDto } from '../dto/user.input.dto';
 import { CreateUserInputDto } from '../dto';
 
 @Injectable()

@@ -17,15 +17,15 @@ import {
     User,
     UserProfileData,
     UserProfileTab,
-    UserRole,
     UserService
 } from '@symbiota2/ui-common';
 import { ReplaySubject, Subscription } from 'rxjs';
 import { PasswordFormValidator } from './password-validator.directive';
 import { take } from 'rxjs/operators';
+import { ApiUserRole } from '@symbiota2/data-access';
 
 @Component({
-    selector: 'app-user-profile',
+    selector: 'symbiota2-user-profile',
     templateUrl: './user-profile.component.html',
     styleUrls: ['./user-profile.component.scss']
 })
@@ -148,19 +148,19 @@ export class UserProfileComponent implements OnInit, OnDestroy, AfterViewInit {
         return bioField ? bioField.length : 0;
     }
 
-    get globalRoles(): UserRole[] {
+    get globalRoles(): ApiUserRole[] {
         return this.loginData ? this.loginData.globalRoles : [];
     }
 
-    get collectionRoles(): UserRole[] {
+    get collectionRoles(): ApiUserRole[] {
         return this.loginData ? this.loginData.collectionRoles : [];
     }
 
-    get checklistRoles(): UserRole[] {
+    get checklistRoles(): ApiUserRole[] {
         return this.loginData ? this.loginData.checklistRoles : [];
     }
 
-    get projectRoles(): UserRole[] {
+    get projectRoles(): ApiUserRole[] {
         return this.loginData ? this.loginData.projectRoles : [];
     }
 

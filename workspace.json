@@ -585,6 +585,21 @@
             "jestConfig": "libs/data-access/jest.config.js",
             "passWithNoTests": true
           }
+        },
+        "build": {
+          "executor": "@nrwl/node:package",
+          "outputs": [
+            "{options.outputPath}"
+          ],
+          "options": {
+            "outputPath": "dist/libs/data-access",
+            "tsConfig": "libs/data-access/tsconfig.lib.json",
+            "packageJson": "libs/data-access/package.json",
+            "main": "libs/data-access/src/index.ts",
+            "assets": [
+              "libs/data-access/*.md"
+            ]
+          }
         }
       }
     }

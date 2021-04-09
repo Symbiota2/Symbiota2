@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { User } from './User.entity';
 import { EntityProvider } from '../../entity-provider.class';
-import { UserRoleName } from '../../user-role-name.enum';
+import { ApiUserRoleName } from '@symbiota2/data-access';
 
 @Index(['uid'])
 @Index(['assignedByUID'])
@@ -23,7 +23,7 @@ export class UserRole extends EntityProvider {
 
     // Role name
     @Column('varchar', { name: 'role', length: 45 })
-    name: UserRoleName;
+    name: ApiUserRoleName;
 
     // TODO: What're these?
     @Column('varchar', { name: 'tablename', nullable: true, length: 45 })

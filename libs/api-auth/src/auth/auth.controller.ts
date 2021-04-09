@@ -20,7 +20,7 @@ import { RefreshCookieStrategy } from './strategies/refresh-cookie.strategy';
 import { RefreshCookieGuard } from './guards';
 import { TokenService } from '../user/services/token.service';
 import { AccessTokenOutputDto } from './dto/access-token-output.dto';
-import { AuthenticatedRequest } from './dto/interfaces';
+import { AuthenticatedRequest } from './dto/authenticated-request';
 import { UserService } from '../user/services/user.service';
 
 @ApiTags('Auth')

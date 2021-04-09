@@ -2,16 +2,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { AppConfigService } from '@symbiota2/api-config';
-import { AuthRole, UserJwtPayload } from '../dto/interfaces';
-
-interface ExtractedJwt {
-    username: string;
-    firstName: string;
-    roles: AuthRole[];
-    iat: number;
-    exp: number;
-    sub: string;
-}
+import { ApiJwtPayload } from '@symbiota2/data-access';
+import { ExtractedJwt } from '../dto/extracted-jwt';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -25,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    async validate(payload: ExtractedJwt): Promise<UserJwtPayload> {
+    async validate(payload: ExtractedJwt): Promise<ApiJwtPayload> {
         return {
             uid: parseInt(payload.sub),
             username: payload.username,

@@ -1,12 +1,16 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
-    RefreshToken, User, UserRoleName
+    RefreshToken, User
 } from '@symbiota2/api-database';
 import { Repository } from 'typeorm';
 import { BaseService } from '@symbiota2/api-common';
 import { v4 as uuid4 } from 'uuid';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { AuthRole, UserJwtPayload } from '../../auth/dto/interfaces';
+import {
+    ApiJwtPayload,
+    ApiUserRole,
+    ApiUserRoleName
+} from '@symbiota2/data-access';
 
 interface RefreshTokenPayload {
     jti: string;
@@ -77,14 +81,15 @@ export class TokenService extends BaseService<RefreshToken> {
 
     async createAccessToken(user: User): Promise<string> {
         const roles = await user.roles;
-        const minRoles: AuthRole[] = roles.map((role) => {
+        const minRoles: ApiUserRole[] = roles.map((role) => {
             return {
-                role: role.name,
-                tableKey: role.tablePrimaryKey
+                id: role.id,
+                name: role.name,
+                tablePrimaryKey: role.tablePrimaryKey
             }
         });
 
-        const payload: UserJwtPayload = {
+        const payload: ApiJwtPayload = {
             uid: user.uid,
             username: user.username,
             firstName: user.firstName,
@@ -98,23 +103,23 @@ export class TokenService extends BaseService<RefreshToken> {
         return this.jwt.signAsync(payload, signOpts);
     }
 
-    static async isSuperAdmin(jwt: UserJwtPayload): Promise<boolean> {
-        return TokenService.hasRole(jwt, UserRoleName.ROLE_SUPER_ADMIN);
+    static async isSuperAdmin(jwt: ApiJwtPayload): Promise<boolean> {
+        return TokenService.hasRole(jwt, ApiUserRoleName.SUPER_ADMIN);
     }
 
-    static async isChecklistAdmin(jwt: UserJwtPayload, checklistID: number): Promise<boolean> {
-        return TokenService.hasRole(jwt, UserRoleName.ROLE_CHECKLIST_ADMIN, checklistID);
+    static async isChecklistAdmin(jwt: ApiJwtPayload, checklistID: number): Promise<boolean> {
+        return TokenService.hasRole(jwt, ApiUserRoleName.CHECKLIST_ADMIN, checklistID);
     }
 
-    static async isCollectionAdmin(jwt: UserJwtPayload, collectionID: number): Promise<boolean> {
-        return TokenService.hasRole(jwt, UserRoleName.ROLE_COLLECTION_ADMIN, collectionID);
+    static async isCollectionAdmin(jwt: ApiJwtPayload, collectionID: number): Promise<boolean> {
+        return TokenService.hasRole(jwt, ApiUserRoleName.COLLECTION_ADMIN, collectionID);
     }
 
-    static async isCollectionEditor(jwt: UserJwtPayload, collectionID: number): Promise<boolean> {
-        return TokenService.hasRole(jwt, UserRoleName.ROLE_COLLECTION_EDITOR, collectionID);
+    static async isCollectionEditor(jwt: ApiJwtPayload, collectionID: number): Promise<boolean> {
+        return TokenService.hasRole(jwt, ApiUserRoleName.COLLECTION_EDITOR, collectionID);
     }
 
-    static async canEditCollection(jwt: UserJwtPayload, collectionID: number): Promise<boolean> {
+    static async canEditCollection(jwt: ApiJwtPayload, collectionID: number): Promise<boolean> {
         const promises: Promise<boolean>[] = [
             TokenService.isCollectionAdmin(jwt, collectionID),
             TokenService.isCollectionEditor(jwt, collectionID)
@@ -124,27 +129,27 @@ export class TokenService extends BaseService<RefreshToken> {
         return isCollAdmin || isCollEditor;
     }
 
-    static async isProjectAdmin(jwt: UserJwtPayload, projectID: number): Promise<boolean> {
-        return TokenService.hasRole(jwt, UserRoleName.ROLE_PROJECT_ADMIN, projectID);
+    static async isProjectAdmin(jwt: ApiJwtPayload, projectID: number): Promise<boolean> {
+        return TokenService.hasRole(jwt, ApiUserRoleName.PROJECT_ADMIN, projectID);
     }
 
-    static async isRareSpeciesAdmin(jwt: UserJwtPayload, collectionID: number): Promise<boolean> {
+    static async isRareSpeciesAdmin(jwt: ApiJwtPayload, collectionID: number): Promise<boolean> {
         return TokenService.hasRole(
             jwt,
-            UserRoleName.ROLE_RARE_SPECIES_ADMIN,
+            ApiUserRoleName.RARE_SPECIES_ADMIN,
             collectionID
         );
     }
 
-    static async isRareSpeciesReader(jwt: UserJwtPayload, collectionID: number): Promise<boolean> {
+    static async isRareSpeciesReader(jwt: ApiJwtPayload, collectionID: number): Promise<boolean> {
         return TokenService.hasRole(
             jwt,
-            UserRoleName.ROLE_RARE_SPECIES_READER,
+            ApiUserRoleName.RARE_SPECIES_READER,
             collectionID
         );
     }
 
-    static async canReadRareSpecies(jwt: UserJwtPayload, collectionID: number): Promise<boolean> {
+    static async canReadRareSpecies(jwt: ApiJwtPayload, collectionID: number): Promise<boolean> {
         const promises: Promise<boolean>[] = [
             TokenService.isRareSpeciesAdmin(jwt, collectionID),
             TokenService.isRareSpeciesReader(jwt, collectionID)
@@ -154,12 +159,12 @@ export class TokenService extends BaseService<RefreshToken> {
         return isRareSppAdmin || isRareSppEditor;
     }
 
-    static async isTaxonEditor(jwt: UserJwtPayload): Promise<boolean> {
-        return TokenService.hasRole(jwt, UserRoleName.ROLE_TAXON_EDITOR);
+    static async isTaxonEditor(jwt: ApiJwtPayload): Promise<boolean> {
+        return TokenService.hasRole(jwt, ApiUserRoleName.TAXON_EDITOR);
     }
 
-    static async isTaxonProfileEditor(jwt: UserJwtPayload): Promise<boolean> {
-        return this.hasRole(jwt, UserRoleName.ROLE_TAXON_PROFILE);
+    static async isTaxonProfileEditor(jwt: ApiJwtPayload): Promise<boolean> {
+        return this.hasRole(jwt, ApiUserRoleName.TAXON_PROFILE_EDITOR);
     }
 
     private encodeRefreshToken(token: RefreshToken): Promise<string> {
@@ -170,14 +175,14 @@ export class TokenService extends BaseService<RefreshToken> {
         });
     }
 
-    private static async hasRole(payload: UserJwtPayload, role: UserRoleName, tablePrimaryKey: number = null): Promise<boolean> {
+    private static async hasRole(payload: ApiJwtPayload, role: ApiUserRoleName, tablePrimaryKey: number = null): Promise<boolean> {
         const matchingRoles = payload.roles.filter((r) => {
-            const nameMatches = r.role === role.toString();
+            const nameMatches = r.name === role.toString();
             if (tablePrimaryKey === null) {
                 return nameMatches;
             }
 
-            return nameMatches && r.tableKey === tablePrimaryKey;
+            return nameMatches && r.tablePrimaryKey === tablePrimaryKey;
         });
 
         return matchingRoles.length > 0;

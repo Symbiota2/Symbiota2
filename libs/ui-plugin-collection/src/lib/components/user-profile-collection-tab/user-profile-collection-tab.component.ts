@@ -5,7 +5,7 @@ import { switchMap } from 'rxjs/operators';
 import { Collection } from '../../dto/Collection.output.dto';
 
 @Component({
-    selector: 'lib-user-profile-collection-tab',
+    selector: 'symbiota2-user-profile-collection-tab',
     templateUrl: "./user-profile-collection-tab.component.html",
     styleUrls: ["./user-profile-collection-tab.component.scss"]
 })
@@ -22,7 +22,7 @@ export class UserProfileCollectionTab implements OnInit {
                 if (user.isSuperAdmin()) {
                     return this.collectionService.findAll();
                 }
-                const collectionIDs = user.collectionRoles.map((r) => r.target);
+                const collectionIDs = user.collectionRoles.map((r) => r.tablePrimaryKey);
                 return this.collectionService.findByIDs(collectionIDs);
             })
         ).subscribe((collections) => {

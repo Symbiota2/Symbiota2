@@ -1,9 +1,9 @@
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsBoolean, IsDateString, IsOptional, IsEmail } from 'class-validator';
-import { ApiInputUser } from '@symbiota2/data-access';
+import { ApiUserProfileData } from '@symbiota2/data-access';
 
-export class UserInputDto implements ApiInputUser {
+export class UserInputDto implements ApiUserProfileData {
     @ApiProperty()
     @IsString()
     firstName: string;

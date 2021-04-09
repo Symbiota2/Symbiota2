@@ -24,11 +24,11 @@ import {
     CollectionInputDto,
     UpdateCollectionInputDto
 } from './dto/Collection.input.dto';
-import { Collection } from '@symbiota2/api-database';
 import { JwtAuthGuard } from '@symbiota2/api-auth';
 import {
     ProtectCollection,
 } from './collection-edit-guard/decorators';
+import { CollectionListItem } from './dto/CollectionListItem.output.dto';
 
 @ApiTags('Collections')
 @Controller('collections')
@@ -38,11 +38,11 @@ export class CollectionController {
         private readonly collections: CollectionService) { }
 
     @Get()
-    @ApiResponse({ status: HttpStatus.OK, type: CollectionOutputDto, isArray: true })
-    async findAll(@Query() findAllParams: CollectionFindAllParams): Promise<CollectionOutputDto[]> {
+    @ApiResponse({ status: HttpStatus.OK, type: CollectionListItem, isArray: true })
+    async findAll(@Query() findAllParams: CollectionFindAllParams): Promise<CollectionListItem[]> {
         const collections = await this.collections.findAll(findAllParams);
-        const collectionDtos = collections.map((c) => {
-            return new CollectionOutputDto(c);
+        const collectionDtos = collections.map(async (c) => {
+            return new CollectionListItem(c);
         });
         return Promise.all(collectionDtos);
     }
@@ -51,7 +51,10 @@ export class CollectionController {
     @ApiResponse({ status: HttpStatus.OK, type: CollectionOutputDto })
     async findByID(@Param('id') id: number): Promise<CollectionOutputDto> {
         const collection = await this.collections.findByID(id);
-        return new CollectionOutputDto(collection);
+        const collectionDto = new CollectionOutputDto(collection);
+        collectionDto.institution = await collection.institution;
+        collectionDto.stats = await collection.collectionStats;
+        return collectionDto;
     }
 
     @Post()

@@ -66,10 +66,7 @@ import { CollectionFieldComponent } from './components/collection-field/collecti
 })
 export class CollectionPlugin extends SymbiotaUiPlugin {
     static routes(): Route[] {
-        return [{
-            path: "collections/:id",
-            component: CollectionPage
-        }];
+        return [CollectionPage.ROUTE];
     }
 
     static userProfileTabs(): UserProfileTab[] {

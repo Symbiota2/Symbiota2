@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, of, Subscription, timer } from 'rxjs';
-import { User, UserProfileData } from "./dto/user-data.class";
+import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
+import { User, UserProfileData } from "./dto/user.class";
 import { ApiClientService } from "../api-client";
 import { plainToClass } from "class-transformer";
 import {
@@ -12,15 +12,14 @@ import {
     switchMap, take,
     tap
 } from 'rxjs/operators';
-import { LoginResponseData } from "./dto/login-data.interface";
+import { ApiLoginResponse } from "@symbiota2/data-access";
 import { AlertService } from "../alert";
 import { HttpErrorResponse } from "@angular/common/http";
 import { UserModule } from "./user.module";
 import jwtDecode from "jwt-decode";
 import {
-    ApiInputCreateUser,
-    ApiInputUser,
-    ApiOutputUser
+    ApiCreateUserData,
+    ApiUser
 } from '@symbiota2/data-access';
 
 type AuthData = { username?: string, password?: string };
@@ -63,7 +62,7 @@ export class UserService {
         shareReplay(1)
     );
 
-    private static userFromJwt(jsonResponse: LoginResponseData): User {
+    private static userFromJwt(jsonResponse: ApiLoginResponse): User {
         if (jsonResponse === null) {
             return null;
         }
@@ -75,7 +74,7 @@ export class UserService {
         private readonly alert: AlertService,
         private readonly api: ApiClientService) { }
 
-    create(userData: ApiInputCreateUser): Observable<User> {
+    create(userData: ApiCreateUserData): Observable<User> {
         const createReq = this.api.queryBuilder(this.usersUrl)
             .post()
             .body(userData)
@@ -88,7 +87,7 @@ export class UserService {
                 }
                 return of('Account creation failed');
             }),
-            switchMap((userOrError: ApiOutputUser | string) => {
+            switchMap((userOrError: ApiUser | string) => {
                 if (typeof userOrError !== 'string') {
                     this.alert.showMessage('Account created successfully');
                     return this.login(userData.username, userData.password);

@@ -4,15 +4,14 @@ import {
     IsNotEmpty,
     IsOptional
 } from 'class-validator';
-import { UserRoleName } from '@symbiota2/api-database';
 import { Type } from 'class-transformer';
-import { ApiInputUserRole } from '@symbiota2/data-access';
+import { ApiCreateUserRoleData, ApiUserRoleName } from '@symbiota2/data-access';
 
-export class RoleInputDto implements ApiInputUserRole {
+export class RoleInputDto implements ApiCreateUserRoleData {
     @ApiProperty()
-    @IsEnum(UserRoleName)
+    @IsEnum(ApiUserRoleName)
     @IsNotEmpty()
-    name: UserRoleName;
+    name: ApiUserRoleName;
 
     @ApiProperty({ required: false })
     @Type(() => Number)

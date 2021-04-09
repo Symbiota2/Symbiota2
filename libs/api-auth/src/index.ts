@@ -1,7 +1,7 @@
 export * from './auth/auth.module';
 export * from './auth/guards';
 export * from './auth/strategies/refresh-cookie.strategy';
-export * from './auth/dto/interfaces';
+export * from './auth/dto/authenticated-request';
 export * from './auth/guards/current-user.guard';
 
 export * from './user/user.module';

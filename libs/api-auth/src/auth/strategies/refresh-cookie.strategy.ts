@@ -5,7 +5,7 @@ import { User } from '@symbiota2/api-database';
 import { TokenService } from '../../user/services/token.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../../user/services/user.service';
-import { AuthenticatedRequest } from '../dto/interfaces';
+import { AuthenticatedRequest } from '../dto/authenticated-request';
 
 @Injectable()
 export class RefreshCookieStrategy extends PassportStrategy(Strategy) {

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, switchMap } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { CollectionService } from '../../services/collection.service';
 import { Collection } from '../../dto/Collection.output.dto';
 import {
@@ -15,11 +15,16 @@ import { CollectionInputDto } from '../../dto/Collection.input.dto';
 import { DomSanitizer, SafeHtml, SafeUrl } from '@angular/platform-browser';
 
 @Component({
-    selector: 'lib-collection-page',
+    selector: 'symbiota2-collection-page',
     templateUrl: './collection-page.component.html',
     styleUrls: ['./collection-page.component.scss']
 })
-export class CollectionPage implements OnInit {
+export class CollectionPage {
+    static readonly ROUTE = {
+        path: "collections/:id",
+        component: CollectionPage
+    };
+
     private static USER_COLLECTIONS_LINK: CollectionProfileLink = {
         text: 'Back to collections',
         routerLink: '/viewprofile',
@@ -86,14 +91,14 @@ export class CollectionPage implements OnInit {
     }
 
     collectionHomePage(): SafeUrl {
-        if (!!this.collection.homePage) {
+        if (this.collection?.homePage) {
             return this.sanitizer.bypassSecurityTrustUrl(this.collection.homePage);
         }
         return null;
     }
 
     georeferencedPercent(): number {
-        if (this.collection.stats.recordCount > 0) {
+        if (this.collection?.stats.recordCount > 0) {
             return Math.round(this.collection.stats.georeferencedCount / this.collection.stats.recordCount * 100);
         }
         return 0;

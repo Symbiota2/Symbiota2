@@ -1,10 +1,10 @@
 import { Exclude, Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '@symbiota2/api-database';
-import { ApiOutputUserRole } from '@symbiota2/data-access';
+import { ApiUserRoleName, ApiUserRole } from '@symbiota2/data-access';
 
 @Exclude()
-export class RoleOutputDto implements ApiOutputUserRole {
+export class RoleOutputDto implements ApiUserRole {
     constructor(role: UserRole) {
         Object.assign(this, role);
     }
@@ -15,7 +15,7 @@ export class RoleOutputDto implements ApiOutputUserRole {
 
     @ApiProperty()
     @Expose()
-    name: string;
+    name: ApiUserRoleName;
 
     @ApiProperty()
     @Expose()
