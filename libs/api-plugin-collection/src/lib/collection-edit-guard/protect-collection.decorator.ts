@@ -1,7 +1,6 @@
 import {
     applyDecorators,
-    createParamDecorator,
-    ExecutionContext, SetMetadata,
+    SetMetadata,
     UseGuards
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@symbiota2/api-auth';

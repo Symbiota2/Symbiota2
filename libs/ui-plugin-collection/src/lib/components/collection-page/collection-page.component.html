@@ -37,13 +37,14 @@
         </div>
 
         <lib-collection-field label="Contact" [value]="collection.contact"></lib-collection-field>
+        <lib-collection-field label="Contact email" [value]="collection.email"></lib-collection-field>
         <lib-collection-field label="Home page" [href]="collectionHomePage()" [value]="collection.homePage"></lib-collection-field>
         <lib-collection-field label="Collection type" [value]="collection.type"></lib-collection-field>
         <lib-collection-field label="Management" [value]="collection.managementType"></lib-collection-field>
-        <lib-collection-field label="Last update" [value]="collection.stats.lastModifiedTimestamp | date"></lib-collection-field>
+        <lib-collection-field label="Last update" [value]="collection.stats?.lastModifiedTimestamp | date"></lib-collection-field>
         <lib-collection-field label="Usage rights" [value]="collection.usageTerm"></lib-collection-field>
     </div>
-    <div id="collectionStats">
+    <div id="collectionStats" *ngIf='collection.stats'>
         <b>Collection Stats</b>
         <ul>
             <li>{{ collection.stats.recordCount }} occurrences</li>

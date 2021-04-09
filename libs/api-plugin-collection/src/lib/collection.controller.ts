@@ -27,7 +27,7 @@ import {
 import { JwtAuthGuard } from '@symbiota2/api-auth';
 import {
     ProtectCollection,
-} from './collection-edit-guard/decorators';
+} from './collection-edit-guard/protect-collection.decorator';
 import { CollectionListItem } from './dto/CollectionListItem.output.dto';
 
 @ApiTags('Collections')
@@ -92,6 +92,11 @@ export class CollectionController {
         if (!collection) {
             throw new NotFoundException();
         }
-        return new CollectionOutputDto(collection);
+
+        const collectionDto = new CollectionOutputDto(collection);
+        collectionDto.stats = await collection.collectionStats;
+        collectionDto.institution = await collection.institution;
+
+        return collectionDto;
     }
 }

@@ -73,19 +73,22 @@ export class CollectionPage {
         dialogRef.afterClosed().subscribe((collectionData) => {
             if (collectionData) {
                 collectionData = CollectionInputDto.fromFormData(collectionData);
-                this.collections.updateByID(this.collection.id, collectionData)
-                    .subscribe((updatedCollection) => {
-                        if (updatedCollection === null) {
-                            this.alerts.showError('Error updating collection');
-                            this.router.navigate(
-                                [CollectionPage.USER_COLLECTIONS_LINK.routerLink],
-                                { queryParams: CollectionPage.USER_COLLECTIONS_LINK.queryParams }
-                            );
-                        }
-                        else {
-                            this.collection = updatedCollection;
-                        }
-                    });
+                this.collections.updateByID(
+                    this.collection.id,
+                    this.currentUser.token,
+                    collectionData
+                ).subscribe((updatedCollection) => {
+                    if (updatedCollection === null) {
+                        this.alerts.showError('Error updating collection');
+                        this.router.navigate(
+                            [CollectionPage.USER_COLLECTIONS_LINK.routerLink],
+                            { queryParams: CollectionPage.USER_COLLECTIONS_LINK.queryParams }
+                        );
+                    }
+                    else {
+                        this.collection = updatedCollection;
+                    }
+                });
             }
         });
     }
@@ -98,7 +101,7 @@ export class CollectionPage {
     }
 
     georeferencedPercent(): number {
-        if (this.collection?.stats.recordCount > 0) {
+        if (this.collection?.stats?.recordCount > 0) {
             return Math.round(this.collection.stats.georeferencedCount / this.collection.stats.recordCount * 100);
         }
         return 0;

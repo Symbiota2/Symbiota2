@@ -33,7 +33,7 @@
     "start:dev:ui": "nx serve ui",
     "start:dev:api": "nx serve api",
     "start:prod:ui": "nx serve ui --prod --watch=false --liveReload=false",
-    "start:prod:api": "nx serve api --watch=false",
+    "start:prod:api": "NODE_ENV=production nx serve api --watch=false",
     "test": "nx run-many --target=test --all",
     "test:api": "nx run-many --target=test --projects=api --with-deps",
     "test:ui": "nx run-many --target=test --projects=ui --with-deps",

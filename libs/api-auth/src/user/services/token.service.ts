@@ -177,7 +177,7 @@ export class TokenService extends BaseService<RefreshToken> {
 
     private static async hasRole(payload: ApiJwtPayload, role: ApiUserRoleName, tablePrimaryKey: number = null): Promise<boolean> {
         const matchingRoles = payload.roles.filter((r) => {
-            const nameMatches = r.name === role.toString();
+            const nameMatches = r.name === role;
             if (tablePrimaryKey === null) {
                 return nameMatches;
             }

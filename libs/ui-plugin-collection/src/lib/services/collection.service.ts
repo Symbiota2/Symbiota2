@@ -93,14 +93,13 @@ export class CollectionService {
         );
     }
 
-    updateByID(id: number, collectionData: Partial<CollectionInputDto>): Observable<Collection> {
+    updateByID(id: number, userToken: string, collectionData: Partial<CollectionInputDto>): Observable<Collection> {
         const url = `${this.baseUrl}/${id}`;
         const req = this.api.queryBuilder(url)
             .patch()
             .body(collectionData)
+            .addJwtAuth(userToken)
             .build();
-
-        console.log(collectionData);
 
         return this.api.send(req).pipe(
             catchError((e) => {

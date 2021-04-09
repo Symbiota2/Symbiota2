@@ -2,7 +2,7 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsString, IsOptional, IsInt, MaxLength, IsNumber, IsEnum, IsNumberString } from 'class-validator';
 
 export class CollectionInputDto {
-    
+
     @ApiProperty({ required: false })
     @IsString()
     @IsOptional()
@@ -48,12 +48,12 @@ export class CollectionInputDto {
     email: string;
 
     @ApiProperty({ required: false })
-    @IsNumberString()
+    @IsNumber()
     @IsOptional()
     latitude: number;
 
     @ApiProperty({ required: false })
-    @IsNumberString()
+    @IsNumber()
     @IsOptional()
     longitude: number;
 
