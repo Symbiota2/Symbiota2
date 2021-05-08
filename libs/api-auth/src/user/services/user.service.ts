@@ -15,13 +15,16 @@ export class UserService extends BaseService<User> {
         super(userRepo);
     }
 
-    async findByLogin(username: string): Promise<User> {
-        return this.userRepo.findOne({ username });
+    async findByLogin(username: string, fields?: Array<keyof User>): Promise<User> {
+        return this.userRepo.findOne({
+            select: fields,
+            where: { username }
+        });
     }
 
-    async findByLoginWithPassword(username: string, password: string): Promise<User> {
+    async findByLoginWithPassword(username: string, password: string, fields?: Array<keyof User>): Promise<User> {
         return this.userRepo.createQueryBuilder()
-            .select()
+            .select(fields)
             .where('username = :username', { username })
             .andWhere('password = PASSWORD(:password)', { password })
             .getOne();
@@ -31,8 +34,8 @@ export class UserService extends BaseService<User> {
         return this.userRepo.save({ uid, ...userData });
     }
 
-    async findAll(): Promise<User[]> {
-        return this.userRepo.find();
+    async findAll(fields?: [keyof User]): Promise<User[]> {
+        return this.userRepo.find({ select: fields });
     }
 
     async updateLastLogin(uid: number): Promise<boolean> {

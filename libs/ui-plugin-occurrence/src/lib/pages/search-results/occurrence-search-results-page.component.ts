@@ -1,30 +1,23 @@
 import {Component, OnInit} from "@angular/core";
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
-import { Q_PARAM_COLLIDS } from '../../../constants';
 import { LoadingService } from '@symbiota2/ui-common';
 import { OccurrenceService } from '../../services/occurrence.service';
-import { finalize } from 'rxjs/operators';
+import {
+    ApiOccurrenceFindAllParams,
+    ApiOccurrenceListItem, ApiTaxonSearchCriterion
+} from '@symbiota2/data-access';
+import { Observable } from 'rxjs';
 
 @Component({
-    selector: "occurrence-search-search-results",
+    selector: "symbiota2-occurrence-search-results",
     templateUrl: "./occurrence-search-results-page.component.html",
     styleUrls: ["./occurrence-search-results-page.component.scss"]
 })
 export class OccurrenceSearchResultsPage implements OnInit {
-    public totalResults = 0;
-    public itemsPerPage = 50;
-    public occurrences = [];
+    public limit = 25;
+    public offset = 0;
 
-    private collectionIDs: number[] = [];
-    private catalogNumber = "";
-    private taxonSearchType = "";
-    private taxonSearchStr = "";
-    private locality = "";
-    private province = "";
-    private country = "";
-    private collector = "";
-    private collectionDateStart: Date = null;
-    private collectionDateEnd: Date = null;
+    occurrences: Observable<ApiOccurrenceListItem[]>;
 
     constructor(
         private readonly router: Router,
@@ -37,58 +30,55 @@ export class OccurrenceSearchResultsPage implements OnInit {
     }
 
     ngOnInit() {
-        this.collectionIDs = this.queryParams.getAll(Q_PARAM_COLLIDS).map((collid) => {
-            return parseInt(collid);
-        });
 
-        if (this.collectionIDs.length > 0) {
+        // TODO: Clean this up
+        const collectionIDs = this.queryParams.getAll('collectionID[]').map(
+            (id) => parseInt(id)
+        );
+        const taxonSearchCriterion = this.queryParams.get('taxonSearchCriterion');
+        const taxonSearchStr = this.queryParams.get('taxonSearchStr');
+        const country = this.queryParams.get('country');
+        const stateProvince = this.queryParams.get('stateProvince');
+        const county = this.queryParams.get('county');
+        const locality = this.queryParams.get('locality');
+        const minimumElevationInMeters = parseInt(this.queryParams.get('minimumElevationInMeters'));
+        const maximumElevationInMeters = parseInt(this.queryParams.get('maximumElevationInMeters'));
 
-            this.loadOccurrences();
+        const minLatitude = parseInt(this.queryParams.get('minLatitude'));
+        const minLongitude = parseInt(this.queryParams.get('minLongitude'));
+
+        const maxLatitude = parseInt(this.queryParams.get('maxLatitude'));
+        const maxLongitude = parseInt(this.queryParams.get('maxLongitude'));
+
+        if (collectionIDs.length > 0) {
+            const findParams: Partial<ApiOccurrenceFindAllParams> = {
+                collectionID: collectionIDs,
+                taxonSearchCriterion: taxonSearchCriterion as ApiTaxonSearchCriterion,
+                taxonSearchStr,
+                county,
+                country,
+                stateProvince,
+                locality,
+                minimumElevationInMeters,
+                maximumElevationInMeters,
+                minLatitude,
+                minLongitude,
+                maxLatitude,
+                maxLongitude,
+                limit: this.limit,
+                offset: this.offset
+            };
+
+            this.occurrences = this.occurrenceService.findAll(findParams);
         }
         else {
-            this.prevPage();
+            this.router.navigate(
+                ['..'],
+                {
+                    relativeTo: this.currentRoute,
+                    queryParams: this.currentRoute.snapshot.queryParams
+                }
+            );
         }
-    }
-
-    loadOccurrences() {
-        const findParams = {
-            collectionIDs: this.collectionIDs,
-            catalogNumber: this.catalogNumber
-        };
-
-        this.occurrenceService.findAll(findParams).subscribe((occurrences) => {
-            this.occurrences = occurrences;
-        });
-    }
-
-    onItemsPerPageChanged(itemsPerPage: string) {
-        // this.itemsPerPage = parseInt(itemsPerPage);
-        this.loadOccurrences();
-    }
-
-    getFirstIndexOnPage() {
-        if (this.totalResults === 0) {
-            return 0;
-        }
-        // return this.itemsPerPage * (this.currentPage - 1) + 1;
-    }
-
-    getLastIndexOnPage(): number {
-        // const lastIdx = this.getFirstIndexOnPage() + this.itemsPerPage - 1;
-        // if (lastIdx > this.totalResults) {
-        //     return this.totalResults;
-        // }
-        // return lastIdx;
-        return 1;
-    }
-
-    async prevPage() {
-        this.router.navigate(
-            ['..'],
-            {
-                relativeTo: this.currentRoute,
-                queryParams: this.currentRoute.snapshot.queryParams
-            }
-        );
     }
 }

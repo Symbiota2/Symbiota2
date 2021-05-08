@@ -4,7 +4,7 @@ import { Collection } from '../../dto/Collection.output.dto';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
-    selector: 'lib-collection-editor',
+    selector: 'symbiota2-collection-editor',
     templateUrl: './collection-editor.component.html',
     styleUrls: ['./collection-editor.component.scss']
 })
@@ -62,6 +62,6 @@ export class CollectionEditorComponent implements OnInit {
     }
 
     onClose() {
-        this.dialogRef.close();
+        this.dialogRef.close(null);
     }
 }

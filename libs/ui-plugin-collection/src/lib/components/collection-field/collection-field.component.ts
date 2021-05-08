@@ -5,7 +5,7 @@ import {
 import { SafeUrl } from '@angular/platform-browser';
 
 @Component({
-    selector: 'lib-collection-field',
+    selector: 'symbiota2-collection-field',
     template: `
         <p *ngIf="value">
             <span *ngIf="label" class="bold">{{ label }}: </span>
@@ -14,7 +14,8 @@ import { SafeUrl } from '@angular/platform-browser';
             </a>
             <ng-template #valueContainer>{{ value }}</ng-template>
         </p>
-    `
+    `,
+    styleUrls: ['./collection-field.component.scss']
 })
 export class CollectionFieldComponent {
     @Input() label: string = null;

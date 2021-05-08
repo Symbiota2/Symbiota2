@@ -22,9 +22,7 @@ export class CategoryController {
             categories.map(async (category) => {
                 const dto = new CategoryOutputDto(category);
                 const collections = await this.collections.findByCategory(category.id);
-                dto.collections = await Promise.all(
-                    collections.map((coll) => new CollectionListItem(coll))
-                );
+                dto.collections = collections.map((coll) => new CollectionListItem(coll));
                 return dto;
             })
         );
@@ -44,7 +42,6 @@ export class CategoryController {
 
         const dto = new CategoryOutputDto(category);
         dto.collections = collections.map(c => new CollectionListItem(c));
-
         return dto;
     }
 }

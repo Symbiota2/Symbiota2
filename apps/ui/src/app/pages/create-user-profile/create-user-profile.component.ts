@@ -13,7 +13,11 @@ import {
     FormGroup,
     Validators
 } from '@angular/forms';
-import { AlertService, UserService } from '@symbiota2/ui-common';
+import {
+    AlertService,
+    ROUTE_USER_PROFILE,
+    UserService
+} from '@symbiota2/ui-common';
 import {
     passwordContainsCharClasses,
     passwordsMatch
@@ -31,8 +35,6 @@ import { combineAll, map, startWith, switchMap, tap } from 'rxjs/operators';
     styleUrls: ['./create-user-profile.component.scss']
 })
 export class CreateUserProfileComponent implements OnInit {
-    static readonly ROUTE = "createprofile";
-
     readonly PASSWORD_MIN_CHARS = 8;
 
     readonly usernameField = new FormControl('', [Validators.required]);
@@ -127,7 +129,7 @@ export class CreateUserProfileComponent implements OnInit {
     onSubmit() {
         const { passwordAgain, ...formData } = this.form.getRawValue();
         this.users.create(formData).subscribe(() => {
-            return this.router.navigate([UserProfileComponent.ROUTE])
+            return this.router.navigate([ROUTE_USER_PROFILE])
         });
     }
 }

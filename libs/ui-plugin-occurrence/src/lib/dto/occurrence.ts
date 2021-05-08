@@ -105,6 +105,14 @@ export class Occurrence extends OccurrenceListItem {
     @Expose() verbatimElevation: string;
     @Expose() verbatimEventDate: string;
 
+    static fromJSON(occurrenceJSON: Record<string, unknown>): Occurrence {
+        return plainToClass(
+            Occurrence,
+            occurrenceJSON,
+            { excludeExtraneousValues: true, enableImplicitConversion: true }
+        );
+    }
+
     collectorInfo(): CollectorInfo {
         return {
             associatedCollectors: this.associatedCollectors,
@@ -126,13 +134,5 @@ export class Occurrence extends OccurrenceListItem {
             dateIdentified: this.dateIdentified,
             identifiedBy: this.identifiedBy
         };
-    }
-
-    static fromJSON(occurrenceJSON: Record<string, unknown>): Occurrence {
-        return plainToClass(
-            Occurrence,
-            occurrenceJSON,
-            { excludeExtraneousValues: true, enableImplicitConversion: true }
-        );
     }
 }

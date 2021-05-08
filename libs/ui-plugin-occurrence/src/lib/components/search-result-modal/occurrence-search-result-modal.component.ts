@@ -3,41 +3,42 @@ import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { OccurrenceService } from '../../services/occurrence.service';
 import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { Occurrence, OccurrenceListItem } from '../../dto';
-import { forkJoin, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { UserService } from '@symbiota2/ui-common';
+import { map } from 'rxjs/operators';
 
 @Component({
-    selector: "occurrence-search-search-result-modal",
+    selector: "symbiota2-occurrence-search-result-modal",
     templateUrl: "./occurrence-search-result-modal.component.html",
     styleUrls: ["./occurrence-search-result-modal.component.scss"]
 })
 export class OccurrenceSearchResultModalComponent implements OnInit {
-    public collection: Collection;
-    public occurrence: Occurrence;
+    collection$: Observable<Collection>;
+    occurrence$: Observable<Occurrence>;
+
+    isEditing = false;
+    canEdit: Observable<boolean>;
 
     constructor(
         private readonly translate: TranslateService,
         private readonly occurrences: OccurrenceService,
         private readonly collections: CollectionService,
+        private readonly userService: UserService,
         @Inject(MAT_DIALOG_DATA) public occurrenceListItem: OccurrenceListItem,
         public dialogRef: MatDialogRef<OccurrenceSearchResultModalComponent>) { }
 
     ngOnInit() {
-        forkJoin([
-            this.occurrences.findByID(this.occurrenceListItem.id),
-            this.collections.findByID(this.occurrenceListItem.collectionID)
-        ]).subscribe(([occurrence, collection]) => {
-            this.occurrence = occurrence;
-            this.collection = collection;
-        });
-    }
+        this.canEdit = this.userService.currentUser.pipe(
+            map((user) => user.canEditCollection(this.occurrenceListItem.collectionID))
+        );
 
-    get loaded(): boolean {
-        return !!this.occurrence && !!this.collection;
+        this.occurrence$ = this.occurrences.findByID(this.occurrenceListItem.id);
+        this.collection$ = this.collections.findByID(this.occurrenceListItem.collectionID);
     }
 
     onEditClick() {
-        // console.log(this.authService.getCurrentPermissions());
+        this.isEditing = !this.isEditing;
     }
 
     onCloseClick() {

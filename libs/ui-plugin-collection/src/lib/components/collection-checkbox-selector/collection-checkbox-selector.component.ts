@@ -83,9 +83,9 @@ export class CollectionTreeData {
 }
 
 @Component({
-    selector: 'collection-collection-checkbox-selector',
+    selector: 'symbiota2-collection-checkbox-selector',
     templateUrl: './collection-checkbox-selector.component.html',
-    styleUrls: ['./collection-checkbox-selector.component.less'],
+    styleUrls: ['./collection-checkbox-selector.component.scss'],
     providers: [CollectionTreeData]
 })
 export class CollectionCheckboxSelectorComponent implements OnChanges, OnInit {

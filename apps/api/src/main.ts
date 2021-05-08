@@ -1,12 +1,12 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { AppConfigService } from '@symbiota2/api-config';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { RefreshCookieStrategy } from '@symbiota2/api-auth';
+import { RequestLoggerInterceptor } from './request-logger/request-logger.interceptor';
 
 const GLOBAL_API_PREFIX = 'api/v1';
 const SWAGGER_DOCS_PREFIX = 'docs'
@@ -36,15 +36,15 @@ export default async function bootstrap() {
         app.use(helmet());
     }
 
-    // Enable CORS, reflect origin
     // TODO: Can this be more restrictive?
-    app.use('*', cors({ origin: true, credentials: true }));
+    app.enableCors({ origin: true, credentials: true });
 
     // Enable cookie parser
     app.use(cookieParser());
 
-    // Serialize output
+    // Log requests, Serialize output
     app.useGlobalInterceptors(
+        new RequestLoggerInterceptor(),
         new ClassSerializerInterceptor(
             app.get(Reflector),
             {

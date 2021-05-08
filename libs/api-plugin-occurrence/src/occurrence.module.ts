@@ -28,7 +28,13 @@ import { SymbiotaApiPlugin } from '@symbiota2/api-common';
                     );
                 }
 
-                return { dest: uploadDir }
+                return {
+                    // TODO: Configurable upload limit
+                    dest: uploadDir,
+                    limits: {
+                        fileSize: 1074000000 // 1GiB
+                    }
+                }
             },
             inject: [AppConfigService]
         })

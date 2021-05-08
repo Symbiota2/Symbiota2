@@ -1,0 +1,11 @@
+<mat-accordion>
+    <mat-expansion-panel [expanded]="expanded" (opened)='expandedChange.emit(true)' (closed)='expandedChange.emit(false)'>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{ label }}
+                <span class='requiredAsterisk' [class.show]='required'>*</span>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-content></ng-content>
+    </mat-expansion-panel>
+</mat-accordion>

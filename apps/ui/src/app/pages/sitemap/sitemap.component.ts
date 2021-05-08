@@ -1,18 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
-    selector: 'app-sitemap',
+    selector: 'symbiota2-sitemap',
     templateUrl: './sitemap.component.html',
     styleUrls: ['./sitemap.component.scss']
 })
-export class SitemapComponent implements OnInit {
-    static readonly ROUTE = "sitemap";
-
-    constructor() {
-
-    }
-
-    ngOnInit() {
-
-    }
+export class SitemapComponent {
+    constructor() {}
 }

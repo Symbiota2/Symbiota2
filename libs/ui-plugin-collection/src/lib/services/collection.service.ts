@@ -4,13 +4,18 @@ import {
     ApiClientService,
 } from "@symbiota2/ui-common";
 import { catchError, map } from 'rxjs/operators';
-import { Collection } from '../dto/Collection.output.dto';
+import { Collection, CollectionListItem } from '../dto/Collection.output.dto';
 import { Injectable } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { CollectionInputDto } from '../dto/Collection.input.dto';
+import {
+    ApiCollectionCategoryOutput,
+    ApiCollectionListItem, ApiCollectionOutput
+} from '@symbiota2/data-access';
 
 interface FindAllParams {
     limit: number;
+    orderBy: string;
 }
 
 @Injectable()
@@ -32,7 +37,7 @@ export class CollectionService {
             .build();
 
         return this.api.send(req).pipe(
-            map((categoryJsonLst: Record<string, unknown>[]) => {
+            map((categoryJsonLst: ApiCollectionCategoryOutput[]) => {
                 return categoryJsonLst.map((cat) => {
                     return new CollectionCategory(cat);
                 });
@@ -40,15 +45,24 @@ export class CollectionService {
         );
     }
 
-    findAll(findAllParams?: FindAllParams): Observable<Collection[]> {
-        const req = this.api.queryBuilder(this.baseUrl).get().build();
-        return this.api.send(req).pipe(
+    findAll(findAllParams?: FindAllParams): Observable<CollectionListItem[]> {
+        const reqBuilder = this.api.queryBuilder(this.baseUrl).get()
+
+        if (findAllParams && findAllParams.limit) {
+            reqBuilder.queryParam('limit', findAllParams.limit);
+        }
+
+        if (findAllParams && findAllParams.orderBy) {
+            reqBuilder.queryParam('orderBy', findAllParams.orderBy);
+        }
+
+        return this.api.send(reqBuilder.build()).pipe(
             catchError((e) => {
                 console.error(e);
                 return of([]);
             }),
-            map((collections: Record<string, unknown>[]) => {
-                return collections.map((collection) => new Collection(collection));
+            map((collections: ApiCollectionListItem[]) => {
+                return collections.map((collection) => new CollectionListItem(collection));
             })
         );
     }
@@ -62,13 +76,16 @@ export class CollectionService {
                 console.error(e);
                 return of(null);
             }),
-            map((collection: Record<string, unknown>) => {
+            map((collection: ApiCollectionOutput) => {
+                if (collection === null) {
+                    return null;
+                }
                 return new Collection(collection);
             })
         );
     }
 
-    findByIDs(ids: number[]): Observable<Collection[]> {
+    findByIDs(ids: number[]): Observable<ApiCollectionListItem[]> {
         if (ids.length === 0) {
             return of([]);
         }
@@ -87,8 +104,8 @@ export class CollectionService {
                 console.error(e);
                 return of([]);
             }),
-            map((collections: Record<string, unknown>[]) => {
-                return collections.map((c) => new Collection(c));
+            map((collections: ApiCollectionListItem[]) => {
+                return collections.map((c) => new CollectionListItem(c));
             })
         );
     }
@@ -106,7 +123,7 @@ export class CollectionService {
                 console.error(e);
                 return of(null);
             }),
-            map((collection: Record<string, unknown>) => {
+            map((collection: ApiCollectionOutput) => {
                 if (collection !== null) {
                     return new Collection(collection);
                 }

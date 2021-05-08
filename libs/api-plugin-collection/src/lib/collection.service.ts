@@ -6,6 +6,7 @@ import {
 import { DeepPartial, Repository } from 'typeorm';
 import { CollectionFindAllParams } from './dto/coll-find-all.input.dto';
 import { BaseService } from '@symbiota2/api-common';
+import { CollectionListItem } from './dto/CollectionListItem.output.dto';
 
 @Injectable()
 export class CollectionService extends BaseService<Collection> {
@@ -19,22 +20,23 @@ export class CollectionService extends BaseService<Collection> {
     }
 
     async findAll(params?: CollectionFindAllParams): Promise<Collection[]> {
-        const { limit, offset, ...qParams } = params;
+        const { orderBy, ...qParams } = params;
 
-        const query = this.collections.createQueryBuilder()
-            .select()
-            .take(limit)
-            .skip(offset);
-
-        if (qParams.id) {
-            query.whereInIds(qParams.id);
-        }
-
-        return query.getMany();
+        return this.collections.find({
+            select: ['id', 'icon', 'collectionName'],
+            order: { [orderBy]: 'ASC' },
+            where: qParams.id ? { id: qParams.id } : {}
+        });
     }
 
-    async findByCategory(categoryID: number): Promise<Collection[]> {
-        const links = await this.categoryLinks.find({ categoryID });
+    async findByCategory(categoryID: number): Promise<CollectionListItem[]> {
+        // This is too slow without using query builder to filter out fields
+        const links = await this.categoryLinks.createQueryBuilder('l')
+            .select(['l.categoryID', 'collection.id', 'collection.icon', 'collection.collectionName'])
+            .where({ categoryID })
+            .leftJoin('l.collection', 'collection')
+            .orderBy('collection.collectionName', 'ASC')
+            .getMany();
         return Promise.all(links.map(async (l) => l.collection));
     }
 

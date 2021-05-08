@@ -1,69 +1,130 @@
-import {Inject, Injectable} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Occurrence } from '@symbiota2/api-database';
-import { Repository, DeepPartial } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { FindAllParams } from './dto/find-all-input.dto';
+import { ApiTaxonSearchCriterion } from '@symbiota2/data-access';
+
+type FindAllReturn = Pick<Occurrence,
+    'id' | 'collectionID' | 'catalogNumber' | 'taxonID' | 'sciname' | 'latitude' | 'longitude'>;
 
 @Injectable()
 export class OccurrenceService {
     constructor(
-        @Inject(Occurrence.PROVIDER_ID) private readonly occurrenceRepo: Repository<Occurrence>) { }
+        @Inject(Occurrence.PROVIDER_ID) private readonly occurrenceRepo: Repository<Occurrence>) {
+    }
 
-    async findAll(findAllOpts: FindAllParams): Promise<Occurrence[]> {
+    async findAll(findAllOpts: FindAllParams): Promise<FindAllReturn[]> {
         const { limit, offset, ...params } = findAllOpts;
-        let qb = this.occurrenceRepo.createQueryBuilder()
-            .select()
+        let qb = this.occurrenceRepo.createQueryBuilder('o')
+            .select([
+                'o.id',
+                'o.collectionID',
+                'o.catalogNumber',
+                'o.taxonID',
+                'o.sciname',
+                'o.latitude',
+                'o.longitude'
+            ])
             .take(limit)
-            .offset(offset);
+            .skip(offset);
 
         if (findAllOpts.collectionID) {
             if (Array.isArray(findAllOpts.collectionID)) {
-                qb = qb.where('collid IN (:...collectionID)', { collectionID: params.collectionID });
+                qb = qb.where('o.collectionID IN (:...collectionID)', { collectionID: params.collectionID });
             }
             else {
-                qb = qb.where('collid = :collectionID', { collectionID: params.collectionID });
+                qb = qb.where('o.collectionID = :collectionID', { collectionID: params.collectionID });
             }
         }
 
-        if (findAllOpts.catalogNumber) {
-            qb = qb.andWhere(
-                'catalogNumber LIKE :catalogNumber',
-                { catalogNumber: `${params.catalogNumber}%` }
+        if (findAllOpts.taxonSearchCriterion && findAllOpts.taxonSearchStr) {
+            const searchStr = `${ findAllOpts.taxonSearchStr }%`;
+            switch (findAllOpts.taxonSearchCriterion) {
+                case ApiTaxonSearchCriterion.familyOrSciName:
+                    qb.andWhere(
+                        '(o.sciname LIKE :searchStr or o.family LIKE :searchStr)',
+                        { searchStr }
+                    );
+                    break;
+                case ApiTaxonSearchCriterion.sciName:
+                    qb.andWhere(
+                        'o.sciname LIKE :searchStr',
+                        { searchStr }
+                    );
+                    break;
+                case ApiTaxonSearchCriterion.family:
+                    qb.andWhere(
+                        'o.family LIKE :searchStr',
+                        { searchStr }
+                    );
+                    break;
+                case ApiTaxonSearchCriterion.higherTaxonomy:
+                    // TODO: Taxon plugin returns children of higher taxonomy?
+                    break;
+                case ApiTaxonSearchCriterion.commonName:
+                    // TODO: Taxon plugin returns common names for a taxon?
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (findAllOpts.minimumElevationInMeters !== undefined) {
+            qb.andWhere(
+                'o.minimumElevationInMeters = :elevation',
+                { elevation: findAllOpts.minimumElevationInMeters }
             );
         }
 
-        if (findAllOpts.scientificName) {
-            qb = qb.andWhere(
-                'sciname LIKE :sciname',
-                { sciname: `%${findAllOpts.scientificName}%` }
+        if (findAllOpts.maximumElevationInMeters !== undefined) {
+            qb.andWhere(
+                'o.maximumElevationInMeters = :elevation',
+                { elevation: findAllOpts.maximumElevationInMeters }
             );
         }
 
-        if (findAllOpts.latitudeGt) {
-            qb = qb.andWhere(
-                'decimalLatitude >= :latGt',
-                { latGt: findAllOpts.latitudeGt }
-            );
+        if (findAllOpts.minLatitude !== undefined) {
+            qb.andWhere(
+                'o.latitude >= :latitude',
+                { latitude: findAllOpts.minLatitude }
+            )
         }
 
-        if (findAllOpts.latitudeLt) {
-            qb = qb.andWhere(
-                'decimalLatitude <= :latLt',
-                { latLt: findAllOpts.latitudeLt }
-            );
+        if (findAllOpts.minLongitude !== undefined) {
+            qb.andWhere(
+                'o.longitude >= :longitude',
+                { longitude: findAllOpts.minLongitude }
+            )
         }
 
-        if (findAllOpts.longitudeGt) {
-            qb = qb.andWhere(
-                'decimalLongitude >= :lonGt',
-                { lonGt: findAllOpts.longitudeGt }
-            );
+        if (findAllOpts.maxLatitude !== undefined) {
+            qb.andWhere(
+                'o.latitude <= :latitude',
+                { latitude: findAllOpts.maxLatitude }
+            )
         }
 
-        if (findAllOpts.longitudeLt) {
-            qb = qb.andWhere(
-                'decimalLongitude <= :lonLt',
-                { lonLt: findAllOpts.longitudeLt }
-            );
+        if (findAllOpts.maxLongitude !== undefined) {
+            qb.andWhere(
+                'o.longitude <= :longitude',
+                { longitude: findAllOpts.maxLongitude }
+            )
+        }
+
+        const remainingKeys = [
+            'country',
+            'county',
+            'locality',
+            'stateProvince',
+        ];
+
+        for (const searchKey of remainingKeys) {
+            if (findAllOpts[searchKey]) {
+                qb.andWhere(
+                    `o.${ searchKey } LIKE :searchStr`,
+                    { searchStr: `${ findAllOpts[searchKey] }%` }
+                );
+            }
         }
 
         return qb.getMany();
@@ -80,7 +141,7 @@ export class OccurrenceService {
 
     async createMany(collectionID: number, occurrenceData: DeepPartial<Occurrence>[]): Promise<void> {
         const occurrences = occurrenceData.map((o) => {
-            return { collectionID, ...o }
+            return { collectionID, ...o };
         });
 
         await this.occurrenceRepo.createQueryBuilder()

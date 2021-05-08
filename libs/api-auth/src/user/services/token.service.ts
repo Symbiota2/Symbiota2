@@ -79,7 +79,7 @@ export class TokenService extends BaseService<RefreshToken> {
         return this.encodeRefreshToken(newToken);
     }
 
-    async createAccessToken(user: User): Promise<string> {
+    async createAccessToken(user: Pick<User, 'uid' | 'username' | 'firstName' | 'roles'>): Promise<string> {
         const roles = await user.roles;
         const minRoles: ApiUserRole[] = roles.map((role) => {
             return {

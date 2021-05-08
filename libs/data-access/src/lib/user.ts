@@ -1,4 +1,4 @@
-import { ApiFindAllQuery } from './common-interfaces';
+import { ApiFindAllQuery } from './common';
 
 export interface ApiChangePasswordData {
     oldPassword: string;

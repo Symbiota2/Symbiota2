@@ -3,8 +3,9 @@ import { HttpClient, HttpEventType, HttpRequest, HttpResponse } from '@angular/c
 import { AppConfigService } from '../app-config';
 import { ApiQueryBuilder } from './api-query-builder.class';
 import { Observable } from 'rxjs';
-import { filter, map } from "rxjs/operators";
+import { filter, finalize, map } from 'rxjs/operators';
 import { ApiClientModule } from './api-client.module';
+import { LoadingService } from '../alert';
 
 @Injectable({
     providedIn: ApiClientModule
@@ -12,7 +13,8 @@ import { ApiClientModule } from './api-client.module';
 export class ApiClientService {
     constructor(
         private readonly appConfig: AppConfigService,
-        private readonly http: HttpClient) { }
+        private readonly http: HttpClient,
+        private readonly loading: LoadingService) { }
 
     apiRoot(): string {
         return this.appConfig.apiUri();
@@ -23,9 +25,11 @@ export class ApiClientService {
     }
 
     send<RequestType, ResponseType>(query: HttpRequest<RequestType>): Observable<ResponseType> {
+        this.loading.start()
         return this.http.request<ResponseType>(query).pipe(
             filter((httpEvent) => httpEvent.type === HttpEventType.Response),
-            map((httpResponse) => (httpResponse as HttpResponse<ResponseType>).body)
+            map((httpResponse) => (httpResponse as HttpResponse<ResponseType>).body),
+            finalize(() => this.loading.end())
         );
     }
 }

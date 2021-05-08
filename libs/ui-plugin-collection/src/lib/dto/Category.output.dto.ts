@@ -1,23 +1,16 @@
-import { Exclude, Expose, plainToClass, Type } from 'class-transformer';
+import {
+    ApiCollectionCategoryOutput,
+} from '@symbiota2/data-access';
 import { CollectionListItem } from './Collection.output.dto';
 
-@Exclude()
-export class CollectionCategory {
-    constructor(category: Record<string, unknown>) {
-        const asCls = plainToClass(CollectionCategory, category);
-        Object.assign(this, asCls);
+export class CollectionCategory implements ApiCollectionCategoryOutput {
+    constructor(category: ApiCollectionCategoryOutput) {
+        Object.assign(this, category);
+        this.collections = category.collections.map((c) => new CollectionListItem(c));
     }
 
-    @Expose()
     id: number;
-
-    @Expose()
     category: string;
-
-    @Expose()
     icon: string;
-
-    @Expose()
-    @Type(() => CollectionListItem)
     collections: CollectionListItem[];
 }

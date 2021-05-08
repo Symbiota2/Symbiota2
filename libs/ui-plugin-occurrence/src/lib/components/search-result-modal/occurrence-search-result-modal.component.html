@@ -1,7 +1,7 @@
 <div mat-dialog-title>
     <div fxLayout="row" fxLayoutAlign="start center">
         <!-- TODO: Link to collection -->
-        <ng-container *ngIf="loaded">
+        <ng-container *ngIf='(collection$ | async) as collection'>
             <div>
                 <img id="collection-icon" *ngIf="collection.icon" [src]="collection.icon" alt="collection icon">
             </div>
@@ -12,7 +12,7 @@
             </div>
         </ng-container>
         <div class="ml-auto">
-            <button class="btn-icon" (click)="onEditClick()">
+            <button *ngIf='canEdit | async' class="btn-icon" (click)="onEditClick()">
                 <mat-icon>create</mat-icon>
             </button>
             <button class="btn-icon" (click)="onCloseClick()">
@@ -21,27 +21,37 @@
         </div>
     </div>
 </div>
-<div mat-dialog-content fxLayout="column" *ngIf="loaded">
-    <div class="edit-category">
-        <lib-expansion-panel title="Collector info" expanded="true">
-            <ng-container *ngFor="let item of occurrence.collectorInfo() | keyvalue">
-                <p *ngIf="item.value">
-                    <b>{{ getI18nForField(item.key) | async }}:</b> {{ item.value }}
-                </p>
-            </ng-container>
-        </lib-expansion-panel>
+<ng-container *ngIf='(occurrence$ | async) as occurrence'>
+    <div mat-dialog-content *ngIf='isEditing; else viewing'>
+        <symbiota2-occurrence-editor
+            [occurrence]='occurrence'
+        >
+        </symbiota2-occurrence-editor>
     </div>
-    <div class="edit-category">
-        <lib-expansion-panel title="Latest identification">
-            <ng-container *ngFor="let item of occurrence.latestIDInfo() | keyvalue">
-                <p *ngIf="item.value">
-                    <b>{{ getI18nForField(item.key) | async }}:</b> {{ item.value }}
-                </p>
-            </ng-container>
-        </lib-expansion-panel>
-    </div>
-    <small id="footer" *ngIf="occurrence.lastModifiedTimestamp">
-        Last updated {{ occurrence.lastModifiedTimestamp | date }}
-    </small>
-</div>
+    <ng-template #viewing>
+        <div mat-dialog-content fxLayout="column">
+            <div class="edit-category">
+                <symbiota2-expansion-panel label="Collector info" expanded="true">
+                    <ng-container *ngFor="let item of occurrence.collectorInfo() | keyvalue">
+                        <p *ngIf="item.value">
+                            <b>{{ getI18nForField(item.key) | async }}:</b> {{ item.value }}
+                        </p>
+                    </ng-container>
+                </symbiota2-expansion-panel>
+            </div>
+            <div class="edit-category">
+                <symbiota2-expansion-panel label="Latest identification">
+                    <ng-container *ngFor="let item of occurrence.latestIDInfo() | keyvalue">
+                        <p *ngIf="item.value">
+                            <b>{{ getI18nForField(item.key) | async }}:</b> {{ item.value }}
+                        </p>
+                    </ng-container>
+                </symbiota2-expansion-panel>
+            </div>
+            <small id="footer" *ngIf="occurrence.lastModifiedTimestamp">
+                Last updated {{ occurrence.lastModifiedTimestamp | date }}
+            </small>
+        </div>
+    </ng-template>
+</ng-container>
 

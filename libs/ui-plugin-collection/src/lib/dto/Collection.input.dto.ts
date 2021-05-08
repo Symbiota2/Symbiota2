@@ -1,69 +1,26 @@
-import { Exclude, Expose, plainToClass } from 'class-transformer';
+import { ApiCollectionInput } from '@symbiota2/data-access';
 
-@Exclude()
-export class CollectionInputDto {
-    @Expose()
-    collectionCode: string;
-
-    @Expose()
-    collectionName: string;
-
-    @Expose()
-    institutionID: number;
-
-    @Expose()
-    fullDescription: string;
-
-    @Expose()
-    homePage: string;
-
-    @Expose()
-    individualUrl: string;
-
-    @Expose()
-    contact: string;
-
-    @Expose()
-    email: string;
-
-    @Expose()
-    latitude: number;
-
-    @Expose()
-    longitude: number;
-
-    @Expose()
-    icon: string;
-
-    @Expose()
-    type: string;
-
-    @Expose()
-    managementType: string;
-
-    @Expose()
-    rightsHolder: string;
-
-    @Expose()
-    rights: string;
-
-    @Expose()
-    usageTerm: string;
-
-    @Expose()
-    accessRights: string;
-
-    @Expose()
-    initialTimestamp: string;
-
-    static fromFormData(data: Record<string, unknown>) {
-        return plainToClass(
-            CollectionInputDto,
-            data,
-            {
-                excludeExtraneousValues: true,
-                enableImplicitConversion: true
-            }
-        );
+export class CollectionInputDto implements ApiCollectionInput {
+    constructor(data: Record<string, unknown>) {
+        Object.assign(this, data);
     }
+
+    collectionCode: string;
+    collectionName: string;
+    institutionID: number;
+    fullDescription: string;
+    homePage: string;
+    individualUrl: string;
+    contact: string;
+    email: string;
+    latitude: number;
+    longitude: number;
+    icon: string;
+    type: string;
+    managementType: string;
+    rightsHolder: string;
+    rights: string;
+    usageTerm: string;
+    accessRights: string;
+    initialTimestamp: string;
 }

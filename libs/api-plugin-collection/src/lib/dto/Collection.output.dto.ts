@@ -1,9 +1,13 @@
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { Collection, Institution } from '@symbiota2/api-database';
 import { ApiProperty } from '@nestjs/swagger';
+import {
+    ApiCollectionInstitutionOutput, ApiCollectionOutput,
+    ApiCollectionStatsOutput
+} from '@symbiota2/data-access';
 
 @Exclude()
-export class CollectionInstitutionOutputDto {
+export class CollectionInstitutionOutputDto implements ApiCollectionInstitutionOutput {
     constructor(institution: Institution) {
         Object.assign(this, institution);
     }
@@ -18,7 +22,7 @@ export class CollectionInstitutionOutputDto {
 }
 
 @Exclude()
-export class CollectionStatsOutputDto {
+export class CollectionStatsOutputDto implements ApiCollectionStatsOutput {
     constructor(collectionStats: CollectionStatsOutputDto) {
         Object.assign(this, collectionStats);
     }
@@ -49,7 +53,7 @@ export class CollectionStatsOutputDto {
 }
 
 @Exclude()
-export class CollectionOutputDto {
+export class CollectionOutputDto implements ApiCollectionOutput {
     constructor(collection: Collection) {
         Object.assign(this, collection);
     }
@@ -99,11 +103,15 @@ export class CollectionOutputDto {
     // Lat/Lng numbers are too long for JS
     @ApiProperty()
     @Expose()
-    latitude: string;
+    @Type(() => String)
+    @Transform((data) => data ? parseFloat(data.value) : null)
+    latitude: number;
 
     @ApiProperty()
     @Expose()
-    longitude: string;
+    @Type(() => String)
+    @Transform((data) => data ? parseFloat(data.value) : null)
+    longitude: number;
 
     @ApiProperty()
     @Expose()

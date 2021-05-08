@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-    IsDateString,
     IsInt,
     IsOptional,
     IsString,
@@ -8,8 +7,9 @@ import {
     IsDate
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiOccurrence } from '@symbiota2/data-access';
 
-export class OccurrenceInputDto {
+export class OccurrenceInputDto implements Partial<ApiOccurrence> {
     @ApiProperty({ required: false })
     @IsString()
     @IsOptional()

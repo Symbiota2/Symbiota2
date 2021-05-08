@@ -30,8 +30,6 @@ import { ApiUserRole } from '@symbiota2/data-access';
     styleUrls: ['./user-profile.component.scss']
 })
 export class UserProfileComponent implements OnInit, OnDestroy, AfterViewInit {
-    static readonly ROUTE = "viewprofile";
-
     @ViewChildren('extraTabs', { read: ViewContainerRef })
     public pluginTabContainers: QueryList<ViewContainerRef>;
 

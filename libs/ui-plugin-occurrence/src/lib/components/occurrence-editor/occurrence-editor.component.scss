@@ -1,0 +1,27 @@
+div[fxLayout='row'] {
+    width: 100%;
+}
+
+symbiota2-expansion-panel {
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+div[fxLayout\.gt-sm='column'], #localitySecurity {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    width: 100%;
+}
+
+mat-checkbox.mat-checkbox {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+#localitySecurity {
+    mat-icon.mat-icon {
+        margin-left: 0.2rem;
+        margin-right: 0.2rem;
+        font-size: 1rem;
+    }
+}

@@ -1,4 +1,4 @@
-import { HttpHeaders, HttpRequest } from '@angular/common/http';
+import { HttpHeaders, HttpParams, HttpRequest } from '@angular/common/http';
 
 export class ApiQueryBuilder<T> {
     private readonly url: string;
@@ -6,9 +6,10 @@ export class ApiQueryBuilder<T> {
     private _body: T = null;
 
     private withCredentials = false;
-    private headers: HttpHeaders = new HttpHeaders({
+    private headers = new HttpHeaders({
         "Content-Type": "application/json; charset=utf-8"
     });
+    private queryParams: HttpParams = new HttpParams();
 
     constructor(url: string) {
         this.url = url;
@@ -39,6 +40,17 @@ export class ApiQueryBuilder<T> {
         return this;
     }
 
+    queryParam(key: string, value: unknown): ApiQueryBuilder<T> {
+        this.queryParams = this.queryParams.append(key, value.toString());
+        return this;
+    }
+
+    fileUpload(): ApiQueryBuilder<T> {
+        this.method = "POST";
+        this.headers = this.headers.delete('Content-Type');
+        return this;
+    }
+
     addJwtAuth(accessToken: string): ApiQueryBuilder<T> {
         return this.addCookieAuth().header("Authorization", `Bearer ${accessToken}`);
     }
@@ -53,7 +65,7 @@ export class ApiQueryBuilder<T> {
         return this;
     }
 
-    private header(key: string, value: string | string[]): ApiQueryBuilder<T> {
+    header(key: string, value: string | string[]): ApiQueryBuilder<T> {
         this.headers = this.headers.set(key, value);
         return this;
     }
@@ -70,7 +82,8 @@ export class ApiQueryBuilder<T> {
             {
                 withCredentials: this.withCredentials,
                 headers: this.headers,
-                responseType: "json"
+                responseType: "json",
+                params: this.queryParams
             }
         );
     }

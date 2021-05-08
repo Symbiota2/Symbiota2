@@ -15,6 +15,8 @@ export class CategoryService extends BaseService<CollectionCategory> {
     }
 
     async findAll(): Promise<CollectionCategory[]> {
-        return this.categories.find();
+        return this.categories.find({
+            order: { category: 'ASC' }
+        });
     }
 }
