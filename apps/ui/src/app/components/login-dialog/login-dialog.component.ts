@@ -1,20 +1,23 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialogRef } from "@angular/material/dialog";
 import { mergeMap, switchMap } from 'rxjs/operators';
-import { AlertService, UserService } from "@symbiota2/ui-common";
+import {
+    AlertService,
+    ROUTE_USER_CREATE,
+    UserService
+} from '@symbiota2/ui-common';
 import { TranslateService } from "@ngx-translate/core";
 import { of } from "rxjs";
-import { CreateUserProfileComponent } from '../../pages/create-user-profile/create-user-profile.component';
 
 @Component({
-    selector: "app-login-dialog",
+    selector: "symbiota2-login-dialog",
     templateUrl: "./login-dialog.component.html",
     styleUrls: ['./login-dialog.component.scss']
 })
 export class LoginDialog implements OnInit {
     private static readonly I8N_LOGIN_FAILED = "symbiota-auth.auth-service.login_failed";
 
-    readonly ROUTE_CREATE_PROFILE = CreateUserProfileComponent.ROUTE;
+    readonly ROUTE_CREATE_PROFILE = ROUTE_USER_CREATE;
 
     username = "";
     password = "";

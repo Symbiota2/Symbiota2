@@ -4,30 +4,105 @@
 
 <!-- Collection select -->
 <div class="expansion-panel">
-    <mat-accordion>
-        <mat-expansion-panel [expanded]="true">
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    Collection select
-                    <span [ngClass]="{ 'required-asterisk': true, hide: collectionIDs.length > 0 }">*</span>
-                </mat-panel-title>
-            </mat-expansion-panel-header>
-            <collection-collection-checkbox-selector
-                [(collectionIDs)]="collectionIDs"
-            >
-            </collection-collection-checkbox-selector>
-        </mat-expansion-panel>
-    </mat-accordion>
+    <symbiota2-expansion-panel label='Collection Select' required='true'>
+        <symbiota2-collection-checkbox-selector
+            [(collectionIDs)]="collectionIDs"
+        >
+        </symbiota2-collection-checkbox-selector>
+    </symbiota2-expansion-panel>
 </div>
 
-<!-- Search criteria -->
+<!-- Taxonomic criteria -->
 <div class="expansion-panel">
-    <lib-expansion-panel title="Search criteria" expanded="true">
-        <occurrence-search-search-criteria
-            [(catalogNumber)]="catalogNumber"
-        >
-        </occurrence-search-search-criteria>
-    </lib-expansion-panel>
+    <symbiota2-expansion-panel label='Taxonomic Criteria' required>
+        <div fxLayout='row wrap'>
+            <div class='form-field w-2'>
+                <mat-form-field>
+                    <mat-select [formControl]='taxonSearchCriterion'>
+                        <mat-option
+                            *ngFor='let opt of taxonCriteriaOptions'
+                            [value]='opt.value'
+                        >
+                            {{ opt.i18n | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class='form-field w-3'>
+                <mat-form-field>
+                    <input matInput [formControl]='taxonSearchStr'>
+                </mat-form-field>
+            </div>
+        </div>
+    </symbiota2-expansion-panel>
+</div>
+
+<!-- Locality criteria -->
+<div class='expansion-panel'>
+    <symbiota2-expansion-panel label='Locality Criteria'>
+        <div fxLayout='row wrap'>
+            <div class='form-field w-2'>
+                <mat-form-field>
+                    <mat-label>Country</mat-label>
+                    <input matInput [formControl]='country'>
+                </mat-form-field>
+            </div>
+            <div class='form-field w-2'>
+                <mat-form-field>
+                    <mat-label>State/Province</mat-label>
+                    <input matInput [formControl]='stateProvince'>
+                </mat-form-field>
+            </div>
+            <div class='form-field w-2'>
+                <mat-form-field>
+                    <mat-label>County</mat-label>
+                    <input matInput [formControl]='county'>
+                </mat-form-field>
+            </div>
+            <div class='form-field w-2'>
+                <mat-form-field>
+                    <mat-label>Locality</mat-label>
+                    <input matInput [formControl]='locality'>
+                </mat-form-field>
+            </div>
+            <div class='form-field w-2'>
+                <mat-form-field>
+                    <mat-label>Minimum elevation (m)</mat-label>
+                    <input matInput type='number' [formControl]='minimumElevationInMeters' min='0'>
+                </mat-form-field>
+            </div>
+            <div class='form-field w-2'>
+                <mat-form-field>
+                    <mat-label>Maximum elevation (m)</mat-label>
+                    <input matInput type='number' [formControl]='maximumElevationInMeters' min='0'>
+                </mat-form-field>
+            </div>
+            <div class='form-field'>
+                <mat-form-field>
+                    <mat-label>Minimum Latitude</mat-label>
+                    <input matInput type='number' [formControl]='minLatitude' step='0.1'>
+                </mat-form-field>
+            </div>
+            <div class='form-field'>
+                <mat-form-field>
+                    <mat-label>Maximum Latitude</mat-label>
+                    <input matInput type='number' [formControl]='maxLatitude' step='0.1'>
+                </mat-form-field>
+            </div>
+            <div class='form-field'>
+                <mat-form-field>
+                    <mat-label>Minimum Longitude</mat-label>
+                    <input matInput type='number' [formControl]='minLongitude' step='0.1'>
+                </mat-form-field>
+            </div>
+            <div class='form-field'>
+                <mat-form-field>
+                    <mat-label>Maximum Longitude</mat-label>
+                    <input matInput type='number' [formControl]='maxLongitude' step='0.1'>
+                </mat-form-field>
+            </div>
+        </div>
+    </symbiota2-expansion-panel>
 </div>
 
 <div id="buttons">

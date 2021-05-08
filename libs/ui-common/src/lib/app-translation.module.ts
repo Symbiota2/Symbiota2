@@ -7,6 +7,7 @@ import {
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppConfigService } from './app-config';
+import { Symbiota2ExpansionPanelComponent } from './components';
 
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(http);
@@ -27,7 +28,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         { provide: TranslateStore, useClass: TranslateStore }
     ],
     exports: [
-        TranslateModule
+        TranslateModule,
     ]
 })
 export class AppTranslationModule {

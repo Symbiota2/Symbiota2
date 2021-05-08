@@ -10,7 +10,7 @@ export class LoadingService {
     constructor() {
         // TODO: Remove this
         this.isLoading.subscribe((isLoading) => {
-            console.debug(isLoading ? 'Loading...' : 'Load finished');
+            console.log(isLoading ? 'Loading...' : 'Load finished');
         });
     }
 

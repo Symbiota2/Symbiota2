@@ -1,7 +1,8 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsString, IsOptional, IsInt, MaxLength, IsNumber, IsEnum, IsNumberString } from 'class-validator';
+import { ApiCollectionInput } from '@symbiota2/data-access';
 
-export class CollectionInputDto {
+export class CollectionInputDto implements ApiCollectionInput {
 
     @ApiProperty({ required: false })
     @IsString()

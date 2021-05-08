@@ -1,1 +1,16 @@
-<img [ngStyle]="{ width: size, height: size }" class="collection-logo" src="{{ src }}" alt="collection logo">
+<a *ngIf='url !== "#"; else noLink' [routerLink]='url'>
+    <img
+        [ngStyle]="{ width: size, height: size }"
+        class="collection-logo"
+        src="{{ src }}"
+        alt="collection logo"
+    >
+</a>
+<ng-template #noLink>
+    <img
+        [ngStyle]="{ width: size, height: size }"
+        class="collection-logo"
+        src="{{ src }}"
+        alt="collection logo"
+    >
+</ng-template>

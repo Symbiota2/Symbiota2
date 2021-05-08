@@ -14,10 +14,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CollectionService } from './collection.service';
-import {
-    CollectionInstitutionOutputDto,
-    CollectionOutputDto, CollectionStatsOutputDto
-} from './dto/Collection.output.dto';
+import { CollectionOutputDto } from './dto/Collection.output.dto';
 import { CollectionFindAllParams } from './dto/coll-find-all.input.dto';
 import { InstitutionService } from './institution/institution.service';
 import {
@@ -26,7 +23,7 @@ import {
 } from './dto/Collection.input.dto';
 import { JwtAuthGuard } from '@symbiota2/api-auth';
 import {
-    ProtectCollection,
+    ProtectCollection
 } from './collection-edit-guard/protect-collection.decorator';
 import { CollectionListItem } from './dto/CollectionListItem.output.dto';
 
@@ -35,22 +32,34 @@ import { CollectionListItem } from './dto/CollectionListItem.output.dto';
 export class CollectionController {
     constructor(
         private readonly institutionService: InstitutionService,
-        private readonly collections: CollectionService) { }
+        private readonly collections: CollectionService) {
+    }
 
     @Get()
-    @ApiResponse({ status: HttpStatus.OK, type: CollectionListItem, isArray: true })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CollectionListItem,
+        isArray: true
+    })
     async findAll(@Query() findAllParams: CollectionFindAllParams): Promise<CollectionListItem[]> {
         const collections = await this.collections.findAll(findAllParams);
-        const collectionDtos = collections.map(async (c) => {
-            return new CollectionListItem(c);
-        });
-        return Promise.all(collectionDtos);
+
+        if (collections.length === 0) {
+            throw new NotFoundException();
+        }
+
+        return collections.map((c) => new CollectionListItem(c));
     }
 
     @Get(':id')
     @ApiResponse({ status: HttpStatus.OK, type: CollectionOutputDto })
     async findByID(@Param('id') id: number): Promise<CollectionOutputDto> {
         const collection = await this.collections.findByID(id);
+
+        if (collection === null) {
+            throw new NotFoundException();
+        }
+
         const collectionDto = new CollectionOutputDto(collection);
         collectionDto.institution = await collection.institution;
         collectionDto.stats = await collection.collectionStats;
@@ -72,15 +81,9 @@ export class CollectionController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiResponse({ status: HttpStatus.NO_CONTENT })
     async deleteByID(@Param('id') id: number): Promise<void> {
-        try {
-            const collection = await this.collections.deleteByID(id);
-
-            if (!collection) {
-                throw new NotFoundException();
-            }
-        }
-        catch (e) {
-            throw new BadRequestException(e.toString());
+        const collection = await this.collections.deleteByID(id);
+        if (!collection) {
+            throw new NotFoundException();
         }
     }
 

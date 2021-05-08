@@ -1,9 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Collection } from '@symbiota2/api-database';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
+import { ApiCollectionListItem } from '@symbiota2/data-access';
 
 @Exclude()
-export class CollectionListItem {
+export class CollectionListItem implements ApiCollectionListItem {
+    constructor(data: ApiCollectionListItem) {
+        Object.assign(this, data);
+    }
+
     @ApiProperty()
     @Expose()
     id: number;
@@ -15,8 +19,4 @@ export class CollectionListItem {
     @ApiProperty()
     @Expose()
     icon: string;
-
-    constructor(collection: Collection) {
-        Object.assign(this, collection);
-    }
 }

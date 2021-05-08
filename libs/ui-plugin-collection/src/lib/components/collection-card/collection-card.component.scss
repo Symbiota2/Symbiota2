@@ -7,13 +7,14 @@ a {
     margin: 0.25rem;
 
     width: 18rem;
-    height: 6rem;
+    height: 3rem;
 
     @media only screen and (max-width: 600px) {
         width: 100%;
     }
 
     .mat-card-content {
+        padding: 0.1rem;
         width: 100%;
         height: 100%;
     }
@@ -28,16 +29,9 @@ a {
     margin-right: 1rem;
 }
 
-#text {
-    height: 100%;
-
+#collectionName {
     &, & span {
         overflow-y: hidden;
         text-overflow: ellipsis;
     }
-}
-
-#institution {
-    font-size: 75%;
-    font-style: italic;
 }

@@ -1,4 +1,6 @@
-import { Q_PARAM_CAT_NUM, Q_PARAM_COLLIDS } from '../../constants';
+import { Q_PARAM_COLLIDS } from '../../constants';
+import { ApiOccurrenceFindAllParams } from '@symbiota2/data-access';
+import { HttpParams } from '@angular/common/http';
 
 export class OccurrenceQueryBuilder {
     protected baseUrl: string;
@@ -17,8 +19,44 @@ export class OccurrenceQueryBuilder {
         return new FindOneBuilder(this.baseUrl);
     }
 
+    create(): CreateOneBuilder {
+        return new CreateOneBuilder(this.baseUrl);
+    }
+
+    upload(): UploadBuilder {
+        return new UploadBuilder(this.baseUrl);
+    }
+
     build(): string {
         return this.url.toString();
+    }
+}
+
+class CreateOneBuilder extends OccurrenceQueryBuilder {
+    protected _collectionID: number;
+
+    collectionID(id: number): CreateOneBuilder {
+        this._collectionID = id;
+        return this;
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/${this._collectionID}`;
+        return super.build();
+    }
+}
+
+class UploadBuilder extends OccurrenceQueryBuilder {
+    protected _collectionID: number;
+
+    collectionID(id: number): UploadBuilder {
+        this._collectionID = id;
+        return this;
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/${this._collectionID}/upload`;
+        return super.build();
     }
 }
 
@@ -38,27 +76,32 @@ class FindOneBuilder extends OccurrenceQueryBuilder {
 
 class FindAllBuilder extends OccurrenceQueryBuilder {
     protected _collectionIDs: number[] = [];
-    protected _catalogNumber: string = null;
+    protected queryParams = new HttpParams();
 
     collectionIDs(ids: number[]): FindAllBuilder {
+        console.log(ids);
         this._collectionIDs = ids;
         return this;
     }
 
-    catalogNumber(catalogNumber: string): FindAllBuilder {
-        this._catalogNumber = catalogNumber;
+    queryParam(key: keyof ApiOccurrenceFindAllParams, val: unknown): FindAllBuilder {
+        if (!(['', undefined, null].includes(val as any) || (typeof val === 'number' && isNaN(val)))) {
+            this.queryParams = this.queryParams.append(key, val.toString());
+        }
         return this;
     }
 
     build(): string {
         this._collectionIDs.forEach((id) => {
-            this.url.searchParams.append(Q_PARAM_COLLIDS, id.toString());
+            this.queryParams.append('collectionID', id.toString());
         });
 
-        this.url.searchParams.set(
-            Q_PARAM_CAT_NUM,
-            this._catalogNumber
-        );
+        for (const key of this.queryParams.keys()) {
+            this.url.searchParams.set(
+                key,
+                this.queryParams.get(key)
+            );
+        }
 
         return super.build();
     }

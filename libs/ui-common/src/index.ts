@@ -13,3 +13,4 @@ export * from './lib/plugin';
 export * from './lib/interfaces';
 
 export * from './lib/components';
+export * from './lib/routes';

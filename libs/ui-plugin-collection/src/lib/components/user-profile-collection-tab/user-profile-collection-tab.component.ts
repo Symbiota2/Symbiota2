@@ -2,22 +2,25 @@ import { Component, OnInit } from '@angular/core';
 import { CollectionService } from '../../services/collection.service';
 import { UserService } from '@symbiota2/ui-common';
 import { switchMap } from 'rxjs/operators';
-import { Collection } from '../../dto/Collection.output.dto';
+import {
+    Collection,
+    CollectionListItem
+} from '../../dto/Collection.output.dto';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'symbiota2-user-profile-collection-tab',
-    templateUrl: "./user-profile-collection-tab.component.html",
-    styleUrls: ["./user-profile-collection-tab.component.scss"]
+    templateUrl: "./user-profile-collection-tab.component.html"
 })
 export class UserProfileCollectionTab implements OnInit {
-    public collections: Collection[] = [];
+    collections: Observable<CollectionListItem[]>;
 
     constructor(
         private readonly user: UserService,
         private readonly collectionService: CollectionService) { }
 
     ngOnInit() {
-        this.user.currentUser.pipe(
+        this.collections = this.user.currentUser.pipe(
             switchMap((user) => {
                 if (user.isSuperAdmin()) {
                     return this.collectionService.findAll();
@@ -25,8 +28,6 @@ export class UserProfileCollectionTab implements OnInit {
                 const collectionIDs = user.collectionRoles.map((r) => r.tablePrimaryKey);
                 return this.collectionService.findByIDs(collectionIDs);
             })
-        ).subscribe((collections) => {
-            this.collections = collections;
-        });
+        );
     }
 }

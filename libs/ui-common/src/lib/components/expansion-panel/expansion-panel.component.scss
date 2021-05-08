@@ -1,0 +1,10 @@
+.requiredAsterisk {
+    &.show {
+        display: block;
+    }
+
+    display: none;
+    color: darkred;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}

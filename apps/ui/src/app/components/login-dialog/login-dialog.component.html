@@ -41,15 +41,19 @@
     </div>
     <div id="links">
         <div>
-            <a [routerLink]='ROUTE_CREATE_PROFILE'>
+            <a [routerLink]='ROUTE_CREATE_PROFILE' (click)='onCancel()'>
                 {{ 'symbiota-auth.login.no_account_text' | translate }}
             </a>
         </div>
         <div>
-            <a href="#">{{ 'symbiota-auth.login.cant_remember_password' | translate }}</a>
+            <a href="#" (click)='onCancel()'>
+                {{ 'symbiota-auth.login.cant_remember_password' | translate }}
+            </a>
         </div>
         <div>
-            <a href="#">{{ 'symbiota-auth.login.cant_remember_login' | translate }}</a>
+            <a href="#" (click)='onCancel()'>
+                {{ 'symbiota-auth.login.cant_remember_login' | translate }}
+            </a>
         </div>
     </div>
 </div>

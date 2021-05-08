@@ -8,7 +8,7 @@ import {
     User,
     UserService,
     PluginService,
-    NavBarLink
+    NavBarLink, ROUTE_USER_PROFILE, ROUTE_USER_CREATE, ROUTE_SITEMAP
 } from '@symbiota2/ui-common';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginDialog } from '../login-dialog/login-dialog.component';
@@ -19,7 +19,7 @@ import { CreateUserProfileComponent } from '../../pages/create-user-profile/crea
 import { SitemapComponent } from '../../pages/sitemap/sitemap.component';
 
 @Component({
-    selector: 'app-navbar',
+    selector: 'symbiota2-navbar',
     templateUrl: './navbar.component.html',
     styleUrls: ['./navbar.component.scss']
 })
@@ -29,9 +29,9 @@ export class NavbarComponent implements OnInit {
     pluginLinks: NavBarLink[] = [];
 
     readonly ROUTE_HOME = HomeComponent.ROUTE;
-    readonly ROUTE_PROFILE = UserProfileComponent.ROUTE;
-    readonly ROUTE_CREATE_PROFILE = CreateUserProfileComponent.ROUTE;
-    readonly ROUTE_SITEMAP = SitemapComponent.ROUTE;
+    readonly ROUTE_PROFILE = ROUTE_USER_PROFILE;
+    readonly ROUTE_CREATE_PROFILE = ROUTE_USER_CREATE;
+    readonly ROUTE_SITEMAP = ROUTE_SITEMAP;
 
     constructor(
         private readonly userService: UserService,

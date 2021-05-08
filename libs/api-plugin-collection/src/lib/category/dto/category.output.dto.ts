@@ -5,13 +5,10 @@ import {
 } from '@symbiota2/api-database';
 import { ApiProperty } from '@nestjs/swagger';
 import { CollectionListItem } from '../../dto/CollectionListItem.output.dto';
+import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 
 @Exclude()
-export class CategoryOutputDto {
-    // TODO: Serialization groups
-    public static readonly GROUP_LIST = 'list';
-    public static readonly GROUP_SINGLE = 'single';
-
+export class CategoryOutputDto implements ApiCollectionCategoryOutput {
     @ApiProperty()
     @Expose()
     id: number;

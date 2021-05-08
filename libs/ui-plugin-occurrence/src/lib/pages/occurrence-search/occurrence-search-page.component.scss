@@ -1,5 +1,5 @@
 #buttons {
-    margin-top: 1rem;
+    margin-top: 2rem;
 
     button {
         margin-left: 1rem;
@@ -16,13 +16,20 @@
     margin-bottom: 1rem;
 }
 
-.required-asterisk {
-    color: darkred;
-    margin-left: 0.25rem;
-    margin-right: 0.25rem;
-    transition: opacity 0.5s;
+div.form-field {
+    margin: 0 1rem;
 
-    &.hide {
-        opacity: 0;
+    .mat-form-field {
+        width: 100%;
+    }
+}
+
+.w-fit {
+    flex-basis: fit-content;
+}
+
+@for $i from 1 through 9 {
+    .w-#{$i} {
+        flex-basis: #{$i * 10} + '%';
     }
 }

@@ -7,14 +7,15 @@
             [checked]="collectionSelections.isSelected(node.id)"
             (change)="toggleCollection($event.source, node.id)"
         >
-            <div class="v-middle">
-                <img
-                    class="collection-icon"
-                    *ngIf="node.icon"
-                    [src]="node.icon"
-                    alt="collection icon"
-                >
-                {{ node.name }}
+            <div fxLayout='row' fxLayoutAlign='start center'>
+                <div class='logo'>
+                    <symbiota2-collection-logo
+                        src='{{ node.icon }}'
+                        size='2rem'
+                    >
+                    </symbiota2-collection-logo>
+                </div>
+                <span>{{ node.name }}</span>
             </div>
         </mat-checkbox>
     </mat-tree-node>

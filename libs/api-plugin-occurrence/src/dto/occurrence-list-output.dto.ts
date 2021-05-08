@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Occurrence } from '@symbiota2/api-database';
 import { Exclude, Expose } from 'class-transformer';
+import { ApiOccurrenceListItem } from '@symbiota2/data-access';
 
 @Exclude()
-export class OccurrenceListOutputDto {
-    constructor(occurrence: Occurrence) {
+export class OccurrenceListOutputDto implements ApiOccurrenceListItem {
+    constructor(occurrence: ApiOccurrenceListItem) {
         Object.assign(this, occurrence);
     }
 

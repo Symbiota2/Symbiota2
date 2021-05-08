@@ -3,11 +3,10 @@ import { TranslateModule } from "@ngx-translate/core";
 
 import {
     ApiClientModule,
-    NavBarLink,
+    NavBarLink, SymbiotaComponentModule,
     SymbiotaUiPlugin
-} from "@symbiota2/ui-common";
+} from '@symbiota2/ui-common';
 
-import { OccurrenceSearchCriteria } from "./components/search-criteria/occurrence-search-criteria.component";
 import { SelectComponent } from "./components/select/select.component";
 import { OccurrenceSearchResultsPage } from "./pages/search-results/occurrence-search-results-page.component";
 import { Route, RouterModule } from "@angular/router";
@@ -32,8 +31,17 @@ import { MatDatepickerModule } from "@angular/material/datepicker";
 import { FlexModule } from "@angular/flex-layout";
 import { MatExpansionModule } from '@angular/material/expansion';
 import { OccurrenceService } from './services/occurrence.service';
-import { ExpansionPanelComponent } from './components/expansion-panel/expansion-panel.component';
 import { OccurrenceUploadComponent } from './pages/occurrence-upload/occurrence-upload.component';
+import { OccurrenceCreateComponent } from './pages/occurrence-create/occurrence-create.component';
+import { OccurrenceEditorComponent } from './components/occurrence-editor/occurrence-editor.component';
+import { OccurrenceFieldComponent } from './components/occurrence-editor/occurrence-field/occurrence-field.component';
+import { OccurrenceExtraFieldComponent } from './components/occurrence-editor/occurrence-extra-field/occurrence-extra-field.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import {
+    ROUTE_CREATE_OCCURRENCE,
+    ROUTE_SEARCH_OCCURRENCES, ROUTE_SEARCH_RESULTS,
+    ROUTE_UPLOAD
+} from './routes';
 
 @NgModule({
     imports: [
@@ -57,7 +65,9 @@ import { OccurrenceUploadComponent } from './pages/occurrence-upload/occurrence-
         RouterModule,
         TranslateModule,
         FlexModule,
-        MatExpansionModule
+        MatExpansionModule,
+        MatCheckboxModule,
+        SymbiotaComponentModule
     ],
     providers: [
         OccurrenceService
@@ -65,40 +75,45 @@ import { OccurrenceUploadComponent } from './pages/occurrence-upload/occurrence-
     declarations: [
         DatePickerComponent,
         OccurrenceSearchCollectionsPage,
-        OccurrenceSearchCriteria,
         OccurrenceSearchResultComponent,
         OccurrenceSearchResultModalComponent,
         OccurrenceSearchResultsPage,
         SelectComponent,
-        ExpansionPanelComponent,
-        OccurrenceUploadComponent
+        OccurrenceUploadComponent,
+        OccurrenceCreateComponent,
+        OccurrenceEditorComponent,
+        OccurrenceFieldComponent,
+        OccurrenceExtraFieldComponent,
     ],
     entryComponents: [
         OccurrenceSearchCollectionsPage,
-        OccurrenceSearchCriteria,
         OccurrenceSearchResultsPage
     ]
 })
 export class OccurrencePlugin extends SymbiotaUiPlugin {
-    private static SEARCH_OCCURRENCES_ROUTE = "occurrences/search";
-    private static SEARCH_RESULTS_ROUTE = "occurrences/search/results";
-    private static UPLOAD_ROUTE = "occurrences/upload";
-
     constructor(private readonly collectionProfile: CollectionProfileService) {
         super();
 
         collectionProfile.putLink((collectionID) => {
             return {
                 text: "Search Occurrences",
-                routerLink: `/${OccurrencePlugin.SEARCH_OCCURRENCES_ROUTE}`,
+                routerLink: `/${ROUTE_SEARCH_OCCURRENCES}`,
                 queryParams: { 'collectionID[]': collectionID }
             };
         });
 
         collectionProfile.putLink((collectionID) => {
             return {
+                text: "Create occurrence",
+                routerLink: `/${ROUTE_CREATE_OCCURRENCE}`,
+                queryParams: { 'collectionID': collectionID }
+            };
+        });
+
+        collectionProfile.putLink((collectionID) => {
+            return {
                 text: "Upload occurrences",
-                routerLink: `/${OccurrencePlugin.UPLOAD_ROUTE}`,
+                routerLink: `/${ROUTE_UPLOAD}`,
                 queryParams: { 'collectionID': collectionID }
             };
         });
@@ -107,24 +122,28 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
     static routes(): Route[] {
         return [
             {
-                path: OccurrencePlugin.SEARCH_OCCURRENCES_ROUTE,
+                path: ROUTE_CREATE_OCCURRENCE,
+                component: OccurrenceCreateComponent
+            },
+            {
+                path: ROUTE_SEARCH_OCCURRENCES,
                 component: OccurrenceSearchCollectionsPage
             },
             {
-                path: OccurrencePlugin.SEARCH_RESULTS_ROUTE,
+                path: ROUTE_SEARCH_RESULTS,
                 component: OccurrenceSearchResultsPage
             },
             {
-                path: OccurrencePlugin.UPLOAD_ROUTE,
+                path: ROUTE_UPLOAD,
                 component: OccurrenceUploadComponent
-            }
+            },
         ];
     }
 
     static navBarLinks(): NavBarLink[] {
         return [
             {
-                url: `/${OccurrencePlugin.SEARCH_OCCURRENCES_ROUTE}`,
+                url: `/${ROUTE_SEARCH_OCCURRENCES}`,
                 name: "Occurrence Search"
             }
         ];

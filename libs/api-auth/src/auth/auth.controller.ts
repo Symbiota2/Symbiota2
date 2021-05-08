@@ -43,7 +43,10 @@ export class AuthController {
         @Req() req: AuthenticatedRequest,
         @Res({ passthrough: true }) res: Response): Promise<AccessTokenOutputDto> {
 
-        const user = await this.users.findByLogin(req.user.username);
+        const user = await this.users.findByLogin(
+            req.user.username,
+            ['uid', 'username', 'firstName']
+        );
 
         const [accessToken, refreshToken] = await Promise.all([
             this.tokens.createAccessToken(user),
@@ -62,7 +65,10 @@ export class AuthController {
         @Req() req: AuthenticatedRequest,
         @Res({ passthrough: true }) res): Promise<AccessTokenOutputDto> {
 
-        const user = await this.users.findByLogin(req.user.username);
+        const user = await this.users.findByLogin(
+            req.user.username,
+            ['uid', 'username', 'firstName']
+        );
 
         const [accessToken, refreshToken] = await Promise.all([
             this.tokens.createAccessToken(user),

@@ -14,6 +14,8 @@ type CollectionProfileLinkFactory = (collectionID: number) => CollectionProfileL
 @Injectable()
 export class CollectionProfileService {
     private _profileLinks = new BehaviorSubject<(CollectionProfileLink | CollectionProfileLinkFactory)[]>([]);
+
+    // TODO: Do we need the shareReplay pipe?
     _links = this._profileLinks.asObservable().pipe(shareReplay(1));
 
     constructor() { }

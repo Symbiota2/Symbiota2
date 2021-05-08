@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {
+    Component,
+    OnInit,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, switchMap } from 'rxjs/operators';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { filter, map, switchMap, take } from 'rxjs/operators';
+import { combineLatest, Observable, of } from 'rxjs';
 import { CollectionService } from '../../services/collection.service';
 import { Collection } from '../../dto/Collection.output.dto';
 import {
@@ -9,26 +12,25 @@ import {
     CollectionProfileService
 } from '../../services/collection-profile.service';
 import { MatDialog } from '@angular/material/dialog';
-import { CollectionEditorComponent } from '../collection-editor/collection-editor.component';
-import { AlertService, User, UserService } from '@symbiota2/ui-common';
-import { CollectionInputDto } from '../../dto/Collection.input.dto';
-import { DomSanitizer, SafeHtml, SafeUrl } from '@angular/platform-browser';
+import {
+    AlertService,
+    User,
+    UserService
+} from '@symbiota2/ui-common';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { CollectionEditorComponent } from '../../components/collection-editor/collection-editor.component';
+import { ROUTE_COLLECTION_LIST } from '../../routes';
 
 @Component({
     selector: 'symbiota2-collection-page',
     templateUrl: './collection-page.component.html',
     styleUrls: ['./collection-page.component.scss']
 })
-export class CollectionPage {
-    static readonly ROUTE = {
-        path: "collections/:id",
-        component: CollectionPage
-    };
-
-    private static USER_COLLECTIONS_LINK: CollectionProfileLink = {
+export class CollectionPage implements OnInit {
+    private static readonly ROUTE_PARAM_COLLID = 'collectionID';
+    private static readonly USER_COLLECTIONS_LINK: CollectionProfileLink = {
         text: 'Back to collections',
-        routerLink: '/viewprofile',
-        queryParams: { tab: 3 }
+        routerLink: `/${ROUTE_COLLECTION_LIST}`,
     };
 
     public collection: Collection = null;
@@ -47,7 +49,13 @@ export class CollectionPage {
 
     ngOnInit(): void {
         this.currentRoute.paramMap.pipe(
-            map((params) => params.has('id') ? parseInt(params.get('id')) : -1),
+            map((params) => {
+                return (
+                    params.has(CollectionPage.ROUTE_PARAM_COLLID) ?
+                        parseInt(params.get(CollectionPage.ROUTE_PARAM_COLLID)) :
+                        -1
+                );
+            }),
             switchMap((collectionID) => this.loadCollection(collectionID)),
             switchMap((collection) => {
                 this.collection = collection;
@@ -66,30 +74,28 @@ export class CollectionPage {
     }
 
     onEdit() {
-        const dialogRef = this.dialog.open(
+        const dialog = this.dialog.open(
             CollectionEditorComponent,
-            { data: this.collection, disableClose: true }
+            { data: this.collection }
         );
-        dialogRef.afterClosed().subscribe((collectionData) => {
-            if (collectionData) {
-                collectionData = CollectionInputDto.fromFormData(collectionData);
-                this.collections.updateByID(
+
+        combineLatest([
+            dialog.afterClosed(),
+            this.userService.currentUser
+        ]).pipe(
+            take(1),
+            filter(([data, currentUser]) => {
+                return data !== null && currentUser !== null;
+            }),
+            switchMap(([collectionData, currentUser]) => {
+                return this.collections.updateByID(
                     this.collection.id,
-                    this.currentUser.token,
+                    currentUser.token,
                     collectionData
-                ).subscribe((updatedCollection) => {
-                    if (updatedCollection === null) {
-                        this.alerts.showError('Error updating collection');
-                        this.router.navigate(
-                            [CollectionPage.USER_COLLECTIONS_LINK.routerLink],
-                            { queryParams: CollectionPage.USER_COLLECTIONS_LINK.queryParams }
-                        );
-                    }
-                    else {
-                        this.collection = updatedCollection;
-                    }
-                });
-            }
+                );
+            })
+        ).subscribe((collection) => {
+            this.collection = collection;
         });
     }
 

@@ -1,0 +1,15 @@
+<a [routerLink]="'/' + ROUTE_COLLECTION_PROFILE.replace(':collectionID', collection.id.toString())">
+    <mat-card title="{{ collection.collectionName }}">
+        <mat-card-content fxLayout="row" fxLayoutAlign="start center">
+            <symbiota2-collection-logo
+                id="logo"
+                src="{{ collection.icon }}"
+                *ngIf="collection.icon"
+            >
+            </symbiota2-collection-logo>
+            <div id='collectionName'>
+                {{ collection.collectionName }}
+            </div>
+        </mat-card-content>
+    </mat-card>
+</a>
