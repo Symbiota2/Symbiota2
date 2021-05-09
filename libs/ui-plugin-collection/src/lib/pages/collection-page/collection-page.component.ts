@@ -30,6 +30,7 @@ export class CollectionPage implements OnInit {
     private static readonly ROUTE_PARAM_COLLID = 'collectionID';
     private static readonly USER_COLLECTIONS_LINK: CollectionProfileLink = {
         text: 'Back to collections',
+        requiresLogin: false,
         routerLink: `/${ROUTE_COLLECTION_LIST}`,
     };
 

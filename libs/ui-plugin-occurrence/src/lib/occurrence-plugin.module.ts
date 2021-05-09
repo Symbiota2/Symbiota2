@@ -98,6 +98,7 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
             return {
                 text: "Search Occurrences",
                 routerLink: `/${ROUTE_SEARCH_OCCURRENCES}`,
+                requiresLogin: false,
                 queryParams: { 'collectionID[]': collectionID }
             };
         });
@@ -106,6 +107,7 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
             return {
                 text: "Create occurrence",
                 routerLink: `/${ROUTE_CREATE_OCCURRENCE}`,
+                requiresLogin: true,
                 queryParams: { 'collectionID': collectionID }
             };
         });
