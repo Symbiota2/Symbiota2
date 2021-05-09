@@ -42,20 +42,20 @@ export class OccurrenceService {
             switch (findAllOpts.taxonSearchCriterion) {
                 case ApiTaxonSearchCriterion.familyOrSciName:
                     qb.andWhere(
-                        '(o.sciname LIKE :searchStr or o.family LIKE :searchStr)',
-                        { searchStr }
+                        '(o.sciname LIKE :sciNameOrFamily or o.family LIKE :sciNameOrFamily)',
+                        { sciNameOrFamily: searchStr }
                     );
                     break;
                 case ApiTaxonSearchCriterion.sciName:
                     qb.andWhere(
-                        'o.sciname LIKE :searchStr',
-                        { searchStr }
+                        'o.sciname LIKE :sciname',
+                        { sciname: searchStr }
                     );
                     break;
                 case ApiTaxonSearchCriterion.family:
                     qb.andWhere(
-                        'o.family LIKE :searchStr',
-                        { searchStr }
+                        'o.family LIKE :family',
+                        { family: searchStr }
                     );
                     break;
                 case ApiTaxonSearchCriterion.higherTaxonomy:
@@ -71,60 +71,90 @@ export class OccurrenceService {
 
         if (findAllOpts.minimumElevationInMeters !== undefined) {
             qb.andWhere(
-                'o.minimumElevationInMeters = :elevation',
-                { elevation: findAllOpts.minimumElevationInMeters }
+                'o.minimumElevationInMeters = :minElevation',
+                { minElevation: findAllOpts.minimumElevationInMeters }
             );
         }
 
         if (findAllOpts.maximumElevationInMeters !== undefined) {
             qb.andWhere(
-                'o.maximumElevationInMeters = :elevation',
-                { elevation: findAllOpts.maximumElevationInMeters }
+                'o.maximumElevationInMeters = :maxElevation',
+                { maxElevation: findAllOpts.maximumElevationInMeters }
             );
         }
 
         if (findAllOpts.minLatitude !== undefined) {
             qb.andWhere(
-                'o.latitude >= :latitude',
-                { latitude: findAllOpts.minLatitude }
+                'o.latitude >= :minLat',
+                { minLat: findAllOpts.minLatitude }
             )
         }
 
         if (findAllOpts.minLongitude !== undefined) {
             qb.andWhere(
-                'o.longitude >= :longitude',
-                { longitude: findAllOpts.minLongitude }
+                'o.longitude >= :minLon',
+                { minLon: findAllOpts.minLongitude }
             )
         }
 
         if (findAllOpts.maxLatitude !== undefined) {
             qb.andWhere(
-                'o.latitude <= :latitude',
-                { latitude: findAllOpts.maxLatitude }
+                'o.latitude <= :maxLat',
+                { maxLat: findAllOpts.maxLatitude }
             )
         }
 
         if (findAllOpts.maxLongitude !== undefined) {
             qb.andWhere(
-                'o.longitude <= :longitude',
-                { longitude: findAllOpts.maxLongitude }
+                'o.longitude <= :maxLon',
+                { maxLon: findAllOpts.maxLongitude }
             )
         }
 
-        const remainingKeys = [
+        const remainingLocalityKeys = [
             'country',
             'county',
             'locality',
             'stateProvince',
         ];
 
-        for (const searchKey of remainingKeys) {
+        for (const searchKey of remainingLocalityKeys) {
             if (findAllOpts[searchKey]) {
                 qb.andWhere(
                     `o.${ searchKey } LIKE :searchStr`,
                     { searchStr: `${ findAllOpts[searchKey] }%` }
                 );
             }
+        }
+
+        if (findAllOpts.collectorLastName) {
+            qb.andWhere(
+                `o.recordedBy LIKE :collectorLastName`,
+                { collectorLastName: `%${findAllOpts.collectorLastName}` }
+            )
+        }
+
+        if (findAllOpts.minEventDate) {
+            qb.andWhere(`o.eventDate is not null`)
+            qb.andWhere(
+                `o.eventDate >= :minEventDate`,
+                { minEventDate: findAllOpts.minEventDate }
+            );
+        }
+
+        if (findAllOpts.maxEventDate) {
+            qb.andWhere(`o.eventDate is not null`)
+            qb.andWhere(
+                `o.eventDate <= :maxEventDate`,
+                { maxEventDate: findAllOpts.maxEventDate }
+            );
+        }
+
+        if (findAllOpts.catalogNumber) {
+            qb.andWhere(
+                `o.catalogNumber LIKE :catalogNumber`,
+                { catalogNumber: `${findAllOpts.catalogNumber}%` }
+            )
         }
 
         return qb.getMany();

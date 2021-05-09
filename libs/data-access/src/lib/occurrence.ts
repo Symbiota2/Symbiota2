@@ -26,6 +26,19 @@ export interface ApiOccurrenceFindAllParams {
     minLongitude: number;
     maxLatitude: number;
     maxLongitude: number;
+
+    // Collector criteria
+    collectorLastName: string;
+    minEventDate: Date;
+    maxEventDate: Date;
+
+    // Specimen criteria
+    catalogNumber: string;
+
+    // Filters
+    limitToSpecimens: boolean;
+    limitToImages: boolean;
+    limitToGenetic: boolean;
 }
 
 export interface ApiOccurrenceListItem {

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-    IsArray,
+    IsBoolean, IsDate, IsDateString,
     IsEnum,
     IsInt,
     IsNumber,
@@ -109,4 +109,42 @@ export class FindAllParams implements Partial<ApiOccurrenceFindAllParams> {
     @IsNumber()
     @IsOptional()
     maxLongitude?: number;
+
+    // Collector criteria
+    @ApiProperty({ required: false })
+    @IsString()
+    @IsOptional()
+    collectorLastName: string;
+
+    @ApiProperty({ required: false })
+    @IsDate()
+    @IsOptional()
+    minEventDate: Date;
+
+    @ApiProperty({ required: false })
+    @IsDate()
+    @IsOptional()
+    maxEventDate: Date;
+
+    // Specimen criteria
+    @ApiProperty({ required: false })
+    @IsString()
+    @IsOptional()
+    catalogNumber: string;
+
+    // Filters
+    @ApiProperty({ required: false })
+    @IsBoolean()
+    @IsOptional()
+    limitToSpecimens = false;
+
+    @ApiProperty({ required: false })
+    @IsBoolean()
+    @IsOptional()
+    limitToImages = false;
+
+    @ApiProperty({ required: false })
+    @IsBoolean()
+    @IsOptional()
+    limitToGenetic = false;
 }
