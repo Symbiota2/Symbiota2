@@ -109,14 +109,13 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
                 queryParams: { 'collectionID': collectionID }
             };
         });
-
-        collectionProfile.putLink((collectionID) => {
-            return {
-                text: "Upload occurrences",
-                routerLink: `/${ROUTE_UPLOAD}`,
-                queryParams: { 'collectionID': collectionID }
-            };
-        });
+        // collectionProfile.putLink((collectionID) => {
+        //     return {
+        //         text: "Upload occurrences",
+        //         routerLink: `/${ROUTE_UPLOAD}`,
+        //         queryParams: { 'collectionID': collectionID }
+        //     };
+        // });
     }
 
     static routes(): Route[] {
@@ -133,10 +132,10 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
                 path: ROUTE_SEARCH_RESULTS,
                 component: OccurrenceSearchResultsPage
             },
-            {
-                path: ROUTE_UPLOAD,
-                component: OccurrenceUploadComponent
-            },
+            // {
+            //     path: ROUTE_UPLOAD,
+            //     component: OccurrenceUploadComponent
+            // },
         ];
     }
 
