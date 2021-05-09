@@ -120,6 +120,7 @@ export class OccurrenceService {
 
         for (const searchKey of remainingLocalityKeys) {
             if (findAllOpts[searchKey]) {
+                qb.andWhere(`o.${searchKey} IS NOT NULL`);
                 qb.andWhere(
                     `o.${ searchKey } LIKE :searchStr`,
                     { searchStr: `${ findAllOpts[searchKey] }%` }
@@ -128,14 +129,15 @@ export class OccurrenceService {
         }
 
         if (findAllOpts.collectorLastName) {
+            qb.andWhere('o.recordedBy IS NOT NULL')
             qb.andWhere(
                 `o.recordedBy LIKE :collectorLastName`,
-                { collectorLastName: `%${findAllOpts.collectorLastName}` }
+                { collectorLastName: `%${findAllOpts.collectorLastName}%` }
             )
         }
 
         if (findAllOpts.minEventDate) {
-            qb.andWhere(`o.eventDate is not null`)
+            qb.andWhere(`o.eventDate IS NOT NULL`)
             qb.andWhere(
                 `o.eventDate >= :minEventDate`,
                 { minEventDate: findAllOpts.minEventDate }
@@ -143,7 +145,7 @@ export class OccurrenceService {
         }
 
         if (findAllOpts.maxEventDate) {
-            qb.andWhere(`o.eventDate is not null`)
+            qb.andWhere(`o.eventDate IS NOT NULL`)
             qb.andWhere(
                 `o.eventDate <= :maxEventDate`,
                 { maxEventDate: findAllOpts.maxEventDate }
@@ -151,6 +153,7 @@ export class OccurrenceService {
         }
 
         if (findAllOpts.catalogNumber) {
+            qb.andWhere(`o.catalogNumber IS NOT NULL`)
             qb.andWhere(
                 `o.catalogNumber LIKE :catalogNumber`,
                 { catalogNumber: `${findAllOpts.catalogNumber}%` }

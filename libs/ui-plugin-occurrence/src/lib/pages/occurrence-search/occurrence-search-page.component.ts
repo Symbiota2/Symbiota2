@@ -1,13 +1,13 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import {
-    Q_PARAM_CAT_NUM,
-    Q_PARAM_COLLIDS,
-} from '../../../constants';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { HttpParams } from '@angular/common/http';
-import { ApiOccurrenceFindAllParams } from '@symbiota2/data-access';
+import { Q_PARAM_COLLIDS } from '../../../constants';
+import { Validators } from '@angular/forms';
 import { ROUTE_SEARCH_RESULTS } from '../../routes';
+import { TypedFormControl, TypedFormGroup } from '@symbiota2/ui-common';
+import {
+    ApiOccurrenceFindAllParams,
+    ApiTaxonSearchCriterion
+} from '@symbiota2/data-access';
 
 @Component({
     selector: "symbiota2-occurrence-search-page",
@@ -24,25 +24,40 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
     ];
 
     collectionIDs: number[] = [];
-    taxonSearchCriterion = new FormControl(this.taxonCriteriaOptions[0].value);
-    taxonSearchStr = new FormControl('');
-    country = new FormControl('');
-    stateProvince = new FormControl('');
-    county = new FormControl('');
-    locality = new FormControl('');
-    minimumElevationInMeters = new FormControl(null, [Validators.min(0)]);
-    maximumElevationInMeters = new FormControl(null, [Validators.min(0)]);
-    minLatitude = new FormControl(null);
-    minLongitude = new FormControl(null);
-    maxLatitude = new FormControl(null);
-    maxLongitude = new FormControl(null);
 
-    taxonCriteria = new FormGroup({
+    // Taxon Criteria
+    taxonSearchCriterion = new TypedFormControl<ApiTaxonSearchCriterion>(
+        this.taxonCriteriaOptions[0].value as ApiTaxonSearchCriterion
+    );
+    taxonSearchStr = new TypedFormControl<string>('');
+
+    // Locality criteria
+    country = new TypedFormControl<string>('');
+    stateProvince = new TypedFormControl<string>('');
+    county = new TypedFormControl<number>(null);
+    locality = new TypedFormControl<string>('');
+    minimumElevationInMeters = new TypedFormControl<number>(null, [Validators.min(0)]);
+    maximumElevationInMeters = new TypedFormControl<number>(null, [Validators.min(0)]);
+    minLatitude = new TypedFormControl<number>(null);
+    minLongitude = new TypedFormControl<number>(null);
+    maxLatitude = new TypedFormControl<number>(null);
+    maxLongitude = new TypedFormControl<number>(null);
+
+    // Collector criteria
+    collectorLastName = new TypedFormControl<string>('');
+    minEventDate = new TypedFormControl<Date>(null);
+    maxEventDate = new TypedFormControl<Date>(null);
+
+    catalogNumber = new TypedFormControl<string>('');
+
+    // Filters
+    limitToSpecimens = new TypedFormControl<boolean>(null);
+    limitToImages = new TypedFormControl<boolean>(null);
+    limitToGeneric = new TypedFormControl<boolean>(null);
+
+    form = new TypedFormGroup<Omit<ApiOccurrenceFindAllParams, 'collectionID' | 'limit' | 'offset'>>({
         taxonSearchCriterion: this.taxonSearchCriterion,
-        taxonSearchStr: this.taxonSearchStr
-    });
-
-    localityCriteria = new FormGroup({
+        taxonSearchStr: this.taxonSearchStr,
         country: this.country,
         stateProvince: this.stateProvince,
         county: this.county,
@@ -52,7 +67,14 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
         minLatitude: this.minLatitude,
         minLongitude: this.minLongitude,
         maxLatitude: this.maxLatitude,
-        maxLongitude: this.maxLongitude
+        maxLongitude: this.maxLongitude,
+        collectorLastName: this.collectorLastName,
+        minEventDate: this.minEventDate,
+        maxEventDate: this.maxEventDate,
+        catalogNumber: this.catalogNumber,
+        limitToImages: this.limitToImages,
+        limitToSpecimens: this.limitToSpecimens,
+        limitToGenetic: this.limitToGeneric
     });
 
     constructor(
@@ -72,30 +94,12 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
     }
 
     async onSearch() {
-        const taxonEntries = Object.entries(this.taxonCriteria.value).filter(([_, v]) => {
-            return v !== null && v !== '';
-        });
-        const localityEntries = Object.entries(this.localityCriteria.value).filter(([_, v]) => {
-            return v !== null && v !== '';
-        });
-
-        const taxonParams = taxonEntries.reduce((obj, [k, v]) => {
-            obj[k] = v.toString();
-            return obj;
-        }, {});
-
-        const localityParams = localityEntries.reduce((obj, [k, v]) => {
-            obj[k] = v.toString();
-            return obj;
-        }, {});
-
         return this.router.navigate(
             [`/${ROUTE_SEARCH_RESULTS}`],
             {
                 queryParams: {
                     'collectionID[]': this.collectionIDs.map((n) => n.toString()),
-                    ...taxonParams,
-                    ...localityParams
+                    ...this.form.value
                 }
             }
         );

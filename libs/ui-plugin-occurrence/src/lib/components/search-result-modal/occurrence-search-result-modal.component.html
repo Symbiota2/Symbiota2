@@ -31,22 +31,40 @@
     <ng-template #viewing>
         <div mat-dialog-content fxLayout="column">
             <div class="edit-category">
-                <symbiota2-expansion-panel label="Collector info" expanded="true">
-                    <ng-container *ngFor="let item of occurrence.collectorInfo() | keyvalue">
-                        <p *ngIf="item.value">
-                            <b>{{ getI18nForField(item.key) | async }}:</b> {{ item.value }}
-                        </p>
-                    </ng-container>
-                </symbiota2-expansion-panel>
+                <mat-card>
+                    <mat-card-title>Collector Info</mat-card-title>
+                    <mat-card-content>
+                        <ng-container *ngFor="let item of occurrence.collectorInfo() | keyvalue">
+                            <p *ngIf="item.value">
+                                <b>{{ getI18nForField(item.key) | async }}: </b>
+                                <span *ngIf='isDate(item.value); else notDate'>
+                                    {{ item.value | date }}
+                                </span>
+                                <ng-template #notDate>
+                                    {{ item.value }}
+                                </ng-template>
+                            </p>
+                        </ng-container>
+                    </mat-card-content>
+                </mat-card>
             </div>
             <div class="edit-category">
-                <symbiota2-expansion-panel label="Latest identification">
-                    <ng-container *ngFor="let item of occurrence.latestIDInfo() | keyvalue">
-                        <p *ngIf="item.value">
-                            <b>{{ getI18nForField(item.key) | async }}:</b> {{ item.value }}
-                        </p>
-                    </ng-container>
-                </symbiota2-expansion-panel>
+                <mat-card>
+                    <mat-card-title>Latest identification</mat-card-title>
+                    <mat-card-content>
+                        <ng-container *ngFor="let item of occurrence.latestIDInfo() | keyvalue">
+                            <p *ngIf="item.value">
+                                <b>{{ getI18nForField(item.key) | async }}: </b>
+                                <span *ngIf='isDate(item.value); else notDate'>
+                                    {{ item.value | date }}
+                                </span>
+                                <ng-template #notDate>
+                                    {{ item.value }}
+                                </ng-template>
+                            </p>
+                        </ng-container>
+                    </mat-card-content>
+                </mat-card>
             </div>
             <small id="footer" *ngIf="occurrence.lastModifiedTimestamp">
                 Last updated {{ occurrence.lastModifiedTimestamp | date }}
@@ -54,4 +72,3 @@
         </div>
     </ng-template>
 </ng-container>
-

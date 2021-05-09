@@ -6,9 +6,10 @@ import {
     Transform,
     Type
 } from 'class-transformer';
+import { ApiOccurrence } from '@symbiota2/data-access';
 
 function dateTransformer(obj: { value: string }): Date {
-    if (!!obj && !!obj.value) {
+    if (obj && obj.value) {
         return new Date(obj.value);
     }
     return null;
@@ -19,7 +20,7 @@ type CollectorInfoProps = (
     'catalogNumber' |
     'eventDate' |
     'otherCatalogNumbers' |
-    'recordedBy' |
+    'recordedByNames' |
     'recordNumber' |
     'verbatimEventDate'
 );
@@ -36,7 +37,7 @@ type LatestIDInfoProps = (
 interface LatestIDInfo extends Pick<Occurrence, LatestIDInfoProps> { }
 
 @Exclude()
-export class Occurrence extends OccurrenceListItem {
+export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurrence> {
     @Expose() associatedCollectors: string;
     @Expose() associatedTaxa: string;
     @Expose() basisOfRecord: string;
@@ -44,21 +45,11 @@ export class Occurrence extends OccurrenceListItem {
     @Expose() country: string;
     @Expose() cultivationStatus: number;
     @Expose() dataGeneralizations: string;
-
-    @Expose()
-    @Transform(dateTransformer, { toClassOnly: true })
-    @Type(() => Date)
-    dateIdentified: Date;
-
+    @Expose() dateIdentified: Date;
     @Expose() disposition: string;
     @Expose() dynamicProperties: string;
     @Expose() establishmentMeans: string;
-
-    @Expose()
-    @Transform(dateTransformer, { toClassOnly: true })
-    @Type(() => Date)
-    eventDate: Date;
-
+    @Expose() eventDate: Date;
     @Expose() family: string;
     @Expose() fieldNotes: string;
     @Expose() fieldNumber: string;
@@ -70,12 +61,7 @@ export class Occurrence extends OccurrenceListItem {
     @Expose() individualCount: string;
     @Expose() labelProject: string;
     @Expose() language: string;
-
-    @Expose()
-    @Transform(dateTransformer, { toClassOnly: true })
-    @Type(() => Date)
-    lastModifiedTimestamp: Date;
-
+    @Expose() lastModifiedTimestamp: Date;
     @Expose() lifeStage: string;
     @Expose() locality: string;
     @Expose() maximumDepthInMeters: number;
@@ -88,7 +74,7 @@ export class Occurrence extends OccurrenceListItem {
     @Expose() otherCatalogNumbers: string;
     @Expose() preparations: string;
     @Expose() processingStatus: string;
-    @Expose() recordedBy: string;
+    @Expose() recordedByNames: string;
     @Expose() recordEnteredBy: string;
     @Expose() recordNumber: string;
     @Expose() reproductiveCondition: string;
@@ -119,7 +105,7 @@ export class Occurrence extends OccurrenceListItem {
             catalogNumber: this.catalogNumber,
             eventDate: this.eventDate,
             otherCatalogNumbers: this.otherCatalogNumbers,
-            recordedBy: this.recordedBy,
+            recordedByNames: this.recordedByNames,
             recordNumber: this.recordNumber,
             verbatimEventDate: this.verbatimEventDate
         };

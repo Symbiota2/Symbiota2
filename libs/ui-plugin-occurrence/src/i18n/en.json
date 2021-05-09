@@ -31,7 +31,7 @@
   "plugins.occurrence.fields.otherCatalogNumbers": "Other catalog numbers",
   "plugins.occurrence.fields.phenology": "Phenology",
   "plugins.occurrence.fields.preparations": "Preparations",
-  "plugins.occurrence.fields.recordedBy": "Collector",
+  "plugins.occurrence.fields.recordedByNames": "Collector",
   "plugins.occurrence.fields.recordNumber": "Record number",
   "plugins.occurrence.fields.samplingProtocol": "Sampling protocol",
   "plugins.occurrence.fields.scientificNameAuthorship": "Author",

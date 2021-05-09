@@ -50,10 +50,18 @@ export class OccurrenceSearchResultsPage implements OnInit {
         const maxLatitude = parseInt(this.queryParams.get('maxLatitude'));
         const maxLongitude = parseInt(this.queryParams.get('maxLongitude'));
 
+        const collectorLastName = this.queryParams.get('collectorLastName');
+
+        const minEventDateStr = this.queryParams.get('minEventDate');
+        const maxEventDateStr = this.queryParams.get('maxEventDate');
+
+        const minEventDate = minEventDateStr ? new Date(minEventDateStr) : null;
+        const maxEventDate = maxEventDateStr ? new Date(maxEventDateStr) : null;
+
         if (collectionIDs.length > 0) {
             const findParams: Partial<ApiOccurrenceFindAllParams> = {
                 collectionID: collectionIDs,
-                taxonSearchCriterion: taxonSearchCriterion as ApiTaxonSearchCriterion,
+                taxonSearchCriterion: taxonSearchStr ? taxonSearchCriterion as ApiTaxonSearchCriterion : null,
                 taxonSearchStr,
                 county,
                 country,
@@ -65,6 +73,9 @@ export class OccurrenceSearchResultsPage implements OnInit {
                 minLongitude,
                 maxLatitude,
                 maxLongitude,
+                collectorLastName,
+                minEventDate: minEventDate ? minEventDate.toISOString() : null,
+                maxEventDate: maxEventDate ? maxEventDate.toISOString() : null,
                 limit: this.limit,
                 offset: this.offset
             };

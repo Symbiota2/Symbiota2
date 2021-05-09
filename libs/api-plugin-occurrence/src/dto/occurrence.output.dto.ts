@@ -14,7 +14,7 @@ export class OccurrenceOutputDto extends OccurrenceListOutputDto {
 
     @ApiProperty()
     @Expose()
-    recordedBy: string;
+    recordedByNames: string;
 
     @ApiProperty()
     @Expose()

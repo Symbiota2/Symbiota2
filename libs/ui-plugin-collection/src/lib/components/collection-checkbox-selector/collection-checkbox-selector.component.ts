@@ -3,7 +3,7 @@ import {
     EventEmitter,
     Input,
     Injectable,
-    Output, OnChanges, SimpleChanges, OnInit
+    Output, OnChanges, SimpleChanges, OnInit, ChangeDetectorRef
 } from '@angular/core';
 import { CollectionService } from '../../services/collection.service';
 import { NestedTreeControl } from '@angular/cdk/tree';
@@ -67,7 +67,7 @@ export class CollectionTreeData {
         );
 
         if ('category' in currentNode) {
-            const category = <CollectionCategory> currentNode;
+            const category = currentNode as CollectionCategory;
             newNode.name = category.category;
 
             category.collections.forEach((collection) => {
@@ -90,6 +90,7 @@ export class CollectionTreeData {
 })
 export class CollectionCheckboxSelectorComponent implements OnChanges, OnInit {
     @Input() collectionIDs: number[];
+    @Input() selectAll = false;
     @Output() collectionIDsChange = new EventEmitter<number[]>();
 
     public treeControl = new NestedTreeControl<TreeNode>(node => node.children);
@@ -102,7 +103,18 @@ export class CollectionCheckboxSelectorComponent implements OnChanges, OnInit {
     ngOnInit() {
         this.treeDataManager.data.subscribe((treeNodes) => {
             this.dataSource.data = treeNodes;
-            this.treeControl.expand(this.dataSource.data[0]);
+
+            const rootNode = this.dataSource.data[0];
+            this.treeControl.expand(rootNode);
+
+            if (this.selectAll && this.collectionIDs.length === 0) {
+                const selectedIDs = [];
+                rootNode.children.forEach((category) => {
+                    const collectionIDs = category.getChildIDs();
+                    selectedIDs.push(...collectionIDs);
+                });
+                this.collectionIDsChange.emit(selectedIDs);
+            }
         });
     }
 

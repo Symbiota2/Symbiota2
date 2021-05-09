@@ -29,8 +29,8 @@ export interface ApiOccurrenceFindAllParams {
 
     // Collector criteria
     collectorLastName: string;
-    minEventDate: Date;
-    maxEventDate: Date;
+    minEventDate: Date | string;
+    maxEventDate: Date | string;
 
     // Specimen criteria
     catalogNumber: string;

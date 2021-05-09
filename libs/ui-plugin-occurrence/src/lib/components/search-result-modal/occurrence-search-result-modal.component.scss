@@ -6,7 +6,16 @@
 }
 
 #footer {
-    margin-top: 2rem;
+    margin: 1rem;
+    color: rgba(128, 128, 128);
+}
+
+.mat-card {
+    padding: 2rem;
+
+    .mat-card-content {
+        margin: 1rem 0;
+    }
 }
 
 .edit-category {
@@ -38,8 +47,4 @@
             transform: scale(1.2);
         }
     }
-}
-
-.font-grey {
-    color: rgba(0, 0, 0, 0.6);
 }

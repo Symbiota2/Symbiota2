@@ -1,7 +1,8 @@
 import { Exclude, Expose, plainToClass } from 'class-transformer';
+import { ApiOccurrenceListItem } from '@symbiota2/data-access';
 
 @Exclude()
-export class OccurrenceListItem {
+export class OccurrenceListItem implements ApiOccurrenceListItem {
     @Expose() id: number;
     @Expose() catalogNumber: string;
     @Expose() collectionID: number;

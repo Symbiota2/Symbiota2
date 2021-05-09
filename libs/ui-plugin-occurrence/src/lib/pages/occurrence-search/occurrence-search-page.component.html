@@ -7,6 +7,7 @@
     <symbiota2-expansion-panel label='Collection Select' required='true'>
         <symbiota2-collection-checkbox-selector
             [(collectionIDs)]="collectionIDs"
+            [selectAll]='true'
         >
         </symbiota2-collection-checkbox-selector>
     </symbiota2-expansion-panel>
@@ -99,6 +100,37 @@
                 <mat-form-field>
                     <mat-label>Maximum Longitude</mat-label>
                     <input matInput type='number' [formControl]='maxLongitude' step='0.1'>
+                </mat-form-field>
+            </div>
+        </div>
+    </symbiota2-expansion-panel>
+</div>
+
+<div class='expansion-panel'>
+    <symbiota2-expansion-panel label='Collector Criteria'>
+        <div fxLayout='row wrap'>
+            <div class='form-field'>
+                <mat-form-field>
+                    <mat-label>
+                        Collector's last name
+                    </mat-label>
+                    <input matInput [formControl]='collectorLastName'>
+                </mat-form-field>
+            </div>
+            <div class='form-field'>
+                <mat-form-field>
+                    <mat-label>Collected after</mat-label>
+                    <input matInput [matDatepicker]='minEventDatePicker' [formControl]='minEventDate'>
+                    <mat-datepicker-toggle matSuffix [for]="minEventDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #minEventDatePicker></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class='form-field'>
+                <mat-form-field>
+                    <mat-label>Collected before</mat-label>
+                    <input matInput [matDatepicker]='maxEventDatePicker' [formControl]='maxEventDate'>
+                    <mat-datepicker-toggle matSuffix [for]="maxEventDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #maxEventDatePicker></mat-datepicker>
                 </mat-form-field>
             </div>
         </div>

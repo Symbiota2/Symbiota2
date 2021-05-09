@@ -30,11 +30,20 @@ export class OccurrenceSearchResultModalComponent implements OnInit {
 
     ngOnInit() {
         this.canEdit = this.userService.currentUser.pipe(
-            map((user) => user.canEditCollection(this.occurrenceListItem.collectionID))
+            map((user) => {
+                return (
+                    user !== null &&
+                    user.canEditCollection(this.occurrenceListItem.collectionID)
+                );
+            })
         );
 
         this.occurrence$ = this.occurrences.findByID(this.occurrenceListItem.id);
         this.collection$ = this.collections.findByID(this.occurrenceListItem.collectionID);
+    }
+
+    isDate(val: string | number | Date): boolean {
+        return val instanceof Date;
     }
 
     onEditClick() {
