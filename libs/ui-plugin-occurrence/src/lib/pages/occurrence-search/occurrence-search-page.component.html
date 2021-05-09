@@ -112,6 +112,14 @@
             <div class='form-field'>
                 <mat-form-field>
                     <mat-label>
+                        Catalog number
+                    </mat-label>
+                    <input matInput [formControl]='catalogNumber'>
+                </mat-form-field>
+            </div>
+            <div class='form-field'>
+                <mat-form-field>
+                    <mat-label>
                         Collector's last name
                     </mat-label>
                     <input matInput [formControl]='collectorLastName'>
@@ -132,6 +140,28 @@
                     <mat-datepicker-toggle matSuffix [for]="maxEventDatePicker"></mat-datepicker-toggle>
                     <mat-datepicker #maxEventDatePicker></mat-datepicker>
                 </mat-form-field>
+            </div>
+        </div>
+    </symbiota2-expansion-panel>
+</div>
+
+<div class='expansion-panel'>
+    <symbiota2-expansion-panel id='filters' label='Filters' expanded>
+        <div fxLayout='row wrap'>
+            <div class='form-field'>
+                <mat-checkbox [formControl]='limitToSpecimens'>
+                    <mat-label>Limit to ocurrences with type 'Specimen'</mat-label>
+                </mat-checkbox>
+            </div>
+            <div class='form-field'>
+                <mat-checkbox [formControl]='limitToImages'>
+                    <mat-label>Limit to occurrences with images</mat-label>
+                </mat-checkbox>
+            </div>
+            <div class='form-field'>
+                <mat-checkbox [formControl]='limitToGenetic'>
+                    <mat-label>Limit to occurrences with genetic data</mat-label>
+                </mat-checkbox>
             </div>
         </div>
     </symbiota2-expansion-panel>

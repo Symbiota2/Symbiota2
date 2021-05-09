@@ -24,6 +24,12 @@ div.form-field {
     }
 }
 
+#filters {
+    .mat-checkbox {
+        margin: 1rem 0;
+    }
+}
+
 .w-fit {
     flex-basis: fit-content;
 }

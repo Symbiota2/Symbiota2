@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Occurrence } from '@symbiota2/api-database';
+import { Occurrence, OccurrenceGenetic, Image } from '@symbiota2/api-database';
 import { DeepPartial, Repository } from 'typeorm';
 import { FindAllParams } from './dto/find-all-input.dto';
 import { ApiTaxonSearchCriterion } from '@symbiota2/data-access';
@@ -10,8 +10,8 @@ type FindAllReturn = Pick<Occurrence,
 @Injectable()
 export class OccurrenceService {
     constructor(
-        @Inject(Occurrence.PROVIDER_ID) private readonly occurrenceRepo: Repository<Occurrence>) {
-    }
+        @Inject(Occurrence.PROVIDER_ID)
+        private readonly occurrenceRepo: Repository<Occurrence>) { }
 
     async findAll(findAllOpts: FindAllParams): Promise<FindAllReturn[]> {
         const { limit, offset, ...params } = findAllOpts;
@@ -158,6 +158,18 @@ export class OccurrenceService {
                 `o.catalogNumber LIKE :catalogNumber`,
                 { catalogNumber: `${findAllOpts.catalogNumber}%` }
             )
+        }
+
+        if (findAllOpts.limitToSpecimens === true) {
+            qb.andWhere('o.basisOfRecord = "PreservedSpecimen"');
+        }
+
+        if (findAllOpts.limitToGenetic === true) {
+            qb.andWhere('(select count(*) from omoccurgenetic g where g.occid = o.id) > 0');
+        }
+
+        if (findAllOpts.limitToImages === true) {
+            qb.andWhere('(select count(*) from images i where i.occid = o.id) > 0');
         }
 
         return qb.getMany();

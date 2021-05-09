@@ -16,11 +16,12 @@ function dateTransformer(obj: { value: string }): Date {
 }
 
 type CollectorInfoProps = (
-    'associatedCollectors' |
     'catalogNumber' |
     'eventDate' |
-    'otherCatalogNumbers' |
     'recordedByNames' |
+    'basisOfRecord' |
+    'associatedCollectors' |
+    'otherCatalogNumbers' |
     'recordNumber' |
     'verbatimEventDate'
 );
@@ -101,11 +102,12 @@ export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurre
 
     collectorInfo(): CollectorInfo {
         return {
-            associatedCollectors: this.associatedCollectors,
             catalogNumber: this.catalogNumber,
             eventDate: this.eventDate,
-            otherCatalogNumbers: this.otherCatalogNumbers,
             recordedByNames: this.recordedByNames,
+            basisOfRecord: this.basisOfRecord,
+            associatedCollectors: this.associatedCollectors,
+            otherCatalogNumbers: this.otherCatalogNumbers,
             recordNumber: this.recordNumber,
             verbatimEventDate: this.verbatimEventDate
         };

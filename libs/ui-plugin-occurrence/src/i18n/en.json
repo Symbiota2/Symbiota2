@@ -1,5 +1,6 @@
 {
   "plugins.occurrence.fields.associatedCollectors": "Associated collectors",
+  "plugins.occurrence.fields.basisOfRecord": "Basis of record",
   "plugins.occurrence.fields.catalogNumber": "Catalog Number",
   "plugins.occurrence.fields.coordUncertainty": "Coordinate Uncertainty (meters)",
   "plugins.occurrence.fields.country": "Country",

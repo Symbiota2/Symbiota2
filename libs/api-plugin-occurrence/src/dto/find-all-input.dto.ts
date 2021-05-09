@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-    IsBoolean, IsDate, IsDateString,
+    IsBoolean, IsBooleanString, IsDate, IsDateString,
     IsEnum,
-    IsInt,
+    IsInt, IsLatitude, IsLongitude,
     IsNumber,
     IsOptional,
     IsString,
@@ -91,22 +91,22 @@ export class FindAllParams implements Partial<ApiOccurrenceFindAllParams> {
     minimumElevationInMeters?: number;
 
     @ApiProperty({ required: false })
-    @IsNumber()
+    @IsLatitude()
     @IsOptional()
     minLatitude?: number;
 
     @ApiProperty({ required: false })
-    @IsNumber()
+    @IsLongitude()
     @IsOptional()
     minLongitude?: number;
 
     @ApiProperty({ required: false })
-    @IsNumber()
+    @IsLatitude()
     @IsOptional()
     maxLatitude?: number;
 
     @ApiProperty({ required: false })
-    @IsNumber()
+    @IsLongitude()
     @IsOptional()
     maxLongitude?: number;
 
@@ -133,17 +133,21 @@ export class FindAllParams implements Partial<ApiOccurrenceFindAllParams> {
     catalogNumber: string;
 
     // Filters
-    @ApiProperty({ required: false })
+    @ApiProperty({ type: Boolean, required: false })
+    // TODO: Why doesn't this use the { value } argument?
+    @Transform((data) => data === 'true')
     @IsBoolean()
     @IsOptional()
     limitToSpecimens = false;
 
-    @ApiProperty({ required: false })
+    @ApiProperty({ type: Boolean, required: false })
+    @Transform((data) => data === 'true')
     @IsBoolean()
     @IsOptional()
     limitToImages = false;
 
-    @ApiProperty({ required: false })
+    @ApiProperty({ type: Boolean, required: false })
+    @Transform((data) => data === 'true')
     @IsBoolean()
     @IsOptional()
     limitToGenetic = false;

@@ -53,7 +53,7 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
     // Filters
     limitToSpecimens = new TypedFormControl<boolean>(null);
     limitToImages = new TypedFormControl<boolean>(null);
-    limitToGeneric = new TypedFormControl<boolean>(null);
+    limitToGenetic = new TypedFormControl<boolean>(null);
 
     form = new TypedFormGroup<Omit<ApiOccurrenceFindAllParams, 'collectionID' | 'limit' | 'offset'>>({
         taxonSearchCriterion: this.taxonSearchCriterion,
@@ -74,7 +74,7 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
         catalogNumber: this.catalogNumber,
         limitToImages: this.limitToImages,
         limitToSpecimens: this.limitToSpecimens,
-        limitToGenetic: this.limitToGeneric
+        limitToGenetic: this.limitToGenetic
     });
 
     constructor(

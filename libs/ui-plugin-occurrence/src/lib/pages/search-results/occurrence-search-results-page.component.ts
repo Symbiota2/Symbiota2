@@ -58,8 +58,18 @@ export class OccurrenceSearchResultsPage implements OnInit {
         const minEventDate = minEventDateStr ? new Date(minEventDateStr) : null;
         const maxEventDate = maxEventDateStr ? new Date(maxEventDateStr) : null;
 
+        const catalogNumber = this.queryParams.get('catalogNumber');
+
+        const limitToSpecimensStr = this.queryParams.get('limitToSpecimens');
+        const limitToImagesStr = this.queryParams.get('limitToImages');
+        const limitToGeneticStr = this.queryParams.get('limitToGenetic');
+
+        const limitToSpecimens = limitToSpecimensStr ? limitToSpecimensStr === 'true' : null;
+        const limitToImages = limitToImagesStr ? limitToImagesStr === 'true' : null;
+        const limitToGenetic = limitToGeneticStr ? limitToGeneticStr === 'true' : null;
+
         if (collectionIDs.length > 0) {
-            const findParams: Partial<ApiOccurrenceFindAllParams> = {
+            const findParams: ApiOccurrenceFindAllParams = {
                 collectionID: collectionIDs,
                 taxonSearchCriterion: taxonSearchStr ? taxonSearchCriterion as ApiTaxonSearchCriterion : null,
                 taxonSearchStr,
@@ -73,7 +83,11 @@ export class OccurrenceSearchResultsPage implements OnInit {
                 minLongitude,
                 maxLatitude,
                 maxLongitude,
+                catalogNumber,
                 collectorLastName,
+                limitToSpecimens,
+                limitToImages,
+                limitToGenetic,
                 minEventDate: minEventDate ? minEventDate.toISOString() : null,
                 maxEventDate: maxEventDate ? maxEventDate.toISOString() : null,
                 limit: this.limit,
