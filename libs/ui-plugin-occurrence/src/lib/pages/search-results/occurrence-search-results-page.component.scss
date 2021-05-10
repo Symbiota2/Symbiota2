@@ -1,21 +1,11 @@
-@import "../../../global";
+$rowBackground: white;
 
-.result-card {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-}
+table.mat-table {
+    width: 100%;
 
-#header {
-    margin-bottom: 1rem;
-}
-
-#result-nav-btns {
-    display: flex;
-    justify-content: center;
-
-    button {
-        @include mx(1rem);
-        min-width: 0;
-        padding: 0 0.5rem;
+    .table-row:hover {
+        cursor: pointer;
+        background: $rowBackground;
+        background: darken($rowBackground, 10%);
     }
 }

@@ -78,8 +78,10 @@ class FindAllBuilder extends OccurrenceQueryBuilder {
     protected _collectionIDs: number[] = [];
     protected queryParams = new HttpParams();
 
-    collectionIDs(ids: number[]): FindAllBuilder {
-        console.log(ids);
+    collectionID(ids: number[] | number): FindAllBuilder {
+        if (!Array.isArray(ids)) {
+            ids = [ids];
+        }
         this._collectionIDs = ids;
         return this;
     }

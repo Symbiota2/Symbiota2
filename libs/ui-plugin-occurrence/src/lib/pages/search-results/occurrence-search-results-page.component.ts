@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { LoadingService } from '@symbiota2/ui-common';
 import { OccurrenceService } from '../../services/occurrence.service';
@@ -7,6 +7,8 @@ import {
     ApiOccurrenceListItem, ApiTaxonSearchCriterion
 } from '@symbiota2/data-access';
 import { Observable } from 'rxjs';
+import { MatTable } from '@angular/material/table';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: "symbiota2-occurrence-search-results",
@@ -14,6 +16,8 @@ import { Observable } from 'rxjs';
     styleUrls: ["./occurrence-search-results-page.component.scss"]
 })
 export class OccurrenceSearchResultsPage implements OnInit {
+    @ViewChild(MatTable) table: MatTable<ApiOccurrenceListItem>;
+
     public limit = 25;
     public offset = 0;
 
@@ -94,7 +98,14 @@ export class OccurrenceSearchResultsPage implements OnInit {
                 offset: this.offset
             };
 
-            this.occurrences = this.occurrenceService.findAll(findParams);
+            this.occurrences = this.occurrenceService.searchResults.occurrences.pipe(
+                    tap(() => {
+                        if (this.table) {
+                            this.table.renderRows();
+                        }
+                    })
+                );
+            this.occurrenceService.searchResults.fetch(findParams);
         }
         else {
             this.router.navigate(

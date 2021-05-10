@@ -1,43 +1,20 @@
 <div id="header">
-    <div fxLayout="row" fxLayoutAlign="start center">
-        <div fxLayout="column">
-            <h1>Search results</h1>
-            <div>
-<!--                Showing {{ getFirstIndexOnPage() | number }}-->
-<!--                through {{ getLastIndexOnPage() | number }}-->
-<!--                of {{ totalResults | number }} total results-->
-            </div>
-        </div>
-        <div fxLayout="column" class="ml-auto">
-            <div>
-<!--                <mat-form-field>-->
-<!--                    <mat-label>Results per page</mat-label>-->
-<!--                    <mat-select-->
-<!--                        [value]="itemsPerPage.toString()"-->
-<!--                        (valueChange)="onItemsPerPageChanged($event)"-->
-<!--                    >-->
-<!--                        <mat-option value="25">25</mat-option>-->
-<!--                        <mat-option value="50">50</mat-option>-->
-<!--                        <mat-option value="100">100</mat-option>-->
-<!--                    </mat-select>-->
-<!--                </mat-form-field>-->
-            </div>
-            <div id="result-nav-btns">
-                <button mat-raised-button color="primary">
-                    <mat-icon>chevron_left</mat-icon>
-                </button>
-                <button mat-raised-button color="primary">
-                    <mat-icon>chevron_right</mat-icon>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<div>
-    <div *ngFor="let occurrence of (occurrences | async)">
-        <div class="result-card">
-            <occurrence-search-search-result [occurrence]="occurrence">
-            </occurrence-search-search-result>
-        </div>
+    <h1>Search results</h1>
+    <div class='mat-elevation-z1'>
+        <mat-paginator [pageSize]='25' [pageSizeOptions]='[25, 50]'></mat-paginator>
+        <table mat-table [dataSource]='occurrences'>
+            <ng-container matColumnDef="catalogNumber">
+                <th mat-header-cell *matHeaderCellDef>Catalog number</th>
+                <td mat-cell *matCellDef="let occurrence">{{ occurrence.catalogNumber }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="sciName">
+                <th mat-header-cell *matHeaderCellDef>Catalog number</th>
+                <td mat-cell *matCellDef="let occurrence">{{ occurrence.sciname }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['catalogNumber', 'sciName']"></tr>
+            <tr mat-row class='table-row' *matRowDef="let row; columns: ['catalogNumber', 'sciName'];"></tr>
+        </table>
     </div>
 </div>

@@ -42,6 +42,9 @@ import {
     ROUTE_SEARCH_OCCURRENCES, ROUTE_SEARCH_RESULTS,
     ROUTE_UPLOAD
 } from './routes';
+import { MatTableModule } from '@angular/material/table';
+import { FindAllResults } from './services/find-all-results';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
     imports: [
@@ -67,9 +70,12 @@ import {
         FlexModule,
         MatExpansionModule,
         MatCheckboxModule,
-        SymbiotaComponentModule
+        SymbiotaComponentModule,
+        MatTableModule,
+        MatPaginatorModule
     ],
     providers: [
+        FindAllResults,
         OccurrenceService
     ],
     declarations: [
