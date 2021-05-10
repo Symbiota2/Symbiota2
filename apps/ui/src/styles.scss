@@ -133,3 +133,13 @@ legend {
         outline: none;
     }
 }
+
+.mat-dialog-panel {
+    min-width: 60rem;
+    max-width: 90%;
+
+    @media only screen and (max-width: 600px) {
+        min-width: 0;
+        max-width: 100%;
+    }
+}

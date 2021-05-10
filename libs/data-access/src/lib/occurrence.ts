@@ -1,3 +1,5 @@
+import { ApiListResults } from './common';
+
 export enum ApiTaxonSearchCriterion {
     familyOrSciName = 'familyOrSciName',
     sciName = 'sciName',
@@ -40,6 +42,8 @@ export interface ApiOccurrenceFindAllParams {
     limitToImages: boolean;
     limitToGenetic: boolean;
 }
+
+export interface ApiOccurrenceList extends ApiListResults<ApiOccurrenceListItem> { }
 
 export interface ApiOccurrenceListItem {
     id: number;

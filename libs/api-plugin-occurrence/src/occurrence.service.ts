@@ -1,11 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Occurrence, OccurrenceGenetic, Image } from '@symbiota2/api-database';
+import { Occurrence } from '@symbiota2/api-database';
 import { DeepPartial, Repository } from 'typeorm';
 import { FindAllParams } from './dto/find-all-input.dto';
 import { ApiTaxonSearchCriterion } from '@symbiota2/data-access';
 
-type FindAllReturn = Pick<Occurrence,
-    'id' | 'collectionID' | 'catalogNumber' | 'taxonID' | 'sciname' | 'latitude' | 'longitude'>;
+type FindAllReturn = {
+    count: number;
+    data: Pick<Occurrence, 'id' | 'collectionID' | 'catalogNumber' | 'taxonID' | 'sciname' | 'latitude' | 'longitude'>[];
+}
 
 @Injectable()
 export class OccurrenceService {
@@ -13,7 +15,7 @@ export class OccurrenceService {
         @Inject(Occurrence.PROVIDER_ID)
         private readonly occurrenceRepo: Repository<Occurrence>) { }
 
-    async findAll(findAllOpts: FindAllParams): Promise<FindAllReturn[]> {
+    async findAll(findAllOpts: FindAllParams): Promise<FindAllReturn> {
         const { limit, offset, ...params } = findAllOpts;
         let qb = this.occurrenceRepo.createQueryBuilder('o')
             .select([
@@ -172,7 +174,11 @@ export class OccurrenceService {
             qb.andWhere('(select count(*) from images i where i.occid = o.id) > 0');
         }
 
-        return qb.getMany();
+        // TODO: Make this a query param
+        qb.addOrderBy('o.id', 'ASC');
+
+        const [data, count] = await qb.getManyAndCount();
+        return { count, data };
     }
 
     async findByID(id: number): Promise<Occurrence> {

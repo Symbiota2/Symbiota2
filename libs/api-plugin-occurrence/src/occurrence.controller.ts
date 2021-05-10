@@ -12,8 +12,8 @@ import {
     UploadedFile, UseGuards,
     UseInterceptors
 } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { OccurrenceListOutputDto } from './dto/occurrence-list-output.dto';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { OccurrenceList, OccurrenceListItem } from './dto/occurrence-list';
 import { OccurrenceService } from './occurrence.service';
 import { FindAllParams } from './dto/find-all-input.dto';
 import { OccurrenceInputDto } from './dto/occurrence-input.dto';
@@ -43,10 +43,11 @@ export class OccurrenceController {
 
     constructor(private readonly occurrenceService: OccurrenceService) { }
 
+    @ApiResponse({ type: OccurrenceList })
     @Get()
-    async findAll(@Query() findAllOpts: FindAllParams): Promise<OccurrenceListOutputDto[]> {
-        const occurrences = await this.occurrenceService.findAll(findAllOpts);
-        return occurrences.map((o) => new OccurrenceListOutputDto(o));
+    async findAll(@Query() findAllOpts: FindAllParams): Promise<OccurrenceList> {
+        const occurrenceList = await this.occurrenceService.findAll(findAllOpts);
+        return new OccurrenceList(occurrenceList.count, occurrenceList.data);
     }
 
     @Get(':id')
@@ -66,7 +67,7 @@ export class OccurrenceController {
         @Param('collectionID')
         collectionID: number,
         @Body(new ParseArrayPipe({ items: OccurrenceInputDto }))
-        occurrenceData: OccurrenceInputDto[]): Promise<OccurrenceListOutputDto> {
+        occurrenceData: OccurrenceInputDto[]): Promise<OccurrenceListItem> {
 
         // TODO: This returns nothing if input is array & something if it's a single occurrence
         if (occurrenceData.length > 1) {
@@ -77,7 +78,7 @@ export class OccurrenceController {
                 collectionID,
                 occurrenceData[0]
             );
-            return new OccurrenceListOutputDto(occurrence);
+            return new OccurrenceListItem(occurrence);
         }
     }
 

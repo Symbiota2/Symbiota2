@@ -10,7 +10,6 @@ import {
 import { SelectComponent } from "./components/select/select.component";
 import { OccurrenceSearchResultsPage } from "./pages/search-results/occurrence-search-results-page.component";
 import { Route, RouterModule } from "@angular/router";
-import { OccurrenceSearchResultComponent } from "./components/search-result/occurrence-search-result.component";
 import { OccurrenceSearchResultModalComponent } from "./components/search-result-modal/occurrence-search-result-modal.component";
 import { OccurrenceSearchCollectionsPage } from "./pages/occurrence-search/occurrence-search-page.component";
 import { DatePickerComponent } from "./components/date-picker/date-picker.component";
@@ -39,8 +38,8 @@ import { OccurrenceExtraFieldComponent } from './components/occurrence-editor/oc
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
     ROUTE_CREATE_OCCURRENCE,
-    ROUTE_SEARCH_OCCURRENCES, ROUTE_SEARCH_RESULTS,
-    ROUTE_UPLOAD
+    ROUTE_SEARCH_OCCURRENCES,
+    ROUTE_SEARCH_RESULTS,
 } from './routes';
 import { MatTableModule } from '@angular/material/table';
 import { FindAllResults } from './services/find-all-results';
@@ -81,7 +80,6 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     declarations: [
         DatePickerComponent,
         OccurrenceSearchCollectionsPage,
-        OccurrenceSearchResultComponent,
         OccurrenceSearchResultModalComponent,
         OccurrenceSearchResultsPage,
         SelectComponent,

@@ -1,12 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
-import { OccurrenceListOutputDto } from './occurrence-list-output.dto';
+import { OccurrenceListItem } from './occurrence-list';
+import { ApiOccurrence } from '@symbiota2/data-access';
 
 // Based on the occurrence editor fields:
 // https://scan-bugs.org/portal/collections/editor/occurrenceeditor.php?csmode=0&occindex=0&occid=348864&collid=3
 
 @Exclude()
-export class OccurrenceOutputDto extends OccurrenceListOutputDto {
+export class OccurrenceOutputDto extends OccurrenceListItem {
+    constructor(data: ApiOccurrence) {
+        super(data);
+        Object.assign(this, data);
+    }
+
     // Collector info
     @ApiProperty()
     @Expose()

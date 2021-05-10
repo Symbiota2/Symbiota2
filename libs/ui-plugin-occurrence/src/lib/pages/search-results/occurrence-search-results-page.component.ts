@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { LoadingService } from '@symbiota2/ui-common';
 import { OccurrenceService } from '../../services/occurrence.service';
 import {
@@ -9,6 +9,11 @@ import {
 import { Observable } from 'rxjs';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
+import { OccurrenceList } from '../../dto/occurrence-list';
+import { PageEvent } from '@angular/material/paginator';
+import { MatDialog } from '@angular/material/dialog';
+import { OccurrenceListItem } from '../../dto';
+import { OccurrenceSearchResultModalComponent } from '../../components';
 
 @Component({
     selector: "symbiota2-occurrence-search-results",
@@ -21,12 +26,21 @@ export class OccurrenceSearchResultsPage implements OnInit {
     public limit = 25;
     public offset = 0;
 
-    occurrences: Observable<ApiOccurrenceListItem[]>;
+    readonly SHOW_COLUMNS = [
+        'occurrenceID',
+        'catalogNumber',
+        'collection',
+        'sciName',
+        'latitude',
+        'longitude'
+    ];
+    occurrences: Observable<OccurrenceList>;
 
     constructor(
         private readonly router: Router,
         private readonly currentRoute: ActivatedRoute,
         private readonly loading: LoadingService,
+        private readonly matDialog: MatDialog,
         private readonly occurrenceService: OccurrenceService) { }
 
     get queryParams(): ParamMap {
@@ -105,6 +119,9 @@ export class OccurrenceSearchResultsPage implements OnInit {
                         }
                     })
                 );
+
+            // Initial fetch, remaining are updated when searchResults.page()
+            // is called
             this.occurrenceService.searchResults.fetch(findParams);
         }
         else {
@@ -116,5 +133,21 @@ export class OccurrenceSearchResultsPage implements OnInit {
                 }
             );
         }
+    }
+
+    onPageChanged(e: PageEvent) {
+        const limit = e.pageSize;
+        const offset = limit * e.pageIndex;
+        this.occurrenceService.searchResults.page(limit, offset);
+    }
+
+    onOccurrenceSelected(occurrence: OccurrenceListItem) {
+        this.matDialog.open(
+            OccurrenceSearchResultModalComponent,
+            {
+                panelClass: 'mat-dialog-panel',
+                data: occurrence
+            }
+        );
     }
 }
