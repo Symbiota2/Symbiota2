@@ -14,6 +14,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { OccurrenceListItem } from '../../dto';
 import { OccurrenceSearchResultModalComponent } from '../../components';
+import { ROUTE_COLLECTION_PROFILE } from '@symbiota2/ui-plugin-collection';
 
 @Component({
     selector: "symbiota2-occurrence-search-results",
@@ -28,8 +29,8 @@ export class OccurrenceSearchResultsPage implements OnInit {
 
     readonly SHOW_COLUMNS = [
         'occurrenceID',
-        'catalogNumber',
         'collection',
+        'catalogNumber',
         'sciName',
         'latitude',
         'longitude'
@@ -133,6 +134,10 @@ export class OccurrenceSearchResultsPage implements OnInit {
                 }
             );
         }
+    }
+
+    collectionURL(id: number): string {
+        return `/${ROUTE_COLLECTION_PROFILE.replace(':collectionID', id.toString())}`;
     }
 
     onPageChanged(e: PageEvent) {

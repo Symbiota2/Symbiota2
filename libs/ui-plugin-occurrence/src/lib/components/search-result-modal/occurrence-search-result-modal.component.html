@@ -2,10 +2,14 @@
     <div fxLayout="row" fxLayoutAlign="start center">
         <!-- TODO: Link to collection -->
         <ng-container *ngIf='(collection$ | async) as collection'>
-            <div>
-                <img id="collection-icon" *ngIf="collection.icon" [src]="collection.icon" alt="collection icon">
+            <div id='collection-icon'>
+                <symbiota2-collection-logo
+                    [collectionID]='collection.id'
+                    [src]='collection.icon'
+                >
+                </symbiota2-collection-logo>
             </div>
-            <div>
+            <div id='collection-name'>
                 <h2>
                     {{ collection.collectionName }}
                 </h2>

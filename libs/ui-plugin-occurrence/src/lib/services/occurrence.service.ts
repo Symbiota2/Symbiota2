@@ -40,6 +40,7 @@ export class OccurrenceService {
                     if (o === null) {
                         return null;
                     }
+                    console.log(o);
                     return Occurrence.fromJSON(o);
                 })
             );

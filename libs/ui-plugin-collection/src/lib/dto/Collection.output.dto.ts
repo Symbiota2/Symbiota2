@@ -2,40 +2,40 @@ import {
     ApiCollectionInstitutionOutput,
     ApiCollectionListItem, ApiCollectionOutput, ApiCollectionStatsOutput
 } from '@symbiota2/data-access';
+import { Exclude, Expose } from 'class-transformer';
 
+@Exclude()
 export class CollectionListItem implements ApiCollectionListItem {
     constructor(collection: ApiCollectionListItem) {
         Object.assign(this, collection);
     }
 
-    id: number;
-    collectionName: string;
-    icon: string;
+    @Expose() id: number;
+    @Expose() collectionName: string;
+    @Expose() icon: string;
 }
 
-export class Collection implements ApiCollectionOutput {
+@Exclude()
+export class Collection extends CollectionListItem implements ApiCollectionOutput {
     constructor(collection: ApiCollectionOutput) {
-        Object.assign(this, collection);
+        super(collection);
     }
 
-    id: number;
-    collectionCode: string;
-    collectionName: string;
-    institution: ApiCollectionInstitutionOutput;
-    stats: ApiCollectionStatsOutput;
-    fullDescription: string;
-    homePage: string;
-    individualUrl: string;
-    contact: string;
-    email: string;
-    latitude: number;
-    longitude: number;
-    icon: string;
-    type: string;
-    managementType: string;
-    rightsHolder: string;
-    rights: string;
-    usageTerm: string;
-    accessRights: string;
-    initialTimestamp: Date;
+    @Expose() collectionCode: string;
+    @Expose() institution: ApiCollectionInstitutionOutput;
+    @Expose() stats: ApiCollectionStatsOutput;
+    @Expose() fullDescription: string;
+    @Expose() homePage: string;
+    @Expose() individualUrl: string;
+    @Expose() contact: string;
+    @Expose() email: string;
+    @Expose() latitude: number;
+    @Expose() longitude: number;
+    @Expose() type: string;
+    @Expose() managementType: string;
+    @Expose() rightsHolder: string;
+    @Expose() rights: string;
+    @Expose() usageTerm: string;
+    @Expose() accessRights: string;
+    @Expose() initialTimestamp: Date;
 }
