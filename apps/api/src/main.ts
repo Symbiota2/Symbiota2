@@ -7,12 +7,13 @@ import { AppConfigService } from '@symbiota2/api-config';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { RefreshCookieStrategy } from '@symbiota2/api-auth';
 import { RequestLoggerInterceptor } from './request-logger/request-logger.interceptor';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 const GLOBAL_API_PREFIX = 'api/v1';
 const SWAGGER_DOCS_PREFIX = 'docs'
 
 export default async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule);
     const configService = app.get(AppConfigService);
 
     // Build docs
@@ -62,6 +63,9 @@ export default async function bootstrap() {
             enableImplicitConversion: true
         }
     }));
+
+    // Can run through a single proxy
+    app.set('trust proxy', 1);
 
     // Start server
     await app.listen(configService.port());
