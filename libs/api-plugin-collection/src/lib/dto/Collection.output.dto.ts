@@ -5,6 +5,7 @@ import {
     ApiCollectionInstitutionOutput, ApiCollectionOutput,
     ApiCollectionStatsOutput
 } from '@symbiota2/data-access';
+import { CollectionListItem } from './CollectionListItem.output.dto';
 
 @Exclude()
 export class CollectionInstitutionOutputDto implements ApiCollectionInstitutionOutput {
@@ -53,22 +54,14 @@ export class CollectionStatsOutputDto implements ApiCollectionStatsOutput {
 }
 
 @Exclude()
-export class CollectionOutputDto implements ApiCollectionOutput {
+export class CollectionOutputDto extends CollectionListItem implements ApiCollectionOutput {
     constructor(collection: Collection) {
-        Object.assign(this, collection);
+        super(collection);
     }
 
     @ApiProperty()
     @Expose()
-    id: number;
-
-    @ApiProperty()
-    @Expose()
     collectionCode: string;
-
-    @ApiProperty()
-    @Expose()
-    collectionName: string;
 
     @ApiProperty()
     @Expose()
@@ -112,10 +105,6 @@ export class CollectionOutputDto implements ApiCollectionOutput {
     @Type(() => String)
     @Transform((data) => data ? parseFloat(data.value) : null)
     longitude: number;
-
-    @ApiProperty()
-    @Expose()
-    icon: string;
 
     @ApiProperty()
     @Expose()

@@ -2,11 +2,18 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Occurrence } from '@symbiota2/api-database';
 import { DeepPartial, Repository } from 'typeorm';
 import { FindAllParams } from './dto/find-all-input.dto';
-import { ApiTaxonSearchCriterion } from '@symbiota2/data-access';
+import {
+    ApiCollectionListItem, ApiOccurrence,
+    ApiTaxonSearchCriterion
+} from '@symbiota2/data-access';
+import { map } from 'rxjs/operators';
 
-type FindAllReturn = {
+type _OccurrenceFindAllItem = Pick<Occurrence, 'id' | 'catalogNumber' | 'taxonID' | 'sciname' | 'latitude' | 'longitude'>;
+type OccurrenceFindAllItem = _OccurrenceFindAllItem & { collection: ApiCollectionListItem };
+
+type OccurrenceFindAllList = {
     count: number;
-    data: Pick<Occurrence, 'id' | 'collectionID' | 'catalogNumber' | 'taxonID' | 'sciname' | 'latitude' | 'longitude'>[];
+    data: OccurrenceFindAllItem[];
 }
 
 @Injectable()
@@ -15,20 +22,23 @@ export class OccurrenceService {
         @Inject(Occurrence.PROVIDER_ID)
         private readonly occurrenceRepo: Repository<Occurrence>) { }
 
-    async findAll(findAllOpts: FindAllParams): Promise<FindAllReturn> {
+    async findAll(findAllOpts: FindAllParams): Promise<OccurrenceFindAllList> {
         const { limit, offset, ...params } = findAllOpts;
         let qb = this.occurrenceRepo.createQueryBuilder('o')
             .select([
                 'o.id',
-                'o.collectionID',
                 'o.catalogNumber',
                 'o.taxonID',
                 'o.sciname',
                 'o.latitude',
-                'o.longitude'
+                'o.longitude',
+                'c.id',
+                'c.collectionName',
+                'c.icon'
             ])
-            .take(limit)
-            .skip(offset);
+            .innerJoin('o.collection', 'c')
+            .limit(limit)
+            .offset(offset);
 
         if (findAllOpts.collectionID) {
             if (Array.isArray(findAllOpts.collectionID)) {
@@ -178,16 +188,38 @@ export class OccurrenceService {
         qb.addOrderBy('o.id', 'ASC');
 
         const [data, count] = await qb.getManyAndCount();
-        return { count, data };
+        return {
+            count,
+            data: await Promise.all(
+                data.map(async (occurrence) => {
+                    const { collection, ...props } = occurrence;
+                    return {
+                        ...props,
+                        collection: await collection
+                    }
+                })
+            )
+        };
     }
 
-    async findByID(id: number): Promise<Occurrence> {
-        return await this.occurrenceRepo.findOne({ id });
+    async findByID(id: number): Promise<ApiOccurrence> {
+        const { collection, ...props } = await this.occurrenceRepo.findOne(
+            { id },
+            { relations: ['collection'] }
+        );
+        return {
+            collection: await collection,
+            ...props
+        }
     }
 
-    async create(collectionID: number, occurrenceData: DeepPartial<Occurrence>): Promise<Occurrence> {
+    async create(collectionID: number, occurrenceData: DeepPartial<Occurrence>): Promise<ApiOccurrence> {
         const occurrence = this.occurrenceRepo.create({ collectionID, ...occurrenceData });
-        return this.occurrenceRepo.save(occurrence);
+        const { collection, ...props } = await this.occurrenceRepo.save(occurrence);
+        return {
+            collection: await collection,
+            ...props
+        };
     }
 
     async createMany(collectionID: number, occurrenceData: DeepPartial<Occurrence>[]): Promise<void> {

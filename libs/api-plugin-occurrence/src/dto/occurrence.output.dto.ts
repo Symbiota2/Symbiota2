@@ -10,7 +10,6 @@ import { ApiOccurrence } from '@symbiota2/data-access';
 export class OccurrenceOutputDto extends OccurrenceListItem {
     constructor(data: ApiOccurrence) {
         super(data);
-        Object.assign(this, data);
     }
 
     // Collector info

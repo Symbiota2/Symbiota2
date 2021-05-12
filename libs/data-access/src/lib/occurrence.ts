@@ -1,4 +1,5 @@
 import { ApiListResults } from './common';
+import { ApiCollectionListItem } from './collection';
 
 export enum ApiTaxonSearchCriterion {
     familyOrSciName = 'familyOrSciName',
@@ -43,17 +44,17 @@ export interface ApiOccurrenceFindAllParams {
     limitToGenetic: boolean;
 }
 
-export interface ApiOccurrenceList extends ApiListResults<ApiOccurrenceListItem> { }
-
 export interface ApiOccurrenceListItem {
     id: number;
-    collectionID: number;
+    collection: ApiCollectionListItem;
     catalogNumber: string;
     taxonID: number | null;
     sciname: string;
     latitude: number | null;
     longitude: number | null;
 }
+
+export interface ApiOccurrenceList extends ApiListResults<ApiOccurrenceListItem> { }
 
 export interface ApiOccurrence extends ApiOccurrenceListItem {
     associatedCollectors: string;

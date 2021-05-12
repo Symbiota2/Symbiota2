@@ -5,14 +5,14 @@ import {
     Get,
     HttpCode,
     HttpStatus,
-    Logger,
+    Logger, NotFoundException,
     Param, ParseArrayPipe,
     Post,
     Query,
-    UploadedFile, UseGuards,
+    UploadedFile,
     UseInterceptors
 } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { OccurrenceList, OccurrenceListItem } from './dto/occurrence-list';
 import { OccurrenceService } from './occurrence.service';
 import { FindAllParams } from './dto/find-all-input.dto';
@@ -22,7 +22,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import fs from 'fs';
 import JSONStream from 'JSONStream';
 import {
-    ApiBodyOneOrMany,
     ApiFileInput,
     CsvInterceptor
 } from '@symbiota2/api-common';
@@ -31,6 +30,7 @@ import { Occurrence } from '@symbiota2/api-database';
 import { plainToClass } from 'class-transformer';
 import { OccurrenceOutputDto } from './dto/occurrence.output.dto';
 import { ProtectCollection } from '@symbiota2/api-plugin-collection';
+import { CollectionListItem } from '@symbiota2/ui-plugin-collection';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -43,20 +43,22 @@ export class OccurrenceController {
 
     constructor(private readonly occurrenceService: OccurrenceService) { }
 
-    @ApiResponse({ type: OccurrenceList })
+    @ApiResponse({ status: HttpStatus.OK, type: OccurrenceList })
     @Get()
     async findAll(@Query() findAllOpts: FindAllParams): Promise<OccurrenceList> {
         const occurrenceList = await this.occurrenceService.findAll(findAllOpts);
         return new OccurrenceList(occurrenceList.count, occurrenceList.data);
     }
 
+    @ApiResponse({ status: HttpStatus.OK, type: OccurrenceOutputDto })
+    @ApiExtraModels(CollectionListItem)
     @Get(':id')
     async findByID(@Param('id') id: number): Promise<OccurrenceOutputDto> {
         const occurrence = await this.occurrenceService.findByID(id);
         if (occurrence) {
             return new OccurrenceOutputDto(occurrence);
         }
-        return null;
+        throw new NotFoundException();
     }
 
     @Post(':collectionID')

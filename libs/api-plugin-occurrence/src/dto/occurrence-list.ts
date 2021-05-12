@@ -4,6 +4,7 @@ import {
     ApiOccurrenceList,
     ApiOccurrenceListItem
 } from '@symbiota2/data-access';
+import { CollectionListItem } from '@symbiota2/api-plugin-collection';
 
 @Exclude()
 export class OccurrenceListItem implements ApiOccurrenceListItem {
@@ -15,9 +16,10 @@ export class OccurrenceListItem implements ApiOccurrenceListItem {
     @Expose()
     id: number;
 
-    @ApiProperty()
+    @ApiProperty({ type: CollectionListItem })
     @Expose()
-    collectionID: number;
+    @Type(() => CollectionListItem)
+    collection: CollectionListItem;
 
     @ApiProperty()
     @Expose()
