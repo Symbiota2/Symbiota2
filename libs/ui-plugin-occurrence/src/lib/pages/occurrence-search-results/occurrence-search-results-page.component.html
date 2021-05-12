@@ -3,7 +3,7 @@
     <div *ngIf='(occurrences | async) as occurrences' class='mat-elevation-z1'>
         <mat-paginator
             [length]='occurrences.count'
-            [pageSize]='occurrences.data.length'
+            [pageSize]='limit'
             [pageSizeOptions]='[25, 50, 100]'
             (page)='onPageChanged($event)'
         >
@@ -52,12 +52,5 @@
             >
             </tr>
         </table>
-        <mat-paginator
-            [length]='occurrences.count'
-            [pageSize]='occurrences.data.length'
-            [pageSizeOptions]='[25, 50, 100]'
-            (page)='onPageChanged($event)'
-        >
-        </mat-paginator>
     </div>
 </div>

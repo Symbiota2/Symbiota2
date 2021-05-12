@@ -9,7 +9,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { Occurrence } from '../dto';
 import { ApiOccurrence } from '@symbiota2/data-access';
-import { FindAllResults } from './find-all-results';
+import { OccurrenceSearchResults } from './occurrence-search-result.service';
 
 type OptionalJSON = Record<string, unknown> | null;
 
@@ -18,7 +18,7 @@ export class OccurrenceService {
     private jwtToken = this.user.currentUser.pipe(map((user) => user.token));
 
     constructor(
-        public readonly searchResults: FindAllResults,
+        public readonly searchResults: OccurrenceSearchResults,
         private readonly user: UserService,
         private readonly apiClient: ApiClientService,
         private readonly appConfig: AppConfigService) { }

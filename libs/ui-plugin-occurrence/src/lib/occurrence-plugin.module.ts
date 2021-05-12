@@ -8,7 +8,7 @@ import {
 } from '@symbiota2/ui-common';
 
 import { SelectComponent } from "./components/select/select.component";
-import { OccurrenceSearchResultsPage } from "./pages/search-results/occurrence-search-results-page.component";
+import { OccurrenceSearchResultsPage } from "./pages/occurrence-search-results/occurrence-search-results-page.component";
 import { Route, RouterModule } from "@angular/router";
 import { OccurrenceSearchResultModalComponent } from "./components/search-result-modal/occurrence-search-result-modal.component";
 import { OccurrenceSearchCollectionsPage } from "./pages/occurrence-search/occurrence-search-page.component";
@@ -42,7 +42,7 @@ import {
     ROUTE_SEARCH_RESULTS,
 } from './routes';
 import { MatTableModule } from '@angular/material/table';
-import { FindAllResults } from './services/find-all-results';
+import { OccurrenceSearchResults } from './services/occurrence-search-result.service';
 import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
@@ -74,7 +74,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
         MatPaginatorModule
     ],
     providers: [
-        FindAllResults,
+        OccurrenceSearchResults,
         OccurrenceService
     ],
     declarations: [

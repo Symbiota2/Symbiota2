@@ -37,7 +37,21 @@ export class CollectionService extends BaseService<Collection> {
             .leftJoin('l.collection', 'collection')
             .orderBy('collection.collectionName', 'ASC')
             .getMany();
-        return Promise.all(links.map(async (l) => l.collection));
+        return Promise.all(links.map(async (l) => new CollectionListItem(await l.collection)));
+    }
+
+    async findUncategorized(): Promise<CollectionListItem[]> {
+        const subquery = await this.categoryLinks.createQueryBuilder('l')
+            .select(['l.collectionID'])
+            .distinct(true);
+
+        const collections = await this.collections.createQueryBuilder('c')
+            .select(['c.id', 'c.icon', 'c.collectionName'])
+            .where(`c.id not in (${subquery.getQuery()})`)
+            .orderBy('c.collectionName', 'ASC')
+            .getMany();
+
+        return collections.map((c) => new CollectionListItem(c));
     }
 
     async create(data: DeepPartial<Collection>): Promise<Collection> {

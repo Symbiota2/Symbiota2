@@ -13,7 +13,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { CollectionListItem } from '../../dto/Collection.output.dto';
 import { CollectionCategory } from '../../dto/Category.output.dto';
 
-const ROOT_NODE_ID = -1;
+const ROOT_NODE_ID = 65536;
 
 class TreeNode {
     id: number;

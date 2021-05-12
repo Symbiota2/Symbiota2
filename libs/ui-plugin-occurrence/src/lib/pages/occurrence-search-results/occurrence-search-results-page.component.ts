@@ -88,7 +88,7 @@ export class OccurrenceSearchResultsPage implements OnInit {
         const limitToGenetic = limitToGeneticStr ? limitToGeneticStr === 'true' : null;
 
         if (collectionIDs.length > 0) {
-            const findParams: ApiOccurrenceFindAllParams = {
+            const findParams: Omit<ApiOccurrenceFindAllParams, 'limit' | 'offset'> = {
                 collectionID: collectionIDs,
                 taxonSearchCriterion: taxonSearchStr ? taxonSearchCriterion as ApiTaxonSearchCriterion : null,
                 taxonSearchStr,
@@ -109,8 +109,6 @@ export class OccurrenceSearchResultsPage implements OnInit {
                 limitToGenetic,
                 minEventDate: minEventDate ? minEventDate.toISOString() : null,
                 maxEventDate: maxEventDate ? maxEventDate.toISOString() : null,
-                limit: this.limit,
-                offset: this.offset
             };
 
             this.occurrences = this.occurrenceService.searchResults.occurrences.pipe(
@@ -123,7 +121,8 @@ export class OccurrenceSearchResultsPage implements OnInit {
 
             // Initial fetch, remaining are updated when searchResults.page()
             // is called
-            this.occurrenceService.searchResults.fetch(findParams);
+            this.occurrenceService.searchResults.setQueryParams(findParams);
+            this.occurrenceService.searchResults.changePage(this.limit, this.offset);
         }
         else {
             this.router.navigate(
@@ -141,9 +140,9 @@ export class OccurrenceSearchResultsPage implements OnInit {
     }
 
     onPageChanged(e: PageEvent) {
-        const limit = e.pageSize;
-        const offset = limit * e.pageIndex;
-        this.occurrenceService.searchResults.page(limit, offset);
+        this.limit = e.pageSize;
+        this.offset = this.limit * e.pageIndex;
+        this.occurrenceService.searchResults.changePage(this.limit, this.offset);
     }
 
     onOccurrenceSelected(occurrence: OccurrenceListItem) {
