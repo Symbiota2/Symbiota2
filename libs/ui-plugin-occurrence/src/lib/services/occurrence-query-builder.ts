@@ -78,32 +78,31 @@ class FindAllBuilder extends OccurrenceQueryBuilder {
     protected _collectionIDs: number[] = [];
     protected queryParams = new HttpParams();
 
-    collectionID(ids: number[] | number): FindAllBuilder {
-        if (!Array.isArray(ids)) {
-            ids = [ids];
-        }
+    collectionIDs(ids: number[]): FindAllBuilder {
         this._collectionIDs = ids;
         return this;
     }
 
-    queryParam(key: keyof ApiOccurrenceFindAllParams, val: unknown): FindAllBuilder {
+    queryParam(key: keyof Omit<ApiOccurrenceFindAllParams, 'collectionID'>, val: unknown): FindAllBuilder {
         if (!(['', undefined, null].includes(val as any) || (typeof val === 'number' && isNaN(val)))) {
-            this.queryParams = this.queryParams.append(key, val.toString());
+            this.queryParams = this.queryParams.set(key, val.toString());
         }
         return this;
     }
 
     build(): string {
-        this._collectionIDs.forEach((id) => {
-            this.queryParams.append('collectionID', id.toString());
-        });
-
         for (const key of this.queryParams.keys()) {
-            this.url.searchParams.set(
-                key,
-                this.queryParams.get(key)
-            );
+            if (key !== 'collectionID') {
+                this.url.searchParams.set(
+                    key,
+                    this.queryParams.get(key)
+                );
+            }
         }
+
+        this._collectionIDs.forEach((id) => {
+            this.url.searchParams.append('collectionID', id.toString());
+        });
 
         return super.build();
     }

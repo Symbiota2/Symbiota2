@@ -10,7 +10,7 @@ export enum ApiTaxonSearchCriterion {
 }
 
 export interface ApiOccurrenceFindAllParams {
-    collectionID: number | number[];
+    collectionID: number[];
     limit: number;
     offset: number;
 

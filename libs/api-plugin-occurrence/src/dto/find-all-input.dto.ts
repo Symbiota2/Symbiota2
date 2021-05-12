@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+    IsArray,
     IsBoolean, IsBooleanString, IsDate, IsDateString,
     IsEnum,
     IsInt, IsLatitude, IsLongitude,
@@ -20,18 +21,11 @@ export class FindAllParams implements Partial<ApiOccurrenceFindAllParams> {
     static readonly DEFAULT_OFFSET = 0;
     static readonly MAX_LIMIT = 128;
 
-    @ApiProperty({ required: false })
-    @Type(() => Number)
-    @Transform(({ value }) => {
-        if (Array.isArray(value)) {
-            return value.map((v) => parseInt(v))
-        }
-        else {
-            return parseInt(value);
-        }
-    })
+    @ApiProperty({ type: Number, isArray: true, required: false })
+    @IsArray()
+    // @IsInt({ each: true })
     @IsOptional()
-    collectionID?: number | number[];
+    collectionID?: number[];
 
     @ApiProperty({ required: false, default: FindAllParams.DEFAULT_LIMIT })
     @IsInt()

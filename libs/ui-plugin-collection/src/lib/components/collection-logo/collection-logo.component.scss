@@ -2,6 +2,12 @@
 $primaryColor: #0e6b88;
 $accentColor: #882a0e;
 
+a {
+    &:active, &:focus {
+        outline: none;
+    }
+}
+
 .collection-logo {
     display: block;
     background: scale-color($primaryColor, $alpha: -80%);

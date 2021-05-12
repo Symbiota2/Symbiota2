@@ -46,14 +46,14 @@ export class FindAllResults {
 
     private _updateOccurrences(params: FindAllParams, page: PageParams) {
         let url = new OccurrenceQueryBuilder(this.appConfig.apiUri()).findAll()
+            .collectionIDs(params.collectionID)
             .queryParam('limit', page.limit)
             .queryParam('offset', page.offset);
 
         for (const key of Object.keys(params)) {
-            url = url.queryParam(
-                key as keyof ApiOccurrenceFindAllParams,
-                params[key]
-            );
+            if (key !== 'collectionID') {
+                url = url.queryParam(key as any, params[key]);
+            }
         }
 
         const query = this.api.queryBuilder(url.build()).get().build();
