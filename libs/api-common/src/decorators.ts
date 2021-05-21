@@ -1,5 +1,10 @@
 import { ApiResponse, getSchemaPath, ApiBody, ApiConsumes, ApiExtraModels } from '@nestjs/swagger';
 import { HttpStatus, Type, applyDecorators } from '@nestjs/common';
+import {
+    registerDecorator, ValidationArguments,
+    ValidationOptions, ValidatorConstraint,
+    ValidatorConstraintInterface
+} from 'class-validator';
 
 export function ApiResponseOneOrMany<T>(cls: Type<T>) {
     return applyDecorators(

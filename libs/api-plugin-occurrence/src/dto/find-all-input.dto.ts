@@ -22,8 +22,8 @@ export class FindAllParams implements Partial<ApiOccurrenceFindAllParams> {
     static readonly MAX_LIMIT = 128;
 
     @ApiProperty({ type: Number, isArray: true, required: false })
+    @Transform((val) => Array.isArray(val) ? val : [val])
     @IsArray()
-    // @IsInt({ each: true })
     @IsOptional()
     collectionID?: number[];
 
