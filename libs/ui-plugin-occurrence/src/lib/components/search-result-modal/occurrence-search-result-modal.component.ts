@@ -67,6 +67,10 @@ export class OccurrenceSearchResultModalComponent implements OnInit {
         return val instanceof Date;
     }
 
+    isNumber(val: string | number): boolean {
+        return typeof val === 'number';
+    }
+
     onEditClick() {
         this.isEditing = !this.isEditing;
     }

@@ -14,18 +14,16 @@
                 <td mat-cell *matCellDef="let occurrence">{{ occurrence.id }}</td>
             </ng-container>
 
-            <ng-container matColumnDef="collection">
-                <th mat-header-cell *matHeaderCellDef>Collection</th>
-                <td mat-cell *matCellDef="let occurrence">
-                    <a [routerLink]='collectionURL(occurrence.collection.id)'>
-                        {{ occurrence.collection.collectionName }}
-                    </a>
-                </td>
-            </ng-container>
-
             <ng-container matColumnDef="catalogNumber">
                 <th mat-header-cell *matHeaderCellDef>Catalog number</th>
                 <td mat-cell *matCellDef="let occurrence">{{ occurrence.catalogNumber }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="collection">
+                <th mat-header-cell *matHeaderCellDef>Collection</th>
+                <td mat-cell *matCellDef="let occurrence">
+                    {{ occurrence.collection.collectionName }}
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="sciName">

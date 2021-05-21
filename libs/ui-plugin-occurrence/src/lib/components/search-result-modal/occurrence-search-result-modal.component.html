@@ -34,7 +34,7 @@
     </div>
     <ng-template #viewing>
         <div mat-dialog-content fxLayout="column">
-            <div class="edit-category">
+            <div>
                 <mat-card>
                     <mat-card-title>Collector Info</mat-card-title>
                     <mat-card-content>
@@ -52,7 +52,7 @@
                     </mat-card-content>
                 </mat-card>
             </div>
-            <div class="edit-category">
+            <div>
                 <mat-card>
                     <mat-card-title>Latest identification</mat-card-title>
                     <mat-card-content>
@@ -63,6 +63,24 @@
                                     {{ item.value | date }}
                                 </span>
                                 <ng-template #notDate>
+                                    {{ item.value }}
+                                </ng-template>
+                            </p>
+                        </ng-container>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+            <div>
+                <mat-card>
+                    <mat-card-title>Locality</mat-card-title>
+                    <mat-card-content>
+                        <ng-container *ngFor="let item of occurrence.localityInfo() | keyvalue">
+                            <p *ngIf="item.value">
+                                <b>{{ getI18nForField(item.key) | async }}: </b>
+                                <span *ngIf='isNumber(item.value); else notNumber'>
+                                    {{ item.value | number }}
+                                </span>
+                                <ng-template #notNumber>
                                     {{ item.value }}
                                 </ng-template>
                             </p>

@@ -9,3 +9,13 @@ table.mat-table {
         background: darken($rowBackground, 10%);
     }
 }
+
+.browseToCollectionIcon {
+    .mat-icon {
+        vertical-align: middle;
+    }
+
+    &:visited {
+        color: initial;
+    }
+}

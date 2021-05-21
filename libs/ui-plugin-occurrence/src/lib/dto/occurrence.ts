@@ -8,34 +8,46 @@ import {
 } from 'class-transformer';
 import { ApiOccurrence } from '@symbiota2/data-access';
 
-function dateTransformer(obj: { value: string }): Date {
-    if (obj && obj.value) {
-        return new Date(obj.value);
-    }
-    return null;
-}
-
 type CollectorInfoProps = (
+    'associatedCollectors' |
+    'basisOfRecord' |
     'catalogNumber' |
     'eventDate' |
-    'recordedByNames' |
-    'basisOfRecord' |
-    'associatedCollectors' |
     'otherCatalogNumbers' |
+    'recordedByNames' |
     'recordNumber' |
     'verbatimEventDate'
 );
 interface CollectorInfo extends Pick<Occurrence, CollectorInfoProps> { }
 
 type LatestIDInfoProps = (
-    'sciname' |
-    'scientificNameAuthorship' |
-    'identificationQualifier' |
+    'dateIdentified' |
     'family' |
+    'identificationQualifier' |
     'identifiedBy' |
-    'dateIdentified'
+    'scientificNameAuthorship' |
+    'sciname'
 );
 interface LatestIDInfo extends Pick<Occurrence, LatestIDInfoProps> { }
+
+type LocalityInfoProps = (
+    'coordinateUncertaintyInMeters' |
+    'country' |
+    'county' |
+    'geodeticDatum' |
+    'latitude' |
+    'locality' |
+    'longitude' |
+    'maximumDepthInMeters' |
+    'maximumElevationInMeters' |
+    'minimumDepthInMeters' |
+    'minimumElevationInMeters' |
+    'municipality' |
+    'stateProvince' |
+    'verbatimCoordinates' |
+    'verbatimDepth'
+);
+interface LocalityInfo extends Pick<Occurrence, LocalityInfoProps> { }
 
 @Exclude()
 export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurrence> {
@@ -43,6 +55,7 @@ export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurre
     @Expose() associatedTaxa: string;
     @Expose() basisOfRecord: string;
     @Expose() coordinateUncertaintyInMeters: number;
+    @Expose() county: string;
     @Expose() country: string;
     @Expose() cultivationStatus: number;
     @Expose() dataGeneralizations: string;
@@ -122,5 +135,25 @@ export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurre
             dateIdentified: this.dateIdentified,
             identifiedBy: this.identifiedBy
         };
+    }
+
+    localityInfo(): LocalityInfo {
+        return {
+            coordinateUncertaintyInMeters: this.coordinateUncertaintyInMeters,
+            country: this.country,
+            county: this.county,
+            geodeticDatum: this.geodeticDatum,
+            latitude: this.latitude,
+            locality: this.locality,
+            longitude: this.longitude,
+            maximumDepthInMeters: this.maximumDepthInMeters,
+            maximumElevationInMeters: this.maximumElevationInMeters,
+            minimumDepthInMeters: this.minimumDepthInMeters,
+            minimumElevationInMeters: this.minimumElevationInMeters,
+            municipality: this.municipality,
+            stateProvince: this.stateProvince,
+            verbatimCoordinates: this.verbatimCoordinates,
+            verbatimDepth: this.verbatimDepth
+        }
     }
 }
