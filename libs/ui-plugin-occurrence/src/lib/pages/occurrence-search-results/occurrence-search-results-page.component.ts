@@ -15,6 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { OccurrenceListItem } from '../../dto';
 import { OccurrenceSearchResultModalComponent } from '../../components';
 import { ROUTE_COLLECTION_PROFILE } from '@symbiota2/ui-plugin-collection';
+import { Q_PARAM_COLLID } from '../../../constants';
 
 @Component({
     selector: "symbiota2-occurrence-search-results",
@@ -51,7 +52,7 @@ export class OccurrenceSearchResultsPage implements OnInit {
     ngOnInit() {
 
         // TODO: Clean this up
-        const collectionIDs = this.queryParams.getAll('collectionID[]').map(
+        const collectionIDs = this.queryParams.getAll(Q_PARAM_COLLID).map(
             (id) => parseInt(id)
         );
         const taxonSearchCriterion = this.queryParams.get('taxonSearchCriterion');

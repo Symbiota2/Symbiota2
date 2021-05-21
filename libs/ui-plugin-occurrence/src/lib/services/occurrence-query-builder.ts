@@ -1,4 +1,4 @@
-import { Q_PARAM_COLLIDS } from '../../constants';
+import { Q_PARAM_COLLID } from '../../constants';
 import { ApiOccurrenceFindAllParams } from '@symbiota2/data-access';
 import { HttpParams } from '@angular/common/http';
 
@@ -84,7 +84,10 @@ class FindAllBuilder extends OccurrenceQueryBuilder {
     }
 
     queryParam(key: keyof Omit<ApiOccurrenceFindAllParams, 'collectionID'>, val: unknown): FindAllBuilder {
-        if (!(['', undefined, null].includes(val as any) || (typeof val === 'number' && isNaN(val)))) {
+        const isNull = ['', undefined, null].includes(val as any);
+        const isNan = typeof val === 'number' && isNaN(val);
+
+        if (!(isNull || isNan)) {
             this.queryParams = this.queryParams.set(key, val.toString());
         }
         return this;
@@ -92,7 +95,7 @@ class FindAllBuilder extends OccurrenceQueryBuilder {
 
     build(): string {
         for (const key of this.queryParams.keys()) {
-            if (key !== 'collectionID') {
+            if (key !== Q_PARAM_COLLID) {
                 this.url.searchParams.set(
                     key,
                     this.queryParams.get(key)
@@ -101,7 +104,7 @@ class FindAllBuilder extends OccurrenceQueryBuilder {
         }
 
         this._collectionIDs.forEach((id) => {
-            this.url.searchParams.append('collectionID', id.toString());
+            this.url.searchParams.append(Q_PARAM_COLLID, id.toString());
         });
 
         return super.build();

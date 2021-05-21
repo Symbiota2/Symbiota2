@@ -1,9 +1,13 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Q_PARAM_COLLIDS } from '../../../constants';
+import { Q_PARAM_COLLID } from '../../../constants';
 import { Validators } from '@angular/forms';
 import { ROUTE_SEARCH_RESULTS } from '../../routes';
-import { TypedFormControl, TypedFormGroup } from '@symbiota2/ui-common';
+import {
+    formToQueryParams,
+    TypedFormControl,
+    TypedFormGroup
+} from '@symbiota2/ui-common';
 import {
     ApiOccurrenceFindAllParams,
     ApiTaxonSearchCriterion
@@ -23,7 +27,7 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
         { i18n: 'plugins.occurrence.search.taxonCriteria.commonName', value: 'commonName' },
     ];
 
-    collectionIDs: number[] = [];
+    collectionIDs = new TypedFormControl<number[]>([]);
 
     // Taxon Criteria
     taxonSearchCriterion = new TypedFormControl<ApiTaxonSearchCriterion>(
@@ -55,7 +59,8 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
     limitToImages = new TypedFormControl<boolean>(null);
     limitToGenetic = new TypedFormControl<boolean>(null);
 
-    form = new TypedFormGroup<Omit<ApiOccurrenceFindAllParams, 'collectionID' | 'limit' | 'offset'>>({
+    form = new TypedFormGroup<Omit<ApiOccurrenceFindAllParams, 'limit' | 'offset'>>({
+        [Q_PARAM_COLLID]: this.collectionIDs,
         taxonSearchCriterion: this.taxonSearchCriterion,
         taxonSearchStr: this.taxonSearchStr,
         country: this.country,
@@ -84,24 +89,24 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
     ngOnInit() {
         const currentParams = this.currentRoute.snapshot.queryParamMap;
 
-        if (currentParams.has(Q_PARAM_COLLIDS)) {
-            this.collectionIDs = currentParams.getAll(Q_PARAM_COLLIDS).map(parseInt);
+        if (currentParams.has(Q_PARAM_COLLID)) {
+            this.collectionIDs.setValue(
+                currentParams.getAll(Q_PARAM_COLLID).map(
+                    (collID) => parseInt(collID)
+                )
+            );
         }
     }
 
     get searchDisabled(): boolean {
-        return this.collectionIDs.length === 0;
+        return this.collectionIDs.value.length === 0;
     }
 
     async onSearch() {
+        const queryParams = formToQueryParams(this.form);
         return this.router.navigate(
             [`/${ROUTE_SEARCH_RESULTS}`],
-            {
-                queryParams: {
-                    'collectionID[]': this.collectionIDs.map((n) => n.toString()),
-                    ...this.form.value
-                }
-            }
+            { queryParams: { ...queryParams } }
         );
     }
 }

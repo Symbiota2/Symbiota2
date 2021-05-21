@@ -44,6 +44,7 @@ import {
 import { MatTableModule } from '@angular/material/table';
 import { OccurrenceSearchResults } from './services/occurrence-search-result.service';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { Q_PARAM_COLLID } from '../constants';
 
 @NgModule({
     imports: [
@@ -103,7 +104,7 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
                 text: "Search Occurrences",
                 routerLink: `/${ROUTE_SEARCH_OCCURRENCES}`,
                 requiresLogin: false,
-                queryParams: { 'collectionID[]': collectionID }
+                queryParams: { [Q_PARAM_COLLID]: [collectionID] }
             };
         });
 
@@ -112,7 +113,7 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
                 text: "Create occurrence",
                 routerLink: `/${ROUTE_CREATE_OCCURRENCE}`,
                 requiresLogin: true,
-                queryParams: { 'collectionID': collectionID }
+                queryParams: { [Q_PARAM_COLLID]: collectionID }
             };
         });
         // collectionProfile.putLink((collectionID) => {
