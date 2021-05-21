@@ -19,4 +19,8 @@ export class CollectionListItem implements ApiCollectionListItem {
     @ApiProperty()
     @Expose()
     icon: string;
+
+    @ApiProperty()
+    @Expose()
+    email: string;
 }
