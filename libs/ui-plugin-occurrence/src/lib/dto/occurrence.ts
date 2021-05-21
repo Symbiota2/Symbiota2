@@ -68,6 +68,18 @@ type MiscInfoProps = (
 );
 interface MiscInfo extends Pick<Occurrence, MiscInfoProps> { }
 
+type CurationInfoProps = (
+    'basisOfRecord' |
+    'dataGeneralizations' |
+    'disposition' |
+    'fieldNumber' |
+    'labelProject' |
+    'language' |
+    'processingStatus' |
+    'typeStatus'
+);
+interface CurationInfo extends Pick<Occurrence, CurationInfoProps> { }
+
 @Exclude()
 export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurrence> {
     @Expose() associatedCollectors: string;
@@ -194,5 +206,18 @@ export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurre
             substrate: this.substrate,
             verbatimAttributes: this.verbatimAttributes
         };
+    }
+
+    curationInfo(): CurationInfo {
+        return {
+            basisOfRecord: this.basisOfRecord,
+            dataGeneralizations: this.dataGeneralizations,
+            disposition: this.disposition,
+            fieldNumber: this.fieldNumber,
+            labelProject: this.labelProject,
+            language: this.language,
+            processingStatus: this.processingStatus,
+            typeStatus: this.typeStatus
+        }
     }
 }

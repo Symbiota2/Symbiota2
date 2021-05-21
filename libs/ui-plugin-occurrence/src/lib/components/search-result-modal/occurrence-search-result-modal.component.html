@@ -1,6 +1,5 @@
 <div mat-dialog-title>
     <div fxLayout="row" fxLayoutAlign="start center">
-        <!-- TODO: Link to collection -->
         <ng-container *ngIf='(collection$ | async) as collection'>
             <div id='collection-icon'>
                 <symbiota2-collection-logo
@@ -101,6 +100,19 @@
                                 <ng-template #notNumber>
                                     {{ item.value }}
                                 </ng-template>
+                            </p>
+                        </ng-container>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+            <div>
+                <mat-card>
+                    <mat-card-title>Curation</mat-card-title>
+                    <mat-card-content>
+                        <ng-container *ngFor="let item of occurrence.curationInfo() | keyvalue">
+                            <p *ngIf="item.value">
+                                <b>{{ getI18nForField(item.key) | async }}: </b>
+                                {{ item.value }}
                             </p>
                         </ng-container>
                     </mat-card-content>
