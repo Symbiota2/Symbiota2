@@ -151,6 +151,8 @@ export class OccurrenceSearchResultsPage implements OnInit {
             OccurrenceSearchResultModalComponent,
             {
                 panelClass: 'mat-dialog-panel',
+                width: '90vw',
+                height: '90%',
                 data: occurrence
             }
         );

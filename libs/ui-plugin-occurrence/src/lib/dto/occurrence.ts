@@ -49,6 +49,25 @@ type LocalityInfoProps = (
 );
 interface LocalityInfo extends Pick<Occurrence, LocalityInfoProps> { }
 
+type MiscInfoProps = (
+    'associatedTaxa' |
+    'cultivationStatus' |
+    'dynamicProperties' |
+    'establishmentMeans' |
+    'fieldNotes' |
+    'habitat' |
+    'individualCount' |
+    'lifeStage' |
+    'occurrenceRemarks' |
+    'preparations' |
+    'reproductiveCondition' |
+    'samplingProtocol' |
+    'sex' |
+    'substrate' |
+    'verbatimAttributes'
+);
+interface MiscInfo extends Pick<Occurrence, MiscInfoProps> { }
+
 @Exclude()
 export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurrence> {
     @Expose() associatedCollectors: string;
@@ -155,5 +174,25 @@ export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurre
             verbatimCoordinates: this.verbatimCoordinates,
             verbatimDepth: this.verbatimDepth
         }
+    }
+
+    miscInfo(): MiscInfo {
+        return {
+            associatedTaxa: this.associatedTaxa,
+            cultivationStatus: this.cultivationStatus,
+            dynamicProperties: this.dynamicProperties,
+            establishmentMeans: this.establishmentMeans,
+            fieldNotes: this.fieldNotes,
+            habitat: this.habitat,
+            individualCount: this.individualCount,
+            lifeStage: this.lifeStage,
+            occurrenceRemarks: this.occurrenceRemarks,
+            preparations: this.preparations,
+            reproductiveCondition: this.reproductiveCondition,
+            samplingProtocol: this.samplingProtocol,
+            sex: this.sex,
+            substrate: this.substrate,
+            verbatimAttributes: this.verbatimAttributes
+        };
     }
 }
