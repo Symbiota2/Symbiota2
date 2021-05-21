@@ -14,11 +14,19 @@
       "rules": {
         "@angular-eslint/directive-selector": [
           "error",
-          { "type": "attribute", "prefix": "symbiota2", "style": "camelCase" }
+          {
+            "type": "attribute",
+            "prefix": "symbiota2",
+            "style": "camelCase"
+          }
         ],
         "@angular-eslint/component-selector": [
           "error",
-          { "type": "element", "prefix": "symbiota2", "style": "kebab-case" }
+          {
+            "type": "element",
+            "prefix": "symbiota2",
+            "style": "kebab-case"
+          }
         ],
         "@angular-eslint/component-class-suffix": "off"
       }
@@ -26,7 +34,7 @@
     {
       "files": ["*.html"],
       "extends": ["plugin:@nrwl/nx/angular-template"],
-      "rules": { }
+      "rules": {}
     }
   ]
 }
