@@ -29,11 +29,7 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
     `;
 
     private get tilesUrl(): string {
-        let url = this.appConfig.tilesUrl();
-        if (this.appConfig.tilesToken()) {
-            url += `accessToken=${this.appConfig.tilesToken()}`;
-        }
-        return url;
+        return this.appConfig.tilesUrl();
     }
 
     tileLayer: TileLayer;

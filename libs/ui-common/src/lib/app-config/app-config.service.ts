@@ -21,10 +21,10 @@ export class AppConfigService {
     }
 
     tilesUrl(): string {
-        return this.environment.tilesUrl;
-    }
-
-    tilesToken(): string {
-        return this.environment.tilesToken;
+        let url = this.environment.tilesUrl;
+        if (this.environment.tilesToken) {
+            url += `?accessToken=${this.environment.tilesToken}`;
+        }
+        return url;
     }
 }
