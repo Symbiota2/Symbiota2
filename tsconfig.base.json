@@ -36,6 +36,9 @@
       "@symbiota2/data-access": ["libs/data-access/src/index.ts"],
       "@symbiota2/api-plugin-geography": [
         "libs/api-plugin-geography/src/index.ts"
+      ],
+      "@symbiota2/ui-plugin-geography": [
+        "libs/ui-plugin-geography/src/index.ts"
       ]
     }
   },

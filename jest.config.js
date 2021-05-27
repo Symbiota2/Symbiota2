@@ -14,5 +14,6 @@ module.exports = {
     '<rootDir>/libs/api-jobs',
     '<rootDir>/libs/data-access',
     '<rootDir>/libs/api-plugin-geography',
+    '<rootDir>/libs/ui-plugin-geography',
   ],
 };
