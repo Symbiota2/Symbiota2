@@ -27,4 +27,8 @@ export class AppConfigService {
         }
         return url;
     }
+
+    tilesAttribution(): string {
+        return this.environment.tilesAttribution;
+    }
 }

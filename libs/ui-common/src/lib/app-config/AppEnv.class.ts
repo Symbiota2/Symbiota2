@@ -4,6 +4,7 @@ export class AppEnv {
     apiUrl = "";
     tilesUrl = "";
     tilesToken = "";
+    tilesAttribution = "";
 
     constructor(environ: Record<string, unknown>) {
         Object.assign(this, environ);

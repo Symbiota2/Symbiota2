@@ -2,12 +2,12 @@ import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { AppConfigService } from '@symbiota2/ui-common';
 import {
     DrawEvents,
-    FeatureGroup, Icon,
+    FeatureGroup,
     latLng,
-    latLngBounds,
     MapOptions, TileLayer,
     Map,
-    tileLayer, LayerGroup, Control
+    tileLayer,
+    Control
 } from 'leaflet';
 import { ReplaySubject } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -18,20 +18,6 @@ import { take } from 'rxjs/operators';
     styleUrls: ['./spatial-module-page.component.scss']
 })
 export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
-    // private static readonly MAP_ATTRIB = `
-    //   © <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> |
-    //   © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> |
-    //   <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>
-    // `;
-
-    private static readonly MAP_ATTRIB = `
-      &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>
-    `;
-
-    private get tilesUrl(): string {
-        return this.appConfig.tilesUrl();
-    }
-
     tileLayer: TileLayer;
     drawnItems: FeatureGroup;
     mapOptions: MapOptions;
@@ -44,8 +30,8 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit() {
         this.tileLayer = tileLayer(
-            this.tilesUrl,
-            { attribution: SpatialModulePage.MAP_ATTRIB }
+            this.appConfig.tilesUrl(),
+            { attribution: this.appConfig.tilesAttribution() }
         );
         this.drawnItems = new FeatureGroup();
 
