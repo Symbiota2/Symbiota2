@@ -230,7 +230,14 @@
           "executor": "@nrwl/angular:package",
           "options": {
             "tsConfig": "libs/ui-plugin-occurrence/tsconfig.lib.json",
-            "project": "libs/ui-plugin-occurrence/ng-package.json"
+            "project": "libs/ui-plugin-occurrence/ng-package.json",
+            "assets": [
+              {
+                "glob": "/*",
+                "input": "libs/ui-plugin-occurrence/src/assets",
+                "output": "./assets"
+              }
+            ]
           },
           "configurations": {
             "production": {

@@ -1,0 +1,11 @@
+<div
+    id='map'
+    *ngIf='mapLoaded'
+    leaflet
+    leafletDraw
+    [leafletOptions]='mapOptions'
+    [leafletDrawOptions]='drawOptions'
+    (leafletDrawCreated)='onDraw($event)'
+    (leafletMapReady)='onMapReady($event)'
+>
+</div>

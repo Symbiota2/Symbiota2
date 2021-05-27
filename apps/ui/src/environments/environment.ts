@@ -8,6 +8,8 @@ export const environment = {
     defaultLanguage: "en",
     appTitle: "",
     recaptchaSiteKey: "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
+    tilesUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    tilesToken: ""
 };
 
 /*

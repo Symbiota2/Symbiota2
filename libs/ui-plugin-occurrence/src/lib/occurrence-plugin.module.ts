@@ -2,7 +2,7 @@ import { NgModule } from "@angular/core";
 import { TranslateModule } from "@ngx-translate/core";
 
 import {
-    ApiClientModule,
+    ApiClientModule, AppConfigModule,
     NavBarLink, SymbiotaComponentModule,
     SymbiotaUiPlugin
 } from '@symbiota2/ui-common';
@@ -39,7 +39,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
     ROUTE_CREATE_OCCURRENCE,
     ROUTE_SEARCH_OCCURRENCES,
-    ROUTE_SEARCH_RESULTS,
+    ROUTE_SEARCH_RESULTS, ROUTE_SPATIAL_MODULE
 } from './routes';
 import { MatTableModule } from '@angular/material/table';
 import { OccurrenceSearchResults } from './services/occurrence-search-result.service';
@@ -47,36 +47,42 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { Q_PARAM_COLLID } from '../constants';
 import { GeographyPlugin } from '@symbiota2/ui-plugin-geography';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { SpatialModulePage } from './pages/spatial-module/spatial-module-page.component';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
+import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
 
 @NgModule({
     imports: [
         ApiClientModule,
-        BrowserModule,
+        AppConfigModule,
         BrowserAnimationsModule,
+        BrowserModule,
         CollectionPlugin,
         CommonModule,
+        FlexModule,
         FormsModule,
+        GeographyPlugin,
+        LeafletDrawModule,
+        LeafletModule,
+        MatAutocompleteModule,
         MatButtonModule,
         MatCardModule,
+        MatCheckboxModule,
         MatDatepickerModule,
         MatDialogModule,
+        MatExpansionModule,
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
         MatNativeDateModule,
         MatOptionModule,
+        MatPaginatorModule,
         MatSelectModule,
+        MatTableModule,
         ReactiveFormsModule,
         RouterModule,
-        TranslateModule,
-        FlexModule,
-        MatExpansionModule,
-        MatCheckboxModule,
         SymbiotaComponentModule,
-        MatTableModule,
-        MatPaginatorModule,
-        GeographyPlugin,
-        MatAutocompleteModule
+        TranslateModule,
     ],
     providers: [
         OccurrenceSearchResults,
@@ -93,10 +99,11 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
         OccurrenceEditorComponent,
         OccurrenceFieldComponent,
         OccurrenceExtraFieldComponent,
+        SpatialModulePage,
     ],
     entryComponents: [
         OccurrenceSearchCollectionsPage,
-        OccurrenceSearchResultsPage
+        OccurrenceSearchResultsPage,
     ]
 })
 export class OccurrencePlugin extends SymbiotaUiPlugin {
@@ -120,6 +127,7 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
                 queryParams: { [Q_PARAM_COLLID]: collectionID }
             };
         });
+
         // collectionProfile.putLink((collectionID) => {
         //     return {
         //         text: "Upload occurrences",
@@ -134,6 +142,10 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
             {
                 path: ROUTE_CREATE_OCCURRENCE,
                 component: OccurrenceCreateComponent
+            },
+            {
+                path: ROUTE_SPATIAL_MODULE,
+                component: SpatialModulePage
             },
             {
                 path: ROUTE_SEARCH_OCCURRENCES,
@@ -155,6 +167,10 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
             {
                 url: `/${ROUTE_SEARCH_OCCURRENCES}`,
                 name: "Occurrence Search"
+            },
+            {
+                url: `/${ROUTE_SPATIAL_MODULE}`,
+                name: "Spatial module"
             }
         ];
     }

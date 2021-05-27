@@ -19,4 +19,12 @@ export class AppConfigService {
     apiUri(): string {
         return this.environment.apiUrl;
     }
+
+    tilesUrl(): string {
+        return this.environment.tilesUrl;
+    }
+
+    tilesToken(): string {
+        return this.environment.tilesToken;
+    }
 }
