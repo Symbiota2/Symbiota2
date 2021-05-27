@@ -45,6 +45,7 @@ import { MatTableModule } from '@angular/material/table';
 import { OccurrenceSearchResults } from './services/occurrence-search-result.service';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { Q_PARAM_COLLID } from '../constants';
+import { GeographyPlugin } from '@symbiota2/ui-plugin-geography';
 
 @NgModule({
     imports: [
@@ -72,7 +73,8 @@ import { Q_PARAM_COLLID } from '../constants';
         MatCheckboxModule,
         SymbiotaComponentModule,
         MatTableModule,
-        MatPaginatorModule
+        MatPaginatorModule,
+        GeographyPlugin
     ],
     providers: [
         OccurrenceSearchResults,

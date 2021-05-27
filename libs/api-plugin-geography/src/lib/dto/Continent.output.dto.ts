@@ -1,16 +1,10 @@
 import { Exclude, Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { GeoThesaurusContinent } from '@symbiota2/api-database';
-
-export interface ApiContinentListItemOutput {
-    id: number;
-    continentTerm: string;
-    acceptedID: number;
-}
-
-export interface ApiContinentOutput extends ApiContinentListItemOutput {
-    footprintWKT: string;
-}
+import {
+    ApiContinentListItemOutput,
+    ApiContinentOutput
+} from '@symbiota2/data-access';
 
 @Exclude()
 export class ContinentListItem implements ApiContinentListItemOutput {

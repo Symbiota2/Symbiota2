@@ -1,7 +1,7 @@
 import {
     ApiContinentListItemOutput,
     ApiContinentOutput
-} from '@symbiota2/api-plugin-geography';
+} from '@symbiota2/data-access';
 
 export class ContinentListItem implements ApiContinentListItemOutput {
     id: number;
