@@ -46,6 +46,7 @@ import { OccurrenceSearchResults } from './services/occurrence-search-result.ser
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { Q_PARAM_COLLID } from '../constants';
 import { GeographyPlugin } from '@symbiota2/ui-plugin-geography';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
     imports: [
@@ -74,7 +75,8 @@ import { GeographyPlugin } from '@symbiota2/ui-plugin-geography';
         SymbiotaComponentModule,
         MatTableModule,
         MatPaginatorModule,
-        GeographyPlugin
+        GeographyPlugin,
+        MatAutocompleteModule
     ],
     providers: [
         OccurrenceSearchResults,

@@ -8,7 +8,7 @@ import { catchError, map } from 'rxjs/operators';
 @Injectable()
 export class CountryService {
     private _countries = new BehaviorSubject<CountryListItem[]>([]);
-    countries = this._countries.asObservable();
+    countryList = this._countries.asObservable();
 
     constructor(
         private readonly api: ApiClientService,
@@ -17,10 +17,10 @@ export class CountryService {
         this.refreshList();
     }
 
-    refreshList() {
+    refreshList(): void {
         const url = this.queryBuilder.countries().findAll().build();
         const query = this.api.queryBuilder(url).get().build();
-        return this.api.send<unknown, Record<string, unknown>[]>(query).pipe(
+        this.api.send<unknown, Record<string, unknown>[]>(query).pipe(
             catchError((e) => {
                 console.error(e);
                 return of([] as Record<string, unknown>[]);
@@ -29,7 +29,7 @@ export class CountryService {
                 const countryObjs = countries.map((country) => new Country(country));
                 this._countries.next(countryObjs);
             })
-        );
+        ).subscribe();
     }
 
     findByID(id: number): Observable<Country> {

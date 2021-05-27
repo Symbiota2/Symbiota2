@@ -20,7 +20,7 @@ import { ContinentService } from './continent.service';
         {
             provide: GeographyQueryBuilder,
             useFactory: (uiConfig) => {
-                return new GeographyQueryBuilder(uiConfig.apiUri())
+                return new GeographyQueryBuilder(`${uiConfig.apiUri()}/geography`)
             },
             deps: [AppConfigService]
         }

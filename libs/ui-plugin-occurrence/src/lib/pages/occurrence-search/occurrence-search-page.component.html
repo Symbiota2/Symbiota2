@@ -44,9 +44,14 @@
     <symbiota2-expansion-panel label='Locality Criteria'>
         <div fxLayout='row wrap'>
             <div class='form-field w-2'>
+                <mat-autocomplete #countries="matAutocomplete">
+                    <mat-option *ngFor='let country of (countryAutoComplete | async)' [value]='country.countryTerm'>
+                        {{ country.countryTerm }}
+                    </mat-option>
+                </mat-autocomplete>
                 <mat-form-field>
                     <mat-label>Country</mat-label>
-                    <input matInput [formControl]='country'>
+                    <input matInput [formControl]='country' [matAutocomplete]='countries'>
                 </mat-form-field>
             </div>
             <div class='form-field w-2'>

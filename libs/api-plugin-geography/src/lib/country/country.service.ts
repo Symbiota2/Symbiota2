@@ -12,7 +12,8 @@ export class CountryService {
 
     async findAll(): Promise<FindAllReturn[]> {
         return this.countryRepo.find({
-            select: ['id', 'continentID', 'acceptedID', 'countryTerm']
+            select: ['id', 'continentID', 'acceptedID', 'countryTerm'],
+            order: { 'countryTerm': 'ASC' }
         });
     }
 

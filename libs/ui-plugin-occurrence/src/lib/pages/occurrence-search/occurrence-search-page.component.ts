@@ -12,6 +12,9 @@ import {
     ApiOccurrenceFindAllParams,
     ApiTaxonSearchCriterion
 } from '@symbiota2/data-access';
+import { CountryService } from '@symbiota2/ui-plugin-geography';
+import { combineAll, filter, map, startWith } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 
 @Component({
     selector: "symbiota2-occurrence-search-page",
@@ -82,9 +85,26 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
         limitToGenetic: this.limitToGenetic
     });
 
+    // TODO: Should we filter on API side instead?
+    countrySearchFilter = this.country.valueChanges.pipe(
+        map(() => this.country.value),
+        startWith('')
+    );
+    countryAutoComplete = combineLatest([
+        this.countries.countryList,
+        this.countrySearchFilter
+    ]).pipe(
+        map(([countries, searchFilter]) => {
+            return countries.filter(
+                (country) => country.countryTerm.startsWith(searchFilter)
+            );
+        })
+    );
+
     constructor(
         private router: Router,
-        private currentRoute: ActivatedRoute) { }
+        private currentRoute: ActivatedRoute,
+        private readonly countries: CountryService) { }
 
     ngOnInit() {
         const currentParams = this.currentRoute.snapshot.queryParamMap;
