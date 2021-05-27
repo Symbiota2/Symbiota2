@@ -9,6 +9,12 @@ export interface ApiCountryListItemOutput {
     countryTerm: string;
 }
 
+export interface ApiCountryOutput extends ApiCountryListItemOutput {
+    iso: string;
+    iso3: string;
+    footprintWKT: string;
+}
+
 @Exclude()
 export class CountryListItem implements ApiCountryListItemOutput {
     constructor(country: Partial<GeoThesaurusCountry>) {
@@ -30,4 +36,19 @@ export class CountryListItem implements ApiCountryListItemOutput {
     @ApiProperty()
     @Expose()
     countryTerm: string;
+}
+
+@Exclude()
+export class Country extends CountryListItem implements ApiCountryOutput {
+    @ApiProperty()
+    @Expose()
+    iso: string;
+
+    @ApiProperty()
+    @Expose()
+    iso3: string;
+
+    @ApiProperty()
+    @Expose()
+    footprintWKT: string;
 }
