@@ -23,7 +23,7 @@ export class AppConfigService {
     tilesUrl(): string {
         let url = this.environment.tilesUrl;
         if (this.environment.tilesToken) {
-            url += `?accessToken=${this.environment.tilesToken}`;
+            url += `?access_token=${this.environment.tilesToken}`;
         }
         return url;
     }
