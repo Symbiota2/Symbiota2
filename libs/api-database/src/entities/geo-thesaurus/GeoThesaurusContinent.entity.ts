@@ -31,7 +31,7 @@ export class GeoThesaurusContinent extends EntityProvider {
     @Column('int', { name: 'acceptedid', nullable: true })
     acceptedID: number | null;
 
-    @Column('text', { name: 'footprintWKT', nullable: true })
+    @Column('longtext', { name: 'footprintWKT', nullable: true })
     footprintWKT: string | null;
 
     @Column('timestamp', {

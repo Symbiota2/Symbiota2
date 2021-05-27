@@ -13,5 +13,6 @@ module.exports = {
     '<rootDir>/libs/api-plugin-occurrence',
     '<rootDir>/libs/api-jobs',
     '<rootDir>/libs/data-access',
+    '<rootDir>/libs/api-plugin-geography',
   ],
 };

@@ -5,8 +5,6 @@ import { entityProviders } from './providers';
 import * as entities from './entities';
 import * as migrations from './migrations';
 import { ApiPluginModule } from '@symbiota2/api-common';
-import { isInstance } from 'class-validator';
-import { EntitySchema } from 'typeorm';
 
 @Module({
     imports: [

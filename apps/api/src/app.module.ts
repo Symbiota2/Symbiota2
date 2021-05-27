@@ -5,6 +5,7 @@ import { ApiPluginModule } from '@symbiota2/api-common';
 import { OccurrenceModule } from '@symbiota2/api-plugin-occurrence';
 import { CollectionModule } from '@symbiota2/api-plugin-collection';
 import { ApiJobsModule } from '@symbiota2/api-jobs';
+import { GeographyModule } from '@symbiota2/api-plugin-geography';
 
 @Module({
     imports: [
@@ -14,7 +15,8 @@ import { ApiJobsModule } from '@symbiota2/api-jobs';
         ApiPluginModule.configure([
             ApiJobsModule,
             CollectionModule,
-            OccurrenceModule
+            OccurrenceModule,
+            GeographyModule,
         ])
     ]
 })

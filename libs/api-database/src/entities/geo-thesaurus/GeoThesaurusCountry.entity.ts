@@ -42,7 +42,7 @@ export class GeoThesaurusCountry extends EntityProvider {
     @Column('int', { name: 'continentid', nullable: true })
     continentID: number | null;
 
-    @Column('text', { name: 'footprintWKT', nullable: true })
+    @Column('longtext', { name: 'footprintWKT', nullable: true })
     footprintWKT: string | null;
 
     @Column('timestamp', {

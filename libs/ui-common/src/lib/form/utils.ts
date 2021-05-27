@@ -1,4 +1,3 @@
-import { HttpParams } from '@angular/common/http';
 import { FormGroup } from '@angular/forms';
 
 export function formToQueryParams(form: FormGroup): Record<string, unknown> {

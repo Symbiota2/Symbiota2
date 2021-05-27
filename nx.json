@@ -29,6 +29,7 @@
     "api-plugin-collection": { "tags": [] },
     "api-plugin-occurrence": { "tags": [] },
     "api-jobs": { "tags": [] },
-    "data-access": { "tags": [] }
+    "data-access": { "tags": [] },
+    "api-plugin-geography": { "tags": [] }
   }
 }

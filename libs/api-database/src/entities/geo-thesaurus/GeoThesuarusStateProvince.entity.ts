@@ -36,7 +36,7 @@ export class GeoThesuarusStateProvince extends EntityProvider {
     @Column('int', { name: 'countryid', nullable: true })
     countryID: number | null;
 
-    @Column('text', { name: 'footprintWKT', nullable: true })
+    @Column('longtext', { name: 'footprintWKT', nullable: true })
     footprintWKT: string | null;
 
     @Column('timestamp', {
