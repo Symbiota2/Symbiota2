@@ -5,7 +5,7 @@ import {
     NotFoundException,
     Param, Query
 } from '@nestjs/common';
-import { ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CountryService } from './country/country.service';
 import {
     Continent,
@@ -15,13 +15,14 @@ import { ContinentService } from './continent/continent.service';
 import { CountryListItem, Country } from './dto/Country.output.dto';
 import { FindOneQueryInput } from './dto/FindOneQuery.input.dto';
 import { Geometry } from 'wkx';
-import { EntityTarget } from 'typeorm';
 
 type GeoJSON = Record<string, unknown>;
 
 @ApiTags('Geography')
 @Controller('geography')
 export class GeographyController {
+    private static readonly FMT_GEOJSON = 'geojson';
+
     constructor(
         private readonly continents: ContinentService,
         private readonly countries: CountryService) { }
@@ -40,7 +41,7 @@ export class GeographyController {
         if (!continent) {
             throw new NotFoundException();
         }
-        if (query.format === 'geojson') {
+        if (query.format === GeographyController.FMT_GEOJSON) {
             return GeographyController.entityToGeoJSON(continent);
         }
         return new Continent(continent);
@@ -62,7 +63,7 @@ export class GeographyController {
         if (!country) {
             throw new NotFoundException();
         }
-        if (query.format === 'geojson') {
+        if (query.format === GeographyController.FMT_GEOJSON) {
             return GeographyController.entityToGeoJSON(country);
         }
         return new Country(country);

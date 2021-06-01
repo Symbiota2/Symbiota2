@@ -1,11 +1,16 @@
-<div
-    id='map'
-    *ngIf='mapLoaded'
-    leaflet
-    leafletDraw
-    [leafletOptions]='mapOptions'
-    [leafletDrawOptions]='drawOptions'
-    (leafletDrawCreated)='onDraw($event)'
-    (leafletMapReady)='onMapReady($event)'
->
+<div fxLayout='row'>
+    <div fxFlex='1 1 100%'>
+        <div
+            *ngIf='mapLoaded'
+            id='map'
+            leaflet
+            leafletDraw
+            [leafletOptions]='mapOptions'
+            [leafletDrawOptions]='drawOptions'
+            (leafletDrawCreated)='onDrawPoly($event)'
+            (leafletDrawDeleted)='onDeletePoly($event)'
+            (leafletMapReady)='onMapReady($event)'
+        >
+        </div>
+    </div>
 </div>

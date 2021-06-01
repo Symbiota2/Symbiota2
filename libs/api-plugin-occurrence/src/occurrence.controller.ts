@@ -12,7 +12,13 @@ import {
     UploadedFile,
     UseInterceptors
 } from '@nestjs/common';
-import { ApiBody, ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBody,
+    ApiExtraModels,
+    ApiQuery,
+    ApiResponse,
+    ApiTags
+} from '@nestjs/swagger';
 import { OccurrenceList, OccurrenceListItem } from './dto/occurrence-list';
 import { OccurrenceService } from './occurrence.service';
 import { FindAllParams } from './dto/find-all-input.dto';
@@ -31,6 +37,7 @@ import { plainToClass } from 'class-transformer';
 import { OccurrenceOutputDto } from './dto/occurrence.output.dto';
 import { ProtectCollection } from '@symbiota2/api-plugin-collection';
 import { CollectionListItem } from '@symbiota2/ui-plugin-collection';
+import { FindGeoJSONInput } from './dto/find-geojson-input.dto';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -47,6 +54,16 @@ export class OccurrenceController {
     @Get()
     async findAll(@Query() findAllOpts: FindAllParams): Promise<OccurrenceList> {
         const occurrenceList = await this.occurrenceService.findAll(findAllOpts);
+        return new OccurrenceList(occurrenceList.count, occurrenceList.data);
+    }
+
+    @ApiResponse({ status: HttpStatus.OK, type: OccurrenceList })
+    @ApiQuery({ type: FindGeoJSONInput })
+    @Get('geojson')
+    async findAllWithPoly(@Query() params: FindGeoJSONInput): Promise<OccurrenceList> {
+        const geojsonStr = Buffer.from(params.geojson, 'base64');
+        const geojson = JSON.parse(geojsonStr.toString('utf-8'));
+        const occurrenceList = await this.occurrenceService.findWithinPolygon(geojson);
         return new OccurrenceList(occurrenceList.count, occurrenceList.data);
     }
 

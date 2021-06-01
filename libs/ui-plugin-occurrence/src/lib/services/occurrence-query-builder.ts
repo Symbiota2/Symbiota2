@@ -15,6 +15,10 @@ export class OccurrenceQueryBuilder {
         return new FindAllBuilder(this.baseUrl);
     }
 
+    findByGeoJSON(): FindGeoJSONBuilder {
+        return new FindGeoJSONBuilder(this.baseUrl);
+    }
+
     findOne(): FindOneBuilder {
         return new FindOneBuilder(this.baseUrl);
     }
@@ -70,6 +74,28 @@ class FindOneBuilder extends OccurrenceQueryBuilder {
 
     build(): string {
         this.url.pathname = `${this.url.pathname}/${this.occID}`;
+        return super.build();
+    }
+}
+
+class FindGeoJSONBuilder extends OccurrenceQueryBuilder {
+    protected geometry: string;
+
+    constructor(baseUrl: string) {
+        super(baseUrl);
+        this.url.pathname = `${this.url.pathname}/geojson`;
+    }
+
+    geoJSON(geojson: { geometry: Record<string, unknown> }) {
+        this.geometry = btoa(JSON.stringify(geojson.geometry));
+        return this;
+    }
+
+    build(): string {
+        this.url.searchParams.set(
+            'geojson',
+            this.geometry
+        );
         return super.build();
     }
 }

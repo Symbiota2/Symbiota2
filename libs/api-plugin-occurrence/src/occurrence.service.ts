@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Occurrence } from '@symbiota2/api-database';
 import { DeepPartial, Repository } from 'typeorm';
 import { FindAllParams } from './dto/find-all-input.dto';
@@ -6,7 +6,7 @@ import {
     ApiCollectionListItem, ApiOccurrence,
     ApiTaxonSearchCriterion
 } from '@symbiota2/data-access';
-import { map } from 'rxjs/operators';
+import { Geometry } from 'wkx';
 
 type _OccurrenceFindAllItem = Pick<Occurrence, 'id' | 'catalogNumber' | 'taxonID' | 'sciname' | 'latitude' | 'longitude'>;
 type OccurrenceFindAllItem = _OccurrenceFindAllItem & { collection: ApiCollectionListItem };
@@ -211,6 +211,54 @@ export class OccurrenceService {
             collection: await collection,
             ...props
         }
+    }
+
+    async findWithinPolygon(geojson: Record<string, unknown>): Promise<OccurrenceFindAllList> {
+        const limit = 200;
+        const offset = 0;
+        let poly;
+
+        try {
+            poly = Geometry.parseGeoJSON(geojson).toWkt();
+        }
+        catch (e) {
+            throw new BadRequestException(`Invalid GeoJSON: ${e.toString()}`);
+        }
+
+        let qb = this.occurrenceRepo.createQueryBuilder('o')
+            .select([
+                'o.id',
+                'o.catalogNumber',
+                'o.taxonID',
+                'o.sciname',
+                'o.latitude',
+                'o.longitude',
+                'c.id',
+                'c.collectionName',
+                'c.icon'
+            ])
+            .innerJoin('o.collection', 'c')
+            .limit(limit)
+            .offset(offset);
+
+        const searchPolyAsWKB = `PolyFromText('${poly}')`;
+        const occurrenceAsPoint = "PointFromWKB(Point(o.longitude, o.latitude))";
+
+        qb = qb.where(`ST_CONTAINS(${searchPolyAsWKB}, ${occurrenceAsPoint})`);
+
+        const [data, count] = await qb.getManyAndCount();
+        return {
+            count,
+            data: await Promise.all(
+                data.map(async (occurrence) => {
+                    const { collection, ...props } = occurrence;
+                    return {
+                        ...props,
+                        collection: await collection
+                    }
+                })
+            )
+        };
     }
 
     async create(collectionID: number, occurrenceData: DeepPartial<Occurrence>): Promise<ApiOccurrence> {

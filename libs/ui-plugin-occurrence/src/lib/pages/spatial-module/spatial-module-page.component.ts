@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { AppConfigService } from '@symbiota2/ui-common';
+import { AlertService, AppConfigService } from '@symbiota2/ui-common';
 import {
     DrawEvents,
     FeatureGroup,
@@ -7,10 +7,12 @@ import {
     MapOptions, TileLayer,
     Map,
     tileLayer,
-    Control
+    Control, Polygon, Circle, geoJSON
 } from 'leaflet';
-import { ReplaySubject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { Occurrence } from '../../dto/occurrence';
+import { OccurrenceService } from '../../services/occurrence.service';
 
 @Component({
     selector: 'symbiota2-spatial-module',
@@ -20,13 +22,18 @@ import { take } from 'rxjs/operators';
 export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
     tileLayer: TileLayer;
     drawnItems: FeatureGroup;
+    occurrenceFeatures: FeatureGroup;
     mapOptions: MapOptions;
     drawOptions: Control.DrawConstructorOptions;
 
+    searchResults = new BehaviorSubject<Occurrence[]>([]);
     map = new ReplaySubject<Map>();
     mapLoaded = false;
 
-    constructor(private readonly appConfig: AppConfigService) { }
+    constructor(
+        private readonly appConfig: AppConfigService,
+        private readonly occurrences: OccurrenceService,
+        private readonly alert: AlertService) { }
 
     ngOnInit() {
         this.tileLayer = tileLayer(
@@ -34,22 +41,24 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
             { attribution: this.appConfig.tilesAttribution() }
         );
         this.drawnItems = new FeatureGroup();
+        this.occurrenceFeatures = new FeatureGroup();
 
         this.mapOptions = {
-            layers: [this.tileLayer, this.drawnItems],
+            layers: [this.tileLayer, this.drawnItems, this.occurrenceFeatures],
             zoom: 3,
             center: latLng(0, 0)
         };
 
         this.drawOptions = {
             edit: {
-                featureGroup: this.drawnItems,
-                edit: false,
+                featureGroup: this.drawnItems
             },
             draw: {
                 marker: false,
                 polyline: false,
-                circlemarker: false
+                circlemarker: false,
+                rectangle: false,
+                circle: false
             }
         };
 
@@ -62,7 +71,7 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
 
     ngAfterViewInit() {
         this.map.pipe(take(1)).subscribe((map) => {
-            console.log("Redrawing map...");
+            // console.log("Redrawing map...");
             map.invalidateSize();
         });
     }
@@ -71,7 +80,30 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
         this.map.pipe(take(1)).subscribe((map) => map.remove());
     }
 
-    onDraw(e: DrawEvents.Created) {
+    onDrawPoly(e: DrawEvents.Created) {
         this.drawnItems.addLayer(e.layer);
+        this.occurrenceFeatures.clearLayers();
+        this.occurrences.findByGeoJSON(e.layer.toGeoJSON() as any).subscribe((occurrences) => {
+            if (occurrences.length === 0) {
+                this.alert.showError('No results found');
+            }
+            else {
+                occurrences.forEach((occurrence) => {
+                    const { latitude, longitude, ...props } = occurrence;
+                    this.occurrenceFeatures.addLayer(geoJSON({
+                        type: 'Feature',
+                        properties: props,
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [longitude, latitude]
+                        }
+                    } as any))
+                });
+            }
+        });
+    }
+
+    onDeletePoly(e: DrawEvents.Deleted) {
+        this.occurrenceFeatures.clearLayers();
     }
 }
