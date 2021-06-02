@@ -7,8 +7,9 @@
             leafletDraw
             [leafletOptions]='mapOptions'
             [leafletDrawOptions]='drawOptions'
+            (leafletZoomChange)='onMapViewChanged()'
+            (leafletCenterChange)='onMapViewChanged()'
             (leafletDrawCreated)='onDrawPoly($event)'
-            (leafletDrawDeleted)='onDeletePoly($event)'
             (leafletMapReady)='onMapReady($event)'
         >
         </div>
