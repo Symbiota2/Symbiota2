@@ -25,7 +25,7 @@ For development, a [.env file](https://www.npmjs.com/package/dotenv) can be used
 | DATABASE_PORT | The database port | 3306 |
 | DATABASE_NAME | The name of the database on DATABASE_HOST | 'symbiota' |
 | DATABASE_USER | The user used to connection to DATABASE_NAME | 'root' |
-| DATABASE_PASSPORT | The password for DATABASE_USER | 'password' |
+| DATABASE_PASSWORD | The password for DATABASE_USER | 'password' |
 | ENABLE_AUTH | FOR DEBUGGING ONLY: Set to 0 to disable API authentication | 1 |
 
 ## Database
