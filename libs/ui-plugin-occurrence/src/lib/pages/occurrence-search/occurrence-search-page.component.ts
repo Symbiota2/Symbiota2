@@ -13,11 +13,12 @@ import {
     ApiTaxonSearchCriterion
 } from '@symbiota2/data-access';
 import {
-    CountryService,
+    CountryService, ProvinceListItem,
     StateProvinceService
 } from '@symbiota2/ui-plugin-geography';
 import { combineAll, filter, map, startWith, switchMap } from 'rxjs/operators';
 import { combineLatest, of } from 'rxjs';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 @Component({
     selector: "symbiota2-occurrence-search-page",
@@ -111,7 +112,7 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
     provinceAutoComplete = this.provinceSearchFilter.pipe(
         switchMap((searchFilter) => {
             if (searchFilter === '') {
-                return of([]);
+                return of([] as ProvinceListItem[]);
             }
             this.provinces.setQueryParams({
                 limit: 10,
@@ -149,5 +150,9 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
             [`/${ROUTE_SEARCH_RESULTS}`],
             { queryParams: { ...queryParams } }
         );
+    }
+
+    async populateCountryFromProvince(countryName: string) {
+        this.country.setValue(countryName);
     }
 }
