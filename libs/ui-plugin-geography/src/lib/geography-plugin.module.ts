@@ -8,6 +8,7 @@ import {
 import { GeographyQueryBuilder } from './query-builder';
 import { CountryService } from './country.service';
 import { ContinentService } from './continent.service';
+import { StateProvinceService } from './state-province.service';
 
 @NgModule({
     imports: [
@@ -17,6 +18,7 @@ import { ContinentService } from './continent.service';
     providers: [
         CountryService,
         ContinentService,
+        StateProvinceService,
         {
             provide: GeographyQueryBuilder,
             useFactory: (uiConfig) => {

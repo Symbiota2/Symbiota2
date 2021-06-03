@@ -1,26 +1,24 @@
-import { ApiCountryListItemOutput, ApiCountryOutput } from '@symbiota2/data-access';
+import {
+    ApiCountryListItemOutput,
+    ApiCountryOutput,
+    ApiStateProvinceListItemOutput, ApiStateProvinceOutput
+} from '@symbiota2/data-access';
 
-export class ProvinceListItem implements ApiCountryListItemOutput {
+export class ProvinceListItem implements ApiStateProvinceListItemOutput {
     id: number;
-    acceptedID: number;
-    continentID: number;
-    countryTerm: string;
+    countryID: number;
+    stateTerm: string;
 
-    constructor(json: Record<string, unknown>) {
+    constructor(json: ApiStateProvinceListItemOutput) {
         Object.assign(this, json);
     }
 }
 
-export class Province implements ApiCountryOutput {
-    id: number;
-    acceptedID: number;
-    continentID: number;
-    countryTerm: string;
-    footprintWKT: string;
-    iso: string;
-    iso3: string;
-
-    constructor(json: Record<string, unknown>) {
-        Object.assign(this, json);
+export class Province extends ProvinceListItem implements ApiStateProvinceOutput {
+    constructor(json: ApiStateProvinceOutput) {
+        super(json);
     }
+
+    acceptedID: number;
+    footprintWKT: string;
 }

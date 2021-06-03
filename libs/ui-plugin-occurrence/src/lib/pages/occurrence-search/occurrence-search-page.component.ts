@@ -12,9 +12,12 @@ import {
     ApiOccurrenceFindAllParams,
     ApiTaxonSearchCriterion
 } from '@symbiota2/data-access';
-import { CountryService } from '@symbiota2/ui-plugin-geography';
-import { combineAll, filter, map, startWith } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
+import {
+    CountryService,
+    StateProvinceService
+} from '@symbiota2/ui-plugin-geography';
+import { combineAll, filter, map, startWith, switchMap } from 'rxjs/operators';
+import { combineLatest, of } from 'rxjs';
 
 @Component({
     selector: "symbiota2-occurrence-search-page",
@@ -101,10 +104,28 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
         })
     );
 
+    provinceSearchFilter = this.stateProvince.valueChanges.pipe(
+        map(() => this.stateProvince.value),
+        startWith('')
+    );
+    provinceAutoComplete = this.provinceSearchFilter.pipe(
+        switchMap((searchFilter) => {
+            if (searchFilter === '') {
+                return of([]);
+            }
+            this.provinces.setQueryParams({
+                limit: 10,
+                stateTerm: searchFilter
+            });
+            return this.provinces.provinceList;
+        })
+    );
+
     constructor(
         private router: Router,
         private currentRoute: ActivatedRoute,
-        private readonly countries: CountryService) { }
+        private readonly countries: CountryService,
+        private readonly provinces: StateProvinceService) { }
 
     ngOnInit() {
         const currentParams = this.currentRoute.snapshot.queryParamMap;

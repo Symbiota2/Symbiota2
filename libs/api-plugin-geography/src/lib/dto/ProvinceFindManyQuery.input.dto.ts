@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
+import { ApiStateProvinceQueryInput } from '@symbiota2/data-access';
 
-export class ProvinceFindManyQuery {
+export class ProvinceFindManyQuery implements ApiStateProvinceQueryInput {
     public static readonly DEFAULT_LIMIT = 100;
     public static readonly DEFAULT_OFFSET = 0;
 
@@ -13,7 +14,7 @@ export class ProvinceFindManyQuery {
     @ApiProperty({ required: false })
     @IsString()
     @IsOptional()
-    stateTerm: string;
+    stateTerm?: string;
 
     @ApiProperty({ required: false, default: ProvinceFindManyQuery.DEFAULT_LIMIT })
     @IsInt()

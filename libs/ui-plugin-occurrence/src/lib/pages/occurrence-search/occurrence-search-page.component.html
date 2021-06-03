@@ -55,9 +55,14 @@
                 </mat-form-field>
             </div>
             <div class='form-field w-2'>
+                <mat-autocomplete #provinces="matAutocomplete">
+                    <mat-option *ngFor='let province of (provinceAutoComplete | async)' [value]='province.stateTerm'>
+                        {{ province.stateTerm }}
+                    </mat-option>
+                </mat-autocomplete>
                 <mat-form-field>
                     <mat-label>State/Province</mat-label>
-                    <input matInput [formControl]='stateProvince'>
+                    <input matInput [formControl]='stateProvince' [matAutocomplete]='provinces'>
                 </mat-form-field>
             </div>
             <div class='form-field w-2'>
