@@ -1,9 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { GeoThesuarusStateProvince } from '@symbiota2/api-database';
-import { FindManyOptions, Like, Repository } from 'typeorm';
+import {
+    GeoThesaurusCountry,
+    GeoThesuarusStateProvince
+} from '@symbiota2/api-database';
+import { Repository } from 'typeorm';
 
-type FindOneOutput = Pick<GeoThesuarusStateProvince, 'id' | 'countryID' | 'acceptedID' | 'stateTerm' | 'footprintWKT'>;
-type FindAllOutput = Pick<GeoThesuarusStateProvince, 'id' | 'countryID' | 'stateTerm'>;
+type FindCountry = { id: number; countryTerm: string };
+type FindOneOutput = Pick<GeoThesuarusStateProvince, 'id' | 'acceptedID' | 'stateTerm' | 'footprintWKT'> & { country: FindCountry };
+type FindAllOutput = Pick<GeoThesuarusStateProvince, 'id' | 'stateTerm'> & { country: FindCountry };
 
 @Injectable()
 export class StateProvinceService {
@@ -12,34 +16,51 @@ export class StateProvinceService {
         private readonly provinceRepo: Repository<GeoThesuarusStateProvince>) { }
 
     async findAll(limit: number, offset: number, countryID: number = null, stateTerm: string = null): Promise<FindAllOutput[]> {
-        const queryArgs: FindManyOptions<GeoThesuarusStateProvince> = {
-            select: ['id', 'countryID', 'stateTerm'],
-            order: { 'stateTerm': 'ASC' },
-            take: limit,
-            skip: offset,
-            where: {}
-        };
+        const queryBuilder = this.provinceRepo.createQueryBuilder('p')
+            .select(['p.id', 'p.stateTerm', 'c.id', 'c.countryTerm'])
+            .innerJoin('p.country', 'c')
+            .take(limit)
+            .skip(offset)
+            .orderBy({ 'p.stateTerm': 'ASC' })
 
         if (countryID) {
-            queryArgs.where['countryID'] = countryID;
+            queryBuilder.andWhere('p.countryID = :countryID', { countryID });
         }
 
         if (stateTerm) {
-            queryArgs.where['stateTerm'] = Like(`${stateTerm}%`);
+            queryBuilder.andWhere('p.stateTerm LIKE :stateTerm', { stateTerm: `${stateTerm}%` });
         }
 
-        return this.provinceRepo.find(queryArgs);
+        const results = await queryBuilder.getMany();
+        return Promise.all(
+            results.map(async (province) => {
+                const { country, ...props } = province;
+                return {
+                    ...props,
+                    country: await country
+                };
+            })
+        );
     }
 
     async findOne(id: number): Promise<FindOneOutput> {
-        return this.provinceRepo.findOne(id, {
-            select: [
-                'id',
-                'countryID',
-                'acceptedID',
-                'stateTerm',
-                'footprintWKT'
-            ]
-        });
+        const province = await this.provinceRepo.createQueryBuilder('p')
+            .select([
+                'p.id',
+                'p.stateTerm',
+                'p.acceptedID',
+                'p.footprintWKT',
+                'c.id',
+                'c.countryTerm'
+            ])
+            .innerJoin('p.country', 'c')
+            .where({ id })
+            .getOne();
+
+        const { country, ...props } = province;
+        return {
+            ...props,
+            country: await country
+        };
     }
 }

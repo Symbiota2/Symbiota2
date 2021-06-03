@@ -31,9 +31,14 @@ export interface ApiStateProvinceQueryInput {
     offset?: number;
 }
 
+export interface ApiStateProvinceCountryOutput {
+    id: number;
+    countryTerm: string;
+}
+
 export interface ApiStateProvinceListItemOutput {
     id: number;
-    countryID: number;
+    country: ApiStateProvinceCountryOutput;
     stateTerm: string;
 }
 

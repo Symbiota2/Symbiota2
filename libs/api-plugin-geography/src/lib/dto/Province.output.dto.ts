@@ -1,14 +1,15 @@
 import {
+    ApiStateProvinceCountryOutput,
     ApiStateProvinceListItemOutput,
     ApiStateProvinceOutput
 } from '@symbiota2/data-access';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Exclude()
-export class ProvinceListItem implements ApiStateProvinceListItemOutput {
-    constructor(province: ApiStateProvinceListItemOutput) {
-        Object.assign(this, province);
+export class ProvinceCountry implements ApiStateProvinceCountryOutput {
+    constructor(country: ApiStateProvinceCountryOutput) {
+        Object.assign(this, country);
     }
 
     @ApiProperty()
@@ -17,7 +18,25 @@ export class ProvinceListItem implements ApiStateProvinceListItemOutput {
 
     @ApiProperty()
     @Expose()
-    countryID: number;
+    countryTerm: string;
+}
+
+@Exclude()
+export class ProvinceListItem implements ApiStateProvinceListItemOutput {
+    constructor(province: ApiStateProvinceListItemOutput) {
+        const { country, ...props } = province;
+        Object.assign(this, props);
+        this.country = new ProvinceCountry(country);
+    }
+
+    @ApiProperty()
+    @Expose()
+    id: number;
+
+    @ApiProperty()
+    @Expose()
+    @Type(() => ProvinceCountry)
+    country: ProvinceCountry;
 
     @ApiProperty()
     @Expose()
@@ -25,26 +44,14 @@ export class ProvinceListItem implements ApiStateProvinceListItemOutput {
 }
 
 @Exclude()
-export class Province implements ApiStateProvinceOutput {
+export class Province extends ProvinceListItem implements ApiStateProvinceOutput {
     constructor(province: ApiStateProvinceOutput) {
-        Object.assign(this, province);
+        super(province);
     }
 
     @ApiProperty()
     @Expose()
-    id: number;
-
-    @ApiProperty()
-    @Expose()
-    stateTerm: string;
-
-    @ApiProperty()
-    @Expose()
     acceptedID: number;
-
-    @ApiProperty()
-    @Expose()
-    countryID: number;
 
     @ApiProperty()
     @Expose()
