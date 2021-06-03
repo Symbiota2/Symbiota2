@@ -151,8 +151,4 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
             { queryParams: { ...queryParams } }
         );
     }
-
-    async populateCountryFromProvince(countryName: string) {
-        this.country.setValue(countryName);
-    }
 }

@@ -58,7 +58,6 @@
                 <mat-autocomplete #provinces="matAutocomplete">
                     <mat-option
                         *ngFor='let province of (provinceAutoComplete | async)' [value]='province.stateTerm'
-                        (onSelectionChange)='populateCountryFromProvince(province.country.countryTerm)'
                     >
                         {{ province.stateTerm }}
                     </mat-option>
