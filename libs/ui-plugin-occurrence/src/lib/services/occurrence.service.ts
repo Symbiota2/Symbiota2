@@ -46,24 +46,6 @@ export class OccurrenceService {
             );
     }
 
-    findByGeoJSON(geojson: { geometry: Record<string, unknown> }): Observable<Occurrence[]> {
-        const url = this.createUrlBuilder().findByGeoJSON()
-            .geoJSON(geojson)
-            .build();
-
-        const query = this.apiClient.queryBuilder(url).get().build();
-        return this.apiClient.send(query)
-            .pipe(
-                catchError((e) => {
-                    console.error(e);
-                    return of([]);
-                }),
-                map<{ data: Array<ApiOccurrence> }, Occurrence[]>((o) => {
-                    return o.data.map((occurrence) => new Occurrence(occurrence));
-                })
-            );
-    }
-
     create(collID: number, occurrence: Partial<ApiOccurrence>): Observable<Occurrence> {
         const url = this.createUrlBuilder().create()
             .collectionID(collID)

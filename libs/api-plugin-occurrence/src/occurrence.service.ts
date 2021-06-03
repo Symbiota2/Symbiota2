@@ -184,6 +184,24 @@ export class OccurrenceService {
             qb.andWhere('(select count(*) from images i where i.occid = o.id) > 0');
         }
 
+        if (findAllOpts.geoJSON) {
+            let poly;
+            const geojsonStr = Buffer.from(findAllOpts.geoJSON, 'base64');
+
+            try {
+                const geojson = JSON.parse(geojsonStr.toString('utf-8'));
+                poly = Geometry.parseGeoJSON(geojson).toWkt();
+            }
+            catch (e) {
+                throw new BadRequestException(`Invalid GeoJSON: ${e.toString()}`);
+            }
+
+            const searchPolyAsWKB = `PolyFromText('${poly}')`;
+            const occurrenceAsPoint = "Point(o.longitude, o.latitude)";
+
+            qb = qb.andWhere(`ST_CONTAINS(${searchPolyAsWKB}, ${occurrenceAsPoint})`);
+        }
+
         // TODO: Make this a query param
         qb.addOrderBy('o.id', 'ASC');
 
@@ -211,54 +229,6 @@ export class OccurrenceService {
             collection: await collection,
             ...props
         }
-    }
-
-    async findWithinPolygon(geojson: Record<string, unknown>): Promise<OccurrenceFindAllList> {
-        const limit = 200;
-        const offset = 0;
-        let poly;
-
-        try {
-            poly = Geometry.parseGeoJSON(geojson).toWkt();
-        }
-        catch (e) {
-            throw new BadRequestException(`Invalid GeoJSON: ${e.toString()}`);
-        }
-
-        let qb = this.occurrenceRepo.createQueryBuilder('o')
-            .select([
-                'o.id',
-                'o.catalogNumber',
-                'o.taxonID',
-                'o.sciname',
-                'o.latitude',
-                'o.longitude',
-                'c.id',
-                'c.collectionName',
-                'c.icon'
-            ])
-            .innerJoin('o.collection', 'c')
-            .limit(limit)
-            .offset(offset);
-
-        const searchPolyAsWKB = `PolyFromText('${poly}')`;
-        const occurrenceAsPoint = "PointFromWKB(Point(o.longitude, o.latitude))";
-
-        qb = qb.where(`ST_CONTAINS(${searchPolyAsWKB}, ${occurrenceAsPoint})`);
-
-        const [data, count] = await qb.getManyAndCount();
-        return {
-            count,
-            data: await Promise.all(
-                data.map(async (occurrence) => {
-                    const { collection, ...props } = occurrence;
-                    return {
-                        ...props,
-                        collection: await collection
-                    }
-                })
-            )
-        };
     }
 
     async create(collectionID: number, occurrenceData: DeepPartial<Occurrence>): Promise<ApiOccurrence> {

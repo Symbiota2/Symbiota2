@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-    IsArray,
+    IsArray, IsBase64,
     IsBoolean, IsBooleanString, IsDate, IsDateString,
     IsEnum,
-    IsInt, IsLatitude, IsLongitude,
+    IsInt, IsLatitude, IsLongitude, IsNotEmpty,
     IsNumber,
     IsOptional,
     IsString,
@@ -145,4 +145,13 @@ export class FindAllParams implements Partial<ApiOccurrenceFindAllParams> {
     @IsBoolean()
     @IsOptional()
     limitToGenetic = false;
+
+    @ApiProperty({
+        description: 'A base64-encoded GeoJSON feature. All occurrences that fall within this polygon will be included' ,
+        required: false
+    })
+    @IsNotEmpty()
+    @IsOptional()
+    @IsBase64()
+    geoJSON: string;
 }

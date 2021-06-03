@@ -42,6 +42,8 @@ export interface ApiOccurrenceFindAllParams {
     limitToSpecimens: boolean;
     limitToImages: boolean;
     limitToGenetic: boolean;
+
+    geoJSON?: string;
 }
 
 export interface ApiOccurrenceListItem {

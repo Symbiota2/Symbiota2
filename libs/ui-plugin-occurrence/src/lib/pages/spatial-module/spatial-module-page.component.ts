@@ -20,6 +20,10 @@ import { take } from 'rxjs/operators';
 import { Occurrence } from '../../dto/occurrence';
 import { OccurrenceService } from '../../services/occurrence.service';
 import { ROUTE_COLLECTION_PROFILE } from '@symbiota2/ui-plugin-collection';
+import {
+    ApiOccurrenceList,
+    ApiOccurrenceListItem
+} from '@symbiota2/data-access';
 
 @Component({
     selector: 'symbiota2-spatial-module',
@@ -54,7 +58,7 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
         private readonly occurrences: OccurrenceService,
         private readonly alert: AlertService) { }
 
-    private static occurrenceToGeoJSON(occurrence: Occurrence): Record<string, unknown> {
+    private static occurrenceToGeoJSON(occurrence: ApiOccurrenceListItem): Record<string, unknown> {
         const { latitude, longitude, ...props } = occurrence;
         return {
             type: 'Feature',
@@ -124,6 +128,14 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
             }
         };
 
+        this.occurrences.searchResults.occurrences.subscribe((occurrences) => {
+            occurrences.data.forEach((occurrence) => {
+                const occurrenceGeoJSON = SpatialModulePage.occurrenceToGeoJSON(occurrence);
+                const geoJSONLayer = SpatialModulePage.occurrenceGeoJSONToLayer(occurrenceGeoJSON);
+                this.occurrenceFeatures.addLayer(geoJSONLayer);
+            });
+        });
+
         this.mapLoaded = true;
     }
 
@@ -148,17 +160,10 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
 
         this.drawnItems.addLayer(e.layer);
 
-        this.occurrences.findByGeoJSON(e.layer.toGeoJSON() as any).subscribe((occurrences) => {
-            if (occurrences.length === 0) {
-                this.alert.showError('No results found');
-            }
-            else {
-                occurrences.forEach((occurrence) => {
-                    const occurrenceGeoJSON = SpatialModulePage.occurrenceToGeoJSON(occurrence);
-                    const geoJSONLayer = SpatialModulePage.occurrenceGeoJSONToLayer(occurrenceGeoJSON);
-                    this.occurrenceFeatures.addLayer(geoJSONLayer);
-                });
-            }
+        const boundingPoly = btoa(JSON.stringify(e.layer.toGeoJSON().geometry));
+        this.occurrences.searchResults.setQueryParams({
+            collectionID: [],
+            geoJSON: boundingPoly
         });
     }
 
