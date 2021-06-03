@@ -13,24 +13,22 @@ import {
     MapOptions, TileLayer,
     Map,
     tileLayer,
-    Control, geoJSON, Layer, circleMarker, GeoJSON
+    Control, geoJSON, Layer, circleMarker, GeoJSON, latLngBounds
 } from 'leaflet';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { first, take } from 'rxjs/operators';
 import { Occurrence } from '../../dto/occurrence';
 import { OccurrenceService } from '../../services/occurrence.service';
 import { ROUTE_COLLECTION_PROFILE } from '@symbiota2/ui-plugin-collection';
-import {
-    ApiOccurrenceList,
-    ApiOccurrenceListItem
-} from '@symbiota2/data-access';
+import { ApiOccurrenceListItem } from '@symbiota2/data-access';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'symbiota2-spatial-module',
     templateUrl: './spatial-module-page.component.html',
     styleUrls: ['./spatial-module-page.component.scss']
 })
-export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
+export class SpatialModulePage implements OnInit, AfterViewInit {
     private static readonly LOCAL_STRG_ZOOM = `${SpatialModulePage.name}_zoom`;
     private static readonly LOCAL_STRG_CENTER = `${SpatialModulePage.name}_center`;
 
@@ -40,7 +38,7 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
         color: 'blue',
         weight: 1,
         opacity: 0.5,
-        fillOpacity: 0.5
+        fillOpacity: 0.5,
     };
 
     tileLayer: TileLayer;
@@ -50,13 +48,14 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
     drawOptions: Control.DrawConstructorOptions;
 
     searchResults = new BehaviorSubject<Occurrence[]>([]);
-    map = new ReplaySubject<Map>();
+    map = new ReplaySubject<Map>(1);
     mapLoaded = false;
 
     constructor(
         private readonly appConfig: AppConfigService,
         private readonly occurrences: OccurrenceService,
-        private readonly alert: AlertService) { }
+        private readonly router: Router,
+        private readonly currentRoute: ActivatedRoute) { }
 
     private static occurrenceToGeoJSON(occurrence: ApiOccurrenceListItem): Record<string, unknown> {
         const { latitude, longitude, ...props } = occurrence;
@@ -110,7 +109,8 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
         this.mapOptions = {
             layers: [this.tileLayer, this.drawnItems, this.occurrenceFeatures],
             zoom: zoom,
-            center: latLng(center[0], center[1])
+            center: latLng(center[0], center[1]),
+            maxBounds: latLngBounds(latLng(-90, -180), latLng(90, 180))
         };
 
         this.drawOptions = {
@@ -136,6 +136,20 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
             });
         });
 
+        this.currentRoute.queryParamMap.subscribe((params) => {
+            const geojson = params.get('geoJSON');
+            this.clearMap();
+
+            if (geojson !== null) {
+                this.drawnItems.addLayer(geoJSON(JSON.parse(atob(geojson))));
+                this.occurrences.searchResults.setQueryParams({
+                    collectionID: [],
+                    geoJSON: geojson
+                });
+            }
+        });
+
+        this.occurrences.searchResults.clear();
         this.mapLoaded = true;
     }
 
@@ -143,32 +157,30 @@ export class SpatialModulePage implements OnInit, AfterViewInit, OnDestroy {
         this.map.next(map);
     }
 
-    ngAfterViewInit() {
-        this.map.pipe(take(1)).subscribe((map) => {
-            // console.log("Redrawing map...");
-            map.invalidateSize();
-        });
-    }
-
-    ngOnDestroy() {
-        this.map.pipe(take(1)).subscribe((map) => map.remove());
-    }
-
-    onDrawPoly(e: DrawEvents.Created) {
-        this.drawnItems.clearLayers();
+    clearMap() {
         this.occurrenceFeatures.clearLayers();
+        this.drawnItems.clearLayers();
+    }
 
-        this.drawnItems.addLayer(e.layer);
+    ngAfterViewInit() {
+        this.map.pipe(first()).subscribe((map) => map.invalidateSize());
+    }
 
-        const boundingPoly = btoa(JSON.stringify(e.layer.toGeoJSON().geometry));
-        this.occurrences.searchResults.setQueryParams({
-            collectionID: [],
-            geoJSON: boundingPoly
-        });
+    async onDrawPoly(e: DrawEvents.Created) {
+        const boundingPolyStr = JSON.stringify(e.layer.toGeoJSON().geometry);
+        const boundingPoly = btoa(boundingPolyStr);
+
+        await this.router.navigate(
+            ['.'],
+            {
+                relativeTo: this.currentRoute,
+                queryParams: { geoJSON: boundingPoly }
+            }
+        );
     }
 
     onMapViewChanged() {
-        this.map.pipe(take(1)).subscribe((map) => {
+        this.map.pipe(first()).subscribe((map) => {
             const zoom = map.getZoom();
             const center = map.getCenter();
 

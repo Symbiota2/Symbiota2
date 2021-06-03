@@ -18,7 +18,7 @@ interface PageParams {
 
 @Injectable()
 export class OccurrenceSearchResults {
-    private readonly _params = new ReplaySubject<FindAllParams>();
+    private readonly _params = new ReplaySubject<FindAllParams>(1);
     private readonly _page = new BehaviorSubject<PageParams>({ limit: 25, offset: 0 });
 
     private readonly _occurrences = new BehaviorSubject<OccurrenceList>(
@@ -42,6 +42,10 @@ export class OccurrenceSearchResults {
 
     changePage(limit: number, offset: number): void {
         this._page.next({ limit, offset });
+    }
+
+    clear(): void {
+        this._occurrences.next(new OccurrenceList({ count: 0, data: [] }));
     }
 
     private _updateOccurrences(params: FindAllParams, page: PageParams) {
