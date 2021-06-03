@@ -20,3 +20,14 @@ export interface ApiCountryOutput extends ApiCountryListItemOutput {
     iso3: string;
     footprintWKT: string;
 }
+
+export interface ApiStateProvinceListItemOutput {
+    id: number;
+    countryID: number;
+    stateTerm: string;
+}
+
+export interface ApiStateProvinceOutput extends ApiStateProvinceListItemOutput {
+    acceptedID: number;
+    footprintWKT: string;
+}

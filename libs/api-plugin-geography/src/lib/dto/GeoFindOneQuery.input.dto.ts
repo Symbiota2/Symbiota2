@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
 
 @Exclude()
-export class FindOneQueryInput {
+export class GeoFindOneQuery {
     @ApiProperty({ type: String, required: false, default: 'wkt' })
     @Expose()
     @IsEnum(['wkt', 'geojson'])

@@ -17,6 +17,10 @@ export class GeographyQueryBuilder {
     countries(): CountryQueryBuilder {
         return new CountryQueryBuilder(this.apiUrl);
     }
+
+    provinces(): ProvinceQueryBuilder {
+        return new ProvinceQueryBuilder(this.apiUrl);
+    }
 }
 
 export class ContinentQueryBuilder extends GeographyQueryBuilder {
@@ -66,6 +70,32 @@ export class CountryQueryBuilder extends GeographyQueryBuilder {
         let url = this.apiUrl;
         if (this.countryID) {
             url = `${url}/${this.countryID}`;
+        }
+        return url;
+    }
+}
+
+export class ProvinceQueryBuilder extends GeographyQueryBuilder {
+    protected provinceID: number = null;
+
+    constructor(apiUrl: string) {
+        super(apiUrl);
+        this.apiUrl = `${this.apiUrl}/provinces`;
+    }
+
+    findOne(id: number) {
+        this.provinceID = id;
+        return this;
+    }
+
+    findAll() {
+        return this;
+    }
+
+    build() {
+        let url = this.apiUrl;
+        if (this.provinceID) {
+            url = `${url}/${this.provinceID}`;
         }
         return url;
     }

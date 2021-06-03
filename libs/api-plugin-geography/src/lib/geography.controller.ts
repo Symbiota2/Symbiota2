@@ -13,8 +13,11 @@ import {
 } from './dto/Continent.output.dto';
 import { ContinentService } from './continent/continent.service';
 import { CountryListItem, Country } from './dto/Country.output.dto';
-import { FindOneQueryInput } from './dto/FindOneQuery.input.dto';
+import { GeoFindOneQuery } from './dto/GeoFindOneQuery.input.dto';
 import { Geometry } from 'wkx';
+import { Province, ProvinceListItem } from './dto/Province.output.dto';
+import { StateProvinceService } from './state-province/state-province.service';
+import { ProvinceFindManyQuery } from './dto/ProvinceFindManyQuery.input.dto';
 
 type GeoJSON = Record<string, unknown>;
 
@@ -25,7 +28,15 @@ export class GeographyController {
 
     constructor(
         private readonly continents: ContinentService,
-        private readonly countries: CountryService) { }
+        private readonly countries: CountryService,
+        private readonly provinces: StateProvinceService) { }
+
+    private static entityToGeoJSON(entity: { footprintWKT: string }): GeoJSON {
+        const { footprintWKT, ...props } = entity;
+        const geojson = Geometry.parse(footprintWKT).toGeoJSON();
+        geojson['properties'] = props;
+        return geojson;
+    }
 
     @Get('continents')
     async continentList(): Promise<ContinentListItem[]> {
@@ -36,7 +47,7 @@ export class GeographyController {
     }
 
     @Get('continents/:id')
-    async continent(@Param('id') id: number, @Query() query: FindOneQueryInput): Promise<Continent | GeoJSON> {
+    async continent(@Param('id') id: number, @Query() query: GeoFindOneQuery): Promise<Continent | GeoJSON> {
         const continent = await this.continents.findOne(id);
         if (!continent) {
             throw new NotFoundException();
@@ -58,7 +69,7 @@ export class GeographyController {
 
     @Get('countries/:id')
     @ApiResponse({ status: HttpStatus.OK, type: Country })
-    async country(@Param('id') id: number, @Query() query: FindOneQueryInput): Promise<Country | GeoJSON> {
+    async country(@Param('id') id: number, @Query() query: GeoFindOneQuery): Promise<Country | GeoJSON> {
         const country = await this.countries.findOne(id);
         if (!country) {
             throw new NotFoundException();
@@ -69,10 +80,28 @@ export class GeographyController {
         return new Country(country);
     }
 
-    private static entityToGeoJSON(entity: { footprintWKT: string }): GeoJSON {
-        const { footprintWKT, ...props } = entity;
-        const geojson = Geometry.parse(footprintWKT).toGeoJSON();
-        geojson['properties'] = props;
-        return geojson;
+    @Get('provinces')
+    async provinceList(@Query() query: ProvinceFindManyQuery): Promise<ProvinceListItem[]> {
+        const provinces = await this.provinces.findAll(
+            query.limit,
+            query.offset,
+            query.countryID,
+            query.stateTerm
+        );
+        return provinces.map((province) => {
+            return new ProvinceListItem(province);
+        });
+    }
+
+    @Get('provinces/:id')
+    async province(@Param('id') id: number, @Query() query: GeoFindOneQuery): Promise<Province | GeoJSON> {
+        const province = await this.provinces.findOne(id);
+        if (!province) {
+            throw new NotFoundException();
+        }
+        if (query.format === GeographyController.FMT_GEOJSON) {
+            return GeographyController.entityToGeoJSON(province);
+        }
+        return new Province(province);
     }
 }
