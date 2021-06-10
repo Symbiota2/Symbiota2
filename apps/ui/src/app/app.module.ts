@@ -27,6 +27,7 @@ import { CollectionPlugin } from "@symbiota2/ui-plugin-collection";
 import { OccurrencePlugin } from '@symbiota2/ui-plugin-occurrence';
 import { CreateUserProfileComponent } from './pages/create-user-profile/create-user-profile.component';
 import { ErrorComponent } from './pages/create-user-profile/error-component/error.component';
+import { PasswordFormValidator } from './pages/user-profile/password-validator.directive';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -38,18 +39,19 @@ const PLUGINS = [
  * config, notifications, and user logins. Imports and configures plugins.
  */
 @NgModule({
-    declarations: [
-        AppComponent,
-        HomeComponent,
-        SitemapComponent,
-        UserProfileComponent,
-        NavbarComponent,
-        LoginDialog,
-        FooterComponent,
-        BannerComponent,
-        CreateUserProfileComponent,
-        ErrorComponent,
-    ],
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    SitemapComponent,
+    UserProfileComponent,
+    NavbarComponent,
+    LoginDialog,
+    FooterComponent,
+    BannerComponent,
+    CreateUserProfileComponent,
+    ErrorComponent,
+    PasswordFormValidator
+  ],
     imports: [
         AlertModule,
         AppConfigModule.configure(environment),
