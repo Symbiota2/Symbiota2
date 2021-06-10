@@ -1,6 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
+/**
+ * An error that appear next to the signup form when a field is incorrect
+ */
 @Component({
     selector: 'symbiota2-signup-error',
     styles: [`

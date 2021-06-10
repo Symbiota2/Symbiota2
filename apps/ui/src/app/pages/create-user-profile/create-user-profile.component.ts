@@ -29,6 +29,9 @@ import { UserProfileComponent } from '../user-profile/user-profile.component';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { combineAll, map, startWith, switchMap, tap } from 'rxjs/operators';
 
+/**
+ * User signup page
+ */
 @Component({
     selector: 'symbiota2-create-user-profile',
     templateUrl: './create-user-profile.component.html',

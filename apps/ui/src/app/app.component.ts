@@ -4,8 +4,12 @@ import {
     UserService
 } from "@symbiota2/ui-common";
 
+/**
+ * The main app component. Contains the site header & navbar, along with a
+ * router-outlet that displays the current page component.
+ */
 @Component({
-    selector: "app-root",
+    selector: "symbiota2-root",
     templateUrl: "./app.component.html",
     styleUrls: ["./app.component.scss"]
 })

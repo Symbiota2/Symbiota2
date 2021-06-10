@@ -24,6 +24,10 @@ import { PasswordFormValidator } from './password-validator.directive';
 import { take } from 'rxjs/operators';
 import { ApiUserRole } from '@symbiota2/data-access';
 
+/**
+ * Displays the current user's profile, displaying a login error and redirecting
+ * to / if no one is logged in.
+ */
 @Component({
     selector: 'symbiota2-user-profile',
     templateUrl: './user-profile.component.html',

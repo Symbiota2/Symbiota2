@@ -17,6 +17,10 @@ const defaultRoutes: Route[] = [
     { path: ROUTE_USER_CREATE, component: CreateUserProfileComponent },
 ];
 
+/**
+ * Configures routing for the core of the UI. Additional (plugin) routes can be
+ * added at runtime via the ui-common plugin.
+ */
 @NgModule({
     imports: [
         RouterModule.forRoot(

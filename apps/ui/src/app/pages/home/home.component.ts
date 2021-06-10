@@ -1,8 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 import { AppConfigService } from "@symbiota2/ui-common";
 
+/**
+ * The home page for the app. Displays a brief description of the portal
+ * that's stored in the AppConfigService
+ */
 @Component({
-    selector: "app-home",
+    selector: "symbiota2-home",
     templateUrl: "./home.component.html",
     styleUrls: ["./home.component.scss"]
 })

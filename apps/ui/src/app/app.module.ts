@@ -33,6 +33,10 @@ const PLUGINS = [
     OccurrencePlugin
 ];
 
+/**
+ * The core of the Angular UI. Imports required plugins for things like
+ * config, notifications, and user logins. Imports and configures plugins.
+ */
 @NgModule({
     declarations: [
         AppComponent,

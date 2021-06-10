@@ -2,12 +2,16 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+
 export const environment = {
+    // Whether we're running in production
     production: false,
+    // Base URL for the backend
     apiUrl: "http://127.0.0.1:8080/api/v1",
     defaultLanguage: "en",
     appTitle: "",
     recaptchaSiteKey: "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
+    // For mapping functionality
     tilesUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     tilesToken: ""
 };
