@@ -3,6 +3,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsBoolean, IsDateString, IsOptional, IsEmail } from 'class-validator';
 import { ApiUserProfileData } from '@symbiota2/data-access';
 
+/**
+ * Object representing the body of a POST request that updates a user's profile
+ * data
+ */
 export class UserInputDto implements ApiUserProfileData {
     @ApiProperty()
     @IsString()

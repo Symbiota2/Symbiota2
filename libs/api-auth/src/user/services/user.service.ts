@@ -4,6 +4,9 @@ import { Repository } from 'typeorm';
 import { BaseService } from '@symbiota2/api-common';
 import { CreateUserInputDto } from '../dto';
 
+/**
+ * CRUD for Users and UserRoles
+ */
 @Injectable()
 export class UserService extends BaseService<User> {
     constructor(
@@ -15,6 +18,10 @@ export class UserService extends BaseService<User> {
         super(userRepo);
     }
 
+    /**
+     * Returns a user with the given username from the database. An
+     * optional list of fields can be provided.
+     */
     async findByLogin(username: string, fields?: Array<keyof User>): Promise<User> {
         return this.userRepo.findOne({
             select: fields,
@@ -22,6 +29,10 @@ export class UserService extends BaseService<User> {
         });
     }
 
+    /**
+     * Returns the user with the given login/password from the database. An
+     * optional list of fields can be provided.
+     */
     async findByLoginWithPassword(username: string, password: string, fields?: Array<keyof User>): Promise<User> {
         return this.userRepo.createQueryBuilder()
             .select(fields)
@@ -30,14 +41,24 @@ export class UserService extends BaseService<User> {
             .getOne();
     }
 
+    /**
+     * Updates the profile data for the given user in the database
+     */
     async patchProfileData(uid: number, userData: Partial<User>): Promise<User> {
         return this.userRepo.save({ uid, ...userData });
     }
 
+    /**
+     * Returns all users from the database. An optional list of fields can be
+     * provided.
+     */
     async findAll(fields?: [keyof User]): Promise<User[]> {
         return this.userRepo.find({ select: fields });
     }
 
+    /**
+     * Updates the lastLogin for the given user (to the current date/time)
+     */
     async updateLastLogin(uid: number): Promise<boolean> {
         const updateQuery = await this.userRepo.update(
             { uid },
@@ -46,6 +67,10 @@ export class UserService extends BaseService<User> {
         return updateQuery.affected > 0;
     }
 
+    /**
+     * Changes the password for the user with the given uid/oldPassword.
+     * If uid or oldPassword is incorrect, no user will be updated.
+     */
     async changePassword(uid: number, oldPassword: string, newPassword: string): Promise<boolean> {
         const updateResult = await this.userRepo.createQueryBuilder()
             .update()
@@ -57,6 +82,9 @@ export class UserService extends BaseService<User> {
         return updateResult.affected > 0;
     }
 
+    /**
+     * Creates a new user in the database
+     */
     async createProfile(userData: CreateUserInputDto): Promise<User> {
         const { password, ...profileData } = userData;
         await this.userRepo.createQueryBuilder()

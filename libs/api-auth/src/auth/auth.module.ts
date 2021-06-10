@@ -8,6 +8,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshCookieStrategy } from './strategies/refresh-cookie.strategy';
 import { AppJwtModule } from '../app-jwt.module';
 
+/**
+ * Module responsible for authenticating users via JWTs (https://jwt.io/).
+ * Heavy use of Heavy use of https://docs.nestjs.com/security/authentication
+ */
 @Module({
     imports: [
         AppConfigModule,

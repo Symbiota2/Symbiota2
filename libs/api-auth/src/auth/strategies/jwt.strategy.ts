@@ -5,6 +5,11 @@ import { AppConfigService } from '@symbiota2/api-config';
 import { ApiJwtPayload } from '@symbiota2/data-access';
 import { ExtractedJwt } from '../dto/extracted-jwt';
 
+/**
+ * Passport strategy for authenticating a user based on the contents of a
+ * JWT token (see http://www.passportjs.org/packages/passport-jwt/ and
+ * https://docs.nestjs.com/security/authentication)
+ */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(protected readonly appConfigService: AppConfigService) {

@@ -10,6 +10,9 @@ import {
 import { Type } from 'class-transformer';
 import { ApiQueryFindUsers } from '@symbiota2/data-access';
 
+/**
+ * Object representing the query parameters for retrieving a list of users
+ */
 export class FindAllQuery implements ApiQueryFindUsers {
     @ApiProperty({ required: false })
     @IsString()

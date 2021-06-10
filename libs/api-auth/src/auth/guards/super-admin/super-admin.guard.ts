@@ -4,7 +4,10 @@ import { TokenService } from '../../../user/services/token.service';
 import { AppConfigService } from '@symbiota2/api-config';
 
 /**
- * Must come after the jwt-auth guard, since it populates req.user
+ * Guard for checking whether the current user has the 'SuperAdmin' role in
+ * the database. It must come after the jwt-auth guard, since the user must be
+ * populated in the request. (see https://docs.nestjs.com/security/authentication
+ * and https://docs.nestjs.com/guards)
  */
 @Injectable()
 export class SuperAdminGuard implements CanActivate {

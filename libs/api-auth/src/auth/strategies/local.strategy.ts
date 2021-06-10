@@ -4,6 +4,12 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from '@symbiota2/api-database';
 import { UserService } from '../../user/services/user.service';
 
+/**
+ * Passport strategy for authenticating a user based on a POST request
+ * containing a username and password
+ * (see http://www.passportjs.org/packages/passport-local/ and
+ * https://docs.nestjs.com/security/authentication)
+ */
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
     constructor(private users: UserService) {

@@ -7,6 +7,10 @@ import {
 import { Type } from 'class-transformer';
 import { ApiCreateUserRoleData, ApiUserRoleName } from '@symbiota2/data-access';
 
+/**
+ * Object representing the body of a POST request for adding a new role to
+ * a user
+ */
 export class RoleInputDto implements ApiCreateUserRoleData {
     @ApiProperty()
     @IsEnum(ApiUserRoleName)

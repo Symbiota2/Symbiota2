@@ -6,7 +6,7 @@ import {
     SerializeOptions, UseGuards, Patch, Body, ForbiddenException, HttpCode, Post
 } from '@nestjs/common';
 import {
-    ApiBearerAuth,
+    ApiBearerAuth, ApiOperation,
     ApiResponse,
     ApiTags
 } from '@nestjs/swagger';
@@ -22,19 +22,33 @@ import { SuperAdminGuard } from '../../auth/guards/super-admin/super-admin.guard
 import { FindAllQuery } from '../dto/find-all-query.dto';
 import { CreateUserInputDto } from '../dto/create-user.input.dto';
 
+/**
+ * Routes for getting/setting user data
+ */
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
     constructor(private readonly userService: UserService) { }
 
     @Post()
+    @ApiOperation({
+        description: "Creates a new user, corresponds to the 'create user' " +
+            "page in the UI"
+    })
     @ApiResponse({ status: HttpStatus.OK, type: UserOutputDto })
     async createUser(@Body() userData: CreateUserInputDto): Promise<UserOutputDto> {
         const user = await this.userService.createProfile(userData);
         return new UserOutputDto(user);
     }
 
+    /**
+     *
+     */
     @Get()
+    @ApiOperation({
+        description: "Returns a list of users in the database. Should only  " +
+            "be available to users with the 'SuperAdmin' role in the database"
+    })
     @ApiBearerAuth()
     @ApiResponse({ status: HttpStatus.OK, type: UserOutputDto, isArray: true })
     @SerializeOptions({ groups: [UserOutputDto.GROUP_LIST] })
@@ -52,6 +66,10 @@ export class UserController {
     }
 
     @Get(':id')
+    @ApiOperation({
+        description: "Returns a specific user's profile by ID. Should only be " +
+            "available to that user, or to a user with the 'SuperAdmin' role"
+    })
     @ApiBearerAuth()
     @ApiResponse({ status: HttpStatus.OK, type: UserOutputDto })
     @UseGuards(JwtAuthGuard, CurrentUserGuard)
@@ -62,6 +80,10 @@ export class UserController {
     }
 
     @Patch(':id')
+    @ApiOperation({
+        description: "Updates a specific user's profile by ID. Should only be " +
+            "available to that user, or to a user with the 'SuperAdmin' role"
+    })
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard, CurrentUserGuard)
     @SerializeOptions({ groups: [UserOutputDto.GROUP_SINGLE] })
@@ -72,6 +94,10 @@ export class UserController {
     }
 
     @Patch(':id/changePassword')
+    @ApiOperation({
+        description: "Updates a specific user's password by ID. Should only be " +
+            "available to that user, or to a user with the 'SuperAdmin' role"
+    })
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard, CurrentUserGuard)
     @HttpCode(HttpStatus.NO_CONTENT)

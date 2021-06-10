@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { UserLoginInputDto } from './dto/user-login-input.dto';
 import {
-    ApiBody, ApiCookieAuth,
+    ApiBody, ApiCookieAuth, ApiOperation,
     ApiResponse,
     ApiTags
 } from '@nestjs/swagger';
@@ -23,6 +23,9 @@ import { AccessTokenOutputDto } from './dto/access-token-output.dto';
 import { AuthenticatedRequest } from './dto/authenticated-request';
 import { UserService } from '../user/services/user.service';
 
+/**
+ * Routes for authenticating users
+ */
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -38,6 +41,11 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @UseGuards(LoginAuthGuard)
     @ApiBody({ type: UserLoginInputDto })
+    @ApiOperation({
+        description: "Creates and issues an access token for use with the " +
+            "API. Sets a cookie with a refresh token for retrieving new " +
+            "access tokens."
+    })
     @ApiResponse({ status: HttpStatus.OK, type: AccessTokenOutputDto })
     async login(
         @Req() req: AuthenticatedRequest,
@@ -59,6 +67,10 @@ export class AuthController {
     @Post('refresh')
     @UseGuards(RefreshCookieGuard)
     @HttpCode(HttpStatus.OK)
+    @ApiOperation({
+        description: "Issues a new access token if the request contains a " +
+            "valid refresh cookie"
+    })
     @ApiResponse({ status: HttpStatus.OK, type: AccessTokenOutputDto })
     @ApiCookieAuth()
     async refreshUser(
@@ -82,6 +94,10 @@ export class AuthController {
     @UseGuards(RefreshCookieGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiCookieAuth()
+    @ApiOperation({
+        description: "Destroys the user's refresh tokens in the database and " +
+            "clears their refresh token cookie"
+    })
     async logout(
         @Req() req: AuthenticatedRequest,
         @Res({ passthrough: true }) res: Response): Promise<void> {
@@ -92,6 +108,10 @@ export class AuthController {
         res.clearCookie(RefreshCookieStrategy.COOKIE_NAME);
     }
 
+    /**
+     * Sets a refresh cookie in the given response based on the given request
+     * and refresh token
+     */
     private async setRefreshCookie(req: Request, res: Response, refreshToken: string): Promise<void> {
         const isDev = this.appConfig.isDevelopment();
         res.cookie(
@@ -101,12 +121,15 @@ export class AuthController {
                 httpOnly: true,
                 secure: !isDev,
                 expires: this.maxCookieDate,
-                domain: req.hostname,
+                domain: req.hostname,   // TODO: We should set this in the app config
                 sameSite: 'none'
             }
         );
     }
 
+    /**
+     * Retrieves the cookie expiration date
+     */
     get maxCookieDate(): Date {
         const date = new Date();
         date.setDate(date.getDate() + AuthController.MAX_COOKIE_DAYS);

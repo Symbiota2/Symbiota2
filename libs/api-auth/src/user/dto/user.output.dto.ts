@@ -3,6 +3,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@symbiota2/api-database';
 import { ApiUser } from '@symbiota2/data-access';
 
+/**
+ * Object representing the body of a response containing user profile data
+ */
 @Exclude()
 export class UserOutputDto implements ApiUser {
     public static readonly GROUP_SINGLE = 'single';

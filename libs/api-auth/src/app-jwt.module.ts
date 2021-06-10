@@ -9,6 +9,10 @@ async function jwtModuleFactory(appConfigService: AppConfigService): Promise<Jwt
     }
 }
 
+/**
+ * Module that sets up JWT authentication based on a secret key provided in the
+ * app config. See https://github.com/nestjs/jwt. Imported by './user/user.module.ts'
+ */
 @Module({
     imports: [
         JwtModule.registerAsync({

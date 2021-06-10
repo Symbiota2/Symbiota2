@@ -7,6 +7,10 @@ import { TokenService } from './services/token.service';
 import { AppConfigModule } from '@symbiota2/api-config';
 import { AppJwtModule } from '../app-jwt.module';
 
+/**
+ * Module for user authorization and profile management.
+ * Heavy use of https://docs.nestjs.com/security/authentication
+ */
 @Module({
     imports: [
         AppJwtModule,
@@ -17,7 +21,10 @@ import { AppJwtModule } from '../app-jwt.module';
         UserService,
         TokenService
     ],
-    controllers: [UserController, UserRoleController],
+    controllers: [
+        UserController,
+        UserRoleController
+    ],
     exports: [
         UserService,
         TokenService

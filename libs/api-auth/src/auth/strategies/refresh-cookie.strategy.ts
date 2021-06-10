@@ -7,6 +7,14 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../../user/services/user.service';
 import { AuthenticatedRequest } from '../dto/authenticated-request';
 
+/**
+ * Passport strategy for authenticating a user based on the contents
+ * of a cookie called refreshToken. This token should contain a JWT signed
+ * by our server that holds a uid and clientID. This is basically an
+ * implementation of OAuth2.
+ * (see http://www.passportjs.org/packages/passport-cookie/ and
+ * https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/)
+ */
 @Injectable()
 export class RefreshCookieStrategy extends PassportStrategy(Strategy) {
     public static readonly COOKIE_NAME = 'refreshToken';

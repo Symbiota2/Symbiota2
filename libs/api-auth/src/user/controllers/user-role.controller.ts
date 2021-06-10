@@ -8,7 +8,7 @@ import {
     UseGuards
 } from '@nestjs/common';
 import {
-    ApiBearerAuth,
+    ApiBearerAuth, ApiOperation,
     ApiResponse,
     ApiTags
 } from '@nestjs/swagger';
@@ -30,6 +30,10 @@ export class UserRoleController {
         private readonly roleRepo: Repository<UserRole>) { }
 
     @Get()
+    @ApiOperation({
+        description: "Returns a list of roles for the given uid. Should only be " +
+            "available to that user, or to a user with the 'SuperAdmin' role"
+    })
     @UseGuards(CurrentUserGuard)
     @ApiResponse({ status: HttpStatus.OK, type: RoleOutputDto, isArray: true })
     async findAll(@Param('id') uid: number): Promise<RoleOutputDto[]> {
@@ -38,6 +42,10 @@ export class UserRoleController {
     }
 
     @Post()
+    @ApiOperation({
+        description: "Adds a role for a given uid. Should only be " +
+            "available to a user with the 'SuperAdmin' role"
+    })
     @UseGuards(SuperAdminGuard)
     @HttpCode(HttpStatus.OK)
     @ApiResponse({ status: HttpStatus.OK, type: RoleOutputDto, isArray: true })
@@ -52,6 +60,10 @@ export class UserRoleController {
         return allRoles.map((role) => new RoleOutputDto(role));
     }
 
+    @ApiOperation({
+        description: "Deletes a role for the given uid. Should only be " +
+            "available to a user with the 'SuperAdmin' role"
+    })
     @Delete(':roleID')
     @UseGuards(SuperAdminGuard)
     @ApiResponse({ status: HttpStatus.OK, type: RoleOutputDto, isArray: true })
