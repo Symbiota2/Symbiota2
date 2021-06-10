@@ -7,17 +7,24 @@ import { CollectionModule } from '@symbiota2/api-plugin-collection';
 import { ApiJobsModule } from '@symbiota2/api-jobs';
 import { GeographyModule } from '@symbiota2/api-plugin-geography';
 
+const ENABLED_PLUGINS = [
+    ApiJobsModule,
+    CollectionModule,
+    OccurrenceModule,
+    GeographyModule,
+];
+
+/**
+ * The core module for the API. Imports the AppConfigModule, UserModule, and
+ * AuthModule, which can't be disabled. Then uses ApiPluginModule to import
+ * plugins.
+ */
 @Module({
     imports: [
         AppConfigModule,
         UserModule,
         AuthModule,
-        ApiPluginModule.configure([
-            ApiJobsModule,
-            CollectionModule,
-            OccurrenceModule,
-            GeographyModule,
-        ])
+        ApiPluginModule.configure(ENABLED_PLUGINS)
     ]
 })
 export class AppModule {}

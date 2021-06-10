@@ -12,6 +12,12 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 const GLOBAL_API_PREFIX = 'api/v1';
 const SWAGGER_DOCS_PREFIX = 'docs'
 
+/**
+ * The main method of the API. Builds the NestJS app, with Swagger UI for
+ * documentation. Configures CORS, helmet, cookie-parser, request logging. Also
+ * filters incoming requests via ValidationPipe, and outgoing
+ * requests via ClassSerializerInterceptor.
+ */
 export default async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
     const configService = app.get(AppConfigService);
@@ -44,6 +50,7 @@ export default async function bootstrap() {
     app.use(cookieParser());
 
     // Log requests, Serialize output
+    // (see https://docs.nestjs.com/techniques/serialization)
     app.useGlobalInterceptors(
         new RequestLoggerInterceptor(),
         new ClassSerializerInterceptor(
@@ -55,7 +62,7 @@ export default async function bootstrap() {
         )
     );
 
-    // Validate input
+    // Validate input (see https://docs.nestjs.com/techniques/validation)
     app.useGlobalPipes(new ValidationPipe({
         whitelist: true,
         transform: true,

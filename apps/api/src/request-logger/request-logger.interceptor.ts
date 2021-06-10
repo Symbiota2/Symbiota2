@@ -9,6 +9,10 @@ import { Observable } from 'rxjs';
 import { Request, Response } from 'express';
 import { format } from 'util';
 
+/**
+ * An interceptor that logs incoming requests. Logs the response time
+ * asynchronously once the request is finished.
+ */
 @Injectable()
 export class RequestLoggerInterceptor implements NestInterceptor {
     private readonly logger = new Logger('HTTP');
