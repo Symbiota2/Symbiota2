@@ -24,22 +24,24 @@ import {
 
 type AuthData = { username?: string, password?: string };
 
-@Injectable({
-    providedIn: UserModule
-})
+/**
+ * Service for retrieving users from the API
+ */
+@Injectable()
 export class UserService {
     private static readonly ONE_MINUTE = 60 * 1000;
 
     private readonly _currentUser = new BehaviorSubject<User>(null);
     private refreshSubscription: Subscription = null;
 
-    // Skip the first, then share results to multiple subscribers, replaying
-    // the 'current state'
-    public readonly currentUser = this._currentUser.asObservable().pipe(
-        skip(1),
-        shareReplay(1)
-    );
+    /**
+     * The currently logged in user
+     */
+    public readonly currentUser = this._currentUser.asObservable().pipe(skip(1));
 
+    /**
+     * Profile data for the currently logged in user
+     */
     public readonly profileData: Observable<UserProfileData> = this.currentUser.pipe(
         switchMap((userData) => {
             if (!userData) {
@@ -62,6 +64,12 @@ export class UserService {
         shareReplay(1)
     );
 
+    /**
+     * Create a user object based on an ApiLoginResponse
+     * @param jsonResponse The JSON returned from the API
+     * @return User The parsed User
+     * @private
+     */
     private static userFromJwt(jsonResponse: ApiLoginResponse): User {
         if (jsonResponse === null) {
             return null;
@@ -74,6 +82,11 @@ export class UserService {
         private readonly alert: AlertService,
         private readonly api: ApiClientService) { }
 
+    /**
+     * Creates a new user
+     * @param userData The fields for the user
+     * @return Observable<User> The created user
+     */
     create(userData: ApiCreateUserData): Observable<User> {
         const createReq = this.api.queryBuilder(this.usersUrl)
             .post()
@@ -97,12 +110,19 @@ export class UserService {
         )
     }
 
+    /**
+     * Log into the API
+     * @return Observable<User> The logged in user
+     */
     login(username: string, password: string): Observable<User> {
         return this.authenticate(this.loginUrl, { username, password }).pipe(
             tap((userData) => this._currentUser.next(userData))
         );
     }
 
+    /**
+     * Log out from the API
+     */
     logout(): void {
         const currentUser = this._currentUser.getValue();
         const logoutReq = this.api.queryBuilder(this.logoutUrl)
@@ -115,12 +135,20 @@ export class UserService {
         })).subscribe();
     }
 
+    /**
+     * Refresh the current access token using a refresh cookie
+     */
     refresh(): Observable<User> {
         return this.authenticate(this.refreshUrl, {}).pipe(
             tap((userData) => this._currentUser.next(userData))
         );
     }
 
+    /**
+     * Update the current user's profile via the API
+     * @param profileData The profile data
+     * @return Observable<UserProfileData> The updated profile data
+     */
     saveProfile(profileData: UserProfileData): Observable<UserProfileData> {
         return this._currentUser.pipe(
             take(1),
@@ -154,7 +182,14 @@ export class UserService {
         );
     }
 
-    changePassword(uid: number, oldPassword: string, newPassword: string): Observable<string> {
+    /**
+     * Change a password via the API
+     * @param uid The uid of the user whose password we're changing
+     * @param oldPassword The old password
+     * @param newPassword The new password
+     * @return Observable<string> An error, if any
+     */
+    changePassword(uid: number, oldPassword: string, newPassword: string): Observable<string | null> {
         const req = this.api.queryBuilder(`${this.api.apiRoot()}/users/${uid}/changePassword`)
             .patch()
             .body({ oldPassword, newPassword })
@@ -170,7 +205,15 @@ export class UserService {
         );
     }
 
+    /**
+     * Authenticate with the API
+     * @param url The url to authenticate against
+     * @param authData A username and password
+     * @private
+     */
     private authenticate(url: string, authData: AuthData) {
+        // Build a POST request to the given URL, with the given authData
+        // as the body
         const authReq = this.api.queryBuilder<AuthData>(url)
             .post()
             .body(authData)
@@ -183,6 +226,7 @@ export class UserService {
                 return of(null);
             }),
             map((jwtData) => {
+                // Parse the user from the returned JSON
                 const userData = UserService.userFromJwt(jwtData);
 
                 // Do refresh with cookie when five minutes remain

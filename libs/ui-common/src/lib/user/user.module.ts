@@ -7,6 +7,7 @@ import { FlexModule } from '@angular/flex-layout';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ApiClientModule } from '../api-client';
+import { UserService } from './user.service';
 
 
 @NgModule({
@@ -20,6 +21,9 @@ import { ApiClientModule } from '../api-client';
         MatInputModule,
         MatTabsModule,
         ReactiveFormsModule,
+    ],
+    providers: [
+        UserService
     ]
 })
 export class UserModule { }

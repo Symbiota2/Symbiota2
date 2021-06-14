@@ -7,12 +7,14 @@ import {
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppConfigService } from './app-config';
-import { Symbiota2ExpansionPanelComponent } from './components';
 
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(http);
 }
 
+/**
+ * Module for implementing @ngx-translate, providing i18n for the UI
+ */
 @NgModule({
     imports: [
         HttpClientModule,
