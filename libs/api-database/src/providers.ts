@@ -33,6 +33,10 @@ import { SalixWordStat } from './entities';
 import { SchemaVersion } from './entities';
 import { Voucher } from './entities';
 
+/**
+ * Providers defined in the root of the entities directory. They're included
+ * in the entityProviders array below
+ */
 const miscProviders = [
     AdminLanguage.getProvider<AdminLanguage>(),
     AdminStat.getProvider<AdminStat>(),
@@ -49,6 +53,10 @@ const miscProviders = [
     Voucher.getProvider<Voucher>()
 ];
 
+/**
+ * List of database entities that extend EntityProvider. Because of this they
+ * can be used as NestJS providers and are registered in database.module.ts
+ */
 export const entityProviders = [
     ...actionRequestProviders,
     ...agentProviders,

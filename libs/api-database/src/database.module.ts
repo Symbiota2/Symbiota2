@@ -6,6 +6,10 @@ import * as entities from './entities';
 import * as migrations from './migrations';
 import { ApiPluginModule } from '@symbiota2/api-common';
 
+/**
+ * Module that imports TypeORM into the API and provides utilities for
+ * manipulating the database
+ */
 @Module({
     imports: [
         AppConfigModule,
@@ -25,8 +29,4 @@ import { ApiPluginModule } from '@symbiota2/api-common';
     ],
     exports: entityProviders
 })
-export class DatabaseModule implements OnApplicationBootstrap {
-    onApplicationBootstrap() {
-
-    }
-}
+export class DatabaseModule { }
