@@ -42,6 +42,7 @@ export class AuthController {
     @UseGuards(LoginAuthGuard)
     @ApiBody({ type: UserLoginInputDto })
     @ApiOperation({
+        summary: "Retrieve an access token and refresh cookie given a username and password",
         description: "Creates and issues an access token for use with the " +
             "API. Sets a cookie with a refresh token for retrieving new " +
             "access tokens."
@@ -68,6 +69,7 @@ export class AuthController {
     @UseGuards(RefreshCookieGuard)
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
+        summary: "Use a refresh cookie to retrieve a new access token",
         description: "Issues a new access token if the request contains a " +
             "valid refresh cookie"
     })
@@ -95,6 +97,7 @@ export class AuthController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiCookieAuth()
     @ApiOperation({
+        summary: "Destroy the refresh token for the current user/clientID pair",
         description: "Destroys the user's refresh tokens in the database and " +
             "clears their refresh token cookie"
     })
