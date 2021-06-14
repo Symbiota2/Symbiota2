@@ -9,7 +9,9 @@ import {
 } from 'class-validator';
 import { AsyncJobStatus, IAsyncJob } from './async-job.entity';
 
-
+/**
+ * DTO for scheduling jobs via the API
+ */
 export class AsyncJobDto<I, O> implements IAsyncJob<I, O> {
     constructor(job: Record<string, unknown>) {
         Object.assign(this, job);

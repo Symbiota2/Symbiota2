@@ -7,6 +7,9 @@ export enum AsyncJobStatus {
     FAILED = 4
 }
 
+/**
+ * Entity that represents an asynchronous job with input data and output data
+ */
 @Entity()
 export class AsyncJob<I, O> {
     @PrimaryColumn('uuid')

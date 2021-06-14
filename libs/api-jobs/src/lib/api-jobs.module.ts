@@ -3,6 +3,9 @@ import { SymbiotaApiPlugin } from '@symbiota2/api-common';
 import { EntityTarget } from 'typeorm';
 import { AsyncJob } from './async-job.entity';
 
+/**
+ * Module for running asynchronous background jobs
+ */
 @Module({
   controllers: [],
   providers: [],
