@@ -32,8 +32,8 @@ export class UserController {
 
     @Post()
     @ApiOperation({
-        description: "Creates a new user, corresponds to the 'create user' " +
-            "page in the UI"
+        summary: "Create a new user",
+        description: "Corresponds to the 'create user' page in the UI"
     })
     @ApiResponse({ status: HttpStatus.OK, type: UserOutputDto })
     async createUser(@Body() userData: CreateUserInputDto): Promise<UserOutputDto> {
@@ -46,8 +46,8 @@ export class UserController {
      */
     @Get()
     @ApiOperation({
-        description: "Returns a list of users in the database. Should only  " +
-            "be available to users with the 'SuperAdmin' role in the database"
+        summary: "Retrieve a list of users from the database",
+        description: "Only available to users with the 'SuperAdmin' role"
     })
     @ApiBearerAuth()
     @ApiResponse({ status: HttpStatus.OK, type: UserOutputDto, isArray: true })
@@ -67,8 +67,8 @@ export class UserController {
 
     @Get(':id')
     @ApiOperation({
-        description: "Returns a specific user's profile by ID. Should only be " +
-            "available to that user, or to a user with the 'SuperAdmin' role"
+        summary: "Return a specific user's profile by ID",
+        description: "Only be available to the user or a user with the 'SuperAdmin' role"
     })
     @ApiBearerAuth()
     @ApiResponse({ status: HttpStatus.OK, type: UserOutputDto })
@@ -81,8 +81,8 @@ export class UserController {
 
     @Patch(':id')
     @ApiOperation({
-        description: "Updates a specific user's profile by ID. Should only be " +
-            "available to that user, or to a user with the 'SuperAdmin' role"
+        summary: "Update a specific user's profile by ID",
+        description: "Only available to the user or a user with the 'SuperAdmin' role"
     })
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard, CurrentUserGuard)
@@ -95,8 +95,8 @@ export class UserController {
 
     @Patch(':id/changePassword')
     @ApiOperation({
-        description: "Updates a specific user's password by ID. Should only be " +
-            "available to that user, or to a user with the 'SuperAdmin' role"
+        summary: "Update a specific user's password by ID",
+        description: "Only available to the user or a user with the 'SuperAdmin' role"
     })
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard, CurrentUserGuard)

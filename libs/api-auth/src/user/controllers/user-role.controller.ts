@@ -31,8 +31,8 @@ export class UserRoleController {
 
     @Get()
     @ApiOperation({
-        description: "Returns a list of roles for the given uid. Should only be " +
-            "available to that user, or to a user with the 'SuperAdmin' role"
+        summary: "Return a list of roles for a user",
+        description: "Only available to the user or a user with the 'SuperAdmin' role"
     })
     @UseGuards(CurrentUserGuard)
     @ApiResponse({ status: HttpStatus.OK, type: RoleOutputDto, isArray: true })
@@ -43,8 +43,8 @@ export class UserRoleController {
 
     @Post()
     @ApiOperation({
-        description: "Adds a role for a given uid. Should only be " +
-            "available to a user with the 'SuperAdmin' role"
+        summary: "Add a role to a user",
+        description: "Only available to users with the 'SuperAdmin' role"
     })
     @UseGuards(SuperAdminGuard)
     @HttpCode(HttpStatus.OK)
@@ -60,11 +60,11 @@ export class UserRoleController {
         return allRoles.map((role) => new RoleOutputDto(role));
     }
 
-    @ApiOperation({
-        description: "Deletes a role for the given uid. Should only be " +
-            "available to a user with the 'SuperAdmin' role"
-    })
     @Delete(':roleID')
+    @ApiOperation({
+        summary: "Remove a role from a user",
+        description: "Only available to users with the 'SuperAdmin' role"
+    })
     @UseGuards(SuperAdminGuard)
     @ApiResponse({ status: HttpStatus.OK, type: RoleOutputDto, isArray: true })
     async removeRole(
