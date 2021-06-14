@@ -8,6 +8,9 @@ import { join as pathJoin } from 'path';
 import { promises as fsPromises } from 'fs';
 import { SymbiotaApiPlugin } from '@symbiota2/api-common';
 
+/**
+ * Module for retrieving occurrence records from the database
+ */
 @Module({
     imports: [
         AppConfigModule,

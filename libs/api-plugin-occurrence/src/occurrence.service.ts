@@ -16,12 +16,21 @@ type OccurrenceFindAllList = {
     data: OccurrenceFindAllItem[];
 }
 
+/**
+ * Service for retrieving occurrence records from the database
+ */
 @Injectable()
 export class OccurrenceService {
     constructor(
         @Inject(Occurrence.PROVIDER_ID)
         private readonly occurrenceRepo: Repository<Occurrence>) { }
 
+    /**
+     * Retrieves a list of occurrence records
+     * @param findAllOpts Filter options for the query
+     * @return OccurrenceFindAllList A subset of the list of occurrences determined
+     * by limit and offset, and a count of all occurrences matching the query
+     */
     async findAll(findAllOpts: FindAllParams): Promise<OccurrenceFindAllList> {
         const { limit, offset, ...params } = findAllOpts;
         let qb = this.occurrenceRepo.createQueryBuilder('o')
@@ -220,6 +229,11 @@ export class OccurrenceService {
         };
     }
 
+    /**
+     * Retrieves a specific occurrence by ID
+     * @param id The occurrence ID
+     * @return ApiOccurrence The occurrence record
+     */
     async findByID(id: number): Promise<ApiOccurrence> {
         const { collection, ...props } = await this.occurrenceRepo.findOne(
             { id },
@@ -231,6 +245,12 @@ export class OccurrenceService {
         }
     }
 
+    /**
+     * Creates a new occurrence record
+     * @param collectionID The collection in which the occurrence should be created
+     * @param occurrenceData The occurrence fields
+     * @return ApiOccurrence The created occurrence
+     */
     async create(collectionID: number, occurrenceData: DeepPartial<Occurrence>): Promise<ApiOccurrence> {
         const occurrence = this.occurrenceRepo.create({ collectionID, ...occurrenceData });
         const { collection, ...props } = await this.occurrenceRepo.save(occurrence);
@@ -240,9 +260,14 @@ export class OccurrenceService {
         };
     }
 
+    /**
+     * Creates a list of occurrences
+     * @param collectionID The collection to which the occurrences should be added
+     * @param occurrenceData The list of occurrences
+     */
     async createMany(collectionID: number, occurrenceData: DeepPartial<Occurrence>[]): Promise<void> {
         const occurrences = occurrenceData.map((o) => {
-            return { collectionID, ...o };
+            return { ...o, collectionID };
         });
 
         await this.occurrenceRepo.createQueryBuilder()

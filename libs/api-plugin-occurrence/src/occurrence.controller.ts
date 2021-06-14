@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import {
     ApiBody,
-    ApiExtraModels,
+    ApiExtraModels, ApiOperation, ApiProperty,
     ApiQuery,
     ApiResponse,
     ApiTags
@@ -50,6 +50,9 @@ export class OccurrenceController {
     constructor(private readonly occurrenceService: OccurrenceService) { }
 
     @ApiResponse({ status: HttpStatus.OK, type: OccurrenceList })
+    @ApiOperation({
+        summary: "Retrieve a list of occurrences"
+    })
     @Get()
     async findAll(@Query() findAllOpts: FindAllParams): Promise<OccurrenceList> {
         const occurrenceList = await this.occurrenceService.findAll(findAllOpts);
@@ -57,6 +60,9 @@ export class OccurrenceController {
     }
 
     @ApiResponse({ status: HttpStatus.OK, type: OccurrenceOutputDto })
+    @ApiOperation({
+        summary: "Retrieve an occurrence by ID"
+    })
     @ApiExtraModels(CollectionListItem)
     @Get(':id')
     async findByID(@Param('id') id: number): Promise<OccurrenceOutputDto> {
@@ -68,6 +74,9 @@ export class OccurrenceController {
     }
 
     @Post(':collectionID')
+    @ApiOperation({
+        summary: "Create an occurrence within the given collection"
+    })
     @ProtectCollection('collectionID')
     @HttpCode(HttpStatus.OK)
     @ApiBody({ type: OccurrenceInputDto, isArray: true })
@@ -94,6 +103,9 @@ export class OccurrenceController {
     @ProtectCollection('collectionID')
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor('file'), CsvInterceptor)
+    @ApiOperation({
+        summary: "Upload a CSV or JSON file containing occurrences"
+    })
     @ApiFileInput('file')
     async createOccurrencesFromCsv(
         @Param('collectionID') collectionID: number,
