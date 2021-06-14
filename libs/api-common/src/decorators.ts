@@ -1,11 +1,9 @@
 import { ApiResponse, getSchemaPath, ApiBody, ApiConsumes, ApiExtraModels } from '@nestjs/swagger';
 import { HttpStatus, Type, applyDecorators } from '@nestjs/common';
-import {
-    registerDecorator, ValidationArguments,
-    ValidationOptions, ValidatorConstraint,
-    ValidatorConstraintInterface
-} from 'class-validator';
 
+/**
+ * Decorator that specifies the request can return one or many of the given cls
+ */
 export function ApiResponseOneOrMany<T>(cls: Type<T>) {
     return applyDecorators(
         ApiExtraModels(cls),
@@ -24,6 +22,10 @@ export function ApiResponseOneOrMany<T>(cls: Type<T>) {
     );
 }
 
+/**
+ * Decorator that specifies the request can accept one or many of the given cls
+ * in the request body
+ */
 export function ApiBodyOneOrMany<T>(cls: Type<T>) {
     return applyDecorators(
         ApiExtraModels(cls),
@@ -41,6 +43,10 @@ export function ApiBodyOneOrMany<T>(cls: Type<T>) {
     );
 }
 
+/**
+ * Decorator that specifies the request is of type multipart/form-data, where
+ * fieldName contains the file data
+ */
 export function ApiFileInput(fieldName: string) {
     return applyDecorators(
         ApiConsumes('multipart/form-data'),
