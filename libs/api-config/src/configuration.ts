@@ -1,6 +1,7 @@
 import path from 'path';
 import * as process from "process";
 
+// ===== Environment variable names =====
 export const ENV_APP_PORT = 'APP_PORT';
 export const ENV_APP_DATA_DIR = 'APP_DATA_DIR';
 export const ENV_NODE_ENV = 'NODE_ENV';
@@ -11,10 +12,10 @@ export const ENV_DB_PASSWORD = 'DATABASE_PASSWORD';
 export const ENV_DB_HOST = 'DATABASE_HOST';
 export const ENV_DB_PORT = 'DATABASE_PORT';
 export const ENV_DB_NAME = 'DATABASE_NAME';
-
-// SQLITE only
 export const ENV_DB_PATH = 'DATABASE_PATH';
+// ======================================
 
+// ===== Configuration defaults =====
 export const DEFAULT_PORT = '8080';
 export const DEFAULT_ENV = 'production';
 
@@ -29,7 +30,12 @@ export const DEFAULT_DATA_DIR = path.join(process.cwd(), 'data');
 
 export const ENV_ENABLE_AUTH = 'ENABLE_AUTH';
 export const DEFAULT_ENABLE_AUTH = '1';
+// ==================================
 
+/**
+ * Returns the app config. If an environment variable is set, it's returned.
+ * Otherwise it's default is used.
+ */
 export default function configBuilder(): Record<string, string> {
     return {
         // App config

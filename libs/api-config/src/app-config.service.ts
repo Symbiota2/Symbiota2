@@ -29,6 +29,9 @@ export enum DatabaseProtocol {
     SQLITE = 'sqlite',
 }
 
+/**
+ * Service for retrieving configuration values set in environment variables
+ */
 @Injectable()
 export class AppConfigService {
     public static readonly ENV_DEV = 'development';
@@ -37,6 +40,10 @@ export class AppConfigService {
     private static readonly JWT_KEY_FILE = '.jwtSigningKey';
     private static readonly PLUGIN_DIR_NAME = 'plugins';
 
+    /**
+     * @param path Path to a file
+     * @return boolean Whether the file exists
+     */
     private static async fsExists(path: string): Promise<boolean> {
         try {
             await fsPromises.access(path, fs.constants.F_OK);
@@ -49,18 +56,31 @@ export class AppConfigService {
 
     constructor(private readonly configService: ConfigService) { }
 
+    /**
+     * @param key The environment variable name
+     * @return T The environment variable value
+     */
     get<T>(key: string): T {
         return this.configService.get<T>(key);
     }
 
+    /**
+     * The port that the app should run on
+     */
     port(): number {
         return this.configService.get<number>(ENV_APP_PORT);
     }
 
+    /**
+     * The value for NODE_ENV
+     */
     environment(): string {
         return this.configService.get<string>(ENV_NODE_ENV);
     }
 
+    /**
+     * The path to the directory where Symbiota2 will store data
+     */
     async dataDir(): Promise<string> {
         const dataDir = this.configService.get<string>(ENV_APP_DATA_DIR);
         const dirExists = await AppConfigService.fsExists(dataDir);
@@ -72,6 +92,11 @@ export class AppConfigService {
         return dataDir;
     }
 
+    /**
+     * The JWT signing key that Symbiota2 should use. This is persisted in
+     * $APP_DATA_DIR/.jwtSigningKey, since it should remain consistent. If it
+     * changes, all users will be forced to log in again.
+     */
     async jwtKey(): Promise<string> {
         const jwtKeyPath = path.join(
             (await this.dataDir()),
@@ -95,6 +120,10 @@ export class AppConfigService {
         return newKey;
     }
 
+    /**
+     * Path to directory that contains Symbiota2 API plugins
+     * TODO: Not implemented, plugins are currently loaded from an array in app.module.ts in the API core app
+     */
     async pluginDir(): Promise<string> {
         const pluginDir = path.join(
             (await this.dataDir()),
@@ -109,11 +138,19 @@ export class AppConfigService {
         return pluginDir;
     }
 
+    /**
+     * Whether we're running within a development environment
+     */
     isDevelopment(): boolean {
         return [AppConfigService.ENV_DEV, AppConfigService.ENV_TEST]
             .includes(this.environment());
     }
 
+    /**
+     * The value of DATABASE_TYPE that specifies the type of database
+     * we're using: 'mysql', 'mariadb', 'postgres', 'sqlite'
+     * TODO: Currently only mariadb is tested / implemented
+     */
     databaseProtocol(): string {
         const proto = this.configService.get<DatabaseProtocol>(ENV_DB_TYPE);
 
@@ -124,6 +161,9 @@ export class AppConfigService {
         return proto;
     }
 
+    /**
+     * Path to the database when DATABASE_TYPE is 'sqlite'
+     */
     databasePath(): string {
         const dbType = this.databaseProtocol();
 
@@ -134,6 +174,9 @@ export class AppConfigService {
         return this.configService.get<string>(ENV_DB_PATH);
     }
 
+    /**
+     * The database uri when DATABASE_TYPE is something other than 'sqlite'
+     */
     databaseUri(): string {
         const dbType = this.databaseProtocol();
 
@@ -154,6 +197,9 @@ export class AppConfigService {
         return uri;
     }
 
+    /**
+     * The TypeORM database configuration
+     */
     databaseConfiguration(): ConnectionOptions {
         const dbProto = this.databaseProtocol();
         const migrationsSrcDir = path.join('src', 'database', 'migrations');
@@ -181,6 +227,9 @@ export class AppConfigService {
         return connectionOpts;
     }
 
+    /**
+     * Whether API JWT authentication/authorization is enabled
+     */
     isAuthEnabled(): boolean {
         return this.configService.get<string>(ENV_ENABLE_AUTH) === '1';
     }
