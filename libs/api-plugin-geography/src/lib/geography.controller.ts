@@ -5,7 +5,7 @@ import {
     NotFoundException,
     Param, Query
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CountryService } from './country/country.service';
 import {
     Continent,
@@ -39,6 +39,10 @@ export class GeographyController {
     }
 
     @Get('continents')
+    @ApiOperation({
+        summary: "Retrieve a list of continents from the database"
+    })
+    @ApiResponse({ status: HttpStatus.OK, type: ContinentListItem, isArray: true })
     async continentList(): Promise<ContinentListItem[]> {
         const continents = await this.continents.findAll();
         return continents.map((continent) => {
@@ -47,6 +51,10 @@ export class GeographyController {
     }
 
     @Get('continents/:id')
+    @ApiOperation({
+        summary: "Retrieve a specific continent by ID",
+        description: "The output format can be specified using the query parameter format=wkt/geojson"
+    })
     async continent(@Param('id') id: number, @Query() query: GeoFindOneQuery): Promise<Continent | GeoJSON> {
         const continent = await this.continents.findOne(id);
         if (!continent) {
@@ -59,6 +67,9 @@ export class GeographyController {
     }
 
     @Get('countries')
+    @ApiOperation({
+        summary: "Retrieve a list of countries from the database"
+    })
     @ApiResponse({ status: HttpStatus.OK, type: CountryListItem, isArray: true })
     async countryList(): Promise<CountryListItem[]> {
         const countries = await this.countries.findAll();
@@ -68,6 +79,10 @@ export class GeographyController {
     }
 
     @Get('countries/:id')
+    @ApiOperation({
+        summary: "Retrieve a specific country by ID",
+        description: "The output format can be specified using the query parameter format=wkt/geojson"
+    })
     @ApiResponse({ status: HttpStatus.OK, type: Country })
     async country(@Param('id') id: number, @Query() query: GeoFindOneQuery): Promise<Country | GeoJSON> {
         const country = await this.countries.findOne(id);
@@ -81,6 +96,10 @@ export class GeographyController {
     }
 
     @Get('provinces')
+    @ApiOperation({
+        summary: "Retrieve a list of states/provinces"
+    })
+    @ApiResponse({ status: HttpStatus.OK, type: ProvinceListItem, isArray: true })
     async provinceList(@Query() query: ProvinceFindManyQuery): Promise<ProvinceListItem[]> {
         const provinces = await this.provinces.findAll(
             query.limit,
@@ -94,6 +113,10 @@ export class GeographyController {
     }
 
     @Get('provinces/:id')
+    @ApiOperation({
+        summary: "Retrieve a specific state/province by ID",
+        description: "The output format can be specified using the query parameter format=wkt/geojson"
+    })
     async province(@Param('id') id: number, @Query() query: GeoFindOneQuery): Promise<Province | GeoJSON> {
         const province = await this.provinces.findOne(id);
         if (!province) {

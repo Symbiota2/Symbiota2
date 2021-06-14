@@ -6,6 +6,9 @@ import { SymbiotaApiPlugin } from '@symbiota2/api-common';
 import { ContinentService } from './continent/continent.service';
 import { StateProvinceService } from './state-province/state-province.service';
 
+/**
+ * Module for retrieving geography data from the database
+ */
 @Module({
     imports: [DatabaseModule],
     controllers: [GeographyController],
