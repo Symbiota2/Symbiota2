@@ -9,6 +9,9 @@ import { SymbiotaApiPlugin } from '@symbiota2/api-common';
 import { AuthModule } from '@symbiota2/api-auth';
 import { AppConfigModule } from '@symbiota2/api-config';
 
+/**
+ * Module for working with specimen collections
+ */
 @Module({
     imports: [
         AppConfigModule,

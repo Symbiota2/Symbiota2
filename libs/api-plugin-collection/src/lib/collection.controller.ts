@@ -10,7 +10,7 @@ import {
     Delete,
     NotFoundException,
     Patch,
-    UseGuards, BadRequestException
+    UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CollectionService } from './collection.service';
@@ -27,6 +27,9 @@ import {
 } from './collection-edit-guard/protect-collection.decorator';
 import { CollectionListItem } from './dto/CollectionListItem.output.dto';
 
+/**
+ * API routes for manipulating specimen collections
+ */
 @ApiTags('Collections')
 @Controller('collections')
 export class CollectionController {
@@ -35,6 +38,10 @@ export class CollectionController {
         private readonly collections: CollectionService) {
     }
 
+    /**
+     * Route for retrieving a list of collections
+     * @param findAllParams The query parameters for the collection list
+     */
     @Get()
     @ApiResponse({
         status: HttpStatus.OK,
