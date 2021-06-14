@@ -12,7 +12,12 @@ import {
     Patch,
     UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+    ApiTags,
+    ApiResponse,
+    ApiBearerAuth,
+    ApiOperation
+} from '@nestjs/swagger';
 import { CollectionService } from './collection.service';
 import { CollectionOutputDto } from './dto/Collection.output.dto';
 import { CollectionFindAllParams } from './dto/coll-find-all.input.dto';
@@ -38,11 +43,10 @@ export class CollectionController {
         private readonly collections: CollectionService) {
     }
 
-    /**
-     * Route for retrieving a list of collections
-     * @param findAllParams The query parameters for the collection list
-     */
     @Get()
+    @ApiOperation({
+        summary: "Retrieve a list of specimen collections"
+    })
     @ApiResponse({
         status: HttpStatus.OK,
         type: CollectionListItem,
@@ -59,6 +63,9 @@ export class CollectionController {
     }
 
     @Get(':id')
+    @ApiOperation({
+        summary: "Retrieve a specimen collection by ID"
+    })
     @ApiResponse({ status: HttpStatus.OK, type: CollectionOutputDto })
     async findByID(@Param('id') id: number): Promise<CollectionOutputDto> {
         const collection = await this.collections.findByID(id);
@@ -74,6 +81,9 @@ export class CollectionController {
     }
 
     @Post()
+    @ApiOperation({
+        summary: "Create a new specimen collection"
+    })
     @HttpCode(HttpStatus.OK)
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
@@ -84,6 +94,9 @@ export class CollectionController {
     }
 
     @Delete(':id')
+    @ApiOperation({
+        summary: "Delete a specimen collection by ID"
+    })
     @ProtectCollection('id')
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiResponse({ status: HttpStatus.NO_CONTENT })
@@ -95,6 +108,9 @@ export class CollectionController {
     }
 
     @Patch(':id')
+    @ApiOperation({
+        summary: "Update a specimen collection by ID"
+    })
     @ProtectCollection('id')
     @ApiResponse({ status: HttpStatus.OK, type: CollectionOutputDto })
     async updateByID(@Param('id') id: number, @Body() data: UpdateCollectionInputDto): Promise<CollectionOutputDto> {

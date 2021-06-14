@@ -1,5 +1,5 @@
 import { Controller, Get, HttpStatus, NotFoundException, Param } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
     CategoryOutputDto
 } from './dto/category.output.dto';
@@ -16,6 +16,9 @@ export class CategoryController {
         private readonly categories: CategoryService) { }
 
     @Get()
+    @ApiOperation({
+        summary: "Retrieve a list of collection categories"
+    })
     @ApiResponse({ status: HttpStatus.OK, type: CategoryOutputDto, isArray: true })
     async getCategoryList(): Promise<CategoryOutputDto[]> {
         const categories = await this.categories.findAll();
@@ -39,6 +42,9 @@ export class CategoryController {
     }
 
     @Get(':id')
+    @ApiOperation({
+        summary: "Retrieve a collection category by ID"
+    })
     @ApiResponse({ status: HttpStatus.OK, type: CategoryOutputDto })
     async getCategory(@Param('id') id: number): Promise<CategoryOutputDto> {
         const [category, collections] = await Promise.all([
