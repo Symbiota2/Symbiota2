@@ -38,7 +38,7 @@
     "test:api": "nx run-many --target=test --projects=api --with-deps",
     "test:ui": "nx run-many --target=test --projects=ui --with-deps",
     "test:cov": "nx run-many --target=test --all",
-    "typeorm": "cross-env TS_NODE_PROJECT=tsconfig.cli.json node -r ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f ormconfig.ts",
+    "typeorm": "cross-env TS_NODE_PROJECT=./apps/api/tsconfig.app.json node -r ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f ormconfig.ts",
     "update": "nx migrate latest",
     "workspace-generator": "nx workspace-generator"
   },

@@ -4,6 +4,8 @@ export class Initial1603126088900 implements MigrationInterface {
     name = 'Initial1603126088900'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query('SET FOREIGN_KEY_CHECKS = 0');
+
         await queryRunner.query('ALTER TABLE `omcollectionstats` DROP FOREIGN KEY IF EXISTS `FK_collectionstats_coll`');
         await queryRunner.query('ALTER TABLE `omcollcatlink` DROP FOREIGN KEY IF EXISTS `FK_collcatlink_cat`');
         await queryRunner.query('ALTER TABLE `omcollcatlink` DROP FOREIGN KEY IF EXISTS `FK_collcatlink_coll`');
@@ -1221,5 +1223,7 @@ export class Initial1603126088900 implements MigrationInterface {
         await queryRunner.query('ALTER TABLE `omcollcatlink` ADD CONSTRAINT `FK_collcatlink_coll` FOREIGN KEY (`collid`) REFERENCES `omcollections`(`CollID`) ON DELETE CASCADE ON UPDATE CASCADE');
         await queryRunner.query('ALTER TABLE `omcollcatlink` ADD CONSTRAINT `FK_collcatlink_cat` FOREIGN KEY (`ccpk`) REFERENCES `omcollcategories`(`ccpk`) ON DELETE CASCADE ON UPDATE CASCADE');
         await queryRunner.query('ALTER TABLE `omcollectionstats` ADD CONSTRAINT `FK_collectionstats_coll` FOREIGN KEY (`collid`) REFERENCES `omcollections`(`CollID`) ON DELETE RESTRICT ON UPDATE RESTRICT');
+
+        await queryRunner.query('SET FOREIGN_KEY_CHECKS = 1');
     }
 }

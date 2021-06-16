@@ -202,12 +202,11 @@ export class AppConfigService {
      */
     databaseConfiguration(): ConnectionOptions {
         const dbProto = this.databaseProtocol();
-        const migrationsSrcDir = path.join('src', 'database', 'migrations');
+
         let connectionOpts: ConnectionOptions = {
             type: dbProto as any,
             synchronize: false,
             migrate: false,
-            cli: { migrationsDir: migrationsSrcDir },
             logging: this.isDevelopment()
         };
 

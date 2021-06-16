@@ -1,28 +1,30 @@
-import dotenv from 'dotenv';
-import * as path from 'path';
-import * as entities from './libs/api-database/src/entities';
-import * as migrations from './libs/api-database/src/migrations';
 import { ConnectionOptions } from 'typeorm';
+import { NestFactory } from '@nestjs/core';
+import { AppConfigModule, AppConfigService } from './libs/api-config/src';
+import { glob } from 'glob';
+// @ts-ignore
+import path from 'path';
 
-const envFile = path.resolve(process.cwd(), '.env');
-dotenv.config({ path: envFile });
+const API_DATABASE_PLUGIN_DIR = path.join('libs', 'api-database')
+const ENTITIES_DIR = path.join(API_DATABASE_PLUGIN_DIR, 'src', 'entities');
+const MIGRATIONS_DIR = path.join(API_DATABASE_PLUGIN_DIR, 'src', 'migrations');
 
-let uri = `${ process.env.DATABASE_TYPE }://`;
-uri += `${ encodeURIComponent(process.env.DATABASE_USER) }:`;
-uri += `${ encodeURIComponent(process.env.DATABASE_PASSWORD) }@`;
-uri += `${ process.env.DATABASE_HOST }:${ process.env.DATABASE_PORT }/`;
-uri += `${ encodeURIComponent(process.env.DATABASE_NAME) }`;
+async function bootstrap(): Promise<ConnectionOptions> {
+    const app = await NestFactory.createApplicationContext(AppConfigModule);
+    const appConfig = app.get(AppConfigService);
 
-const ormconfig: ConnectionOptions = {
-    type: process.env.DATABASE_TYPE as any,
-    synchronize: false,
-    migrationsRun: false,
-    entities: Object.values(entities),
-    migrations: Object.values(migrations),
-    cli: { 'migrationsDir': './libs/api-database/src/migrations' },
-    logging: false,
-    url: uri
+    const entitiesFiles = glob.sync(path.join(ENTITIES_DIR, "**", "*.entity.ts"));
+    const migrationsFiles = glob.sync(path.join(MIGRATIONS_DIR, "**", "*.ts"));
+
+    return {
+        ...appConfig.databaseConfiguration(),
+        entities: entitiesFiles,
+        migrations: migrationsFiles,
+        cli: {
+            entitiesDir: ENTITIES_DIR,
+            migrationsDir: MIGRATIONS_DIR
+        },
+    };
 }
 
-export default ormconfig;
-module.exports = ormconfig;
+module.exports = bootstrap();

@@ -1,6 +1,7 @@
 import {
     Connection,
-    createConnection, EntityTarget, MigrationInterface,
+    createConnection,
+    EntityTarget,
 } from 'typeorm';
 import { AppConfigService } from '@symbiota2/api-config';
 import {Provider} from '@nestjs/common';
@@ -15,7 +16,6 @@ export const DATABASE_PROVIDER_ID = 'DATABASE_CONNECTION';
  */
 export interface DatabaseProviderOptions {
     entities: Array<string | EntityTarget<any>>;
-    migrations: Array<string | MigrationInterface>;
 }
 
 /**

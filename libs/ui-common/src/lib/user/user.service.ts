@@ -37,7 +37,12 @@ export class UserService {
     /**
      * The currently logged in user
      */
-    public readonly currentUser = this._currentUser.asObservable().pipe(skip(1));
+    public readonly currentUser = this._currentUser.asObservable().pipe(
+        // Skip the first one, it's usually null on initial page load
+        skip(1),
+        // After that, replay the last submitted value to all subscribers
+        shareReplay(1)
+    );
 
     /**
      * Profile data for the currently logged in user
