@@ -22,6 +22,9 @@
       "@symbiota2/ui-plugin-collection": [
         "libs/ui-plugin-collection/src/index.ts"
       ],
+      "@symbiota2/ui-plugin-taxa": [
+        "libs/ui-plugin-taxa/src/index.ts"
+      ],
       "@symbiota2/api-common": ["libs/api-common/src/index.ts"],
       "@symbiota2/api-config": ["libs/api-config/src/index.ts"],
       "@symbiota2/api-database": ["libs/api-database/src/index.ts"],
@@ -31,6 +34,9 @@
       ],
       "@symbiota2/api-plugin-occurrence": [
         "libs/api-plugin-occurrence/src/index.ts"
+      ],
+      "@symbiota2/api-plugin-taxa": [
+        "libs/api-plugin-taxa/src/index.ts"
       ],
       "@symbiota2/api-jobs": ["libs/api-jobs/src/index.ts"],
       "@symbiota2/data-access": ["libs/data-access/src/index.ts"],

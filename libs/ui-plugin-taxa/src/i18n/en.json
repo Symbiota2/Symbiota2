@@ -1,0 +1,14 @@
+{
+  "taxa.taxa_available_permission.admin": "Admin",
+  "taxa.taxa_available_permission.taxa_permissions": "taxa Permissions",
+  "taxa.taxa_available_permission.editor": "Editor",
+  "taxa.taxa_available_permission.rare": "Rare",
+  "taxa.taxa_checkbox_selector.select_all": "Select all",
+  "taxa.taxa_current_permission.admin_for": "Administrator for the following taxa",
+  "taxa.taxa_current_permission.editor_for": "Editor for the following taxa",
+  "taxa.taxa_current_permission.rare_for": "View and map rare species for the following taxa",
+  "taxa.rare_species_reader_available_permission.rare_species_reader": "Can read Rare Species data for all taxa",
+  "taxa.rare_species_reader_current_permission.rare_species_reader": "Can read Rare Species data for all taxa",
+  "taxa.specimen_management_tab": "Specimen Management",
+  "core.layout.header.topnav.search_taxa_link": "Search Taxa"
+}

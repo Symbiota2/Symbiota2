@@ -30,6 +30,7 @@ export class TaxaEnumTreeEntry extends EntityProvider {
     @JoinColumn([{ name: 'tid'}])
     taxon: Promise<Taxon>;
 
+
     @ManyToOne(() => Taxon, (taxa) => taxa.childTaxaEnumEntries, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',

@@ -15,9 +15,9 @@ import {
     ENV_NODE_ENV
 } from './configuration';
 
-import path from 'path';
-import crypto from 'crypto';
-import fs from 'fs';
+import * as path from 'path';
+import * as crypto from 'crypto';
+import * as fs from 'fs';
 
 const fsPromises = fs.promises;
 

@@ -1,0 +1,145 @@
+<div>
+    <h1>Taxon Viewer</h1>
+</div>
+
+<!-- Configure name list -->
+<div class="expansion-panel">
+    <symbiota2-expansion-panel label='Configure Name List'>
+        <mat-radio-group
+            aria-labelledby="configure-radio-group-label"
+            class="configure-radio-group"
+            (change)='configureChangeAction()'
+            [(ngModel)]="kindOfName">
+            <mat-radio-button value="Scientific">Use scientific names</mat-radio-button>&nbsp;&nbsp;
+            <mat-radio-button value="Common">Use common names</mat-radio-button>
+            <!-- <div>Using {{kindOfName}} names</div> -->
+            <div *ngIf='kindOfName == "Scientific"'>
+
+                <br/>
+                <br/>
+                <mat-checkbox class="example-margin" [checked]='hasAuthors' (change)='loadScientificNames()'>Include authors</mat-checkbox>
+
+                <br/>
+                <br/>
+                <mat-form-field appearance="fill">
+                    <mat-label>Narrow taxa authority</mat-label>
+                    <mat-select field-class="symbiota2-field-class"
+                                placeholder="Choose Taxonomic Authority"
+                                [(value)]="taxonomicAuthorityID"
+                                (selectionChange)="authorityChangeAction()">
+                        <mat-option *ngFor="let authority of taxonomicAuthorityList"
+                                    [value]="authority.id" >{{ authority.name }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!--
+                <br/>
+                <br/>
+                <mat-form-field appearance="fill">
+                    <mat-label>Narrow kingdom</mat-label>
+                    <mat-select >
+                        <mat-option value="option1">Option 1</mat-option>
+                        <mat-option value="option2">Option 2</mat-option>
+                        <mat-option value="option3">Option 3</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                -->
+
+            </div>
+
+            <div *ngIf='kindOfName == "Common"'>
+                <br/>
+                <br/>
+                <mat-form-field appearance="fill">
+                <mat-label>Choose Language</mat-label>
+                <mat-select field-class="symbiota2-field-class"
+                            placeholder="Choose Vernacular Language"
+                            [(value)]="language"
+                            (selectionChange)="languageChangeAction(language)">
+                    <mat-option *ngFor="let lang of languageList"
+                                [value]="lang" >{{ lang }}</mat-option>
+                </mat-select>
+                </mat-form-field>
+            </div>
+        </mat-radio-group>
+    </symbiota2-expansion-panel>
+</div>
+
+<!-- Taxonomy -->
+<div class="expansion-panel">
+    <symbiota2-expansion-panel label='View Taxonomy'>
+            <form class="name-autocomplete-form" (ngSubmit)="onSubmit()">
+                <mat-form-field class="name-autocomplete-full-width">
+                    <mat-label>{{kindOfName}} name</mat-label>
+                    <input type="text"
+                           placeholder="{{kindOfName}} Name"
+                           aria-label="String"
+                           matInput
+                           [formControl]="nameControl"
+                           [matAutocomplete]="auto">
+                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                            {{option}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+                <button class="button" type="submit">View Taxonomy</button>
+            </form>
+
+        <mat-tree #tree [dataSource]="dataSource" [treeControl]="treeControl" class="example-tree">
+            <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
+                <li class="mat-tree-node">
+                    <!-- <button mat-icon-button disabled></button> -->
+                    <button *ngIf='isNotExpanded(node)' mat-icon-button matTreeNodeToggle
+                            [attr.aria-label]="'toggle ' + node.name"
+                            (click)="loadChildren(node)">
+                        <mat-icon class="mat-icon-rtl-mirror">
+                            {{treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right'}}
+                        </mat-icon>
+                    </button>
+                    {{node.name}}
+                </li>
+            </mat-tree-node>
+
+            <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
+                <li>
+                    <div *ngIf='isSynonym(node)' class="mat-tree-node">
+                        [{{node.name}}]
+                    </div>
+                    <div *ngIf='!isSynonym(node)' class="mat-tree-node">
+                        {{node.name}}
+                    </div>
+                    <ul >
+                        <ng-container matTreeNodeOutlet></ng-container>
+                    </ul>
+                </li>
+            </mat-nested-tree-node>
+
+            <!--
+            <mat-nested-tree-node matTreeNodePadding [matTreeNodePaddingIndent]="10" *matTreeNodeDef="let node; when: hasNestedChild">
+                <li>
+                    <div class="mat-tree-node">
+                        <button mat-icon-button matTreeNodeToggle
+                                [attr.aria-label]="'toggle ' + node.name">
+                            <mat-icon class="mat-icon-rtl-mirror">
+                                {{treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right'}}
+                            </mat-icon>
+                        </button>
+                        {{node.name}}
+                    </div>
+                    <ul >
+                        <ng-container matTreeNodeOutlet></ng-container>
+                    </ul>
+                </li>
+            </mat-nested-tree-node>
+            -->
+        </mat-tree>
+    </symbiota2-expansion-panel>
+ </div>
+
+<div [ngSwitch]="currentPage">
+
+
+
+</div>
+

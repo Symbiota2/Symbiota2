@@ -1,0 +1,62 @@
+#buttons {
+    margin-top: 1rem;
+
+    button {
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+
+    button:first-child {
+        margin-left: 0;
+    }
+}
+
+.expansion-panel {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.example-tree-invisible {
+    display: none;
+}
+
+.mat-tree-node {
+    min-height: 10px;
+    height: 17px;
+}
+
+.mat-icon {
+    width: 0px;
+}
+.example-tree ul,
+.example-tree li {
+    margin-top: 0;
+    margin-bottom: 0;
+    list-style-type: none;
+    padding-left: 7px;
+}
+
+.name-autocomplete-form {
+    min-width: 150px;
+    max-width: 500px;
+    width: 100%;
+}
+
+.name-autocomplete-full-width {
+    width: 100%;
+}
+
+.symbiota2-panel-class {
+    width:20px;
+    max-width:20px;
+    font-size: 10px;
+}
+
+.mat-icon-button {
+    padding: 0;
+    min-width: 0;
+    width: 40px;
+    height: 25px;
+    flex-shrink: 0;
+    line-height: 10px;
+}

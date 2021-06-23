@@ -4,14 +4,16 @@ import { UserModule, AuthModule } from '@symbiota2/api-auth';
 import { ApiPluginModule } from '@symbiota2/api-common';
 import { OccurrenceModule } from '@symbiota2/api-plugin-occurrence';
 import { CollectionModule } from '@symbiota2/api-plugin-collection';
-import { ApiJobsModule } from '@symbiota2/api-jobs';
-import { GeographyModule } from '@symbiota2/api-plugin-geography';
+import { ApiJobsModule } from '@symbiota2/api-jobs'
+import { TaxonModule } from '@symbiota2/api-plugin-taxa'
+import {GeographyModule} from '@symbiota2/api-plugin-geography'
 
 const ENABLED_PLUGINS = [
     ApiJobsModule,
     CollectionModule,
     OccurrenceModule,
     GeographyModule,
+    TaxonModule
 ];
 
 /**

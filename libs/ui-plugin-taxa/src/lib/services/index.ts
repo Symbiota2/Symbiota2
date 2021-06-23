@@ -1,0 +1,5 @@
+export * from './taxon/taxon.service'
+export * from './taxonomicEnumTree/taxonomic.enumtree.service'
+export * from './taxonomicStatus/taxonomic.status.service'
+export * from './taxonVernacular/taxonVernacular.service'
+export * from './taxonomicAuthority/taxonomicAuthority.service'

@@ -266,6 +266,43 @@
         }
       }
     },
+    "ui-plugin-taxa": {
+      "projectType": "library",
+      "root": "libs/ui-plugin-taxa",
+      "sourceRoot": "libs/ui-plugin-taxa/src",
+      "prefix": "symbiota2",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/angular:package",
+          "options": {
+            "tsConfig": "libs/ui-plugin-occurrence/tsconfig.lib.json",
+            "project": "libs/ui-plugin-occurrence/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "libs/ui-plugin-occurrence/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/ui-plugin-occurrence/src/**/*.ts",
+              "libs/ui-plugin-occurrence/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/ui-plugin-occurrence"],
+          "options": {
+            "jestConfig": "libs/ui-plugin-occurrence/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "ui-plugin-collection": {
       "projectType": "library",
       "root": "libs/ui-plugin-collection",
@@ -501,6 +538,38 @@
             "assets": [
               "libs/api-plugin-collection/*.md"
             ]
+          }
+        }
+      }
+    },
+    "api-plugin-taxa": {
+      "root": "libs/api-plugin-taxa",
+      "sourceRoot": "libs/api-plugin-taxa/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/api-plugin-taxa/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/api-plugin-taxa"],
+          "options": {
+            "jestConfig": "libs/api-plugin-taxa/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "executor": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/api-plugin-taxa",
+            "tsConfig": "libs/api-plugin-taxa/tsconfig.lib.json",
+            "packageJson": "libs/api-plugin-taxa/package.json",
+            "main": "libs/api-plugin-taxa/src/index.ts",
+            "assets": ["libs/api-plugin-taxa/*.md"]
           }
         }
       }
