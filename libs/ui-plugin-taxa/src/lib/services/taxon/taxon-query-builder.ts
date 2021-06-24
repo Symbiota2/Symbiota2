@@ -88,7 +88,11 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
     build(): string {
         //this.url = new URL(`${this.url.pathname}/scientificNames`)
         //this.url = this.namesUrl
-        return super.build();
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
+        }
+
+        return super.build()
     }
 }
 

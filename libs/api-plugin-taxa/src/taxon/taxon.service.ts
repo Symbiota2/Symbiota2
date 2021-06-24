@@ -3,6 +3,7 @@ import { Taxon } from '@symbiota2/api-database'
 import { In, Repository } from 'typeorm'
 import { TaxonFindAllParams } from './dto/taxon-find-all.input.dto'
 import { BaseService } from '@symbiota2/api-common'
+import { TaxonFindNamesParams } from './dto/taxon-find-names.input.dto';
 
 @Injectable()
 export class TaxonService extends BaseService<Taxon>{
@@ -45,8 +46,8 @@ export class TaxonService extends BaseService<Taxon>{
     /*
     Project the author and sciname from the taxa table using possibly a list of taxaIDs and an authority ID
      */
-    async findAllScientificNamesPlusAuthors(params?: TaxonFindAllParams): Promise<Taxon[]> {
-        const { limit, offset, ...qParams } = params
+    async findAllScientificNamesPlusAuthors(params?: TaxonFindNamesParams): Promise<Taxon[]> {
+        const { ...qParams } = params
         if (qParams.taxonAuthorityID) {
             const qb = this.myRepository.createQueryBuilder('o')
                 .select([
@@ -64,22 +65,19 @@ export class TaxonService extends BaseService<Taxon>{
             return (qParams.id)?
                 await this.myRepository.find({
                     select: ["scientificName", "author"],
-                    take: limit,
-                    skip: offset,
                     where: { id: In(params.id) }})
                 : await this.myRepository.find({
-                    select: ["scientificName", "author"],
-                    take: limit,
-                    skip: offset })
+                    select: ["scientificName", "author"]
+                })
         }
     }
 
     /*
     Project the sciname from the taxa table using possibly a list of taxaIDs and an authority ID
      */
-    async findAllScientificNames(params?: TaxonFindAllParams): Promise<Taxon[]> {
+    async findAllScientificNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         //console.log("Taxon service: finding scientific names")
-        const { limit, offset, ...qParams } = params
+        const { ...qParams } = params
 
         if (qParams.taxonAuthorityID) {
             const qb = this.myRepository.createQueryBuilder('o')
@@ -97,53 +95,18 @@ export class TaxonService extends BaseService<Taxon>{
             return (qParams.id)?
                 await this.myRepository.find({
                     select: ["scientificName"],
-                    take: limit,
-                    skip: offset,
                     where: { id: In(params.id) }})
                 : await this.myRepository.find({
-                    select: ["scientificName"],
-                    take: limit,
-                    skip: offset })
-        }
-            /*
-            return (qParams.id)?
-                await this.myRepository.find({
-                    relations: ["taxonStatuses"],
-                    select: ["scientificName"],
-                    take: limit,
-                    skip: offset,
-                    where: { taxonStatuses: {taxonAuthorityID: params.taxonAuthorityID }, id: In(params.id) }})
-                : await this.myRepository.find({
-                    relations: ["taxonStatuses"],
-                    select: ["scientificName"],
-                    where: { taxonStatuses: {id: 3 }}
-                    //take: limit,
-                    //skip: offset
-                    //where: { taxonStatuses: {taxonAuthorityID: params.taxonAuthorityID} }
-                    //where: { 'Taxon__taxonStatuses.taxauthid': params.taxonAuthorityID }
+                    select: ["scientificName"]
                 })
-        } else {
-            return (qParams.id)?
-                await this.myRepository.find({
-                    select: ["scientificName"],
-                    take: limit,
-                    skip: offset,
-                    where: { id: In(params.id) }})
-                : await this.myRepository.find({
-                    select: ["scientificName"],
-                    take: limit,
-                    skip: offset })
         }
-
-             */
     }
 
     /*
     Find all of the taxons that have a particular scientific name.
      */
-    async findByScientificName(sciname: string, params?: TaxonFindAllParams): Promise<Taxon[]> {
-        // const { limit, offset, ...qParams } = params;
-        const { limit, offset, ...qParams } = params
+    async findByScientificName(sciname: string, params?: TaxonFindNamesParams): Promise<Taxon[]> {
+        const { ...qParams } = params
         if (qParams.taxonAuthorityID) {
             // Have to use the query builder since where filter on nested relations does not work
             const qb = this.myRepository.createQueryBuilder('o')

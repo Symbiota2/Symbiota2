@@ -40,6 +40,7 @@ export class TaxonService {
     }
 
     findAllScientificNames(authorityID?): Observable<string[]> {
+        console.log("authorityid is " + authorityID)
         const url = this.createQueryBuilder()
             .authorityID(authorityID)
             .findAllScientificNames()

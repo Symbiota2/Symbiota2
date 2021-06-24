@@ -31,7 +31,7 @@ interface TaxonNode {
 
 export class TaxaViewerPageComponent implements OnInit {
     nameControl = new FormControl()
-    options: string[] = ['One', 'Two', 'Three']
+    nameOptions: string[]
     hasAuthors = false
     language = "none"
     kindOfName = "Scientific"
@@ -120,7 +120,7 @@ export class TaxaViewerPageComponent implements OnInit {
     private _filter(value: string): string[] {
         const filterValue = value.toLowerCase();
 
-        return this.options.filter(
+        return this.nameOptions.filter(
             (option) => option.toLowerCase().indexOf(filterValue) === 0
         );
     }
@@ -149,16 +149,16 @@ export class TaxaViewerPageComponent implements OnInit {
     public loadCommonNames() {
         const language = this.language
         this.nameControl.setValue("")
-        this.options = []
+        this.nameOptions = []
 
         // If the language is not set, load all of the common names
         if (this.language == "none") {
             this.taxonVernacularService.findAllCommonNames().subscribe((names) => {
-                this.options = names
+                this.nameOptions = names
             })
         } else {
             this.taxonVernacularService.findAllCommonNamesByLanguage(language).subscribe((names) => {
-                this.options = names
+                this.nameOptions = names
             })
         }
 
@@ -167,25 +167,22 @@ export class TaxaViewerPageComponent implements OnInit {
 
     // Load all of the desired Scientific names into a list
     public loadScientificNames() {
-        const findParams = {
-            //taxonIDs: this.taxonIDs
-        }
-
-        this.hasAuthors = !this.hasAuthors
+        //this.hasAuthors = !this.hasAuthors
         this.nameControl.setValue("")
-        this.options = []
+        this.nameOptions= []
         if (this.hasAuthors) {
             console.log("has authors")
             this.taxaService.findAllScientificNamesPlusAuthors(this.taxonomicAuthorityID).subscribe((names) => {
-                this.options = names
+                this.nameOptions = names
             })
         } else {
             console.log(" no authors")
             this.taxaService.findAllScientificNames(this.taxonomicAuthorityID).subscribe((names) => {
-                this.options = names
+                this.nameOptions = names
             })
         }
 
+        console.log("options size is " + this.nameOptions.length)
     }
 
     hasNestedChild = (_: number, nodeData: TaxonNode) =>

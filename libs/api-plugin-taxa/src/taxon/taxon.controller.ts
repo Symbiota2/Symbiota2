@@ -6,7 +6,7 @@ import {
 } from './dto/TaxonDto';
 import { TaxonFindAllParams } from './dto/taxon-find-all.input.dto';
 import { TaxonNamesDto } from './dto/Taxon.names.dto';
-import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
+import { TaxonFindNamesParams } from './dto/taxon-find-names.input.dto';
 
 @ApiTags('Taxon')
 @Controller('taxon')
@@ -35,8 +35,8 @@ export class TaxonController {
     @ApiOperation({
         summary: "Retrieve a list of scientific names.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
-    async findAllScientificNames(@Query() findAllParams: TaxonFindAllParams): Promise<string[]> {
-        const taxons = await this.taxons.findAllScientificNames(findAllParams)
+    async findAllScientificNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<string[]> {
+        const taxons = await this.taxons.findAllScientificNames(findNamesParams)
         const names = taxons.map(async (c) => {
             return c.scientificName
         });
@@ -49,8 +49,8 @@ export class TaxonController {
     @ApiOperation({
         summary: "Retrieve a list of scientific names and authors.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
-    async findAllScientificNamesPlusAuthors(@Query() findAllParams: TaxonFindAllParams): Promise<string[]> {
-        const taxons = await this.taxons.findAllScientificNamesPlusAuthors(findAllParams)
+    async findAllScientificNamesPlusAuthors(@Query() findNamesParams: TaxonFindNamesParams): Promise<string[]> {
+        const taxons = await this.taxons.findAllScientificNamesPlusAuthors(findNamesParams)
         const names = taxons.map(async (c) => {
             return c.scientificName + (c.author? " - " + c.author : "")
         });
@@ -63,8 +63,8 @@ export class TaxonController {
     @ApiOperation({
         summary: "Retrieve a scientific name."
     })
-    async findByScientificName(@Param('scientificName') sciname: string, @Query() findAllParams: TaxonFindAllParams): Promise<TaxonDto> {
-        const taxons = await this.taxons.findByScientificName(sciname, findAllParams)
+    async findByScientificName(@Param('scientificName') sciname: string, @Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonDto> {
+        const taxons = await this.taxons.findByScientificName(sciname, findNamesParams)
         const dto = new TaxonDto(taxons[0])
         return dto
     }
