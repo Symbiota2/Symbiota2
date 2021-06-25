@@ -22,10 +22,14 @@ export class TaxonomicEnumTreeService {
         return new TaxonomicEnumTreeQueryBuilder(this.appConfig.apiUri());
     }
 
-    findAncestors(tid: number): Observable<TaxonomicEnumTreeListItem[]> {
+    /*
+    Find all of the ancestors for a given taxon id and taxa authorityid
+    */
+    findAncestors(tid: number, authorityID: number): Observable<TaxonomicEnumTreeListItem[]> {
         const url = this.createQueryBuilder()
             .findAncestors()
             .taxonID(tid)
+            .authorityID(authorityID)
             .build()
 
         const query = this.apiClient.queryBuilder(url).get().build();
@@ -37,10 +41,14 @@ export class TaxonomicEnumTreeService {
             )
     }
 
-    findAncestorTaxons(tid: number): Observable<TaxonListItem[]> {
+    /*
+    Find all of the ancestors for a given taxon id and taxa authorityid as taxon records
+     */
+    findAncestorTaxons(tid: number, authorityID: number): Observable<TaxonListItem[]> {
         const url = this.createQueryBuilder()
             .findAncestorTaxons()
             .taxonID(tid)
+            .authorityID(authorityID)
             .build()
 
         const query = this.apiClient.queryBuilder(url).get().build();
@@ -52,6 +60,9 @@ export class TaxonomicEnumTreeService {
             )
     }
 
+    /*
+    Find all of the taxa enum records (the API service has a default taxa authority)
+     */
     findAll(params?: FindParams): Observable<TaxonomicEnumTreeListItem[]> {
         const url = this.createQueryBuilder()
             .findAll()
@@ -66,10 +77,14 @@ export class TaxonomicEnumTreeService {
             );
     }
 
-    findByID(id: number): Observable<TaxonomicEnumTreeListItem> {
+    /*
+    Find a given taxon enum record, using a taxon id and a taxa authority id
+     */
+    findByID(id: number, authorityID: number): Observable<TaxonomicEnumTreeListItem> {
         const url = this.createQueryBuilder()
             .findOne()
             .id(id)
+            .authorityID(authorityID)
             .build();
 
         const query = this.apiClient.queryBuilder(url).get().build()

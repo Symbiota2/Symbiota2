@@ -12,25 +12,24 @@
             [(ngModel)]="kindOfName">
             <mat-radio-button value="Scientific">Use scientific names</mat-radio-button>&nbsp;&nbsp;
             <mat-radio-button value="Common">Use common names</mat-radio-button>
+
+            <div>
+            <mat-form-field appearance="fill">
+                <mat-label>Narrow taxa authority</mat-label>
+                <mat-select field-class="symbiota2-field-class"
+                            placeholder="Choose Taxonomic Authority"
+                            [(value)]="taxonomicAuthorityID"
+                            (selectionChange)="authorityChangeAction()">
+                    <mat-option *ngFor="let authority of taxonomicAuthorityList"
+                                [value]="authority.id" >{{ authority.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            </div>
+
             <!-- <div>Using {{kindOfName}} names</div> -->
             <div *ngIf='kindOfName == "Scientific"'>
+                <mat-checkbox class="example-margin" [(ngModel)]='hasAuthors' (change)='loadScientificNames()'>Include authors</mat-checkbox>
 
-                <br/>
-                <br/>
-                <mat-checkbox class="example-margin" [checked]='hasAuthors' (change)='loadScientificNames()'>Include authors</mat-checkbox>
-
-                <br/>
-                <br/>
-                <mat-form-field appearance="fill">
-                    <mat-label>Narrow taxa authority</mat-label>
-                    <mat-select field-class="symbiota2-field-class"
-                                placeholder="Choose Taxonomic Authority"
-                                [(value)]="taxonomicAuthorityID"
-                                (selectionChange)="authorityChangeAction()">
-                        <mat-option *ngFor="let authority of taxonomicAuthorityList"
-                                    [value]="authority.id" >{{ authority.name }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
 
                 <!--
                 <br/>
@@ -48,8 +47,6 @@
             </div>
 
             <div *ngIf='kindOfName == "Common"'>
-                <br/>
-                <br/>
                 <mat-form-field appearance="fill">
                 <mat-label>Choose Language</mat-label>
                 <mat-select field-class="symbiota2-field-class"

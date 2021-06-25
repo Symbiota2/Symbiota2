@@ -34,8 +34,8 @@ export class TaxonomicEnumTreeController {
     @ApiOperation({
         summary: "Retrieve all of the ancestor taxons for a given taxon ID."
     })
-    async findAncestorTaxons(@Param('taxonID') taxonid: string): Promise<TaxonDto[]> {
-        const taxons = await this.myService.findAncestors(taxonid)
+    async findAncestorTaxons(@Param('taxonID') taxonid: string, @Query() findAllParams: TaxonomicEnumTreeFindAllParams): Promise<TaxonDto[]> {
+        const taxons = await this.myService.findAncestors(taxonid, findAllParams)
         const taxonDtos = taxons.map(async (c) => {
             const parentTaxon = await c.parentTaxon
             const taxon = new TaxonomicEnumTreeDto(c)

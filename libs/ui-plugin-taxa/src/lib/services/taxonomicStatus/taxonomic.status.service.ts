@@ -39,22 +39,6 @@ export class TaxonomicStatusService {
             )
     }
 
-
-
-    /*
-    findChildren(tid: number): Observable<TaxonomicStatusListItem> {
-        const url = this.createQueryBuilder()
-            .findChildren()
-            .taxonID(tid)
-            .build()
-
-        const query = this.apiClient.queryBuilder(url).get().build();
-        return this.apiClient.send<any, Record<string, unknown>>(query)
-            .pipe(map((o) => TaxonomicStatusListItem.fromJSON(o)))
-    }
-
-     */
-
     findAll(params?: FindParams): Observable<TaxonomicStatusListItem[]> {
         const url = this.createQueryBuilder()
             .taxonomicAuthorityID(params? params.taxonomicAuthorityID : null)

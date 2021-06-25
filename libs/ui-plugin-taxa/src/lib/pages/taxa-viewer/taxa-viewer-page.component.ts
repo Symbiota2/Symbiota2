@@ -140,7 +140,7 @@ export class TaxaViewerPageComponent implements OnInit {
 
     // Load the languages for vernacular names
     public loadVernacularLanguages() {
-        this.taxonVernacularService.findAllLanguages().subscribe((language) => {
+        this.taxonVernacularService.findAllLanguages(this.taxonomicAuthorityID).subscribe((language) => {
             this.languageList = language
         })
     }
@@ -153,11 +153,11 @@ export class TaxaViewerPageComponent implements OnInit {
 
         // If the language is not set, load all of the common names
         if (this.language == "none") {
-            this.taxonVernacularService.findAllCommonNames().subscribe((names) => {
+            this.taxonVernacularService.findAllCommonNames(this.taxonomicAuthorityID).subscribe((names) => {
                 this.nameOptions = names
             })
         } else {
-            this.taxonVernacularService.findAllCommonNamesByLanguage(language).subscribe((names) => {
+            this.taxonVernacularService.findAllCommonNamesByLanguage(language, this.taxonomicAuthorityID).subscribe((names) => {
                 this.nameOptions = names
             })
         }
@@ -167,7 +167,6 @@ export class TaxaViewerPageComponent implements OnInit {
 
     // Load all of the desired Scientific names into a list
     public loadScientificNames() {
-        //this.hasAuthors = !this.hasAuthors
         this.nameControl.setValue("")
         this.nameOptions= []
         if (this.hasAuthors) {
@@ -321,7 +320,7 @@ export class TaxaViewerPageComponent implements OnInit {
 
         // Find the ancestors
         this.taxonomicEnumTreeService
-            .findAncestorTaxons(taxonid)
+            .findAncestorTaxons(taxonid, this.taxonomicAuthorityID)
             .subscribe((ancTaxa) => {
                 const newTree = ancTaxa
                     .sort(function (a, b) {
@@ -354,7 +353,7 @@ export class TaxaViewerPageComponent implements OnInit {
         this.isLoading = true;
 
         // Look up the common name first
-        this.taxonVernacularService.findCommonName(name).subscribe((taxon) => {
+        this.taxonVernacularService.findCommonName(name, this.taxonomicAuthorityID).subscribe((taxon) => {
             //this.taxon = taxon
 
             const tid = taxon.taxonID

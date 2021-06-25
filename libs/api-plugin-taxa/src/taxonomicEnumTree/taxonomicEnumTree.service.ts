@@ -20,19 +20,33 @@ export class TaxonomicEnumTreeService extends BaseService<TaxonomicEnumTreeDto>{
     async findAll(params?: TaxonomicEnumTreeFindAllParams): Promise<TaxonomicEnumTreeDto[]> {
         const { limit, offset, ...qParams } = params
 
+        console.log("taxaenum service " + qParams.taxonAuthorityID)
         if (qParams.taxonAuthorityID) {
             return (qParams.taxonID) ?
                 await this.taxonomicEnumTrees.find({
                     relations: ["parentTaxon", "taxon"],
                     take: limit,
                     skip: offset,
-                    where: { taxonAuthorityID: params.taxonAuthorityID }
+                    where: { taxonAuthorityID: params.taxonAuthorityID, taxonID: In(params.taxonID) }
                 })
                 : await this.taxonomicEnumTrees.find({
                     relations: ["parentTaxon", "taxon"],
                     take: limit,
                     skip: offset,
-                    where: { taxonAuthorityID: params.taxonAuthorityID, taxonID: In(params.taxonID) }
+                    where: { taxonAuthorityID: params.taxonAuthorityID }
+                })
+        } else {
+            return (qParams.taxonID) ?
+                await this.taxonomicEnumTrees.find({
+                    relations: ["parentTaxon", "taxon"],
+                    take: limit,
+                    skip: offset,
+                    where: { taxonID: In(params.taxonID) }
+                })
+                : await this.taxonomicEnumTrees.find({
+                    relations: ["parentTaxon", "taxon"],
+                    take: limit,
+                    skip: offset
                 })
         }
     }

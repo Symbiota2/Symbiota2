@@ -1,4 +1,4 @@
-import { Q_PARAM_TAXAIDS } from '../../../constants';
+import { Q_PARAM_AUTHORITYID, Q_PARAM_TAXAIDS } from '../../../constants';
 
 export class TaxonVernacularQueryBuilder {
     protected baseUrl: string
@@ -42,6 +42,7 @@ export class TaxonVernacularQueryBuilder {
 
 class FindCommonNameBuilder extends TaxonVernacularQueryBuilder {
     protected _commonName: string = null
+    protected _authorityID: number
 
     constructor(apiBaseUrl: string, name: string) {
         super(apiBaseUrl)
@@ -49,27 +50,45 @@ class FindCommonNameBuilder extends TaxonVernacularQueryBuilder {
         this.url = new URL(`${apiBaseUrl}/taxonVernacular/commonName/${name}`)
     }
 
+    authorityID(authorityID: number): FindCommonNameBuilder {
+        this._authorityID = authorityID
+        return this
+    }
+
     build(): string {
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
         return super.build()
     }
 }
 
 
 class FindOneBuilder extends TaxonVernacularQueryBuilder {
-    protected taxonID: number = null
+    protected _taxonID: number = null
+    protected _authorityID: number
 
     id(id: number): FindOneBuilder {
-        this.taxonID = id
+        this._taxonID = id
+        return this
+    }
+
+    authorityID(authorityID: number): FindOneBuilder {
+        this._authorityID = authorityID
         return this
     }
 
     build(): string {
-        this.url.pathname = `${this.url.pathname}/${this.taxonID}`;
+        this.url.pathname = `${this.url.pathname}/${this._taxonID}`
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
         return super.build()
     }
 }
 
 class FindAllLanguagesBuilder extends TaxonVernacularQueryBuilder {
+    protected _authorityID: number
 
     constructor(apiBaseUrl: string) {
         super(apiBaseUrl)
@@ -77,12 +96,21 @@ class FindAllLanguagesBuilder extends TaxonVernacularQueryBuilder {
         this.url = new URL(`${apiBaseUrl}/taxonVernacular/languages`)
     }
 
+    authorityID(authorityID: number): FindAllLanguagesBuilder {
+        this._authorityID = authorityID
+        return this
+    }
+
     build(): string {
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
         return super.build();
     }
 }
 
 class FindAllCommonNamesByLanguageBuilder extends TaxonVernacularQueryBuilder {
+    protected _authorityID: number
 
     constructor(apiBaseUrl: string, language: string) {
         super(apiBaseUrl)
@@ -90,12 +118,21 @@ class FindAllCommonNamesByLanguageBuilder extends TaxonVernacularQueryBuilder {
         this.url = new URL(`${apiBaseUrl}/taxonVernacular/commonNamesByLanguage/${language}`)
     }
 
+    authorityID(authorityID: number): FindAllCommonNamesByLanguageBuilder {
+        this._authorityID = authorityID
+        return this
+    }
+
     build(): string {
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
         return super.build();
     }
 }
 
 class FindAllCommonNamesBuilder extends TaxonVernacularQueryBuilder {
+    protected _authorityID: number
 
     constructor(apiBaseUrl: string) {
         super(apiBaseUrl)
@@ -103,16 +140,30 @@ class FindAllCommonNamesBuilder extends TaxonVernacularQueryBuilder {
         this.url = new URL(`${apiBaseUrl}/taxonVernacular/commonNames`)
     }
 
+    authorityID(authorityID: number): FindAllCommonNamesBuilder {
+        this._authorityID = authorityID
+        return this
+    }
+
     build(): string {
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
         return super.build();
     }
 }
 
 class FindAllBuilder extends TaxonVernacularQueryBuilder {
-    protected _taxonIDs: number[] = [];
+    protected _taxonIDs: number[] = []
+    protected _authorityID: number
 
     taxonIDs(ids: number[]): FindAllBuilder {
         this._taxonIDs = ids
+        return this
+    }
+
+    authorityID(authorityID: number): FindAllBuilder {
+        this._authorityID = authorityID
         return this
     }
 
@@ -120,7 +171,9 @@ class FindAllBuilder extends TaxonVernacularQueryBuilder {
         this._taxonIDs.forEach((id) => {
             this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString());
         })
-
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
         return super.build();
     }
 }

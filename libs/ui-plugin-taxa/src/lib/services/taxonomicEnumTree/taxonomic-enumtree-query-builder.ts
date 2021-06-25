@@ -1,4 +1,4 @@
-import { Q_PARAM_TAXAIDS } from '../../../constants';
+import { Q_PARAM_TAXAIDS, Q_PARAM_AUTHORITYID } from '../../../constants';
 
 export class TaxonomicEnumTreeQueryBuilder {
     protected baseUrl: string
@@ -32,28 +32,42 @@ export class TaxonomicEnumTreeQueryBuilder {
     }
 }
 
-
 class FindOneBuilder extends TaxonomicEnumTreeQueryBuilder {
-    protected taxonID: number = null
+    protected _taxonID: number = null
+    protected _authorityID: number
 
     id(id: number): FindOneBuilder {
-        this.taxonID = id
+        this._taxonID = id
+        return this
+    }
+
+    authorityID(authorityID: number): FindOneBuilder {
+        this._authorityID = authorityID
         return this
     }
 
     build(): string {
-        this.url.pathname = `${this.url.pathname}/${this.taxonID}`;
+        this.url.pathname = `${this.url.pathname}/${this._taxonID}`
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
         return super.build()
     }
 }
 
 class FindAncestorsBuilder extends TaxonomicEnumTreeQueryBuilder {
     protected _taxonID: number = null
+    protected _authorityID: number
 
     constructor(apiBaseUrl: string) {
         super(apiBaseUrl)
         this.baseUrl = apiBaseUrl
         this.url = new URL(`${apiBaseUrl}/taxonomicEnumTree/ancestors`)
+    }
+
+    authorityID(authorityID: number): FindAncestorsBuilder {
+        this._authorityID = authorityID
+        return this
     }
 
     taxonID(id: number): FindAncestorsBuilder {
@@ -63,17 +77,27 @@ class FindAncestorsBuilder extends TaxonomicEnumTreeQueryBuilder {
     }
 
     build(): string {
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
+
         return super.build();
     }
 }
 
 class FindAncestorTaxonsBuilder extends TaxonomicEnumTreeQueryBuilder {
     protected _taxonID: number = null
+    protected _authorityID: number
 
     constructor(apiBaseUrl: string) {
         super(apiBaseUrl)
         this.baseUrl = apiBaseUrl
         this.url = new URL(`${apiBaseUrl}/taxonomicEnumTree/ancestorTaxons`)
+    }
+
+    authorityID(authorityID: number): FindAncestorTaxonsBuilder {
+        this._authorityID = authorityID
+        return this
     }
 
     taxonID(id: number): FindAncestorTaxonsBuilder {
@@ -83,23 +107,36 @@ class FindAncestorTaxonsBuilder extends TaxonomicEnumTreeQueryBuilder {
     }
 
     build(): string {
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
+
         return super.build();
     }
 }
 
 class FindAllBuilder extends TaxonomicEnumTreeQueryBuilder {
-    protected _taxonIDs: number[] = [];
+    protected _taxonIDs: number[] = []
+    protected _authorityID: number
 
     taxonIDs(ids: number[]): FindAllBuilder {
         this._taxonIDs = ids
         return this
     }
 
+    authorityID(authorityID: number): FindAllBuilder {
+        this._authorityID = authorityID
+        return this
+    }
+
     build(): string {
         this._taxonIDs.forEach((id) => {
-            this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString());
+            this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString())
         })
 
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
         return super.build();
     }
 }

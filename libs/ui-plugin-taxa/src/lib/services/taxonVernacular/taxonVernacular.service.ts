@@ -27,55 +27,47 @@ export class TaxonVernacularService {
         return this.apiClient.apiRoot()
     }
 
-    /*
-    findCommonName(name): Observable<TaxonListItem> {
-        const url = this.createQueryBuilder()
-            .findScientificName()
-            .scientificName(sciname)
-            .build()
-        const query = this.apiClient.queryBuilder(url).get().build()
-        return this.apiClient.send<any, Record<string, unknown>>(query)
-            .pipe(map((o) => Taxon.fromJSON(o)))
-    }
-
-     */
-
-    findCommonName(name: string): Observable<TaxonVernacularListItem> {
+    findCommonName(name: string, authorityID?: number): Observable<TaxonVernacularListItem> {
         const url = this.createQueryBuilder()
             .findCommonName(name)
+            .authorityID(authorityID)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, TaxonVernacularListItem>(query)
     }
 
-    findAllCommonNamesByLanguage(language: string): Observable<string[]> {
+    findAllCommonNamesByLanguage(language: string, authorityID?: number): Observable<string[]> {
         const url = this.createQueryBuilder()
             .findAllCommonNamesByLanguage(language)
+            .authorityID(authorityID)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)
     }
 
-    findAllCommonNames(): Observable<string[]> {
+    findAllCommonNames(authorityID?: number): Observable<string[]> {
         const url = this.createQueryBuilder()
             .findAllCommonNames()
+            .authorityID(authorityID)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)
     }
 
-    findAllLanguages(): Observable<string[]> {
+    findAllLanguages(authorityID?: number): Observable<string[]> {
         const url = this.createQueryBuilder()
             .findAllLanguages()
+            .authorityID(authorityID)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)
     }
 
-    findAll(params?: FindAllParams): Observable<TaxonVernacularListItem[]> {
+    findAll(authorityID?: number, params?: FindAllParams): Observable<TaxonVernacularListItem[]> {
         const url = this.createQueryBuilder()
             .findAll()
             .taxonIDs(params.taxonIDs)
+            .authorityID(authorityID)
             .build();
 
         const query = this.apiClient.queryBuilder(url).get().build();

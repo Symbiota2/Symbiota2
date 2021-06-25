@@ -22,16 +22,6 @@ export class TaxonomicEnumTreeFindAllParams extends BaseFindAllParams {
     @IsOptional()
     taxonID: number[]
 
-
-    /*
-    @ApiProperty({ name: 'taxonid', type: Number, required: false })
-    @Type(() => Number)
-    @IsArray()
-    @IsInt({ each: true })
-    @IsOptional()
-    taxonid: number
-    */
-
     @Min(0)
     @Max(TaxonomicEnumTreeFindAllParams.MAX_LIMIT)
     limit: number = TaxonomicEnumTreeFindAllParams.DEFAULT_LIMIT;
