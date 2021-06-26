@@ -5,7 +5,7 @@ export class TaxonQueryBuilder {
     protected namesUrl: URL
     protected nameUrl: URL
     protected url: URL
-    protected _authorityID: string
+    _authorityID: string
 
     constructor(apiBaseUrl: string) {
         this.baseUrl = apiBaseUrl
@@ -32,12 +32,9 @@ export class TaxonQueryBuilder {
         return new FindOneBuilder(this.baseUrl)
     }
 
-    authorityID(authorityID? : string): TaxonQueryBuilder {
-        this._authorityID = authorityID? authorityID : undefined
-        return this
-    }
 
     build(): string {
+
         return this.url.toString()
     }
 }
@@ -56,8 +53,16 @@ class FindScientificNameBuilder extends TaxonQueryBuilder {
         return this
     }
 
+    authorityID(authorityID? : string): FindScientificNameBuilder {
+        this._authorityID = authorityID? authorityID : undefined
+        return this
+    }
+
     build(): string {
-        this.url.pathname = `${this.url.pathname}/${this._scientificName}`;
+        this.url.pathname = `${this.url.pathname}/${this._scientificName}`
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
+        }
         return super.build()
     }
 }
@@ -71,8 +76,16 @@ class FindOneBuilder extends TaxonQueryBuilder {
         return this
     }
 
+    authorityID(authorityID? : string): FindOneBuilder {
+        this._authorityID = authorityID? authorityID : undefined
+        return this
+    }
+
     build(): string {
-        this.url.pathname = `${this.url.pathname}/${this.taxonID}`;
+        this.url.pathname = `${this.url.pathname}/${this.taxonID}`
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
+        }
         return super.build()
     }
 }
@@ -85,9 +98,12 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
         this.url = new URL(`${apiBaseUrl}/taxon/scientificNames`)
     }
 
+    authorityID(authorityID? : string): FindAllScientificNamesBuilder {
+        this._authorityID = authorityID? authorityID : undefined
+        return this
+    }
+
     build(): string {
-        //this.url = new URL(`${this.url.pathname}/scientificNames`)
-        //this.url = this.namesUrl
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
         }
@@ -104,9 +120,15 @@ class FindAllScientificNamesPlusAuthorsBuilder extends TaxonQueryBuilder {
         this.url = new URL(`${apiBaseUrl}/taxon/scientificNamesPlusAuthors`)
     }
 
+    authorityID(authorityID? : string): FindAllScientificNamesPlusAuthorsBuilder {
+        this._authorityID = authorityID? authorityID : undefined
+        return this
+    }
+
     build(): string {
-        //this.url = new URL(`${this.url.pathname}/scientificNames`)
-        //this.url = this.namesUrl
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
+        }
         return super.build();
     }
 }
@@ -119,13 +141,18 @@ class FindAllBuilder extends TaxonQueryBuilder {
         return this
     }
 
+    authorityID(authorityID? : string): FindAllBuilder {
+        this._authorityID = authorityID? authorityID : undefined
+        return this
+    }
+
     build(): string {
-        this._taxonIDs.forEach((id) => {
-            this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString());
-        })
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
         }
+        this._taxonIDs.forEach((id) => {
+            this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString());
+        })
 
         return super.build();
     }

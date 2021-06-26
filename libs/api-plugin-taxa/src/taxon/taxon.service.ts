@@ -18,17 +18,19 @@ export class TaxonService extends BaseService<Taxon>{
      */
     async findAll(params?: TaxonFindAllParams): Promise<Taxon[]> {
         const { limit, offset, ...qParams } = params
+
         if (qParams.taxonAuthorityID) {
             // Have to use query builder since filter on nested relations does not work
             const qb = this.myRepository.createQueryBuilder('o')
-                .innerJoin('o.taxonStatuses', 'c')
+                .leftJoin('o.taxonStatuses', 'c')
                 .take(limit)
                 .skip(offset)
                 .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
 
             if (qParams.id) {
-                qb.andWhere('id IN :taxonIDs', {taxonIDs: params.id})
+                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
             }
+
             return qb.getMany()
         } else {
             // Can use nested relations
@@ -58,7 +60,7 @@ export class TaxonService extends BaseService<Taxon>{
                 .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
 
             if (qParams.id) {
-                qb.andWhere('id IN :taxonIDs', {taxonIDs: params.id})
+                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
             }
             return qb.getMany()
         } else {
@@ -88,7 +90,7 @@ export class TaxonService extends BaseService<Taxon>{
                 .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
 
             if (qParams.id) {
-                qb.andWhere('id IN :taxonIDs', {taxonIDs: params.id})
+                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
             }
             return qb.getMany()
         } else {
@@ -110,9 +112,6 @@ export class TaxonService extends BaseService<Taxon>{
         if (qParams.taxonAuthorityID) {
             // Have to use the query builder since where filter on nested relations does not work
             const qb = this.myRepository.createQueryBuilder('o')
-                .select([
-                    'o.scientificName'
-                ])
                 .innerJoin('o.taxonStatuses', 'c')
                 .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
                 .andWhere('o.scientificName = :sciname', {sciname: sciname})
@@ -126,13 +125,8 @@ export class TaxonService extends BaseService<Taxon>{
     /*
     Find a taxon using a taxon ID.
      */
-    async findByTID(id: number, params?: TaxonFindAllParams): Promise<Taxon> {
-        const { limit, offset, ...qParams } = params
-        return (qParams.taxonAuthorityID)?
-            await this.myRepository.findOne({
-                relations: ["taxonStatuses"],
-                where: { taxonAuthorityID: params.taxonAuthorityID, id: id }})
-            : this.myRepository.findOne({ where: {id: id} })
+    async findByTID(id: number): Promise<Taxon> {
+        return this.myRepository.findOne({ where: {id: id} })
     }
 
     /*

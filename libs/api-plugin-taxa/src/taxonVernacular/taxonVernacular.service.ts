@@ -3,6 +3,7 @@ import { TaxonVernacular } from '@symbiota2/api-database';
 import { In, Repository } from 'typeorm';
 import { TaxonVernacularFindAllParams } from './dto/taxonVernacular-find-all.input.dto';
 import { BaseService } from '@symbiota2/api-common';
+import { TaxonVernacularFindParams } from './dto/taxonVernacular-find.input.dto';
 
 
 @Injectable()
@@ -73,9 +74,23 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
         return names
     }
 
-    async findByCommonName(commonName: string): Promise<TaxonVernacular[]> {
-        // const { limit, offset, ...qParams } = params;
-        return await this.myRepository.find({where: {vernacularName: commonName}});
+    async findByCommonName(commonName: string, params?: TaxonVernacularFindParams): Promise<TaxonVernacular[]> {
+        const { ...qParams } = params
+        if (qParams.taxonAuthorityID) {
+            // Have to use the query builder since where filter on nested relations does not work
+
+            const qb = this.myRepository.createQueryBuilder('o')
+                //.select('o.*')
+                .leftJoin('o.taxon', 't')
+                .leftJoin('t.taxonStatuses', 's')
+                .where('s.taxonAuthorityID = :authorityID AND o.vernacularName = :name', { authorityID: params.taxonAuthorityID,
+                name: commonName})
+                //.andWhere('o.vernacularName = :commonName', { commonName: commonName} )
+
+            return qb.getMany()
+        } else {
+            return await this.myRepository.find({where: {vernacularName: commonName}})
+        }
     }
 
     async findByTID(id: number): Promise<TaxonVernacular> {

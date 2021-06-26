@@ -5,6 +5,7 @@ import {
     TaxonVernacularOutputDto
 } from './dto/TaxonVernacular.output.dto';
 import { TaxonVernacularFindAllParams } from './dto/taxonVernacular-find-all.input.dto';
+import { TaxonVernacularFindParams } from './dto/taxonVernacular-find.input.dto';
 
 @ApiTags('TaxonVernacular')
 @Controller('taxonVernacular')
@@ -41,7 +42,6 @@ export class TaxonVernacularController {
     async findAllLanguages(): Promise<string[]> {
         const myRows = await this.myService.findAllLanguages()
         const languages = myRows.map(async (language) => {
-            //console.log("lanuage is " + await language.language)
             return language.language
         })
         return Promise.all(languages)
@@ -79,17 +79,20 @@ export class TaxonVernacularController {
         return Promise.all(names)
     }
 
-    // The commonName controller finds using a common name
-    // TODO: Fix the fact that this uses the first commmon name, should be limited to a taxa authority
+    /*
+    The commonName controller finds using a common name
+     */
     @Get('commonName/:commonName')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonVernacularOutputDto })
     @ApiOperation({
         summary: "Use a common name to get a taxon vernacular record, but since there could be many matches just return the first"
     })
-    async findByCommonName(@Param('commonName') commonName: string): Promise<TaxonVernacularOutputDto> {
-        const name = await this.myService.findByCommonName(commonName)
-        const dto = new TaxonVernacularOutputDto(name[0])
-        return dto
+    async findByCommonName(@Param('commonName') commonName: string, @Query() findParams: TaxonVernacularFindParams): Promise<TaxonVernacularOutputDto> {
+        const name = await this.myService.findByCommonName(commonName, findParams)
+        //if (name.length > 1) {
+            const dto = new TaxonVernacularOutputDto(name[0])
+            return dto
+        //}
     }
 
     // TODO: Add taxa authority

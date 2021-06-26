@@ -20,7 +20,6 @@ export class TaxonomicEnumTreeService extends BaseService<TaxonomicEnumTreeDto>{
     async findAll(params?: TaxonomicEnumTreeFindAllParams): Promise<TaxonomicEnumTreeDto[]> {
         const { limit, offset, ...qParams } = params
 
-        console.log("taxaenum service " + qParams.taxonAuthorityID)
         if (qParams.taxonAuthorityID) {
             return (qParams.taxonID) ?
                 await this.taxonomicEnumTrees.find({

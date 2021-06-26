@@ -24,14 +24,13 @@ export class TaxonService {
     public getUrl() {
         const apiBaseUrl = this.appConfig.apiUri()
         const x = new URL(`${apiBaseUrl}/taxon/scientificNames`)
-        //return x.toString()
         return this.apiClient.apiRoot()
     }
 
     findScientificName(sciname, authorityID?): Observable<TaxonListItem> {
         const url = this.createQueryBuilder()
-            .authorityID(authorityID)
             .findScientificName()
+            .authorityID(authorityID)
             .scientificName(sciname)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
@@ -42,8 +41,8 @@ export class TaxonService {
     findAllScientificNames(authorityID?): Observable<string[]> {
         console.log("authorityid is " + authorityID)
         const url = this.createQueryBuilder()
-            .authorityID(authorityID)
             .findAllScientificNames()
+            .authorityID(authorityID)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)
@@ -51,8 +50,8 @@ export class TaxonService {
 
     findAllScientificNamesPlusAuthors(authorityID?): Observable<string[]> {
         const url = this.createQueryBuilder()
-            .authorityID(authorityID)
             .findAllScientificNamesPlusAuthors()
+            .authorityID(authorityID)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)
@@ -60,8 +59,8 @@ export class TaxonService {
 
     findAll(authorityID?, params?: FindAllParams): Observable<TaxonListItem[]> {
         const url = this.createQueryBuilder()
-            .authorityID(authorityID)
             .findAll()
+            .authorityID(authorityID)
             .taxonIDs(params? params.taxonIDs : [])
             .build();
 
@@ -69,17 +68,17 @@ export class TaxonService {
         return this.apiClient.send<any, Record<string, unknown>[]>(query)
             .pipe(
                 map((taxons) => taxons.map((o) => {
-                    return TaxonListItem.fromJSON(o);
+                    return TaxonListItem.fromJSON(o)
                 }))
-            );
+            )
     }
 
     findByID(id: number, authorityID?): Observable<Taxon> {
         const url = this.createQueryBuilder()
-            .authorityID(authorityID)
             .findOne()
+            .authorityID(authorityID)
             .id(id)
-            .build();
+            .build()
 
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, Record<string, unknown>>(query)

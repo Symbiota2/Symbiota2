@@ -80,12 +80,13 @@ class FindAllBuilder extends TaxonomicStatusQueryBuilder {
     }
 
     build(): string {
-        this._taxonIDs.forEach((id) => {
-            this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString());
-        })
         if (this.authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this.authorityID.toString())
         }
+        this._taxonIDs.forEach((id) => {
+            this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString());
+        })
+
 
         return super.build();
     }

@@ -74,8 +74,8 @@ export class TaxonController {
     @ApiOperation({
         summary: "Find a taxon by the taxonID"
     })
-    async findByTID(@Param('taxonid') id: number, @Query() findAllParams: TaxonFindAllParams): Promise<TaxonDto> {
-        const taxon = await this.taxons.findByTID(id, findAllParams)
+    async findByTID(@Param('taxonid') id: number): Promise<TaxonDto> {
+        const taxon = await this.taxons.findByTID(id)
         const dto = new TaxonDto(taxon)
         return dto
     }

@@ -130,13 +130,15 @@ class FindAllBuilder extends TaxonomicEnumTreeQueryBuilder {
     }
 
     build(): string {
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
+
         this._taxonIDs.forEach((id) => {
             this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString())
         })
 
-        if (this._authorityID) {
-            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
-        }
+
         return super.build();
     }
 }
