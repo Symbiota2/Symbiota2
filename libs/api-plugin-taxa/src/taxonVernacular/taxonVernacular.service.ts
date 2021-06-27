@@ -110,7 +110,7 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
                 ])
                 .innerJoin('o.taxon', 't')
                 .innerJoin('t.taxonStatuses', 's')
-                .where('t.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
+                .where('s.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
                 .andWhere("o.language = '" + language + "' AND o.vernacularName IS NOT NULL AND " + whereClause)
                 .groupBy('o.vernacularName')  // For distinct
                 .orderBy("o.vernacularName")
