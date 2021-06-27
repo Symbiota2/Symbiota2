@@ -32,6 +32,7 @@ export class TaxonService {
             .findScientificName()
             .authorityID(authorityID)
             .scientificName(sciname)
+            .authorityID(authorityID)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, Record<string, unknown>>(query)
@@ -39,7 +40,6 @@ export class TaxonService {
     }
 
     findAllScientificNames(authorityID?): Observable<string[]> {
-        console.log("authorityid is " + authorityID)
         const url = this.createQueryBuilder()
             .findAllScientificNames()
             .authorityID(authorityID)

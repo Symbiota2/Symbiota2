@@ -32,7 +32,6 @@ export class TaxonQueryBuilder {
         return new FindOneBuilder(this.baseUrl)
     }
 
-
     build(): string {
 
         return this.url.toString()
@@ -53,8 +52,8 @@ class FindScientificNameBuilder extends TaxonQueryBuilder {
         return this
     }
 
-    authorityID(authorityID? : string): FindScientificNameBuilder {
-        this._authorityID = authorityID? authorityID : undefined
+    authorityID(authorityID : string): FindScientificNameBuilder {
+        this._authorityID = authorityID
         return this
     }
 
@@ -67,7 +66,6 @@ class FindScientificNameBuilder extends TaxonQueryBuilder {
     }
 }
 
-
 class FindOneBuilder extends TaxonQueryBuilder {
     protected taxonID: number = null
 
@@ -75,6 +73,7 @@ class FindOneBuilder extends TaxonQueryBuilder {
         this.taxonID = id
         return this
     }
+
 
     authorityID(authorityID? : string): FindOneBuilder {
         this._authorityID = authorityID? authorityID : undefined
@@ -98,8 +97,8 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
         this.url = new URL(`${apiBaseUrl}/taxon/scientificNames`)
     }
 
-    authorityID(authorityID? : string): FindAllScientificNamesBuilder {
-        this._authorityID = authorityID? authorityID : undefined
+    authorityID(authorityID : string): FindAllScientificNamesBuilder {
+        this._authorityID = authorityID
         return this
     }
 
@@ -120,8 +119,9 @@ class FindAllScientificNamesPlusAuthorsBuilder extends TaxonQueryBuilder {
         this.url = new URL(`${apiBaseUrl}/taxon/scientificNamesPlusAuthors`)
     }
 
-    authorityID(authorityID? : string): FindAllScientificNamesPlusAuthorsBuilder {
-        this._authorityID = authorityID? authorityID : undefined
+
+    authorityID(authorityID : string): FindAllScientificNamesPlusAuthorsBuilder {
+        this._authorityID = authorityID
         return this
     }
 

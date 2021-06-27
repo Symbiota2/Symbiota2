@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { TaxonVernacular } from '@symbiota2/api-database';
+import { Taxon, TaxonVernacular } from '@symbiota2/api-database';
 import { In, Repository } from 'typeorm';
 import { TaxonVernacularFindAllParams } from './dto/taxonVernacular-find-all.input.dto';
 import { BaseService } from '@symbiota2/api-common';
@@ -15,15 +15,37 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
         super(myRepository);
     }
 
-    // Find all of the taxonVernacular rows possibly using an array of ids
+    /*
+    Find all of the taxonVernacular rows possibly using an array of ids
+     */
     async findAll(params?: TaxonVernacularFindAllParams): Promise<TaxonVernacular[]> {
         const { limit, offset, ...qParams } = params
-        return await (qParams.id)?
-              this.myRepository.find({take: limit, skip: offset, where: { id: In(params.id)}})
-            : this.myRepository.find({take: limit, skip: offset})
+        if (qParams.taxonAuthorityID) {
+            // Have to use the query builder since where filter on nested relations does not work
+            const qb = this.myRepository.createQueryBuilder('o')
+                .innerJoin('o.taxon', 't')
+                .innerJoin('t.taxonStatuses', 's')
+                .where('t.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
+
+            if (qParams.id) {
+                qb.andWhere('o.taxonID IN :taxonID', {taxonID: params.id})
+            }
+
+            return qb.getMany()
+        } else {
+            return await (qParams.id)?
+                this.myRepository.find({
+                    take: limit,
+                    skip: offset,
+                    where: { id: In(params.id)}})
+                : this.myRepository.find({take: limit, skip: offset})
+        }
+
     }
 
-    // Get a list of all of the languages
+    /*
+     Get a list of all of the languages
+     */
     async findAllLanguages(): Promise<TaxonVernacular[]> {
         const results = await this.myRepository.createQueryBuilder('o')
             .select([
@@ -38,40 +60,76 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
                 return language
             })
         )
-
-
     }
 
-    // Get a list of all of the common names
-    async findAllCommonNames(params?: TaxonVernacularFindAllParams): Promise<TaxonVernacular[]> {
-        const { limit, offset, ...qParams } = params
-        const whereClause = (qParams.id)? "o.taxonID in " + params.id : "true"
-        const names = await this.myRepository.createQueryBuilder('o')
-            .select([
-                'o.vernacularName'
-            ])
-            .where("o.vernacularName IS NOT NULL AND " + whereClause)
-            .groupBy('o.vernacularName')  // For distinct
-            .orderBy("o.vernacularName")
-            .getMany()
+    /*
+     Get a list of all of the common names
+     */
+    async findAllCommonNames(params?: TaxonVernacularFindParams): Promise<TaxonVernacular[]> {
+        const { ...qParams } = params
+        // Check if there is a taxonAuthorityID specified
+        if (qParams.taxonAuthorityID) {
+            const whereClause = (qParams.id)? "o.taxonID in " + params.id : "true"
+            const names = await this.myRepository.createQueryBuilder('o')
+                .select([
+                    'o.vernacularName'
+                ])
+                .innerJoin('o.taxon', 't')
+                .innerJoin('t.taxonStatuses', 's')
+                .where('s.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
+                .andWhere("o.vernacularName IS NOT NULL AND " + whereClause)
+                .groupBy('o.vernacularName')  // For distinct
+                .orderBy("o.vernacularName")
+                .getMany()
 
-        return names
+            return names
+
+        } else {
+            const whereClause = (qParams.id)? "o.taxonID in " + params.id : "true"
+            const names = await this.myRepository.createQueryBuilder('o')
+                .select([
+                    'o.vernacularName'
+                ])
+                .where("o.vernacularName IS NOT NULL AND " + whereClause)
+                .groupBy('o.vernacularName')  // For distinct
+                .orderBy("o.vernacularName")
+                .getMany()
+
+            return names
+        }
     }
 
     // Get a list of all of the common names for a given language
-    async findAllCommonNamesByLanguage(language: string, params?: TaxonVernacularFindAllParams): Promise<TaxonVernacular[]> {
-        const { limit, offset, ...qParams } = params
+    async findAllCommonNamesByLanguage(language: string, params?: TaxonVernacularFindParams): Promise<TaxonVernacular[]> {
+        const { ...qParams } = params
         const whereClause = (qParams.id)? "o.taxonID in " + params.id : "true"
-        const names = await this.myRepository.createQueryBuilder('o')
-            .select([
-                'o.vernacularName'
-            ])
-            .where("o.language = '" + language + "' AND o.vernacularName IS NOT NULL AND " + whereClause)
-            .groupBy('o.vernacularName')  // For distinct
-            .orderBy("o.vernacularName")
-            .getMany()
+        if (qParams.taxonAuthorityID) {
+            const names = await this.myRepository.createQueryBuilder('o')
+                .select([
+                    'o.vernacularName'
+                ])
+                .innerJoin('o.taxon', 't')
+                .innerJoin('t.taxonStatuses', 's')
+                .where('t.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
+                .andWhere("o.language = '" + language + "' AND o.vernacularName IS NOT NULL AND " + whereClause)
+                .groupBy('o.vernacularName')  // For distinct
+                .orderBy("o.vernacularName")
+                .getMany()
 
-        return names
+            return names
+
+        } else {
+            const names = await this.myRepository.createQueryBuilder('o')
+                .select([
+                    'o.vernacularName'
+                ])
+                .where("o.language = '" + language + "' AND o.vernacularName IS NOT NULL AND " + whereClause)
+                .groupBy('o.vernacularName')  // For distinct
+                .orderBy("o.vernacularName")
+                .getMany()
+
+            return names
+        }
     }
 
     async findByCommonName(commonName: string, params?: TaxonVernacularFindParams): Promise<TaxonVernacular[]> {
