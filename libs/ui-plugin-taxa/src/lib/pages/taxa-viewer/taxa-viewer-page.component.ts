@@ -222,6 +222,7 @@ export class TaxaViewerPageComponent implements OnInit {
             this.taxonomicStatusService.findAll({taxonIDs: [taxon.id], taxonomicAuthorityID: this.taxonomicAuthorityID} ).subscribe((myStatii) => {
                 myStatii.forEach((myStatus) => {
                     if (taxonID != myStatus.taxonIDAccepted) {
+                        console.log("Found synonym " + taxonID)
                         taxonID = myStatus.taxonIDAccepted
                         this.taxaService.findByID(myStatus.taxonIDAccepted, this.taxonomicAuthorityID).subscribe( (myTaxon) => {
                             baseNode.name = myTaxon.scientificName

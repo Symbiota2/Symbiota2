@@ -94,8 +94,9 @@
                         <mat-icon class="mat-icon-rtl-mirror">
                             {{treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right'}}
                         </mat-icon>
+                        &nbsp; &nbsp; {{node.name}}
                     </button>
-                    {{node.name}}
+                    <span *ngIf='!isNotExpanded(node)'> &nbsp; &nbsp; {{node.name}} </span>
                 </li>
             </mat-tree-node>
 
@@ -107,22 +108,14 @@
                         <mat-icon class="mat-icon-rtl-mirror">
                             {{treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right'}}
                         </mat-icon>
-<!--
-                    <div *ngIf='isSynonym(node)' class="mat-tree-node">
-                        [{{node.name}}]
-                    </div>
-                    <div *ngIf='!isSynonym(node)' class="mat-tree-node">
-                        {{node.name}}
-                    </div>
--->
+                        &nbsp; &nbsp; {{node.name}}
                     </button>
-                    {{node.name}}
                     <ul >
                         <ng-container matTreeNodeOutlet></ng-container>
                     </ul>
-                    </li>
-                    <li *ngIf='!isNotExpanded(node)'>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{node.name}}
+                </li>
+                <li *ngIf='!isNotExpanded(node)'>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{node.name}}
                     <ul >
                         <ng-container matTreeNodeOutlet></ng-container>
                     </ul>
