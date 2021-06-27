@@ -77,7 +77,7 @@ export class TaxaViewerPageComponent implements OnInit {
     }
 
     /*
-    Taxaonomic authority has a new value
+    Taxonomic authority has a new value
      */
     authorityChangeAction() {
         // If the authority changes
@@ -198,7 +198,6 @@ export class TaxaViewerPageComponent implements OnInit {
                 this.nameOptions = names
             })
         }
-
     }
 
     hasNestedChild = (_: number, nodeData: TaxonNode) =>
@@ -343,7 +342,7 @@ export class TaxaViewerPageComponent implements OnInit {
                         // Build a new parent node
                         const item: TaxonNode = {
                             name: b.scientificName,
-                            expanded: true,
+                            expanded: false,
                             synonym: false,
                             children: a,
                         }
@@ -466,27 +465,33 @@ export class TaxaViewerPageComponent implements OnInit {
 
     /*
     Not used, probably can delete
-     */
+
     async onSwitchPage(page: number) {
         await this.router.navigate([], {
             relativeTo: this.currentRoute,
             queryParams: {
                 page: page,
             },
-        });
+        })
     }
+
+     */
 
     /*
     Not used, probably can delete
-    */
+
     async onPrevious() {
         return this.onSwitchPage(this.currentPage - 1);
     }
 
+     */
+
     /*
     Not used, probably can delete
-    */
+
     async onNext() {
-        return this.onSwitchPage(this.currentPage + 1);
+        return this.onSwitchPage(this.currentPage + 1)
     }
+
+     */
 }

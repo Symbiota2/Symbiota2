@@ -100,13 +100,29 @@
             </mat-tree-node>
 
             <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
-                <li>
+                <li *ngIf='isNotExpanded(node)'>
+                    <button *ngIf='isNotExpanded(node)' mat-icon-button matTreeNodeToggle
+                            [attr.aria-label]="'toggle ' + node.name"
+                            (click)="loadChildren(node)">
+                        <mat-icon class="mat-icon-rtl-mirror">
+                            {{treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right'}}
+                        </mat-icon>
+<!--
                     <div *ngIf='isSynonym(node)' class="mat-tree-node">
                         [{{node.name}}]
                     </div>
                     <div *ngIf='!isSynonym(node)' class="mat-tree-node">
                         {{node.name}}
                     </div>
+-->
+                    </button>
+                    {{node.name}}
+                    <ul >
+                        <ng-container matTreeNodeOutlet></ng-container>
+                    </ul>
+                    </li>
+                    <li *ngIf='!isNotExpanded(node)'>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{node.name}}
                     <ul >
                         <ng-container matTreeNodeOutlet></ng-container>
                     </ul>
