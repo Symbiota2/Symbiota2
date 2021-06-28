@@ -4,7 +4,7 @@ export class Initial1603126088900 implements MigrationInterface {
     name = 'Initial1603126088900'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query('SET FOREIGN_KEY_CHECKS = 0');
+        await queryRunner.query('SET SESSION FOREIGN_KEY_CHECKS = 0');
 
         await queryRunner.query('ALTER TABLE `omcollectionstats` DROP FOREIGN KEY IF EXISTS `FK_collectionstats_coll`');
         await queryRunner.query('ALTER TABLE `omcollcatlink` DROP FOREIGN KEY IF EXISTS `FK_collcatlink_cat`');
@@ -707,9 +707,13 @@ export class Initial1603126088900 implements MigrationInterface {
         await queryRunner.query('ALTER TABLE lkupcounty RENAME INDEX `fk_stateprovince` TO `IDX_bcfc1657f86b19844e00684a0b`');
         await queryRunner.query('ALTER TABLE lkupmunicipality RENAME INDEX `fk_stateprovince` TO `IDX_76df7a74cc37f6111fa3e0a4f0`');
         await queryRunner.query('ALTER TABLE lkupstateprovince RENAME INDEX `fk_country` TO `IDX_bebd435aaa96ae7e2d946485a1`');
+
+        await queryRunner.query('SET SESSION FOREIGN_KEY_CHECKS = 1');
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query('SET SESSION FOREIGN_KEY_CHECKS = 0');
+
         await queryRunner.query('ALTER TABLE `omcollectionstats` DROP FOREIGN KEY `FK_e1c01a24d56ff7bb441160aa44e`');
         await queryRunner.query('DROP INDEX `REL_e1c01a24d56ff7bb441160aa44` ON `omcollectionstats`');
         await queryRunner.query('ALTER TABLE `omcollectionstats` CHANGE `collid` `collid` int(10) UNSIGNED NOT NULL');
@@ -1224,6 +1228,6 @@ export class Initial1603126088900 implements MigrationInterface {
         await queryRunner.query('ALTER TABLE `omcollcatlink` ADD CONSTRAINT `FK_collcatlink_cat` FOREIGN KEY (`ccpk`) REFERENCES `omcollcategories`(`ccpk`) ON DELETE CASCADE ON UPDATE CASCADE');
         await queryRunner.query('ALTER TABLE `omcollectionstats` ADD CONSTRAINT `FK_collectionstats_coll` FOREIGN KEY (`collid`) REFERENCES `omcollections`(`CollID`) ON DELETE RESTRICT ON UPDATE RESTRICT');
 
-        await queryRunner.query('SET FOREIGN_KEY_CHECKS = 1');
+        await queryRunner.query('SET SESSION FOREIGN_KEY_CHECKS = 1');
     }
 }

@@ -20,5 +20,4 @@ export class GeoThesFootprint1622091177961 implements MigrationInterface {
         await queryRunner.query("ALTER TABLE `geothesstateprovince` DROP COLUMN `footprintWKT`");
         await queryRunner.query("ALTER TABLE `geothesstateprovince` ADD `footprintWKT` text CHARACTER SET \"utf8\" COLLATE \"utf8_general_ci\" NULL");
     }
-
 }
