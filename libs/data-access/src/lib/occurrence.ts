@@ -1,6 +1,12 @@
 import { ApiListResults } from './common';
 import { ApiCollectionListItem } from './collection';
 
+export enum ApiOccurrenceBasisOfRecord {
+    PRESERVED_SPECIMEN = 'Preserved Specimen',
+    LIVING_SPECIMEN = 'Living Specimen',
+    HUMAN_OBSERVATION = 'Human Observation'
+}
+
 export enum ApiTaxonSearchCriterion {
     familyOrSciName = 'familyOrSciName',
     sciName = 'sciName',

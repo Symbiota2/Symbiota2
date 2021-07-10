@@ -1,5 +1,0 @@
-export * from './Trait.entity'
-export * from './TraitAttribute.entity'
-export * from './TraitDependency.entity'
-export * from './TraitState.entity'
-export * from './TraitTaxonLink.entity'

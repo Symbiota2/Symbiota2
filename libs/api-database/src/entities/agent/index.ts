@@ -1,7 +1,0 @@
-export * from './Agent.entity'
-export * from './AgentFullText.entity'
-export * from './AgentLink.entity'
-export * from './AgentName.entity'
-export * from './AgentNumberPattern.entity'
-export * from './AgentRelation.entity'
-export * from './AgentTeam.entity'

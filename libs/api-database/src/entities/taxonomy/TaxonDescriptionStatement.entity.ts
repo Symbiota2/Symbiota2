@@ -10,39 +10,36 @@ import { TaxonDescriptionBlock } from './TaxonDescriptionBlock.entity';
 import { EntityProvider } from '../../entity-provider.class';
 
 @Index(['descriptionBlockID'])
-@Entity('taxadescrstmts')
+@Entity()
 export class TaxonDescriptionStatement extends EntityProvider {
-    @PrimaryGeneratedColumn({ type: 'int', name: 'tdsid', unsigned: true })
+    @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id: number;
 
-    @Column('int', { name: 'tdbid', unsigned: true })
+    @Column('int', { unsigned: true })
     descriptionBlockID: number;
 
-    @Column('varchar', { name: 'heading', length: 75 })
+    @Column('varchar', { length: 75 })
     heading: string;
 
-    @Column('text', { name: 'statement' })
+    @Column('text')
     statement: string;
 
     @Column('int', {
-        name: 'displayheader',
         unsigned: true,
-        default: () => '\'1\'',
+        default: () => "'1'",
     })
     displayHeader: number;
 
-    @Column('varchar', { name: 'notes', nullable: true, length: 250 })
+    @Column('varchar', { nullable: true, length: 250 })
     notes: string | null;
 
     @Column('int', {
-        name: 'sortsequence',
         unsigned: true,
         default: () => '\'89\'',
     })
     sortSequence: number;
 
     @Column('timestamp', {
-        name: 'initialtimestamp',
         default: () => 'CURRENT_TIMESTAMP()',
     })
     initialTimestamp: Date;
@@ -52,6 +49,6 @@ export class TaxonDescriptionStatement extends EntityProvider {
         (taxadescrblock) => taxadescrblock.descriptionStatements,
         { onDelete: 'CASCADE', onUpdate: 'CASCADE' }
     )
-    @JoinColumn([{ name: 'tdbid'}])
+    @JoinColumn({ name: 'descriptionBlockID' })
     descriptionBlock: Promise<TaxonDescriptionBlock>;
 }

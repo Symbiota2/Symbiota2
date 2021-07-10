@@ -1,47 +1,41 @@
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { EntityProvider } from '../../entity-provider.class';
 
-@Index('UNIQUE_taxonunits', ['kingdomName', 'rankID'], { unique: true })
-@Entity('taxonunits')
+@Index(['kingdomName', 'rankID'], { unique: true })
+@Entity()
 export class TaxonomicUnit extends EntityProvider {
-    @PrimaryGeneratedColumn({ type: 'int', name: 'taxonunitid' })
+    @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
     @Column('varchar', {
-        name: 'kingdomName',
         length: 45,
         default: () => '\'Organism\'',
     })
     kingdomName: string;
 
-    @Column('smallint', {
-        name: 'rankid',
-        unsigned: true,
-        default: () => '\'0\''
-    })
+    @Column('smallint', { unsigned: true, default: () => "'0'" })
     rankID: number;
 
-    @Column('varchar', { name: 'rankname' })
+    @Column('varchar')
     rankName: string;
 
-    @Column('varchar', { name: 'suffix', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     suffix: string;
 
-    @Column('smallint', { name: 'dirparentrankid' })
+    @Column('smallint')
     directParentRankID: number;
 
     // TODO: What is this?
-    @Column('smallint', { name: 'reqparentrankid', nullable: true })
+    @Column('smallint', { nullable: true })
     reqParentRankID: number | null;
 
-    @Column('varchar', { name: 'modifiedby', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     lastModifiedBy: string;
 
-    @Column('datetime', { name: 'modifiedtimestamp', nullable: true })
+    @Column('datetime', { nullable: true })
     lastModifiedTimestamp: Date | null;
 
     @Column('timestamp', {
-        name: 'initialtimestamp',
         default: () => 'CURRENT_TIMESTAMP()',
     })
     initialTimestamp: Date;

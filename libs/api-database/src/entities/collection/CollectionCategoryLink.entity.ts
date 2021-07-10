@@ -4,29 +4,25 @@ import { Collection } from './Collection.entity';
 import { EntityProvider } from '../../entity-provider.class';
 
 @Index(['collectionID'])
-@Entity('omcollcatlink')
+@Entity()
 export class CollectionCategoryLink extends EntityProvider {
-    @Column('int', { primary: true, name: 'ccpk', unsigned: true })
+    @Column('int', { primary: true, unsigned: true })
     categoryID: number;
 
-    @Column('int', { primary: true, name: 'collid', unsigned: true })
+    @Column('int', { primary: true, unsigned: true })
     collectionID: number;
 
     @Column('tinyint', {
-        name: 'isPrimary',
         nullable: true,
         width: 1,
-        default: () => '\'1\'',
+        default: () => "1",
     })
     isPrimary: number | null;
 
-    @Column('int', { name: 'sortsequence', nullable: true })
+    @Column('int', { nullable: true })
     sortSequence: number | null;
 
-    @Column('timestamp', {
-        name: 'initialtimestamp',
-        default: () => 'CURRENT_TIMESTAMP()',
-    })
+    @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP()' })
     initialTimestamp: Date;
 
     @ManyToOne(
@@ -34,14 +30,14 @@ export class CollectionCategoryLink extends EntityProvider {
         (omcollcategories) => omcollcategories.collectionCategoryLinks,
         { onDelete: 'CASCADE', onUpdate: 'CASCADE' }
     )
-    @JoinColumn([{ name: 'ccpk'}])
+    @JoinColumn({ name: 'categoryID' })
     category: Promise<CollectionCategory>;
 
     @ManyToOne(
         () => Collection,
-        (omcollections) => omcollections.collectionCategoryLinks,
+        (omcollections) => omcollections.categoryLinks,
         { onDelete: 'CASCADE', onUpdate: 'CASCADE' }
     )
-    @JoinColumn([{ name: 'collid'}])
+    @JoinColumn({ name: 'collectionID' })
     collection: Promise<Collection>;
 }

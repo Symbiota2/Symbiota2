@@ -9,45 +9,43 @@ import {
 import { Taxon } from './Taxon.entity';
 import { EntityProvider } from '../../entity-provider.class';
 
-@Index('Index_unique', ['taxonID', 'url'])
-@Entity('taxalinks')
+@Index(['taxonID', 'url'], { unique: true })
+@Entity()
 export class TaxonLink extends EntityProvider {
-    @PrimaryGeneratedColumn({ type: 'int', name: 'tlid', unsigned: true })
+    @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id: number;
 
-    @Column('int', { name: 'tid', unsigned: true })
+    @Column('int', { unsigned: true })
     taxonID: number;
 
-    @Column('varchar', { name: 'url', length: 500 })
+    @Column('varchar', { length: 500 })
     url: string;
 
-    @Column('varchar', { name: 'title', length: 100 })
+    @Column('varchar', { length: 100 })
     title: string;
 
-    @Column('varchar', { name: 'sourceIdentifier', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     sourceIdentifier: string | null;
 
-    @Column('varchar', { name: 'owner', nullable: true, length: 100 })
+    @Column('varchar', { nullable: true, length: 100 })
     owner: string | null;
 
-    @Column('varchar', { name: 'icon', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     icon: string | null;
 
-    @Column('int', { name: 'inherit', nullable: true, default: () => '\'1\'' })
+    @Column('int', { nullable: true, default: () => "'1'" })
     inherit: number | null;
 
-    @Column('varchar', { name: 'notes', nullable: true, length: 250 })
+    @Column('varchar', { nullable: true, length: 250 })
     notes: string | null;
 
     @Column('int', {
-        name: 'sortsequence',
         unsigned: true,
-        default: () => '\'50\'',
+        default: () => "'50'",
     })
     sortSequence: number;
 
     @Column('timestamp', {
-        name: 'initialtimestamp',
         default: () => 'CURRENT_TIMESTAMP()',
     })
     initialTimestamp: Date;
@@ -56,6 +54,6 @@ export class TaxonLink extends EntityProvider {
         onDelete: 'RESTRICT',
         onUpdate: 'RESTRICT',
     })
-    @JoinColumn([{ name: 'tid'}])
+    @JoinColumn([{ name: 'taxonID' }])
     taxon: Promise<Taxon>;
 }

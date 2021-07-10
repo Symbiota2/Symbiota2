@@ -10,24 +10,24 @@ import { User } from './User.entity';
 import { EntityProvider } from '../../entity-provider.class';
 
 @Index(['clientID', 'token'])
-@Entity('userRefreshTokens')
+@Entity()
 export class RefreshToken extends EntityProvider {
     public static readonly EXPIRES_IN_DAYS = 1;
 
-    @Column('int', { name: 'uid', unsigned: true, primary: true })
+    @Column('int', { unsigned: true, primary: true })
     uid: number;
 
-    @PrimaryGeneratedColumn('uuid', { name: 'clientID' })
+    @PrimaryGeneratedColumn('uuid')
     clientID: string;
 
-    @PrimaryGeneratedColumn('uuid', { name: 'token' })
+    @PrimaryGeneratedColumn('uuid')
     token: string;
 
-    @Column('timestamp', { name: 'expiresAt', default: () => 'CURRENT_TIMESTAMP()' })
+    @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP()' })
     expiresAt: Date;
 
     @ManyToOne(() => User, (user) => user.refreshToken, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'uid', referencedColumnName: 'uid' })
+    @JoinColumn({ name: 'uid' })
     user: Promise<User>;
 
     @BeforeInsert()

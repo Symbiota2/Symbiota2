@@ -9,59 +9,53 @@ import {
 } from 'typeorm';
 import { TaxonProfilePublicationDescriptionLink } from './TaxonProfilePublicationDescriptionLink.entity';
 import { TaxonDescriptionStatement } from './TaxonDescriptionStatement.entity';
-import { AdminLanguage } from '../AdminLanguage.entity';
 import { Taxon } from './Taxon.entity';
 import { EntityProvider } from '../../entity-provider.class';
 import { User } from '../user/User.entity';
 
-@Index('Index_unique', ['taxonID', 'displayLevel', 'language'], { unique: true })
+@Index(['taxonID', 'displayLevel', 'language'], { unique: true })
 @Index(['adminLanguageID'])
-@Entity('taxadescrblock')
+@Entity()
 export class TaxonDescriptionBlock extends EntityProvider {
-    @PrimaryGeneratedColumn({ type: 'int', name: 'tdbid', unsigned: true })
+    @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id: number;
 
-    @Column('int', { name: 'tid', unsigned: true })
+    @Column('int', { unsigned: true })
     taxonID: number;
 
-    @Column('varchar', { name: 'caption', nullable: true, length: 40 })
+    @Column('varchar', { nullable: true, length: 40 })
     caption: string;
 
-    @Column('varchar', { name: 'source', nullable: true, length: 250 })
+    @Column('varchar', { nullable: true, length: 250 })
     source: string;
 
-    @Column('varchar', { name: 'sourceurl', nullable: true, length: 250 })
+    @Column('varchar', { nullable: true, length: 250 })
     sourceUrl: string;
 
     @Column('varchar', {
-        name: 'language',
         nullable: true,
         length: 45,
         default: () => '\'English\'',
     })
     language: string;
 
-    @Column('int', { name: 'langid', nullable: true })
+    @Column('int', { nullable: true })
     adminLanguageID: number | null;
 
     @Column('int', {
-        name: 'displaylevel',
         comment: '1 = short descr, 2 = intermediate descr',
         unsigned: true,
-        default: () => '\'1\'',
+        default: () => "'1'",
     })
     displayLevel: number;
 
-    @Column('int', { name: 'uid', unsigned: true })
+    @Column('int', { unsigned: true })
     creatorUID: number;
 
-    @Column('varchar', { name: 'notes', nullable: true, length: 250 })
+    @Column('varchar', { nullable: true, length: 250 })
     notes: string;
 
-    @Column('timestamp', {
-        name: 'initialtimestamp',
-        default: () => 'CURRENT_TIMESTAMP()',
-    })
+    @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP()' })
     initialTimestamp: Date;
 
     @OneToMany(
@@ -74,25 +68,17 @@ export class TaxonDescriptionBlock extends EntityProvider {
     descriptionStatements: Promise<TaxonDescriptionStatement[]>;
 
     @ManyToOne(
-        () => AdminLanguage,
-        (adminlanguages) => adminlanguages.taxaDescBlocks,
-        { onDelete: 'NO ACTION', onUpdate: 'NO ACTION' }
-    )
-    @JoinColumn([{ name: 'langid'}])
-    adminLanguage: Promise<AdminLanguage>;
-
-    @ManyToOne(
         () => User,
         (user) => user.taxonDescriptionBlocks,
         { onDelete: 'NO ACTION', onUpdate: 'NO ACTION' }
     )
-    @JoinColumn([{ name: 'uid' }])
+    @JoinColumn([{ name: 'creatorUID' }])
     creator: Promise<User>;
 
     @ManyToOne(() => Taxon, (taxa) => taxa.taxonDescriptionBlocks, {
         onDelete: 'RESTRICT',
         onUpdate: 'RESTRICT',
     })
-    @JoinColumn([{ name: 'tid'}])
+    @JoinColumn([{ name: 'taxonID' }])
     taxon: Promise<Taxon>;
 }

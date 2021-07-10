@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { OccurrenceListItem } from './occurrence-list';
-import { ApiOccurrence } from '@symbiota2/data-access';
+import {
+    ApiOccurrence,
+    ApiOccurrenceBasisOfRecord
+} from '@symbiota2/data-access';
 
 // Based on the occurrence editor fields:
 // https://scan-bugs.org/portal/collections/editor/occurrenceeditor.php?csmode=0&occindex=0&occid=348864&collid=3
@@ -197,7 +200,7 @@ export class OccurrenceOutputDto extends OccurrenceListItem {
 
     @ApiProperty()
     @Expose()
-    basisOfRecord: string;
+    basisOfRecord: ApiOccurrenceBasisOfRecord;
 
     @ApiProperty()
     @Expose()

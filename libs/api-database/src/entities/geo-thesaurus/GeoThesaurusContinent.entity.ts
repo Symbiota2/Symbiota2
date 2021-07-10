@@ -11,31 +11,30 @@ import { GeoThesaurusCountry } from './GeoThesaurusCountry.entity';
 import { EntityProvider } from '../../entity-provider.class';
 
 @Index(['acceptedID'])
-@Entity('geothescontinent')
+@Entity()
 export class GeoThesaurusContinent extends EntityProvider {
-    @PrimaryGeneratedColumn({ type: 'int', name: 'gtcid' })
+    @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
-    @Column('varchar', { name: 'continentterm', length: 45 })
+    @Column('varchar', { length: 45 })
     continentTerm: string;
 
-    @Column('varchar', { name: 'abbreviation', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     abbreviation: string | null;
 
-    @Column('varchar', { name: 'code', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     code: string | null;
 
-    @Column('int', { name: 'lookupterm', default: () => '\'1\'' })
+    @Column('int', { default: () => "'1'" })
     lookupTerm: number;
 
-    @Column('int', { name: 'acceptedid', nullable: true })
+    @Column('int', { nullable: true })
     acceptedID: number | null;
 
-    @Column('longtext', { name: 'footprintWKT', nullable: true })
+    @Column('longtext', { nullable: true })
     footprintWKT: string | null;
 
     @Column('timestamp', {
-        name: 'initialtimestamp',
         nullable: true,
         default: () => 'CURRENT_TIMESTAMP()',
     })
@@ -49,7 +48,7 @@ export class GeoThesaurusContinent extends EntityProvider {
         (geothescontinent) => geothescontinent.otherNames,
         { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' }
     )
-    @JoinColumn([{ name: 'acceptedid' }])
+    @JoinColumn([{ name: 'acceptedID' }])
     acceptedName: Promise<GeoThesaurusContinent>;
 
     @OneToMany(

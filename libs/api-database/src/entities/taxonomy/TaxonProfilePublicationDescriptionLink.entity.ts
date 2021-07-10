@@ -4,25 +4,25 @@ import { TaxonDescriptionBlock } from './TaxonDescriptionBlock.entity';
 import { EntityProvider } from '../../entity-provider.class';
 
 @Index(['publicationID'])
-@Entity('taxaprofilepubdesclink')
+@Index(['descriptionBlockID'])
+@Entity()
 export class TaxonProfilePublicationDescriptionLink extends EntityProvider {
-    @Column('int', { primary: true, name: 'tdbid', unsigned: true })
+    @Column('int', { primary: true, unsigned: true })
     descriptionBlockID: number;
 
-    @Column('int', { primary: true, name: 'tppid' })
+    @Column('int', { primary: true })
     publicationID: number;
 
-    @Column('varchar', { name: 'caption', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     caption: string | null;
 
-    @Column('varchar', { name: 'editornotes', nullable: true, length: 250 })
+    @Column('varchar', { nullable: true, length: 250 })
     editorNotes: string | null;
 
-    @Column('int', { name: 'sortsequence', nullable: true })
+    @Column('int', { nullable: true })
     sortSequence: number | null;
 
     @Column('timestamp', {
-        name: 'initialtimestamp',
         nullable: true,
         default: () => 'CURRENT_TIMESTAMP()',
     })
@@ -33,7 +33,7 @@ export class TaxonProfilePublicationDescriptionLink extends EntityProvider {
         (taxaprofilepubs) => taxaprofilepubs.taxonDescriptionLinks,
         { onDelete: 'CASCADE', onUpdate: 'CASCADE' }
     )
-    @JoinColumn([{ name: 'tppid'}])
+    @JoinColumn({ name: 'publicationID' })
     publication: Promise<TaxonProfilePublication>;
 
     @ManyToOne(
@@ -41,6 +41,6 @@ export class TaxonProfilePublicationDescriptionLink extends EntityProvider {
         (taxadescrblock) => taxadescrblock.publicDescriptionLinks,
         { onDelete: 'CASCADE', onUpdate: 'CASCADE' }
     )
-    @JoinColumn([{ name: 'tdbid'}])
+    @JoinColumn({ name: 'descriptionBlockID' })
     descriptionBlock: Promise<TaxonDescriptionBlock>;
 }

@@ -7,13 +7,16 @@ import {
     IsDate
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiOccurrence } from '@symbiota2/data-access';
+import {
+    ApiOccurrence,
+    ApiOccurrenceBasisOfRecord
+} from '@symbiota2/data-access';
 
 export class OccurrenceInputDto implements Partial<ApiOccurrence> {
     @ApiProperty({ required: false })
     @IsString()
     @IsOptional()
-    basisOfRecord: string = null;
+    basisOfRecord: ApiOccurrenceBasisOfRecord = null;
 
     @ApiProperty({ required: false })
     @IsString()

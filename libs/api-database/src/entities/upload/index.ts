@@ -1,7 +1,0 @@
-export * from './DeterminationTempUpload.entity'
-export * from './GlossaryUpload.entity'
-export * from './ImageTempUpload.entity'
-export * from './SpeciesMapUpload.entity'
-export * from './SpeciesUploadParameter.entity'
-export * from './SpeciesUploadTemp.entity'
-export * from './TaxonUpload.entity'

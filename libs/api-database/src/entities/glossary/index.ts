@@ -1,5 +1,0 @@
-export * from './Glossary.entity'
-export * from './GlossaryImage.entity'
-export * from './GlossarySource.entity'
-export * from './GlossaryTaxonLink.entity'
-export * from './GlossaryTermLink.entity'

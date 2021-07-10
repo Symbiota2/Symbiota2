@@ -12,37 +12,33 @@ import { EntityProvider } from '../../entity-provider.class';
 
 @Index(['countyID'])
 @Index(['acceptedID'])
-@Entity('geothesmunicipality')
+@Entity()
 export class GeoThesaurusMunicipality extends EntityProvider {
-    @PrimaryGeneratedColumn({ type: 'int', name: 'gtmid' })
+    @PrimaryGeneratedColumn()
     id: number;
 
-    @Column('varchar', { name: 'municipalityterm', length: 45 })
+    @Column('varchar', { length: 45 })
     municipalityTerm: string;
 
-    @Column('varchar', { name: 'abbreviation', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     abbreviation: string | null;
 
-    @Column('varchar', { name: 'code', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     code: string | null;
 
-    @Column('int', { name: 'lookupterm', default: () => '\'1\'' })
+    @Column('int', { default: () => "'1'" })
     lookupTerm: number;
 
-    @Column('int', { name: 'acceptedid', nullable: true })
+    @Column('int', { nullable: true })
     acceptedID: number | null;
 
-    @Column('int', { name: 'countyid', nullable: true })
+    @Column('int', { nullable: true })
     countyID: number | null;
 
-    @Column('text', { name: 'footprintWKT', nullable: true })
+    @Column('text', { nullable: true })
     footprintWKT: string | null;
 
-    @Column('timestamp', {
-        name: 'initialtimestamp',
-        nullable: true,
-        default: () => 'CURRENT_TIMESTAMP()',
-    })
+    @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP()' })
     initialTimestamp: Date | null;
 
     @ManyToOne(
@@ -50,7 +46,7 @@ export class GeoThesaurusMunicipality extends EntityProvider {
         (geothesmunicipality) => geothesmunicipality.otherNames,
         { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' }
     )
-    @JoinColumn([{ name: 'acceptedid' }])
+    @JoinColumn([{ name: 'acceptedID' }])
     acceptedName: Promise<GeoThesaurusMunicipality>;
 
     @OneToMany(
@@ -64,6 +60,6 @@ export class GeoThesaurusMunicipality extends EntityProvider {
         (geothescounty) => geothescounty.municipalities,
         { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' }
     )
-    @JoinColumn([{ name: 'countyid' }])
+    @JoinColumn([{ name: 'countyID' }])
     county: Promise<GeoThesaurusCounty>;
 }

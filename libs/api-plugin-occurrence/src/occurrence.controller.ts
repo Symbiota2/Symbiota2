@@ -119,71 +119,71 @@ export class OccurrenceController {
         const inputStream = fs.createReadStream(file.path);
 
         return new Promise(((resolve, reject) => {
-            let currentChunk: DeepPartial<Occurrence>[] = [];
-            const occurrencePromises = [];
-            const uploadStart = Date.now();
-
-            this.logger.debug('Upload started');
-
-            inputStream.pipe(JSONStream.parse('*'))
-                .on('data', async (occurrence) => {
-                    if (currentChunk.length < OccurrenceController.CREATE_MANY_CHUNK_SZ) {
-                        try {
-                            currentChunk.push(
-                                plainToClass(
-                                    OccurrenceInputDto,
-                                    occurrence,
-                                    {
-                                        enableImplicitConversion: true,
-                                        excludeExtraneousValues: true
-                                    }
-                                )
-                            );
-                        }
-                        catch (e) {
-                            throw new BadRequestException(e.message);
-                        }
-                    }
-                    else {
-                        occurrencePromises.push(
-                            this.occurrenceService.createMany(
-                                collectionID,
-                                currentChunk
-                            )
-                        );
-                        currentChunk = [];
-                    }
-                })
-                .on('error', async (e) => {
-                    await fsPromises.unlink(file.path);
-                    reject(e);
-                })
-                .on('end', async () => {
-                    if (currentChunk.length > 0) {
-                        occurrencePromises.push(
-                            this.occurrenceService.createMany(
-                                collectionID,
-                                currentChunk
-                            )
-                        );
-                    }
-
-                    try {
-                        await Promise.all(occurrencePromises);
-                    }
-                    catch (e) {
-                        reject(e);
-                    }
-                    finally {
-                        const uploadTook = Math.round(
-                            (Date.now() - uploadStart) / 1000
-                        );
-                        this.logger.debug(`Upload took ${uploadTook}s`);
-                        await fsPromises.unlink(file.path);
-                    }
-
-                    resolve();
-                });
+            // let currentChunk: DeepPartial<Occurrence>[] = [];
+            // const occurrencePromises = [];
+            // const uploadStart = Date.now();
+            //
+            // this.logger.debug('Upload started');
+            //
+            // inputStream.pipe(JSONStream.parse('*'))
+            //     .on('data', async (occurrence) => {
+            //         if (currentChunk.length < OccurrenceController.CREATE_MANY_CHUNK_SZ) {
+            //             try {
+            //                 currentChunk.push(
+            //                     plainToClass(
+            //                         OccurrenceInputDto,
+            //                         occurrence,
+            //                         {
+            //                             enableImplicitConversion: true,
+            //                             excludeExtraneousValues: true
+            //                         }
+            //                     )
+            //                 );
+            //             }
+            //             catch (e) {
+            //                 throw new BadRequestException(e.message);
+            //             }
+            //         }
+            //         else {
+            //             occurrencePromises.push(
+            //                 this.occurrenceService.createMany(
+            //                     collectionID,
+            //                     currentChunk
+            //                 )
+            //             );
+            //             currentChunk = [];
+            //         }
+            //     })
+            //     .on('error', async (e) => {
+            //         await fsPromises.unlink(file.path);
+            //         reject(e);
+            //     })
+            //     .on('end', async () => {
+            //         if (currentChunk.length > 0) {
+            //             occurrencePromises.push(
+            //                 this.occurrenceService.createMany(
+            //                     collectionID,
+            //                     currentChunk
+            //                 )
+            //             );
+            //         }
+            //
+            //         try {
+            //             await Promise.all(occurrencePromises);
+            //         }
+            //         catch (e) {
+            //             reject(e);
+            //         }
+            //         finally {
+            //             const uploadTook = Math.round(
+            //                 (Date.now() - uploadStart) / 1000
+            //             );
+            //             this.logger.debug(`Upload took ${uploadTook}s`);
+            //             await fsPromises.unlink(file.path);
+            //         }
+            //
+            //         resolve();
+            //     });
         }));
     }
 }

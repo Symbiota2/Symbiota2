@@ -9,44 +9,41 @@ import {
 import { Taxon } from './Taxon.entity';
 import { EntityProvider } from '../../entity-provider.class';
 
-@Index('taxaresource_name', ['sourceName'])
+@Index(['sourceName'])
 @Index(['taxonID'])
-@Entity('taxaresourcelinks')
+@Entity()
 export class TaxonResourceLink extends EntityProvider {
-    @PrimaryGeneratedColumn({ type: 'int', name: 'taxaresourceid' })
+    @PrimaryGeneratedColumn()
     id: number;
 
-    @Column('int', { name: 'tid', unsigned: true })
+    @Column('int', { unsigned: true })
     taxonID: number;
 
-    @Column('varchar', { name: 'sourcename', length: 150 })
+    @Column('varchar', { length: 150 })
     sourceName: string;
 
-    @Column('varchar', { name: 'sourceidentifier', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     sourceIdentifier: string | null;
 
-    @Column('varchar', { name: 'sourceguid', nullable: true, length: 150 })
+    @Column('varchar', { nullable: true, length: 150 })
     sourceGUID: string | null;
 
-    @Column('varchar', { name: 'url', nullable: true, length: 250 })
+    @Column('varchar', { nullable: true, length: 250 })
     url: string | null;
 
-    @Column('varchar', { name: 'notes', nullable: true, length: 250 })
+    @Column('varchar', { nullable: true, length: 250 })
     notes: string | null;
 
-    @Column('int', { name: 'ranking', nullable: true })
+    @Column('int', { nullable: true })
     ranking: number | null;
 
-    @Column('timestamp', {
-        name: 'initialtimestamp',
-        default: () => 'CURRENT_TIMESTAMP()',
-    })
+    @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP()' })
     initialTimestamp: Date;
 
     @ManyToOne(() => Taxon, (taxa) => taxa.resourceLinks, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
     })
-    @JoinColumn([{ name: 'tid'}])
+    @JoinColumn([{ name: 'taxonID' }])
     taxon: Promise<Taxon>;
 }

@@ -6,76 +6,60 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
-import { AdminLanguage } from '../AdminLanguage.entity';
 import { Taxon } from './Taxon.entity';
 import { EntityProvider } from '../../entity-provider.class';
 
-@Index('unique-key', ['language', 'vernacularName', 'taxonID'], { unique: true })
-@Index('tid1', ['taxonID'])
-@Index('vernacularsnames', ['vernacularName'])
+@Index(['language', 'vernacularName', 'taxonID'], { unique: true })
+@Index(['taxonID'])
+@Index(['vernacularName'])
 @Index(['adminLanguageID'])
-@Entity('taxavernaculars')
+@Entity()
 export class TaxonVernacular extends EntityProvider {
-    @PrimaryGeneratedColumn({ type: 'int', name: 'VID' })
+    @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
-    @Column('int', { name: 'TID', unsigned: true, default: () => '\'0\'' })
+    @Column('int', { unsigned: true, default: () => "'0'" })
     taxonID: number;
 
-    @Column('varchar', { name: 'VernacularName', length: 80 })
+    @Column('varchar', { length: 80 })
     vernacularName: string;
 
-    @Column('varchar', {
-        name: 'Language',
-        length: 15,
-        default: () => '\'English\'',
-    })
+    @Column('varchar', { length: 15, default: () => "'English'" })
     language: string;
 
-    @Column('int', { name: 'langid', nullable: true })
+    @Column('int', { nullable: true })
     adminLanguageID: number | null;
 
-    @Column('varchar', { name: 'Source', nullable: true, length: 50 })
+    @Column('varchar', { nullable: true, length: 50 })
     source: string;
 
-    @Column('varchar', { name: 'notes', nullable: true, length: 250 })
+    @Column('varchar', { nullable: true, length: 250 })
     notes: string;
 
-    @Column('varchar', { name: 'username', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     username: string;
 
     @Column('int', {
-        name: 'isupperterm',
         nullable: true,
-        default: () => '\'0\''
+        default: () => "'0'"
     })
     isUpperTerm: number | null;
 
     @Column('int', {
-        name: 'SortSequence',
         nullable: true,
-        default: () => '\'50\'',
+        default: () => "'50'",
     })
     sortSequence: number | null;
 
     @Column('timestamp', {
-        name: 'InitialTimeStamp',
         default: () => 'CURRENT_TIMESTAMP()',
     })
     initialTimestamp: Date;
-
-    @ManyToOne(
-        () => AdminLanguage,
-        (adminlanguages) => adminlanguages.taxonVernaculars,
-        { onDelete: 'SET NULL', onUpdate: 'CASCADE' }
-    )
-    @JoinColumn([{ name: 'langid'}])
-    adminLanguage: Promise<AdminLanguage>;
 
     @ManyToOne(() => Taxon, (taxa) => taxa.vernacularNames, {
         onDelete: 'RESTRICT',
         onUpdate: 'RESTRICT',
     })
-    @JoinColumn([{ name: 'TID'}])
+    @JoinColumn([{ name: 'taxonID' }])
     taxon: Promise<Taxon>;
 }

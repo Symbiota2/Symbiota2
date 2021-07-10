@@ -13,34 +13,33 @@ import { EntityProvider } from '../../entity-provider.class';
 
 @Index(['countryID'])
 @Index(['acceptedID'])
-@Entity('geothesstateprovince')
+@Entity()
 export class GeoThesuarusStateProvince extends EntityProvider {
-    @PrimaryGeneratedColumn({ type: 'int', name: 'gtspid' })
+    @PrimaryGeneratedColumn()
     id: number;
 
-    @Column('varchar', { name: 'stateterm', length: 45 })
+    @Column('varchar', { length: 45 })
     stateTerm: string;
 
-    @Column('varchar', { name: 'abbreviation', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     abbreviation: string | null;
 
-    @Column('varchar', { name: 'code', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     code: string | null;
 
-    @Column('int', { name: 'lookupterm', default: () => '\'1\'' })
+    @Column('int', { default: () => '\'1\'' })
     lookupTerm: number;
 
-    @Column('int', { name: 'acceptedid', nullable: true })
+    @Column('int', { nullable: true })
     acceptedID: number | null;
 
-    @Column('int', { name: 'countryid', nullable: true })
+    @Column('int', { nullable: true })
     countryID: number | null;
 
-    @Column('longtext', { name: 'footprintWKT', nullable: true })
+    @Column('longtext', { nullable: true })
     footprintWKT: string | null;
 
     @Column('timestamp', {
-        name: 'initialtimestamp',
         nullable: true,
         default: () => 'CURRENT_TIMESTAMP()',
     })
@@ -54,7 +53,7 @@ export class GeoThesuarusStateProvince extends EntityProvider {
         (geothesstateprovince) => geothesstateprovince.otherNames,
         { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' }
     )
-    @JoinColumn([{ name: 'acceptedid' }])
+    @JoinColumn([{ name: 'acceptedID' }])
     acceptedName: Promise<GeoThesuarusStateProvince>;
 
     @OneToMany(
@@ -68,6 +67,6 @@ export class GeoThesuarusStateProvince extends EntityProvider {
         (geothescountry) => geothescountry.stateProvinces,
         { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' }
     )
-    @JoinColumn([{ name: 'countryid' }])
+    @JoinColumn([{ name: 'countryID' }])
     country: Promise<GeoThesaurusCountry>;
 }

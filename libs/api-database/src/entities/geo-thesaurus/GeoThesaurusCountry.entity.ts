@@ -13,40 +13,39 @@ import { EntityProvider } from '../../entity-provider.class';
 
 @Index(['continentID'])
 @Index(['acceptedID'])
-@Entity('geothescountry')
+@Entity()
 export class GeoThesaurusCountry extends EntityProvider {
-    @PrimaryGeneratedColumn({ type: 'int', name: 'gtcid' })
+    @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
-    @Column('varchar', { name: 'countryterm', length: 45 })
+    @Column('varchar', { length: 45 })
     countryTerm: string;
 
-    @Column('varchar', { name: 'abbreviation', nullable: true, length: 45 })
+    @Column('varchar', { nullable: true, length: 45 })
     abbreviation: string | null;
 
-    @Column('varchar', { name: 'iso', nullable: true, length: 2 })
+    @Column('varchar', { nullable: true, length: 2 })
     iso: string | null;
 
-    @Column('varchar', { name: 'iso3', nullable: true, length: 3 })
+    @Column('varchar', { nullable: true, length: 3 })
     iso3: string | null;
 
-    @Column('int', { name: 'numcode', nullable: true })
+    @Column('int', { nullable: true })
     numCode: number | null;
 
-    @Column('int', { name: 'lookupterm', default: () => '\'1\'' })
+    @Column('int', { default: () => "'1'" })
     lookupTerm: number;
 
-    @Column('int', { name: 'acceptedid', nullable: true })
+    @Column('int', { nullable: true })
     acceptedID: number | null;
 
-    @Column('int', { name: 'continentid', nullable: true })
+    @Column('int', { nullable: true })
     continentID: number | null;
 
-    @Column('longtext', { name: 'footprintWKT', nullable: true })
+    @Column('longtext', { nullable: true })
     footprintWKT: string | null;
 
     @Column('timestamp', {
-        name: 'initialtimestamp',
         nullable: true,
         default: () => 'CURRENT_TIMESTAMP()',
     })
@@ -63,7 +62,7 @@ export class GeoThesaurusCountry extends EntityProvider {
         (geothescountry) => geothescountry.otherNames,
         { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' }
     )
-    @JoinColumn([{ name: 'acceptedid' }])
+    @JoinColumn([{ name: 'acceptedID' }])
     acceptedName: Promise<GeoThesaurusCountry>;
 
     @OneToMany(() => GeoThesaurusCountry, (geothescountry) => geothescountry.acceptedName)
@@ -74,6 +73,6 @@ export class GeoThesaurusCountry extends EntityProvider {
         (geothescontinent) => geothescontinent.countries,
         { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' }
     )
-    @JoinColumn([{ name: 'continentid' }])
+    @JoinColumn([{ name: 'continentID' }])
     continent: Promise<GeoThesaurusContinent>;
 }
