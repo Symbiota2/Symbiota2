@@ -31,7 +31,7 @@ export class CollectionService extends BaseService<Collection> {
         const { orderBy, ...qParams } = params;
 
         return this.collections.find({
-            select: ['id', 'icon', 'collectionName', 'email'],
+            select: ['id', 'icon', 'name', 'email'],
             order: { [orderBy]: 'ASC' },
             where: qParams.id ? { id: qParams.id } : {}
         });

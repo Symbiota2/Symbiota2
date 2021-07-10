@@ -19,16 +19,10 @@ export class GeoThesuarusStateProvince extends EntityProvider {
     id: number;
 
     @Column('varchar', { length: 45 })
-    stateTerm: string;
+    name: string;
 
     @Column('varchar', { nullable: true, length: 45 })
     abbreviation: string | null;
-
-    @Column('varchar', { nullable: true, length: 45 })
-    code: string | null;
-
-    @Column('int', { default: () => '\'1\'' })
-    lookupTerm: number;
 
     @Column('int', { nullable: true })
     acceptedID: number | null;

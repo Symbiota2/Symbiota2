@@ -4,8 +4,8 @@ import {
 } from '@symbiota2/api-database';
 import { Repository } from 'typeorm';
 
-type ContinentListReturnVal = Pick<GeoThesaurusContinent, 'id' | 'acceptedID' | 'continentTerm'>;
-type ContinentReturnVal = Pick<GeoThesaurusContinent, 'id' | 'acceptedID' | 'continentTerm' | 'footprintWKT'>;
+type ContinentListReturnVal = Pick<GeoThesaurusContinent, 'id' | 'acceptedID' | 'name'>;
+type ContinentReturnVal = Pick<GeoThesaurusContinent, 'id' | 'acceptedID' | 'name' | 'footprintWKT'>;
 
 /**
  * Service for retrieving continents from the database
@@ -23,7 +23,7 @@ export class ContinentService {
      */
     async findOne(id: number): Promise<ContinentReturnVal> {
         return this.continentRepo.findOne(id, {
-            select: ['id', 'acceptedID', 'continentTerm', 'footprintWKT']
+            select: ['id', 'acceptedID', 'name', 'footprintWKT']
         });
     }
 
@@ -33,7 +33,7 @@ export class ContinentService {
      */
     async findAll(): Promise<ContinentListReturnVal[]> {
         return this.continentRepo.find({
-            select: ['id', 'acceptedID', 'continentTerm']
+            select: ['id', 'acceptedID', 'name']
         });
     }
 }

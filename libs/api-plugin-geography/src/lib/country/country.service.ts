@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { GeoThesaurusCountry } from '@symbiota2/api-database';
 import { Repository } from 'typeorm';
 
-type FindAllReturn = Pick<GeoThesaurusCountry, 'id' | 'continentID' | 'acceptedID' | 'countryTerm'>;
+type FindAllReturn = Pick<GeoThesaurusCountry, 'id' | 'continentID' | 'acceptedID' | 'name'>;
 
 /**
  * Service for retrieving countries from the database
@@ -18,8 +18,8 @@ export class CountryService {
      */
     async findAll(): Promise<FindAllReturn[]> {
         return this.countryRepo.find({
-            select: ['id', 'continentID', 'acceptedID', 'countryTerm'],
-            order: { 'countryTerm': 'ASC' }
+            select: ['id', 'continentID', 'acceptedID', 'name'],
+            order: { 'name': 'ASC' }
         });
     }
 
@@ -33,7 +33,7 @@ export class CountryService {
                 'id',
                 'continentID',
                 'acceptedID',
-                'countryTerm',
+                'name',
                 'iso',
                 'iso3',
                 'footprintWKT'

@@ -3,8 +3,8 @@ import { GeoThesuarusStateProvince } from '@symbiota2/api-database';
 import { Repository } from 'typeorm';
 
 type FindCountry = { id: number; countryTerm: string };
-type FindOneOutput = Pick<GeoThesuarusStateProvince, 'id' | 'acceptedID' | 'stateTerm' | 'footprintWKT'> & { country: FindCountry };
-type FindAllOutput = Pick<GeoThesuarusStateProvince, 'id' | 'stateTerm'> & { country: FindCountry };
+type FindOneOutput = Pick<GeoThesuarusStateProvince, 'id' | 'acceptedID' | 'name' | 'footprintWKT'> & { country: FindCountry };
+type FindAllOutput = Pick<GeoThesuarusStateProvince, 'id' | 'name'> & { country: FindCountry };
 
 /**
  * Service for retrieving states/provinces from the database

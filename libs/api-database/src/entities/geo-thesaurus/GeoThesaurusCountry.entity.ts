@@ -19,7 +19,7 @@ export class GeoThesaurusCountry extends EntityProvider {
     id: number;
 
     @Column('varchar', { length: 45 })
-    countryTerm: string;
+    name: string;
 
     @Column('varchar', { nullable: true, length: 45 })
     abbreviation: string | null;
@@ -29,12 +29,6 @@ export class GeoThesaurusCountry extends EntityProvider {
 
     @Column('varchar', { nullable: true, length: 3 })
     iso3: string | null;
-
-    @Column('int', { nullable: true })
-    numCode: number | null;
-
-    @Column('int', { default: () => "'1'" })
-    lookupTerm: number;
 
     @Column('int', { nullable: true })
     acceptedID: number | null;

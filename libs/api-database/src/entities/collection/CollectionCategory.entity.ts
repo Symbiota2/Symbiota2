@@ -8,7 +8,7 @@ export class CollectionCategory extends EntityProvider {
     id: number;
 
     @Column('varchar', { length: 75 })
-    category: string;
+    name: string;
 
     @Column('varchar', { nullable: true, length: 250 })
     icon: string | null;

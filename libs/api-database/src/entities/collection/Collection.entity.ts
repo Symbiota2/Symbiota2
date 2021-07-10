@@ -14,24 +14,18 @@ import { Institution } from './Institution.entity';
 import { Occurrence } from '../occurrence/Occurrence.entity';
 import { EntityProvider } from '../../entity-provider.class';
 
-@Index(['institutionCode', 'collectionCode'], { unique: true })
+@Index(['institutionID', 'code'], { unique: true })
 @Index(['institutionID'])
 @Entity()
 export class Collection extends EntityProvider {
     @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id: number;
 
-    @Column('varchar', {  length: 45 })
-    institutionCode: string;
-
     @Column('varchar', {  nullable: true, length: 45 })
-    collectionCode: string;
+    code: string;
 
     @Column('varchar', {  length: 150 })
-    collectionName: string;
-
-    @Column('varchar', {  nullable: true, length: 100 })
-    collectionIDStr: string;
+    name: string;
 
     @Column('varchar', {  nullable: true, length: 100 })
     datasetName: string;
