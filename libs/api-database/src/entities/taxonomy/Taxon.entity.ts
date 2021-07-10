@@ -19,7 +19,6 @@ import { EntityProvider } from '../../entity-provider.class';
 
 @Index(['scientificName', 'rankID', 'author'], { unique: true })
 @Index(['rankID'])
-@Index(['unitName1', 'unitName2'])
 @Index(['initialTimestamp'])
 @Index(['lastModifiedUID'])
 @Index(['scientificName'])
@@ -36,24 +35,6 @@ export class Taxon extends EntityProvider {
 
     @Column('varchar', { length: 250 })
     scientificName: string;
-
-    @Column('varchar', { nullable: true, length: 1 })
-    unitInd1: string;
-
-    @Column('varchar', { length: 50 })
-    unitName1: string;
-
-    @Column('varchar', { nullable: true, length: 1 })
-    unitInd2: string;
-
-    @Column('varchar', { nullable: true, length: 50 })
-    unitName2: string;
-
-    @Column('varchar', { nullable: true, length: 7 })
-    unitInd3: string;
-
-    @Column('varchar', { nullable: true, length: 35 })
-    unitName3: string;
 
     @Column('varchar', { nullable: true, length: 100 })
     author: string;
@@ -133,4 +114,37 @@ export class Taxon extends EntityProvider {
     })
     @JoinColumn([{ name: 'lastModifiedUID' }])
     lastModifiedUser: Promise<User>;
+
+    // TODO: Do we need the IND and NAME fields? What are the IND fields?
+    get unitInd1(): string {
+        return '';
+    }
+
+    get unitInd2(): string {
+        return '';
+    }
+
+    get unitInd3(): string {
+        return '';
+    }
+
+    get unitName1(): string {
+        return this.scientificName.split(" ")[0];
+    }
+
+    get unitName2(): string {
+        const nameParts = this.scientificName.split(" ");
+        if (nameParts.length > 1) {
+            return nameParts[1];
+        }
+        return '';
+    }
+
+    get unitName3(): string {
+        const nameParts = this.scientificName.split(" ");
+        if (nameParts.length > 2) {
+            return nameParts[2];
+        }
+        return '';
+    }
 }
