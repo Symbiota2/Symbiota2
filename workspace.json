@@ -266,21 +266,21 @@
         }
       }
     },
-    "ui-plugin-taxa": {
+    "ui-plugin-image": {
       "projectType": "library",
-      "root": "libs/ui-plugin-taxa",
-      "sourceRoot": "libs/ui-plugin-taxa/src",
+      "root": "libs/ui-plugin-image",
+      "sourceRoot": "libs/ui-plugin-image/src",
       "prefix": "symbiota2",
       "targets": {
         "build": {
           "executor": "@nrwl/angular:package",
           "options": {
-            "tsConfig": "libs/ui-plugin-occurrence/tsconfig.lib.json",
-            "project": "libs/ui-plugin-occurrence/ng-package.json"
+            "tsConfig": "libs/ui-plugin-image/tsconfig.lib.json",
+            "project": "libs/ui-plugin-image/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "libs/ui-plugin-occurrence/tsconfig.lib.prod.json"
+              "tsConfig": "libs/ui-plugin-image/tsconfig.lib.prod.json"
             }
           }
         },
@@ -288,16 +288,53 @@
           "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": [
-              "libs/ui-plugin-occurrence/src/**/*.ts",
-              "libs/ui-plugin-occurrence/src/**/*.html"
+              "libs/ui-plugin-image/src/**/*.ts",
+              "libs/ui-plugin-image/src/**/*.html"
             ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/ui-plugin-occurrence"],
+          "outputs": ["coverage/libs/ui-plugin-image"],
           "options": {
-            "jestConfig": "libs/ui-plugin-occurrence/jest.config.js",
+            "jestConfig": "libs/ui-plugin-image/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "ui-plugin-taxonomy": {
+      "projectType": "library",
+      "root": "libs/ui-plugin-taxonomy",
+      "sourceRoot": "libs/ui-plugin-taxonomy/src",
+      "prefix": "symbiota2",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/angular:package",
+          "options": {
+            "tsConfig": "libs/ui-plugin-taxonomy/tsconfig.lib.json",
+            "project": "libs/ui-plugin-taxonomy/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "libs/ui-plugin-taxonomy/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/ui-plugin-taxonomy/src/**/*.ts",
+              "libs/ui-plugin-taxonomy/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/ui-plugin-taxonomy"],
+          "options": {
+            "jestConfig": "libs/ui-plugin-taxonomy/jest.config.js",
             "passWithNoTests": true
           }
         }
@@ -542,22 +579,22 @@
         }
       }
     },
-    "api-plugin-taxa": {
-      "root": "libs/api-plugin-taxa",
-      "sourceRoot": "libs/api-plugin-taxa/src",
+    "api-plugin-image": {
+      "root": "libs/api-plugin-image",
+      "sourceRoot": "libs/api-plugin-image/src",
       "projectType": "library",
       "targets": {
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-plugin-taxa/**/*.ts"]
+            "lintFilePatterns": ["libs/api-plugin-image/**/*.ts"]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-plugin-taxa"],
+          "outputs": ["coverage/libs/api-plugin-image"],
           "options": {
-            "jestConfig": "libs/api-plugin-taxa/jest.config.js",
+            "jestConfig": "libs/api-plugin-image/jest.config.js",
             "passWithNoTests": true
           }
         },
@@ -565,11 +602,43 @@
           "executor": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "outputPath": "dist/libs/api-plugin-taxa",
-            "tsConfig": "libs/api-plugin-taxa/tsconfig.lib.json",
-            "packageJson": "libs/api-plugin-taxa/package.json",
-            "main": "libs/api-plugin-taxa/src/index.ts",
-            "assets": ["libs/api-plugin-taxa/*.md"]
+            "outputPath": "dist/libs/api-plugin-image",
+            "tsConfig": "libs/api-plugin-image/tsconfig.lib.json",
+            "packageJson": "libs/api-plugin-image/package.json",
+            "main": "libs/api-plugin-image/src/index.ts",
+            "assets": ["libs/api-plugin-image/*.md"]
+          }
+        }
+      }
+    },
+    "api-plugin-taxonomy": {
+      "root": "libs/api-plugin-taxonomy",
+      "sourceRoot": "libs/api-plugin-taxonomy/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/api-plugin-taxonomy/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/api-plugin-taxonomy"],
+          "options": {
+            "jestConfig": "libs/api-plugin-taxonomy/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "executor": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/api-plugin-taxonomy",
+            "tsConfig": "libs/api-plugin-taxonomy/tsconfig.lib.json",
+            "packageJson": "libs/api-plugin-taxonomy/package.json",
+            "main": "libs/api-plugin-taxonomy/src/index.ts",
+            "assets": ["libs/api-plugin-taxonomy/*.md"]
           }
         }
       }

@@ -26,14 +26,14 @@ import { BannerComponent } from './components/banner/banner.component';
 import { CollectionPlugin } from "@symbiota2/ui-plugin-collection";
 import { OccurrencePlugin } from '@symbiota2/ui-plugin-occurrence';
 import { CreateUserProfileComponent } from './pages/create-user-profile/create-user-profile.component';
-import { TaxaPlugin } from '@symbiota2/ui-plugin-taxa';
+import { TaxonomyPlugin } from '@symbiota2/ui-plugin-taxonomy';
 import { ErrorComponent } from './pages/create-user-profile/error-component/error.component';
 import { PasswordFormValidator } from './pages/user-profile/password-validator.directive';
 
 const PLUGINS = [
     CollectionPlugin,
     OccurrencePlugin,
-    TaxaPlugin
+    TaxonomyPlugin
 ];
 
 /**

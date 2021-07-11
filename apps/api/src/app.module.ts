@@ -5,7 +5,8 @@ import { ApiPluginModule } from '@symbiota2/api-common';
 import { OccurrenceModule } from '@symbiota2/api-plugin-occurrence';
 import { CollectionModule } from '@symbiota2/api-plugin-collection';
 import { ApiJobsModule } from '@symbiota2/api-jobs'
-import { TaxonModule } from '@symbiota2/api-plugin-taxa'
+import { ImageModule } from '@symbiota2/api-plugin-image'
+import { TaxonomyModule } from '@symbiota2/api-plugin-taxonomy'
 import {GeographyModule} from '@symbiota2/api-plugin-geography'
 
 const ENABLED_PLUGINS = [
@@ -13,7 +14,8 @@ const ENABLED_PLUGINS = [
     CollectionModule,
     OccurrenceModule,
     GeographyModule,
-    TaxonModule
+    ImageModule,
+    TaxonomyModule
 ];
 
 /**

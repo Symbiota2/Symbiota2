@@ -22,8 +22,11 @@
       "@symbiota2/ui-plugin-collection": [
         "libs/ui-plugin-collection/src/index.ts"
       ],
-      "@symbiota2/ui-plugin-taxa": [
-        "libs/ui-plugin-taxa/src/index.ts"
+      "@symbiota2/ui-plugin-image": [
+        "libs/ui-plugin-image/src/index.ts"
+      ],
+      "@symbiota2/ui-plugin-taxonomy": [
+        "libs/ui-plugin-taxonomy/src/index.ts"
       ],
       "@symbiota2/api-common": ["libs/api-common/src/index.ts"],
       "@symbiota2/api-config": ["libs/api-config/src/index.ts"],
@@ -35,8 +38,11 @@
       "@symbiota2/api-plugin-occurrence": [
         "libs/api-plugin-occurrence/src/index.ts"
       ],
-      "@symbiota2/api-plugin-taxa": [
-        "libs/api-plugin-taxa/src/index.ts"
+      "@symbiota2/api-plugin-image": [
+        "libs/api-plugin-image/src/index.ts"
+      ],
+      "@symbiota2/api-plugin-taxonomy": [
+        "libs/api-plugin-taxonomy/src/index.ts"
       ],
       "@symbiota2/api-jobs": ["libs/api-jobs/src/index.ts"],
       "@symbiota2/data-access": ["libs/data-access/src/index.ts"],
