@@ -5,6 +5,7 @@ import {
     QueryList,
     ViewChildren
 } from '@angular/core';
+import { ROUTE_COLLECTION_NEW } from "../../routes";
 import { CollectionService } from '../../services/collection.service';
 import { Observable } from 'rxjs';
 import { CollectionCategory } from '../../dto/Category.output.dto';
@@ -15,6 +16,8 @@ import { CollectionCategory } from '../../dto/Category.output.dto';
     styleUrls: ['./collection-list-page.component.scss']
 })
 export class CollectionListPage implements OnInit {
+    readonly ROUTE_COLLECTION_NEW = ROUTE_COLLECTION_NEW;
+
     expandAll = true;
     categories: Observable<CollectionCategory[]>;
 

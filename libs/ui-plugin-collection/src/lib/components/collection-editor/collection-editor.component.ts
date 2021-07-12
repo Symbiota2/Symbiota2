@@ -50,7 +50,7 @@ export class CollectionEditorComponent implements OnInit {
     }
 
     onEditLogo() {
-
+        // TODO: add functionality
     }
 
     onSubmit() {
