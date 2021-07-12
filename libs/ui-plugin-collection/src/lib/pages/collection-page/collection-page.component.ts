@@ -77,7 +77,7 @@ export class CollectionPage implements OnInit {
     onEdit() {
         const dialog = this.dialog.open(
             CollectionEditorComponent,
-            { data: this.collection }
+            { data: this.collection, disableClose: true }
         );
 
         combineLatest([
