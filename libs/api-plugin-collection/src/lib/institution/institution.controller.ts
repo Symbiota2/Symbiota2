@@ -1,8 +1,14 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Param,
+    Query,
+    SerializeOptions
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { InstitutionListItem } from "./dto/institution-list-item.output.dto";
 import { InstitutionService } from "./institution.service";
 import { InstitutionFindAllParams } from './dto/inst-find-all.input.dto';
+import { Institution } from '@symbiota2/api-database';
 
 @Controller('institutions')
 @ApiTags('Institutions')
@@ -11,10 +17,19 @@ export class InstitutionController {
 
     @Get()
     @ApiOperation({
-        summary: "Retrieve a specimen collection owner from the database"
+        summary: "Retrieve a list of specimen collection owners from the database"
     })
-    async findAll(@Query() query: InstitutionFindAllParams): Promise<InstitutionListItem[]> {
-        const institutions = await this.institutions.findAll(query);
-        return institutions.map((i) => new InstitutionListItem(i));
+    @SerializeOptions({ groups: ['list'] })
+    async findAll(@Query() query: InstitutionFindAllParams): Promise<Institution[]> {
+        return this.institutions.findAll(query);
+    }
+
+    @Get(':id')
+    @ApiOperation({
+        summary: "Retrieve a specimen collection owner by ID"
+    })
+    @SerializeOptions({ groups: ['single'] })
+    async findByID(@Param('id') institutionID: number): Promise<Institution> {
+        return this.institutions.findByID(institutionID);
     }
 }

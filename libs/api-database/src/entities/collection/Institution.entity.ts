@@ -7,20 +7,28 @@ import {
     OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Collection } from './collection/Collection.entity';
-import { OccurrenceLoan } from './occurrence/OccurrenceLoan.entity';
-import { User } from './user/User.entity';
-import { EntityProvider } from '../entity-provider.class';
+import { Collection } from './Collection.entity';
+import { OccurrenceLoan } from '../occurrence/OccurrenceLoan.entity';
+import { User } from '../user/User.entity';
+import { EntityProvider } from '../../entity-provider.class';
+import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
 @Index(['lastModifiedUID'])
 @Entity('institutions')
 export class Institution extends EntityProvider {
+    @ApiProperty()
+    @Expose({ groups: ['single', 'list'] })
     @PrimaryGeneratedColumn({ type: 'int', name: 'iid', unsigned: true })
     id: number;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'InstitutionCode', length: 45 })
     code: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single', 'list'] })
     @Column('varchar', { name: 'InstitutionName', length: 150 })
     name: string;
 
@@ -31,36 +39,58 @@ export class Institution extends EntityProvider {
     })
     name2: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'Address1', nullable: true, length: 150 })
     address1: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'Address2', nullable: true, length: 150 })
     address2: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'City', nullable: true, length: 45 })
     city: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'StateProvince', nullable: true, length: 45 })
     stateProvince: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'PostalCode', nullable: true, length: 45 })
     postalCode: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'Country', nullable: true, length: 45 })
     country: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'Phone', nullable: true, length: 45 })
     phone: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'Contact', nullable: true, length: 65 })
     contact: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'Email', nullable: true, length: 45 })
     email: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'Url', nullable: true, length: 250 })
     url: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'Notes', nullable: true, length: 250 })
     notes: string;
 
@@ -70,6 +100,8 @@ export class Institution extends EntityProvider {
     @Column('datetime', { name: 'modifiedTimeStamp', nullable: true })
     lastModifiedTimestamp: Date | null;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('timestamp', {
         name: 'IntialTimeStamp',
         default: () => 'CURRENT_TIMESTAMP()',

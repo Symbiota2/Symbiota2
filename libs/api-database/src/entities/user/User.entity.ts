@@ -18,7 +18,7 @@ import { Glossary } from '../glossary/Glossary.entity';
 import { GlossaryImage } from '../glossary/GlossaryImage.entity';
 import { Image } from '../image/Image.entity';
 import { ImageKeyword } from '../image/ImageKeyword.entity';
-import { Institution } from '../Institution.entity';
+import { Institution } from '../collection/Institution.entity';
 import { Medium } from '../Medium.entity';
 import { Occurrence } from '../occurrence/Occurrence.entity';
 import { OccurrenceAssociation } from '../occurrence/OccurrenceAssociation.entity';

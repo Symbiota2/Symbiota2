@@ -3,6 +3,22 @@ export interface ApiCollectionInstitutionOutput {
     name: string;
 }
 
+export interface ApiInstitutionOutput extends ApiCollectionInstitutionOutput {
+    code: string;
+    address1: string;
+    address2: string;
+    city: string;
+    stateProvince: string;
+    postalCode: string;
+    country: string;
+    phone: string;
+    contact: string;
+    email: string;
+    url: string;
+    notes: string;
+    initialTimestamp: string;
+}
+
 export interface ApiCollectionStatsOutput {
     familyCount: number;
     genusCount: number;

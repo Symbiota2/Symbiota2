@@ -27,7 +27,7 @@ export * from './Collector.entity';
 export * from './Configuration.entity';
 export * from './CtNameType.entity';
 export * from './CtRelationshipType.entity';
-export * from './Institution.entity';
+export * from './collection/Institution.entity';
 export * from './Medium.entity';
 export * from './Paleochronostratigraphy.entity';
 export * from './SalixWordStat.entity';

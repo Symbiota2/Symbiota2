@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { OccurrenceLoanLink } from './OccurrenceLoanLink.entity';
 import { Collection } from '../collection';
-import { Institution } from '../Institution.entity';
+import { Institution } from '../collection/Institution.entity';
 import { EntityProvider } from '../../entity-provider.class';
 
 @Index(['ownerInstitutionID'])

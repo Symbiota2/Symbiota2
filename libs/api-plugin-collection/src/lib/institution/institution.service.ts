@@ -19,7 +19,6 @@ export class InstitutionService extends BaseService<Institution> {
     constructor(
         @Inject(Institution.PROVIDER_ID)
         private readonly institutions: Repository<Institution>) {
-
         super(institutions);
     }
 
@@ -30,6 +29,7 @@ export class InstitutionService extends BaseService<Institution> {
     findAll(params?: InstitutionFindAllParams): Promise<Institution[]> {
         const { limit, offset, ...qParams } = params;
         return this.institutions.find({
+            select: ['id', 'name'],
             where: qParams,
             take: limit,
             skip: offset
