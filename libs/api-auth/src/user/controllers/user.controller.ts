@@ -54,11 +54,9 @@ export class UserController {
     @SerializeOptions({ groups: [UserOutputDto.GROUP_LIST] })
     @UseGuards(JwtAuthGuard, SuperAdminGuard)
     async findAll(@Query() query?: FindAllQuery): Promise<UserOutputDto[]> {
-        if (query) {
-            if (query.username) {
-                const user = await this.userService.findByLogin(query.username);
-                return [new UserOutputDto(user)];
-            }
+        if (query && query.username) {
+            const user = await this.userService.findByLogin(query.username);
+            return [new UserOutputDto(user)];
         }
 
         const users = await this.userService.findAll();

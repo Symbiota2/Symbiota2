@@ -53,7 +53,10 @@ export class UserService extends BaseService<User> {
      * provided.
      */
     async findAll(fields?: [keyof User]): Promise<User[]> {
-        return this.userRepo.find({ select: fields });
+        if (fields) {
+            return this.userRepo.find({ select: fields });
+        }
+        return this.userRepo.find();
     }
 
     /**
