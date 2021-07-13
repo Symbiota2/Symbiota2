@@ -117,8 +117,8 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
         return [
             {
                 url: `/${TaxonomyPlugin.TAXA_VIEWER_ROUTE}`,
-                //name: "core.layout.header.topnav.search_taxa_link"
-                name: "Taxa Viewer"
+                name: "core.layout.header.topnav.taxonomy.viewer.link"
+                //name: "Taxa Viewer"
             }
         ]
     }
