@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { FormControl, FormGroup, Validators, FormBuilder } from "@angular/forms";
 
 @Component({
   selector: 'symbiota2-collection-new-collection',
@@ -8,10 +8,29 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 })
 export class CollectionNewCollectionComponent implements OnInit {
 
-  constructor() { }
-
+  newCollectionForm = this.fb.group({
+    name: [''],
+    code: [''],
+    desc: [''],
+    homepage: [''],
+    contact: [''],
+    email: [''],
+    latitude: [''],
+    longitude: [''],
+    category: [''],
+    license: [''],
+    aggregators: [''],
+    icon: [''],
+    type: [''],
+    management: [''],
+  });
+  
+  constructor(private fb: FormBuilder) {}
+  
   ngOnInit(): void {
     
   }
+
+  
 
 }

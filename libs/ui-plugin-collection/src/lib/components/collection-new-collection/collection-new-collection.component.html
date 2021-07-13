@@ -1,80 +1,80 @@
 <p>collection-new-collection works!</p>
-<div fxLayout="column">
-    <div fxLayout="row wrap" fxLayoutGap="20px">
+<form [formGroup]="newCollectionForm">
+    <div fxLayout="column">
+        <div fxLayout="row wrap" fxLayoutGap="20px">
+            <mat-form-field>
+                <mat-label>Collection Code</mat-label>
+                <input matInput formControlName="code"/>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Collection Name</mat-label>
+                <input matInput formControlName="name"/>
+            </mat-form-field>
+        </div>
         <mat-form-field>
-            <mat-label>Collection Code</mat-label>
-            <input matInput />
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="desc"></textarea>
         </mat-form-field>
         <mat-form-field>
-            <mat-label>Collection Name</mat-label>
-            <input matInput />
+            <mat-label>Homepage</mat-label>
+            <input matInput type="url" formControlName="homepage"/>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Contact</mat-label>
+            <input matInput type="url" formControlName="contact"/>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email"/>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>latitude</mat-label>
+            <input matInput type="number" step="0.000001" formControlName="latitude"/>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>longitude</mat-label>
+            <input matInput type="number" step="0.000001" formControlName="longitude"/>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Category</mat-label>
+            <mat-select formControlName="category">
+                <!-- //TODO: api will handle populating categories -->
+                <mat-option value="one">category one</mat-option>
+                <mat-option value="two">category two</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>License</mat-label>
+            <input matInput type="url" formControlName="license"/>
+        </mat-form-field>
+        <mat-checkbox value="publishToAggregators" formControlName="aggregators">
+            Publish to Aggregators</mat-checkbox
+        >
+        <mat-form-field>
+            <mat-label>Icon URL</mat-label>
+            <input matInput formControlName="icon" />
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Collection Type</mat-label>
+            <mat-select formControlName="type">
+                <!-- //TODO: api will handle populating collection types -->
+                <mat-option value="preservedSpecimens"
+                    >Preserved Specimens</mat-option
+                >
+                <mat-option value="generalObservations"
+                    >General Observations</mat-option
+                >
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Management</mat-label>
+            <mat-select formControlName="management">
+                <!-- //TODO: api will handle populating collection types -->
+                <mat-option value="snapshot">Snapshot</mat-option>
+                <mat-option value="liveData">Live Data</mat-option>
+            </mat-select>
         </mat-form-field>
     </div>
-    <mat-form-field>
-        <mat-label>Institution Code</mat-label>
-        <input matInput />
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Desciption</mat-label>
-        <textarea matInput></textarea>
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Homepage</mat-label>
-        <input matInput type="url" />
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Email</mat-label>
-        <input matInput type="email" />
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>latitude</mat-label>
-        <input matInput type="number" step="0.000001" />
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>longitude</mat-label>
-        <input matInput type="number" step="0.000001" />
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Category</mat-label>
-        <mat-select>
-            <!-- //TODO: api will handle populating categories -->
-            <mat-option value="one">category one</mat-option>
-            <mat-option value="two">category two</mat-option>
-        </mat-select>
-    </mat-form-field>
-    <mat-checkbox value="publicEdits">Allow Public Edits</mat-checkbox>
-    <mat-form-field>
-        <mat-label>License</mat-label>
-        <input matInput type="url" />
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Rights Holder</mat-label>
-        <input matInput />
-    </mat-form-field>
-    <mat-checkbox value="publishToAggregators">Publish to Aggregators</mat-checkbox>
-    <mat-form-field>
-        <mat-label>Source Record URL</mat-label>
-        <input matInput />
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Icon URL</mat-label>
-        <input matInput />
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Collection Type</mat-label>
-        <mat-select>
-            <!-- //TODO: api will handle populating collcetion types -->
-            <mat-option value="preservedSpecimens">Preserved Specimens</mat-option>
-            <mat-option value="generalObservations">General Observations</mat-option>
-        </mat-select>
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Managment</mat-label>
-        <mat-select>
-            <!-- //TODO: api will handle populating collcetion types -->
-            <mat-option value="snapshot">Snapshot</mat-option>
-            <mat-option value="liveData">Live Data</mat-option>
-        </mat-select>
-    </mat-form-field>
-
-</div>
+    <pre> <b>Form Values:</b> {{newCollectionForm.value | json}}</pre>
+    <p><b>Form Status:</b> {{newCollectionForm.status}}</p>
+</form>
