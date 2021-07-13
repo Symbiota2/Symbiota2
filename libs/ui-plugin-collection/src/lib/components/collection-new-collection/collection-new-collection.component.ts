@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators, FormBuilder } from "@angular/forms";
+import { Validators, FormBuilder } from "@angular/forms";
 
 @Component({
   selector: 'symbiota2-collection-new-collection',
@@ -9,20 +9,20 @@ import { FormControl, FormGroup, Validators, FormBuilder } from "@angular/forms"
 export class CollectionNewCollectionComponent implements OnInit {
 
   newCollectionForm = this.fb.group({
-    name: [''],
-    code: [''],
-    desc: [''],
-    homepage: [''],
-    contact: [''],
-    email: [''],
-    latitude: [''],
-    longitude: [''],
-    category: [''],
-    license: [''],
+    name: ['', Validators.required],
+    code: ['', Validators.required],
+    desc: ['', Validators.required],
+    homepage: ['', Validators.required],
+    contact: ['', Validators.required],
+    email: ['', Validators.required, Validators.email],
+    latitude: ['', Validators.required],
+    longitude: ['', Validators.required],
+    category: ['', Validators.required],
+    license: ['', Validators.required],
     aggregators: [''],
-    icon: [''],
-    type: [''],
-    management: [''],
+    icon: ['', ],
+    type: ['', Validators.required],
+    management: ['', Validators.required],
   });
   
   constructor(private fb: FormBuilder) {}
@@ -31,6 +31,9 @@ export class CollectionNewCollectionComponent implements OnInit {
     
   }
 
-  
+  onSubmit(): void {
+    //TODO: add functionality
+    console.log(this.newCollectionForm.value);
+  }
 
 }
