@@ -20,6 +20,7 @@ import { TranslateService } from '@ngx-translate/core'
 interface TaxonNode {
     name: string
     taxonID: number
+    author: string
     expanded?: boolean
     synonym?: boolean
     children?: TaxonNode[]
@@ -35,6 +36,7 @@ export class TaxaViewerPageComponent implements OnInit {
     nameControl = new FormControl()
     nameOptions: string[]
     hasAuthors = false
+    includeAuthors = false
     language = "none"
     kindOfName = "Scientific"
     languageList = []
@@ -218,18 +220,18 @@ export class TaxaViewerPageComponent implements OnInit {
         this.taxaService.findScientificName(sciname,this.taxonomicAuthorityID).subscribe((taxon) => {
             this.taxon = taxon
             let taxonID = taxon.id
-            let baseNode: TaxonNode = { name: sciname, taxonID: taxonID, expanded: true, synonym: false, children: []}
+            let baseNode: TaxonNode = { name: sciname, taxonID: taxonID, author: taxon.author, expanded: true, synonym: false, children: []}
 
             // Is this taxon a synonym?
             this.taxonomicStatusService.findAll({taxonIDs: [taxon.id], taxonomicAuthorityID: this.taxonomicAuthorityID} ).subscribe((myStatii) => {
                 myStatii.forEach((myStatus) => {
                     if (taxonID != myStatus.taxonIDAccepted) {
-                        console.log("Found synonym " + taxonID)
+                        //console.log("Found synonym " + taxonID)
                         taxonID = myStatus.taxonIDAccepted
                         this.taxaService.findByID(myStatus.taxonIDAccepted, this.taxonomicAuthorityID).subscribe( (myTaxon) => {
                             baseNode.name = myTaxon.scientificName
                             baseNode.taxonID = myTaxon.id
-                            const synNode: TaxonNode = {name: sciname, taxonID: myTaxon.id, expanded: false, synonym: true, children: []}
+                            const synNode: TaxonNode = {name: sciname, taxonID: myTaxon.id, author: myTaxon.author, expanded: false, synonym: true, children: []}
                             baseNode.children = [synNode]
                         })
                     }
@@ -245,6 +247,7 @@ export class TaxaViewerPageComponent implements OnInit {
                     const acceptedId = rec.taxonIDAccepted
                     if (rec.taxonID !== acceptedId) {
                         // This is a synonym
+                        //console.log("found child synonym " + rec.taxonID)
                         if (childrenSynonyms[acceptedId]) {
                             // Have seen this accepted name before
                             childrenSynonyms[acceptedId].concat(rec.taxonID)
@@ -271,9 +274,11 @@ export class TaxaViewerPageComponent implements OnInit {
                 // Get the names of the children
                 this.taxaService.findAll(this.taxonomicAuthorityID,{taxonIDs: childrenTids}).subscribe((t) => {
                     t.forEach(function (r) {
+                        //console.log(" name is " + r.scientificName)
                         const child : TaxonNode = {
                             name: r.scientificName,
                             taxonID: r.id,
+                            author: r.author,
                             expanded: false,
                             synonym: false,
                             children: []
@@ -301,6 +306,7 @@ export class TaxaViewerPageComponent implements OnInit {
                                     const childItem: TaxonNode = {
                                         name: synonym.scientificName,
                                         taxonID: synonym.id,
+                                        author: synonym.author,
                                         expanded: false,
                                         synonym: true,
                                         children: []
@@ -347,6 +353,7 @@ export class TaxaViewerPageComponent implements OnInit {
                         const item: TaxonNode = {
                             name: b.scientificName,
                             taxonID: b.id,
+                            author: b.author,
                             expanded: false,
                             synonym: false,
                             children: a,
@@ -437,10 +444,12 @@ export class TaxaViewerPageComponent implements OnInit {
 
                     // Sort and format the children as tree nodes
                     const childrenTree = []
-                    children.sort((a,b) => a.scientificName = b.scientificName).forEach((item) => {
+                    children.sort((a,b) => a.scientificName - b.scientificName).forEach((item) => {
+                        //console.log(" what is name " + item.scientificName)
                         const baseNode: TaxonNode = {
                             name: item.scientificName,
                             taxonID: item.id,
+                            author: item.author,
                             expanded: false,
                             synonym: false,
                             children: [] }

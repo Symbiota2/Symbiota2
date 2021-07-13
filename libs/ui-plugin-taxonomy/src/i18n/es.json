@@ -20,6 +20,7 @@
   "taxonomy.viewer.label.name.scientific": "Nombre científico",
   "taxonomy.viewer.label.name.common": "Nombre vernáculo",
   "taxonomy.viewer.label.checkbox.authors": "Incluir autores",
+  "taxonomy.viewer.label.checkbox.include.authors": "Incluir autores",
   "core.layout.header.topnav.taxonomy.viewer.link": "Visor de taxonomía",
   "taxon.profile.title": "Perfil de taxón",
   "taxon.profile.no.image": "Imagen aún no disponible.",
