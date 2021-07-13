@@ -32,6 +32,8 @@ import { CollectionFieldComponent } from './components/collection-field/collecti
 import { CollectionListPage } from './pages/collection-list-page/collection-list-page.component';
 import { CollectionCardComponent } from './components/collection-card/collection-card.component';
 import { CollectionEditorComponent } from './components/collection-editor/collection-editor.component';
+import { CollectionEditorDialogComponent } from './components/collection-editor-dialog/collection-editor-dialog.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
     declarations: [
@@ -42,26 +44,28 @@ import { CollectionEditorComponent } from './components/collection-editor/collec
         CollectionLogoComponent,
         CollectionListPage,
         CollectionCardComponent,
-        CollectionEditorComponent
+        CollectionEditorComponent,
+        CollectionEditorDialogComponent
     ],
-    imports: [
-        AppTranslationModule,
-        MatTreeModule,
-        MatIconModule,
-        MatCheckboxModule,
-        CommonModule,
-        MatButtonModule,
-        MatTabsModule,
-        UiPluginModule,
-        FlexModule,
-        MatCardModule,
-        RouterModule,
-        MatFormFieldModule,
-        MatButtonModule,
-        ReactiveFormsModule,
-        SymbiotaComponentModule,
-        MatInputModule
-    ],
+  imports: [
+    AppTranslationModule,
+    MatTreeModule,
+    MatIconModule,
+    MatCheckboxModule,
+    CommonModule,
+    MatButtonModule,
+    MatTabsModule,
+    UiPluginModule,
+    FlexModule,
+    MatCardModule,
+    RouterModule,
+    MatFormFieldModule,
+    MatButtonModule,
+    ReactiveFormsModule,
+    SymbiotaComponentModule,
+    MatInputModule,
+    MatDialogModule
+  ],
     providers: [
         CollectionService,
         CollectionProfileService

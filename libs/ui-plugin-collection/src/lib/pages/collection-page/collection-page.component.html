@@ -1,4 +1,4 @@
-<div *ngIf="collection">
+<div *ngIf="(collection | async) as collection">
     <div fxLayout="row" fxLayoutAlign="start center">
         <symbiota2-collection-logo
             id="collectionLogo"
@@ -12,16 +12,16 @@
             <h1 id="collectionName">
                 {{ collection.collectionName }}
                 <button
+                    *ngIf="userCanEdit | async"
                     id='editButton'
                     mat-icon-button
-                    *ngIf="currentUser && currentUser.canEditCollection(collection.id)"
                     (click)="onEdit()"
                 >
                     <mat-icon>edit</mat-icon>
                 </button>
             </h1>
             <div id="links">
-                <ng-container *ngFor="let link of links">
+                <ng-container *ngFor="let link of (links | async)">
                     <span>
                         <a
                             [routerLink]="link.routerLink"
@@ -41,7 +41,7 @@
                 <!-- TODO: i18n -->
                 <symbiota2-collection-field label="Contact" [value]="collection.contact"></symbiota2-collection-field>
                 <symbiota2-collection-field label="Contact email" [value]="collection.email"></symbiota2-collection-field>
-                <symbiota2-collection-field label="Home page" [href]="collectionHomePage()" [value]="collection.homePage"></symbiota2-collection-field>
+                <symbiota2-collection-field label="Home page" [href]="collectionHomePage | async" [value]="collection.homePage"></symbiota2-collection-field>
                 <symbiota2-collection-field label="Collection type" [value]="collection.type"></symbiota2-collection-field>
                 <symbiota2-collection-field label="Management" [value]="collection.managementType"></symbiota2-collection-field>
                 <symbiota2-collection-field label="Usage rights" [value]="collection.usageTerm"></symbiota2-collection-field>
@@ -53,7 +53,7 @@
                 <b>Collection Stats</b>
                 <ul>
                     <li>{{ collection.stats.recordCount }} occurrences</li>
-                    <li>{{ collection.stats.georeferencedCount }} ({{ georeferencedPercent() }}%) georeferenced</li>
+                    <li>{{ collection.stats.georeferencedCount }} ({{ geoReferencedPercent | async }}%) georeferenced</li>
                     <li>{{ collection.stats.familyCount }} families</li>
                     <li>{{ collection.stats.genusCount }} genera</li>
                     <li>{{ collection.stats.speciesCount }} species</li>

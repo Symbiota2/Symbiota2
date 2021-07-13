@@ -1,0 +1,19 @@
+<div mat-dialog-content id='window' *ngIf='this.collection'>
+    <div fxLayout="row" fxLayoutAlign="start center">
+        <!-- TODO: Edit logo -->
+        <symbiota2-collection-logo src="{{ collection.icon }}" size="3rem">
+        </symbiota2-collection-logo>
+        <h1>Edit Collection</h1>
+        <button mat-icon-button id='closeBtn' (click)="onClose()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div fxLayout='row' id='editor'>
+        <symbiota2-collection-editor
+            [(collection)]='collection'
+            (submitClicked)='onSubmit()'
+            (resetClicked)='onReset()'
+        >
+        </symbiota2-collection-editor>
+    </div>
+</div>

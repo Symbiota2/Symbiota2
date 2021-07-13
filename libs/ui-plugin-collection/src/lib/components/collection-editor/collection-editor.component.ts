@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
 import { Collection } from '../../dto/Collection.output.dto';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'symbiota2-collection-editor',
@@ -9,9 +9,16 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
     styleUrls: ['./collection-editor.component.scss']
 })
 export class CollectionEditorComponent implements OnInit {
-    constructor(
-        @Inject(MAT_DIALOG_DATA) public readonly collection: Collection,
-        private readonly dialogRef: MatDialogRef<CollectionEditorComponent>) { }
+    @Input()
+    collection!: Collection;
+
+    @Output()
+    submitClicked = new EventEmitter<void>();
+
+    @Output()
+    resetClicked = new EventEmitter<void>();
+
+    constructor() { }
 
     controlName = new FormControl('');
     controlCode = new FormControl('');
@@ -45,23 +52,14 @@ export class CollectionEditorComponent implements OnInit {
         'accessRights': this.controlAccessRights,
     });
 
+    @Output()
+    collectionChange = this.form.valueChanges.pipe(
+        map(() => {
+            return { ...this.collection, ...this.form.value };
+        })
+    );
+
     ngOnInit() {
-        this.onReset();
-    }
-
-    onEditLogo() {
-
-    }
-
-    onSubmit() {
-        this.dialogRef.close(this.form.value);
-    }
-
-    onReset() {
         this.form.patchValue(this.collection);
-    }
-
-    onClose() {
-        this.dialogRef.close(null);
     }
 }

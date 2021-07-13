@@ -1,9 +1,6 @@
-import {
-    Component,
-    OnInit,
-} from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { filter, map, switchMap, take } from 'rxjs/operators';
+import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { combineLatest, Observable, of } from 'rxjs';
 import { CollectionService } from '../../services/collection.service';
 import { Collection } from '../../dto/Collection.output.dto';
@@ -14,19 +11,18 @@ import {
 import { MatDialog } from '@angular/material/dialog';
 import {
     AlertService,
-    User,
     UserService
 } from '@symbiota2/ui-common';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { CollectionEditorComponent } from '../../components/collection-editor/collection-editor.component';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ROUTE_COLLECTION_LIST } from '../../routes';
+import { CollectionEditorDialogComponent } from '../../components/collection-editor-dialog/collection-editor-dialog.component';
 
 @Component({
     selector: 'symbiota2-collection-page',
     templateUrl: './collection-page.component.html',
     styleUrls: ['./collection-page.component.scss']
 })
-export class CollectionPage implements OnInit {
+export class CollectionPage {
     private static readonly ROUTE_PARAM_COLLID = 'collectionID';
     private static readonly USER_COLLECTIONS_LINK: CollectionProfileLink = {
         text: 'Back to collections',
@@ -34,9 +30,55 @@ export class CollectionPage implements OnInit {
         routerLink: `/${ROUTE_COLLECTION_LIST}`,
     };
 
-    public collection: Collection = null;
-    public links: CollectionProfileLink[] = [];
-    public currentUser: User = null;
+    public collection = this.currentRoute.paramMap.pipe(
+        map((params) => {
+            return (
+                params.has(CollectionPage.ROUTE_PARAM_COLLID) ?
+                    parseInt(params.get(CollectionPage.ROUTE_PARAM_COLLID)) :
+                    -1
+            );
+        }),
+        switchMap((collectionID) => this.loadCollection(collectionID))
+    );
+
+    public links: Observable<CollectionProfileLink[]> = this.collection.pipe(
+        switchMap((collection) => {
+            return this.profileService.links(collection.id);
+        }),
+        map((links) => {
+            return [
+                CollectionPage.USER_COLLECTIONS_LINK,
+                ...links
+            ];
+        })
+    );
+
+    public userCanEdit = combineLatest([
+        this.userService.currentUser,
+        this.collection
+    ]).pipe(
+        map(([user, collection]) => {
+            return !!user && !!collection && user.canEditCollection(collection.id);
+        })
+    );
+
+    public collectionHomePage = this.collection.pipe(
+        map((collection) => {
+            if (collection?.homePage) {
+                return this.sanitizer.bypassSecurityTrustUrl(collection.homePage);
+            }
+            return null;
+        })
+    );
+
+    public geoReferencedPercent = this.collection.pipe(
+        map((collection) => {
+            if (collection?.stats?.recordCount > 0) {
+                return Math.round(collection.stats.georeferencedCount / collection.stats.recordCount * 100);
+            }
+            return 0;
+        })
+    );
 
     constructor(
         private readonly userService: UserService,
@@ -48,70 +90,41 @@ export class CollectionPage implements OnInit {
         private readonly dialog: MatDialog,
         private readonly sanitizer: DomSanitizer) { }
 
-    ngOnInit(): void {
-        this.currentRoute.paramMap.pipe(
-            map((params) => {
-                return (
-                    params.has(CollectionPage.ROUTE_PARAM_COLLID) ?
-                        parseInt(params.get(CollectionPage.ROUTE_PARAM_COLLID)) :
-                        -1
-                );
-            }),
-            switchMap((collectionID) => this.loadCollection(collectionID)),
-            switchMap((collection) => {
-                this.collection = collection;
-                return this.profileService.links(collection.id);
-            })
-        ).subscribe((links) => {
-            this.links = [
-                CollectionPage.USER_COLLECTIONS_LINK,
-                ...links
-            ];
-        });
-
-        this.userService.currentUser.subscribe((user) => {
-            this.currentUser = user;
-        });
-    }
-
     onEdit() {
-        const dialog = this.dialog.open(
-            CollectionEditorComponent,
-            { data: this.collection }
-        );
-
-        combineLatest([
-            dialog.afterClosed(),
-            this.userService.currentUser
-        ]).pipe(
+        this.collection.pipe(
+            filter((collection) => !!collection),
             take(1),
-            filter(([data, currentUser]) => {
-                return data !== null && currentUser !== null;
-            }),
-            switchMap(([collectionData, currentUser]) => {
-                return this.collections.updateByID(
-                    this.collection.id,
-                    currentUser.token,
-                    collectionData
+            switchMap((collection) => {
+                const dialog = this.dialog.open(
+                    CollectionEditorDialogComponent,
+                    { data: collection, disableClose: true }
                 );
+
+                return combineLatest([
+                    dialog.afterClosed(),
+                    this.userService.currentUser
+                ]).pipe(
+                    take(1),
+                    switchMap(([collectionData, currentUser]) => {
+                        if (collectionData === null || currentUser === null) {
+                            return null;
+                        }
+                        return this.collections.updateByID(
+                            collectionData.id,
+                            currentUser.token,
+                            collectionData
+                        );
+                    })
+                )
             })
-        ).subscribe((collection) => {
-            this.collection = collection;
+        ).subscribe(() => {
+            // TODO: This is a hack, we need to replace it with better state management in the collection service
+            // Refresh the page
+            const origReuseRoute = this.router.routeReuseStrategy.shouldReuseRoute;
+            this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+            this.router.navigate(['.'], { relativeTo: this.currentRoute });
+            this.router.routeReuseStrategy.shouldReuseRoute = origReuseRoute;
         });
-    }
-
-    collectionHomePage(): SafeUrl {
-        if (this.collection?.homePage) {
-            return this.sanitizer.bypassSecurityTrustUrl(this.collection.homePage);
-        }
-        return null;
-    }
-
-    georeferencedPercent(): number {
-        if (this.collection?.stats?.recordCount > 0) {
-            return Math.round(this.collection.stats.georeferencedCount / this.collection.stats.recordCount * 100);
-        }
-        return 0;
     }
 
     private loadCollection(id: number): Observable<Collection> {
