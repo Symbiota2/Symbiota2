@@ -1,24 +1,24 @@
 <div>
-    <h1>Taxon Viewer</h1>
+    <h1>{{ "taxonomy.viewer.title" | translate }}</h1>
 </div>
 
 <!-- Configure name list -->
 <div class="expansion-panel">
-    <symbiota2-expansion-panel label='Configure Name List'>
+    <symbiota2-expansion-panel label='{{"taxonomy.viewer.configure.label" | translate}}'>
         <mat-radio-group
             aria-labelledby="configure-radio-group-label"
             class="configure-radio-group"
             (change)='configureChangeAction()'
             [(ngModel)]="kindOfName">
-            <mat-radio-button value="Scientific">Use scientific names</mat-radio-button>&nbsp;&nbsp;
-            <mat-radio-button value="Common">Use common names</mat-radio-button>
+            <mat-radio-button value="Scientific">{{"taxonomy.viewer.option.scientific" | translate}}</mat-radio-button>&nbsp;&nbsp;
+            <mat-radio-button value="Common">{{"taxonomy.viewer.option.common" | translate}}</mat-radio-button>
 
             <div>
                 <br/>
             <mat-form-field appearance="fill">
-                <mat-label>Choose taxonomic authority</mat-label>
+                <mat-label>{{"taxonomy.viewer.label.authority" | translate}}</mat-label>
                 <mat-select field-class="symbiota2-field-class"
-                            placeholder="Choose Taxonomic Authority"
+                            placeholder='{{"taxonomy.viewer.label.authority" | translate}}'
                             [(value)]="taxonomicAuthorityID"
                             (selectionChange)="authorityChangeAction()">
                     <mat-option *ngFor="let authority of taxonomicAuthorityList"
@@ -29,7 +29,7 @@
 
             <!-- <div>Using {{kindOfName}} names</div> -->
             <div *ngIf='kindOfName == "Scientific"'>
-                <mat-checkbox class="example-margin" [(ngModel)]='hasAuthors' (change)='loadScientificNames()'>Include authors</mat-checkbox>
+                <mat-checkbox class="example-margin" [(ngModel)]='hasAuthors' (change)='loadScientificNames()'>{{"taxonomy.viewer.label.checkbox.authors" | translate}}</mat-checkbox>
                 <!--
                 <br/>
                 <br/>
@@ -46,9 +46,9 @@
 
             <div *ngIf='kindOfName == "Common"'>
                 <mat-form-field appearance="fill">
-                <mat-label>Choose Language</mat-label>
+                <mat-label>{{"taxonomy.viewer.label.language" | translate}}</mat-label>
                 <mat-select field-class="symbiota2-field-class"
-                            placeholder="Choose Vernacular Language"
+                            placeholder='{{"taxonomy.viewer.label.language" | translate}}'
                             [(value)]="language"
                             (selectionChange)="languageChangeAction(language)">
                     <mat-option *ngFor="let lang of languageList"
@@ -62,12 +62,19 @@
 
 <!-- Taxonomy -->
 <div class="expansion-panel">
-    <symbiota2-expansion-panel label='View Taxonomy'>
+    <symbiota2-expansion-panel label='{{"taxonomy.viewer.label.taxonomy" | translate}}'>
             <form class="name-autocomplete-form" (ngSubmit)="onSubmit()">
                 <mat-form-field class="name-autocomplete-full-width">
-                    <mat-label>{{kindOfName}} name</mat-label>
-                    <input type="text"
-                           placeholder="{{kindOfName}} Name"
+                    <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxonomy.viewer.label.name.scientific" | translate}}</mat-label>
+                    <mat-label *ngIf='kindOfName == "Common"'>{{"taxonomy.viewer.label.name.common" | translate}}</mat-label>
+                    <input *ngIf='kindOfName == "Scientific"' type="text"
+                           placeholder='{{"taxonomy.viewer.label.name.scientific" | translate}}'
+                           aria-label="String"
+                           matInput
+                           [formControl]="nameControl"
+                           [matAutocomplete]="auto">
+                    <input *ngIf='kindOfName == "Common"' type="text"
+                           placeholder='{{"taxonomy.viewer.label.name.common" | translate}}'
                            aria-label="String"
                            matInput
                            [formControl]="nameControl"
@@ -78,7 +85,7 @@
                         </mat-option>
                     </mat-autocomplete>
                 </mat-form-field>
-                <button class="button" type="submit">View Taxonomy</button>
+                <button class="button" type="submit">{{"taxonomy.viewer.label.taxonomy" | translate}}</button>
             </form>
 
         <mat-tree #tree [dataSource]="dataSource" [treeControl]="treeControl" class="example-tree">
@@ -142,8 +149,6 @@
  </div>
 
 <div [ngSwitch]="currentPage">
-
-
 
 </div>
 

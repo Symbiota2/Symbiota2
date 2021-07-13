@@ -10,5 +10,15 @@
   "taxa.rare_species_reader_available_permission.rare_species_reader": "Can read Rare Species data for all taxa",
   "taxa.rare_species_reader_current_permission.rare_species_reader": "Can read Rare Species data for all taxa",
   "taxa.specimen_management_tab": "Specimen Management",
-  "core.layout.header.topnav.search_taxa_link": "Search Taxa"
+  "taxonomy.viewer.title": "Taxon Viewer",
+  "taxonomy.viewer.option.scientific": "Use scientific names",
+  "taxonomy.viewer.option.common": "Use vernacular names",
+  "taxonomy.viewer.configure.label": "Configure Name List",
+  "taxonomy.viewer.label.authority": "Choose Taxonomic Authority",
+  "taxonomy.viewer.label.taxonomy": "View Taxonomy",
+  "taxonomy.viewer.label.language": "Choose language",
+  "taxonomy.viewer.label.name.scientific": "Scientific name",
+  "taxonomy.viewer.label.name.common": "Vernacular name",
+  "taxonomy.viewer.label.checkbox.authors": "Include authors",
+  "core.layout.header.topnav.search_taxonomy_link": "Taxon Viewer"
 }

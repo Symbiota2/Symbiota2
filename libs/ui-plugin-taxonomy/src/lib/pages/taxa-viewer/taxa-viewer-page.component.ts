@@ -11,6 +11,7 @@ import {
 import { TaxonomicEnumTreeService } from '@symbiota2/ui-plugin-taxonomy'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { map, startWith } from 'rxjs/operators'
+import { TranslateService } from '@ngx-translate/core'
 
 /**
  * Taxonomic data with nested structure.
@@ -64,7 +65,8 @@ export class TaxaViewerPageComponent implements OnInit {
         private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
         private router: Router,
         private formBuilder: FormBuilder,
-        private currentRoute: ActivatedRoute
+        private currentRoute: ActivatedRoute,
+        private readonly translate: TranslateService
     ) {
         this.dataSource.data = []
     }
