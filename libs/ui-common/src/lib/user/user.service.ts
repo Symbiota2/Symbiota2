@@ -15,7 +15,6 @@ import {
 import { ApiLoginResponse } from "@symbiota2/data-access";
 import { AlertService } from "../alert";
 import { HttpErrorResponse } from "@angular/common/http";
-import { UserModule } from "./user.module";
 import jwtDecode from "jwt-decode";
 import {
     ApiCreateUserData,

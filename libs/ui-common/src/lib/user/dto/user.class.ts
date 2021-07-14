@@ -38,7 +38,7 @@ export class User {
     private static checkHasRole(roles: UserRole[], reqRole: ApiUserRoleName, tablePk: number = null): boolean {
         const roleObjs = roles.filter((roleObj) => roleObj.name === reqRole);
         if (tablePk !== null) {
-            return roleObjs.filter((role) => role.id === tablePk).length > 0;
+            return roleObjs.filter((role) => role.tablePrimaryKey === tablePk).length > 0;
         }
         return roleObjs.length > 0;
     }
@@ -46,11 +46,9 @@ export class User {
     canEditCollection(id: number): boolean {
         const isGlobalEditor = this.hasRole(ApiUserRoleName.COLLECTION_EDITOR);
         const isGlobalAdmin = this.hasRole(ApiUserRoleName.COLLECTION_ADMIN);
-
-        const isEditor = this.hasRole(ApiUserRoleName.COLLECTION_EDITOR, id);
         const isAdmin = this.hasRole(ApiUserRoleName.COLLECTION_ADMIN, id);
 
-        return this.isSuperAdmin() || isGlobalEditor || isGlobalAdmin || isEditor || isAdmin;
+        return this.isSuperAdmin() || isGlobalEditor || isGlobalAdmin || isAdmin;
     }
 
     canEditProject(id: number): boolean {
@@ -104,10 +102,7 @@ export class User {
         return Math.round(this.exp.getTime() - new Date().getTime());
     }
 
-    hasRole(
-        role: ApiUserRoleName,
-        roleTarget: number = null): boolean {
-
+    hasRole(role: ApiUserRoleName, roleTarget: number = null): boolean {
         if (roleTarget === null) {
             return User.checkHasRole(this.globalRoles, role);
         }

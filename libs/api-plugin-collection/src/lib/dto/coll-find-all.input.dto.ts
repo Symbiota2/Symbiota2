@@ -5,13 +5,16 @@ import {
     IsInt,
     IsString
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CollectionFindAllParams {
     static readonly DEFAULT_ORDER_BY = 'collectionName';
 
     @ApiProperty({ name: 'id[]', type: [Number], required: false })
     @Type(() => Number)
+    @Transform((collectionIDs) => {
+        return Number.isInteger(collectionIDs) ? [collectionIDs] : collectionIDs;
+    })
     @IsArray()
     @IsInt({ each: true })
     @IsOptional()

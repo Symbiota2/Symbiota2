@@ -2,6 +2,8 @@ import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
 import { Collection } from '../../dto/Collection.output.dto';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { map } from 'rxjs/operators';
+import { formToQueryParams } from '@symbiota2/ui-common';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'symbiota2-collection-editor',
@@ -10,7 +12,7 @@ import { map } from 'rxjs/operators';
 })
 export class CollectionEditorComponent implements OnInit {
     @Input()
-    collection!: Collection;
+    collection!: Partial<Collection>;
 
     @Output()
     submitClicked = new EventEmitter<void>();
@@ -27,8 +29,8 @@ export class CollectionEditorComponent implements OnInit {
     controlUrl = new FormControl('');
     controlContact = new FormControl('');
     controlEmail = new FormControl('');
-    controlLat = new FormControl(0.0, [Validators.min(-90), Validators.max(90)]);
-    controlLng = new FormControl(0.0, [Validators.min(-180), Validators.max(180)]);
+    controlLat = new FormControl(null, [Validators.min(-90), Validators.max(90)]);
+    controlLng = new FormControl(null, [Validators.min(-180), Validators.max(180)]);
     controlType = new FormControl('');
     controlMgmtType = new FormControl('');
     controlRightsHolder = new FormControl('');
@@ -53,10 +55,8 @@ export class CollectionEditorComponent implements OnInit {
     });
 
     @Output()
-    collectionChange = this.form.valueChanges.pipe(
-        map(() => {
-            return { ...this.collection, ...this.form.value };
-        })
+    collectionChange: Observable<Partial<Collection>> = this.form.valueChanges.pipe(
+        map(() => this.form.value)
     );
 
     ngOnInit() {

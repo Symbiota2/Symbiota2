@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { filter, map, switchMap, take, tap } from 'rxjs/operators';
-import { combineLatest, Observable, of } from 'rxjs';
+import { catchError, filter, map, switchMap, take, tap } from 'rxjs/operators';
+import { combineLatest, Observable, of, throwError } from 'rxjs';
 import { CollectionService } from '../../services/collection.service';
 import { Collection } from '../../dto/Collection.output.dto';
 import {
@@ -39,14 +39,16 @@ export class CollectionPage {
             );
         }),
         tap((collectionID) => {
-            if (collectionID === -1) {
+            this.collections.setCollectionID(collectionID);
+        }),
+        switchMap(() => {
+            return this.collections.currentCollection;
+        }),
+        tap((collection) => {
+            if (collection === null) {
                 this.router.navigate(['']);
                 this.alerts.showError('Collection not found');
             }
-        }),
-        switchMap((collectionID) => {
-            this.collections.setCollectionID(collectionID);
-            return this.collections.currentCollection;
         })
     );
 
@@ -101,7 +103,7 @@ export class CollectionPage {
 
     onEdit() {
         this.collection.pipe(
-            filter((collection) => !!collection),
+            filter((collection) => collection !== null),
             take(1),
             switchMap((collection) => {
                 const dialog = this.dialog.open(
@@ -112,10 +114,9 @@ export class CollectionPage {
                 return dialog.afterClosed().pipe(
                     take(1),
                     map((collectionData) => {
-                        if (collectionData === null) {
-                            return null;
+                        if (collectionData !== null) {
+                            return this.collections.updateCurrentCollection(collectionData);
                         }
-                        this.collections.updateCurrentCollection(collectionData);
                     })
                 )
             })
