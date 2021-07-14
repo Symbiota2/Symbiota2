@@ -38,7 +38,16 @@ export class CollectionPage {
                     -1
             );
         }),
-        switchMap((collectionID) => this.loadCollection(collectionID))
+        tap((collectionID) => {
+            if (collectionID === -1) {
+                this.router.navigate(['']);
+                this.alerts.showError('Collection not found');
+            }
+        }),
+        switchMap((collectionID) => {
+            this.collections.setCollectionID(collectionID);
+            return this.collections.currentCollection;
+        })
     );
 
     public links: Observable<CollectionProfileLink[]> = this.collection.pipe(
@@ -100,40 +109,16 @@ export class CollectionPage {
                     { data: collection, disableClose: true }
                 );
 
-                return combineLatest([
-                    dialog.afterClosed(),
-                    this.userService.currentUser
-                ]).pipe(
+                return dialog.afterClosed().pipe(
                     take(1),
-                    switchMap(([collectionData, currentUser]) => {
-                        if (collectionData === null || currentUser === null) {
+                    map((collectionData) => {
+                        if (collectionData === null) {
                             return null;
                         }
-                        return this.collections.updateByID(
-                            collectionData.id,
-                            currentUser.token,
-                            collectionData
-                        );
+                        this.collections.updateCurrentCollection(collectionData);
                     })
                 )
             })
-        ).subscribe(() => {
-            // TODO: This is a hack, we need to replace it with better state management in the collection service
-            // Refresh the page
-            const origReuseRoute = this.router.routeReuseStrategy.shouldReuseRoute;
-            this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-            this.router.navigate(['.'], { relativeTo: this.currentRoute });
-            this.router.routeReuseStrategy.shouldReuseRoute = origReuseRoute;
-        });
-    }
-
-    private loadCollection(id: number): Observable<Collection> {
-        if (id === -1 || Number.isNaN(id)) {
-            this.router.navigate(["/"]);
-            return of(null);
-        }
-        else {
-            return this.collections.findByID(id);
-        }
+        ).subscribe();
     }
 }

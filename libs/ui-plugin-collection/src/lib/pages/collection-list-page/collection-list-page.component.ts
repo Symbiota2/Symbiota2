@@ -1,13 +1,5 @@
-import {
-    AfterViewInit,
-    Component,
-    OnInit,
-    QueryList,
-    ViewChildren
-} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CollectionService } from '../../services/collection.service';
-import { Observable } from 'rxjs';
-import { CollectionCategory } from '../../dto/Category.output.dto';
 
 @Component({
     selector: 'symbiota2-collection-list-page',
@@ -16,12 +8,12 @@ import { CollectionCategory } from '../../dto/Category.output.dto';
 })
 export class CollectionListPage implements OnInit {
     expandAll = true;
-    categories: Observable<CollectionCategory[]>;
+    categories = this.collectionService.categories;
 
     constructor(private readonly collectionService: CollectionService) { }
 
     ngOnInit() {
-        this.categories = this.collectionService.categories();
+        this.collectionService.refreshCategories();
     }
 
     onExpandCollapse(isExpanded: boolean) {

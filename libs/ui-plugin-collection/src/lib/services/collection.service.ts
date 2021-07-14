@@ -1,12 +1,16 @@
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { CollectionCategory } from '../dto/Category.output.dto';
 import {
-    ApiClientService,
-} from "@symbiota2/ui-common";
-import { catchError, map } from 'rxjs/operators';
+    ApiClientService, UserService
+} from '@symbiota2/ui-common';
+import {
+    catchError,
+    filter,
+    map,
+    switchMap, take
+} from 'rxjs/operators';
 import { Collection, CollectionListItem } from '../dto/Collection.output.dto';
 import { Injectable } from '@angular/core';
-import { HttpParams } from '@angular/common/http';
 import { CollectionInputDto } from '../dto/Collection.input.dto';
 import {
     ApiCollectionCategoryOutput,
@@ -14,49 +18,110 @@ import {
 } from '@symbiota2/data-access';
 
 interface FindAllParams {
-    limit: number;
-    orderBy: string;
+    id?: number | number[];
+    limit?: number;
+    orderBy?: string;
 }
 
 @Injectable()
 export class CollectionService {
-    private static readonly COLLECTION_BASE_URL = "collections";
-    private static readonly CATEGORY_BASE_URL = `${CollectionService.COLLECTION_BASE_URL}/categories`;
+    private readonly COLLECTION_BASE_URL = `${this.api.apiRoot()}/collections`;
+    private readonly CATEGORY_BASE_URL = `${this.COLLECTION_BASE_URL}/categories`;
 
-    constructor(private readonly api: ApiClientService) {}
+    private readonly currentCategories = new BehaviorSubject<ApiCollectionCategoryOutput[]>([]);
 
-    private get baseUrl() {
-        return `${this.api.apiRoot()}/${CollectionService.COLLECTION_BASE_URL}`;
+    private readonly collectionQueryParams = new BehaviorSubject<FindAllParams>(null);
+    private readonly currentCollectionID = new BehaviorSubject<number>(-1);
+
+    currentCollection = this.currentCollectionID.pipe(
+        switchMap((id) => {
+            if (id > 0) {
+                return this.fetchCollectionByID(id)
+            }
+            return of(null);
+        })
+    );
+
+    collectionList = this.collectionQueryParams.pipe(
+        switchMap((params) => this.fetchCollectionList(params))
+    );
+
+    categories = this.currentCategories.asObservable();
+
+    constructor(
+        private readonly api: ApiClientService,
+        private readonly users: UserService) {
+
+        this.refreshCategories();
     }
 
-    categories(): Observable<CollectionCategory[]> {
-        const catUrl = `${this.api.apiRoot()}/${CollectionService.CATEGORY_BASE_URL}`;
+    setCollectionID(id: number) {
+        this.currentCollectionID.next(id);
+    }
 
-        const req = this.api.queryBuilder(catUrl)
+    setCollectionQueryParams(findAllParams?: FindAllParams) {
+        if (findAllParams) {
+            this.collectionQueryParams.next(findAllParams);
+        }
+        else {
+            this.collectionQueryParams.next(null);
+        }
+    }
+
+    updateCurrentCollection(collectionData: Partial<CollectionInputDto>) {
+        combineLatest([
+            this.users.currentUser,
+            this.currentCollection
+        ]).pipe(
+            take(1),
+            filter(([currentUser, currentCollection]) => {
+                return currentUser !== null && currentCollection !== null;
+            }),
+            switchMap(([currentUser, currentCollection]) => {
+                return this.updateByCollectionID(
+                    currentCollection.id,
+                    currentUser.token,
+                    collectionData
+                );
+            })
+        ).subscribe((collection) => {
+            // Refresh the current collection
+            this.currentCollectionID.next(collection.id);
+        });
+    }
+
+    refreshCategories() {
+        const req = this.api.queryBuilder(this.CATEGORY_BASE_URL)
             .get()
             .build();
 
-        return this.api.send(req).pipe(
+        this.api.send(req).pipe(
             map((categoryJsonLst: ApiCollectionCategoryOutput[]) => {
                 return categoryJsonLst.map((cat) => {
                     return new CollectionCategory(cat);
                 });
             })
-        );
+        ).subscribe((categories) => {
+            this.currentCategories.next(categories);
+        });
     }
 
-    findAll(findAllParams?: FindAllParams): Observable<CollectionListItem[]> {
-        const reqBuilder = this.api.queryBuilder(this.baseUrl).get()
+    private fetchCollectionList(findAllParams?: FindAllParams): Observable<CollectionListItem[]> {
+        const url = this.api.queryBuilder(this.COLLECTION_BASE_URL).get();
+
+        for (const key of Object.keys(findAllParams)) {
+            url.queryParam(key, findAllParams[key]);
+        }
 
         if (findAllParams && findAllParams.limit) {
-            reqBuilder.queryParam('limit', findAllParams.limit);
+            url.queryParam('limit', findAllParams.limit);
         }
 
         if (findAllParams && findAllParams.orderBy) {
-            reqBuilder.queryParam('orderBy', findAllParams.orderBy);
+            url.queryParam('orderBy', findAllParams.orderBy);
         }
 
-        return this.api.send(reqBuilder.build()).pipe(
+        return this.api.send(url.build()).pipe(
             catchError((e) => {
                 console.error(e);
                 return of([]);
@@ -67,8 +132,8 @@ export class CollectionService {
         );
     }
 
-    findByID(id: number): Observable<Collection> {
-        const url = `${this.baseUrl}/${id}`;
+    private fetchCollectionByID(id: number): Observable<Collection> {
+        const url = `${this.COLLECTION_BASE_URL}/${id}`;
         const req = this.api.queryBuilder(url).get().build();
 
         return this.api.send(req).pipe(
@@ -85,33 +150,12 @@ export class CollectionService {
         );
     }
 
-    findByIDs(ids: number[]): Observable<ApiCollectionListItem[]> {
-        if (ids.length === 0) {
-            return of([]);
-        }
+    private updateByCollectionID(
+        id: number,
+        userToken: string,
+        collectionData: Partial<CollectionInputDto>): Observable<Collection> {
 
-        const url = new URL(this.baseUrl);
-        const qParams = new HttpParams(
-            { fromObject: { id: ids.map((id) => id.toString()) } }
-        );
-
-        const req = this.api.queryBuilder(`${url}?${qParams.toString()}`)
-            .get()
-            .build();
-
-        return this.api.send(req).pipe(
-            catchError((e) => {
-                console.error(e);
-                return of([]);
-            }),
-            map((collections: ApiCollectionListItem[]) => {
-                return collections.map((c) => new CollectionListItem(c));
-            })
-        );
-    }
-
-    updateByID(id: number, userToken: string, collectionData: Partial<CollectionInputDto>): Observable<Collection> {
-        const url = `${this.baseUrl}/${id}`;
+        const url = `${this.COLLECTION_BASE_URL}/${id}`;
         const req = this.api.queryBuilder(url)
             .patch()
             .body(collectionData)

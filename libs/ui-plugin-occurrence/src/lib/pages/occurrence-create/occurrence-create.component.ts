@@ -22,8 +22,11 @@ export class OccurrenceCreateComponent {
     );
 
     private collection = this.collectionID.pipe(
-        switchMap((collectionID) => {
-            return this.collections.findByID(collectionID)
+        map((collectionID) => {
+            this.collections.setCollectionID(collectionID);
+        }),
+        switchMap(() => {
+            return this.collections.currentCollection;
         }),
         tap((collection) => {
             if (collection === null) {

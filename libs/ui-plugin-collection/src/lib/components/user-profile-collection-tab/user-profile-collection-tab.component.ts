@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CollectionService } from '../../services/collection.service';
 import { UserService } from '@symbiota2/ui-common';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 import {
     Collection,
     CollectionListItem
@@ -21,12 +21,18 @@ export class UserProfileCollectionTab implements OnInit {
 
     ngOnInit() {
         this.collections = this.user.currentUser.pipe(
-            switchMap((user) => {
+            tap((user) => {
                 if (user.isSuperAdmin()) {
-                    return this.collectionService.findAll();
+                    this.collectionService.setCollectionQueryParams();
                 }
-                const collectionIDs = user.collectionRoles.map((r) => r.tablePrimaryKey);
-                return this.collectionService.findByIDs(collectionIDs);
+                else {
+                    this.collectionService.setCollectionQueryParams({
+                        id: user.collectionRoles.map((r) => r.tablePrimaryKey)
+                    });
+                }
+            }),
+            switchMap(() => {
+                return this.collectionService.collectionList;
             })
         );
     }
