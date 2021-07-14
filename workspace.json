@@ -295,7 +295,9 @@
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/ui-plugin-image"],
+          "outputs": [
+            "coverage/libs/ui-plugin-image"
+          ],
           "options": {
             "jestConfig": "libs/ui-plugin-image/jest.config.js",
             "passWithNoTests": true
@@ -332,7 +334,9 @@
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/ui-plugin-taxonomy"],
+          "outputs": [
+            "coverage/libs/ui-plugin-taxonomy"
+          ],
           "options": {
             "jestConfig": "libs/ui-plugin-taxonomy/jest.config.js",
             "passWithNoTests": true
@@ -587,12 +591,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-plugin-image/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-plugin-image/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-plugin-image"],
+          "outputs": [
+            "coverage/libs/api-plugin-image"
+          ],
           "options": {
             "jestConfig": "libs/api-plugin-image/jest.config.js",
             "passWithNoTests": true
@@ -600,13 +608,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/api-plugin-image",
             "tsConfig": "libs/api-plugin-image/tsconfig.lib.json",
             "packageJson": "libs/api-plugin-image/package.json",
             "main": "libs/api-plugin-image/src/index.ts",
-            "assets": ["libs/api-plugin-image/*.md"]
+            "assets": [
+              "libs/api-plugin-image/*.md"
+            ]
           }
         }
       }
@@ -619,12 +631,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-plugin-taxonomy/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-plugin-taxonomy/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-plugin-taxonomy"],
+          "outputs": [
+            "coverage/libs/api-plugin-taxonomy"
+          ],
           "options": {
             "jestConfig": "libs/api-plugin-taxonomy/jest.config.js",
             "passWithNoTests": true
@@ -632,13 +648,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/api-plugin-taxonomy",
             "tsConfig": "libs/api-plugin-taxonomy/tsconfig.lib.json",
             "packageJson": "libs/api-plugin-taxonomy/package.json",
             "main": "libs/api-plugin-taxonomy/src/index.ts",
-            "assets": ["libs/api-plugin-taxonomy/*.md"]
+            "assets": [
+              "libs/api-plugin-taxonomy/*.md"
+            ]
           }
         }
       }
@@ -808,6 +828,46 @@
           "options": {
             "jestConfig": "libs/ui-plugin-geography/jest.config.js",
             "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "dwc": {
+      "root": "libs/dwc",
+      "sourceRoot": "libs/dwc/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/dwc/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/dwc"
+          ],
+          "options": {
+            "jestConfig": "libs/dwc/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "executor": "@nrwl/node:package",
+          "outputs": [
+            "{options.outputPath}"
+          ],
+          "options": {
+            "outputPath": "dist/libs/dwc",
+            "tsConfig": "libs/dwc/tsconfig.lib.json",
+            "packageJson": "libs/dwc/package.json",
+            "main": "libs/dwc/src/index.ts",
+            "assets": [
+              "libs/dwc/*.md"
+            ]
           }
         }
       }

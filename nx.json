@@ -35,6 +35,7 @@
     "api-jobs": { "tags": [] },
     "data-access": { "tags": [] },
     "api-plugin-geography": { "tags": [] },
-    "ui-plugin-geography": { "tags": [] }
+    "ui-plugin-geography": { "tags": [] },
+    "dwc": { "tags": [] }
   }
 }
