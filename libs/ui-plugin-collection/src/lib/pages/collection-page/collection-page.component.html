@@ -9,8 +9,10 @@
         >
         </symbiota2-collection-logo>
         <div fxLayout="column" fxLayoutAlign="center start">
-            <h1 id="collectionName">
-                {{ collection.collectionName }}
+            <div fxLayout='row' fxLayoutAlign='start center'>
+                <h1 id="collectionName">
+                    {{ collection.collectionName }}
+                </h1>
                 <button
                     *ngIf="userCanEdit | async"
                     id='editButton'
@@ -19,7 +21,15 @@
                 >
                     <mat-icon>edit</mat-icon>
                 </button>
-            </h1>
+            </div>
+            <div id='subTitle'>
+                <small class='italic' *ngIf='collection.institution?.name'>
+                    <span >at {{ collection.institution.name }} </span>
+                </small>
+                <small class='italic' *ngIf='collection.institution?.code && collection.collectionCode'>
+                    ({{ collection.institution.code }}-{{ collection.collectionCode }})
+                </small>
+            </div>
             <div id="links">
                 <ng-container *ngFor="let link of (links | async)">
                     <span>

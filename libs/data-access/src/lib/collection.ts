@@ -1,5 +1,6 @@
 export interface ApiCollectionInstitutionOutput {
     id: number;
+    code: string;
     name: string;
 }
 
