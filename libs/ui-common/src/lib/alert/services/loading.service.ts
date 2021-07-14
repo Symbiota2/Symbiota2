@@ -1,12 +1,9 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, forkJoin, Observable, of, timer } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import {
-    delay,
     distinctUntilChanged,
     map,
-    shareReplay, startWith, switchMap,
-    take,
-    tap
+    shareReplay
 } from 'rxjs/operators';
 import { AlertModule } from "../alert.module";
 
@@ -14,13 +11,6 @@ import { AlertModule } from "../alert.module";
     providedIn: AlertModule
 })
 export class LoadingService {
-    constructor() {
-        // TODO: Remove this
-        this.isLoading.subscribe((isLoading) => {
-            console.log(isLoading ? 'Loading...' : 'Load finished');
-        });
-    }
-
     private loadingCounter = new BehaviorSubject<number>(0);
 
     isLoading = this.loadingCounter.pipe(
