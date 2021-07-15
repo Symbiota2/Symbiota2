@@ -36,7 +36,8 @@ export class PasswordResetComponent {
             })
         ).subscribe((success) => {
             if (success) {
-                this.alerts.showMessage('If the username exists, a new password has been sent.');
+                // TODO: i18n
+                this.alerts.showMessage('If the username exists, a new password has been sent to the associated email address.');
                 this.router.navigate(['/']);
             }
         });
