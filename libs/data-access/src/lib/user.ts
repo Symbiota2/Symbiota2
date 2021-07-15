@@ -1,7 +1,6 @@
 import { ApiFindAllQuery } from './common';
 
 export interface ApiChangePasswordData {
-    oldPassword: string;
     newPassword: string;
 }
 

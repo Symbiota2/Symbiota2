@@ -11,8 +11,14 @@ import {
     ENV_DB_PATH,
     ENV_DB_PORT,
     ENV_DB_TYPE,
-    ENV_DB_USER, ENV_ENABLE_AUTH,
-    ENV_NODE_ENV
+    ENV_DB_USER,
+    ENV_ENABLE_AUTH,
+    ENV_NODE_ENV,
+    ENV_REDIS_HOST,
+    ENV_REDIS_PORT,
+    ENV_SMTP_HOST, ENV_SMTP_PASSWORD,
+    ENV_SMTP_PORT, ENV_SMTP_SENDER,
+    ENV_SMTP_USER
 } from './configuration';
 
 import * as path from 'path';
@@ -231,5 +237,54 @@ export class AppConfigService {
      */
     isAuthEnabled(): boolean {
         return this.configService.get<string>(ENV_ENABLE_AUTH) === '1';
+    }
+
+    /**
+     * The redis host for processing asynchronous jobs
+     */
+    redisHost(): string {
+        return this.configService.get<string>(ENV_REDIS_HOST);
+    }
+
+    /**
+     * The redis port for processing asynchronous jobs
+     */
+    redisPort(): number {
+        return parseInt(this.configService.get<string>(ENV_REDIS_PORT));
+    }
+
+    /**
+     * The SMTP host for sending emails
+     */
+    smtpHost(): string {
+        return this.configService.get<string>(ENV_SMTP_HOST);
+    }
+
+    /**
+     * The SMTP port to connect to on the SMTP host
+     */
+    smtpPort(): number {
+        return parseInt(this.configService.get<string>(ENV_SMTP_PORT));
+    }
+
+    /**
+     * The SMTP user to authenticate with against the SMTP host
+     */
+    smtpUser(): string {
+        return this.configService.get<string>(ENV_SMTP_USER);
+    }
+
+    /**
+     * The password for the SMTP user
+     */
+    smtpPassword(): string {
+        return this.configService.get<string>(ENV_SMTP_PASSWORD);
+    }
+
+    /**
+     * The 'From' field for emails sent by the website
+     */
+    smtpSender(): string {
+        return this.configService.get<string>(ENV_SMTP_SENDER);
     }
 }

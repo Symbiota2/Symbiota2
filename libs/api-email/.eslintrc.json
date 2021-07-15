@@ -1,14 +1,11 @@
 {
   "extends": ["../../.eslintrc.json"],
   "ignorePatterns": ["!**/*"],
-  "rules": {
-    "@typescript-eslint/no-empty-interface": "off"
-  },
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "parserOptions": {
-        "project": ["libs/api-jobs/tsconfig.*?.json"]
+        "project": ["libs/api-email/tsconfig.*?.json"]
       },
       "rules": {}
     },

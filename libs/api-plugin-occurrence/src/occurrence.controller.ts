@@ -37,6 +37,7 @@ import { plainToClass } from 'class-transformer';
 import { OccurrenceOutputDto } from './dto/occurrence.output.dto';
 import { ProtectCollection } from '@symbiota2/api-plugin-collection';
 import { CollectionListItem } from '@symbiota2/ui-plugin-collection';
+import { DwCArchiveParser } from '@symbiota2/dwc';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -102,7 +103,7 @@ export class OccurrenceController {
     @Post(':collectionID/upload')
     @ProtectCollection('collectionID')
     @HttpCode(HttpStatus.CREATED)
-    @UseInterceptors(FileInterceptor('file'), CsvInterceptor)
+    @UseInterceptors(FileInterceptor('file'))
     @ApiOperation({
         summary: "Upload a CSV or JSON file containing occurrences"
     })

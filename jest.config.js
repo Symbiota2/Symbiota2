@@ -15,10 +15,10 @@ module.exports = {
     '<rootDir>/libs/api-plugin-occurrence',
     '<rootDir>/libs/api-plugin-image',
     '<rootDir>/libs/api-plugin-taxonomy',
-    '<rootDir>/libs/api-jobs',
     '<rootDir>/libs/data-access',
     '<rootDir>/libs/api-plugin-geography',
     '<rootDir>/libs/ui-plugin-geography',
     '<rootDir>/libs/dwc',
+    '<rootDir>/libs/api-email',
   ],
 };

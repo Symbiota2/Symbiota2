@@ -3,6 +3,7 @@ import { MatDialogRef } from "@angular/material/dialog";
 import { mergeMap, switchMap } from 'rxjs/operators';
 import {
     AlertService,
+    ROUTE_PASSWORD_RESET,
     ROUTE_USER_CREATE,
     UserService
 } from '@symbiota2/ui-common';
@@ -18,6 +19,7 @@ export class LoginDialog implements OnInit {
     private static readonly I8N_LOGIN_FAILED = "symbiota-auth.auth-service.login_failed";
 
     readonly ROUTE_CREATE_PROFILE = ROUTE_USER_CREATE;
+    readonly ROUTE_PASSWORD_RESET = ROUTE_PASSWORD_RESET;
 
     username = "";
     password = "";

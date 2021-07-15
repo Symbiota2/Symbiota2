@@ -46,7 +46,7 @@
             </a>
         </div>
         <div>
-            <a href="#" (click)='onCancel()'>
+            <a [routerLink]='ROUTE_PASSWORD_RESET' (click)='onCancel()'>
                 {{ 'symbiota-auth.login.cant_remember_password' | translate }}
             </a>
         </div>

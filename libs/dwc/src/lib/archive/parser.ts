@@ -14,10 +14,6 @@ export class DwCArchiveParser {
 
     static parse<T>(filePath: string, cb: DwCAParseCallback<T>) {
         const fileName = path.basename(filePath);
-        if (!fileName.endsWith(".zip")) {
-            throw new Error("Invalid DwC Archive. Only zip files are supported");
-        }
-
         const extractDirPrefix = path.join(tmpdir(), fileName.replace(/.zip$/, "-"));
 
         DwCArchiveParser.withTempDir(extractDirPrefix, async (extractDir) => {

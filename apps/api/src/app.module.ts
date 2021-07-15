@@ -1,16 +1,15 @@
 import { Module } from '@nestjs/common';
-import { AppConfigModule } from '@symbiota2/api-config';
+import { AppConfigModule, AppConfigService } from '@symbiota2/api-config';
 import { UserModule, AuthModule } from '@symbiota2/api-auth';
 import { ApiPluginModule } from '@symbiota2/api-common';
 import { OccurrenceModule } from '@symbiota2/api-plugin-occurrence';
 import { CollectionModule } from '@symbiota2/api-plugin-collection';
-import { ApiJobsModule } from '@symbiota2/api-jobs'
 import { ImageModule } from '@symbiota2/api-plugin-image'
 import { TaxonomyModule } from '@symbiota2/api-plugin-taxonomy'
-import {GeographyModule} from '@symbiota2/api-plugin-geography'
+import { GeographyModule } from '@symbiota2/api-plugin-geography'
+import { BullModule } from '@nestjs/bull';
 
 const ENABLED_PLUGINS = [
-    ApiJobsModule,
     CollectionModule,
     OccurrenceModule,
     GeographyModule,
@@ -28,6 +27,16 @@ const ENABLED_PLUGINS = [
         AppConfigModule,
         UserModule,
         AuthModule,
+        BullModule.forRootAsync({
+            useFactory: (appConfig: AppConfigService) => ({
+                redis: {
+                    host: appConfig.redisHost(),
+                    port: appConfig.redisPort()
+                }
+            }),
+            inject: [AppConfigService],
+            imports: [AppConfigModule]
+        }),
         ApiPluginModule.configure(ENABLED_PLUGINS)
     ]
 })

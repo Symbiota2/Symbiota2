@@ -21,7 +21,7 @@ import {
 } from '@symbiota2/ui-common';
 import { ReplaySubject, Subscription } from 'rxjs';
 import { PasswordFormValidator } from './password-validator.directive';
-import { take } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 import { ApiUserRole } from '@symbiota2/data-access';
 
 /**
@@ -52,7 +52,6 @@ export class UserProfileComponent implements OnInit, OnDestroy, AfterViewInit {
     public readonly FC_BIO = "biography";
     public readonly FC_PUBLIC = "isPublic";
 
-    public readonly FC_PWD_CURRENT = "currentPassword";
     public readonly FC_PWD = PasswordFormValidator.FIELD_PWD;
     public readonly FC_PWD_CONFIRM = PasswordFormValidator.FIELD_PWD_AGAIN;
 
@@ -85,7 +84,6 @@ export class UserProfileComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
     public passwordFormGroup = new FormGroup({
-        [this.FC_PWD_CURRENT]: new FormControl('', [Validators.required]),
         [this.FC_PWD]: new FormControl('', [Validators.required]),
         [this.FC_PWD_CONFIRM]: new FormControl('', [Validators.required])
     });
@@ -179,21 +177,21 @@ export class UserProfileComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     onChangePassword(submitEvent) {
-        const oldPassword = this.passwordFormGroup.get(this.FC_PWD_CURRENT).value;
         const newPassword = this.passwordFormGroup.get(this.FC_PWD).value;
-        const uid = this.loginData.uid;
 
-        this.userService.changePassword(uid, oldPassword, newPassword).subscribe((err) => {
-            // TODO: i18n
-            if (err) {
-                this.alertService.showError(err);
-            }
-            else {
-                this.alertService.showMessage('Password updated successfully');
-            }
+        this.userService.currentUser.pipe(take(1)).subscribe((user) => {
+            this.userService.changePassword(user.username, newPassword).subscribe((err) => {
+                // TODO: i18n
+                if (err) {
+                    this.alertService.showError(err);
+                }
+                else {
+                    this.alertService.showMessage('Password updated successfully');
+                }
 
-            submitEvent.target.reset();
-            this.passwordFormGroup.reset();
+                submitEvent.target.reset();
+                this.passwordFormGroup.reset();
+            });
         });
     }
 

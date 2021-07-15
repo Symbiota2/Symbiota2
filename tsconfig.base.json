@@ -46,7 +46,8 @@
       "@symbiota2/ui-plugin-geography": [
         "libs/ui-plugin-geography/src/index.ts"
       ],
-      "@symbiota2/dwc": ["libs/dwc/src/index.ts"]
+      "@symbiota2/dwc": ["libs/dwc/src/index.ts"],
+      "@symbiota2/api-email": ["libs/api-email/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "data"]
