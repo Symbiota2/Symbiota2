@@ -32,9 +32,10 @@
     "api-plugin-occurrence": { "tags": [] },
     "api-plugin-image": { "tags": [] },
     "api-plugin-taxonomy": { "tags": [] },
-    "api-jobs": { "tags": [] },
     "data-access": { "tags": [] },
     "api-plugin-geography": { "tags": [] },
-    "ui-plugin-geography": { "tags": [] }
+    "ui-plugin-geography": { "tags": [] },
+    "dwc": { "tags": [] },
+    "api-email": { "tags": [] }
   }
 }

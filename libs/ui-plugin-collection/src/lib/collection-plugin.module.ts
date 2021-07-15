@@ -35,9 +35,9 @@ import { CollectionFieldComponent } from './components/collection-field/collecti
 import { CollectionListPage } from './pages/collection-list-page/collection-list-page.component';
 import { CollectionCardComponent } from './components/collection-card/collection-card.component';
 import { CollectionEditorComponent } from './components/collection-editor/collection-editor.component';
-import { CollectionNewCollectionComponent } from './components/collection-new-collection/collection-new-collection.component';
+import { CollectionEditorDialogComponent } from './components/collection-editor-dialog/collection-editor-dialog.component';
+import { MatDialogModule } from '@angular/material/dialog';
 import { CollectionNewPage } from './pages/collection-new-page/collection-new-page.component';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @NgModule({
     declarations: [
@@ -49,29 +49,28 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
         CollectionListPage,
         CollectionCardComponent,
         CollectionEditorComponent,
-        CollectionNewCollectionComponent,
+        CollectionEditorDialogComponent,
         CollectionNewPage
     ],
-    imports: [
-        AppTranslationModule,
-        MatTreeModule,
-        MatIconModule,
-        MatCheckboxModule,
-        MatSelectModule,
-        MatRadioModule,
-        CommonModule,
-        MatButtonModule,
-        MatTabsModule,
-        UiPluginModule,
-        FlexModule,
-        MatCardModule,
-        RouterModule,
-        MatFormFieldModule,
-        MatButtonModule,
-        ReactiveFormsModule,
-        SymbiotaComponentModule,
-        MatInputModule
-    ],
+  imports: [
+    AppTranslationModule,
+    MatTreeModule,
+    MatIconModule,
+    MatCheckboxModule,
+    CommonModule,
+    MatButtonModule,
+    MatTabsModule,
+    UiPluginModule,
+    FlexModule,
+    MatCardModule,
+    RouterModule,
+    MatFormFieldModule,
+    MatButtonModule,
+    ReactiveFormsModule,
+    SymbiotaComponentModule,
+    MatInputModule,
+    MatDialogModule
+  ],
     providers: [
         CollectionService,
         CollectionProfileService

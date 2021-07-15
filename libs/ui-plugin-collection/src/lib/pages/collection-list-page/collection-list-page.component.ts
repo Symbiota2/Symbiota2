@@ -1,14 +1,6 @@
-import {
-    AfterViewInit,
-    Component,
-    OnInit,
-    QueryList,
-    ViewChildren
-} from '@angular/core';
-import { ROUTE_COLLECTION_NEW } from "../../routes";
+import { Component, OnInit } from '@angular/core';
 import { CollectionService } from '../../services/collection.service';
-import { Observable } from 'rxjs';
-import { CollectionCategory } from '../../dto/Category.output.dto';
+import { ROUTE_COLLECTION_NEW } from '../../routes'
 
 @Component({
     selector: 'symbiota2-collection-list-page',
@@ -19,12 +11,12 @@ export class CollectionListPage implements OnInit {
     readonly ROUTE_COLLECTION_NEW = ROUTE_COLLECTION_NEW;
 
     expandAll = true;
-    categories: Observable<CollectionCategory[]>;
+    categories = this.collectionService.categories;
 
     constructor(private readonly collectionService: CollectionService) { }
 
     ngOnInit() {
-        this.categories = this.collectionService.categories();
+        this.collectionService.refreshCategories();
     }
 
     onExpandCollapse(isExpanded: boolean) {

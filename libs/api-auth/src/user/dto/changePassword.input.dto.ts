@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiChangePasswordData } from '@symbiota2/data-access';
 
 /**
@@ -8,9 +8,11 @@ import { ApiChangePasswordData } from '@symbiota2/data-access';
 export class ChangePasswordInputDto implements ApiChangePasswordData {
     @ApiProperty()
     @IsString()
-    oldPassword: string;
+    @IsNotEmpty()
+    username: string;
 
     @ApiProperty()
     @IsString()
+    @IsNotEmpty()
     newPassword: string;
 }

@@ -1,9 +1,17 @@
 import {
     Controller,
     Get,
-    HttpStatus, Param,
+    HttpStatus,
+    Param,
     Query,
-    SerializeOptions, UseGuards, Patch, Body, ForbiddenException, HttpCode, Post
+    SerializeOptions,
+    UseGuards,
+    Patch,
+    Body,
+    ForbiddenException,
+    HttpCode,
+    Post,
+    Req, BadRequestException
 } from '@nestjs/common';
 import {
     ApiBearerAuth, ApiOperation,
@@ -21,6 +29,11 @@ import { ChangePasswordInputDto } from '../dto/changePassword.input.dto';
 import { SuperAdminGuard } from '../../auth/guards/super-admin/super-admin.guard';
 import { FindAllQuery } from '../dto/find-all-query.dto';
 import { CreateUserInputDto } from '../dto/create-user.input.dto';
+import { InjectQueue } from '@nestjs/bull';
+import { QUEUE_ID_PASSWORD_RESET } from '../services/password-reset.queue';
+import { Queue } from 'bull';
+import { ResetPasswordInputDto } from '../dto/reset-password.input.dto';
+import { AuthenticatedRequest, TokenService } from '@symbiota2/api-auth';
 
 /**
  * Routes for getting/setting user data
@@ -28,7 +41,9 @@ import { CreateUserInputDto } from '../dto/create-user.input.dto';
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
-    constructor(private readonly userService: UserService) { }
+    constructor(
+        private readonly userService: UserService,
+        @InjectQueue(QUEUE_ID_PASSWORD_RESET) private readonly passwordResetQueue: Queue) { }
 
     @Post()
     @ApiOperation({
@@ -54,11 +69,9 @@ export class UserController {
     @SerializeOptions({ groups: [UserOutputDto.GROUP_LIST] })
     @UseGuards(JwtAuthGuard, SuperAdminGuard)
     async findAll(@Query() query?: FindAllQuery): Promise<UserOutputDto[]> {
-        if (query) {
-            if (query.username) {
-                const user = await this.userService.findByLogin(query.username);
-                return [new UserOutputDto(user)];
-            }
+        if (query && query.username) {
+            const user = await this.userService.findByLogin(query.username);
+            return [new UserOutputDto(user)];
         }
 
         const users = await this.userService.findAll();
@@ -102,18 +115,28 @@ export class UserController {
     @UseGuards(JwtAuthGuard, CurrentUserGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiResponse({ status: HttpStatus.NO_CONTENT })
-    async changePassword(
-        @Param('id') id: number,
-        @Body() passwdData: ChangePasswordInputDto): Promise<void> {
+    async changePassword(@Req() request: AuthenticatedRequest, @Body() passwdData: ChangePasswordInputDto): Promise<void> {
+        const isSuperAdmin = await TokenService.isSuperAdmin(request.user);
+        const usernameMatches = request.user.username === passwdData.username;
 
-        const err = await this.userService.changePassword(
-            id,
-            passwdData.oldPassword,
+        if (!(isSuperAdmin || usernameMatches)) {
+            throw new ForbiddenException("Cannot edit this user's password");
+        }
+
+        const email = await this.userService.resetPassword(
+            passwdData.username,
             passwdData.newPassword
         );
 
-        if (err) {
-            throw new ForbiddenException(err);
+        if (!email) {
+            throw new BadRequestException('User not found');
         }
+    }
+
+    @Post('forgotPassword')
+    @ApiOperation({ summary: 'Post with a username to receive a password reset email' })
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async resetPassword(@Body() { username }: ResetPasswordInputDto): Promise<void> {
+        await this.passwordResetQueue.add({ username });
     }
 }

@@ -1,5 +1,5 @@
 <div>
-    <h1>Taxon Profile</h1>
+    <h1>{{"taxon.profile.title" | translate}}</h1>
 </div>
 
 <!-- Configure name list -->
@@ -9,7 +9,7 @@
             <tr>
                 <td>
                     <img *ngIf='image' src="{{image.url}}"/>
-                    <span *ngIf='!image'>No image available.</span>
+                    <span *ngIf='!image'>{{"taxon.profile.no.image" | translate}}</span>
                     <br/>
                     <span style='text-aligh:right'>{{image.photographerName}}</span>
                 </td>
@@ -20,11 +20,11 @@
                     </div>
                     <span *ngIf="descriptions.length > 0">
                         <span *ngFor="let d of descriptions">
-                            <b *ngIf='d.displayHeader == 1'>{{d.heading}}</b>&nbsp;{{d.statement}}.
+                            <b *ngIf='d.displayHeader == 1'>{{d.heading}}</b>&nbsp;{{d.statement}}
                         </span>
                     </span>
                     <span *ngIf='descriptions.length == 0'>
-                        No description available.
+                        {{"taxon.profile.no.description" | translate}}
                     </span>
                 </td>
             </tr>
@@ -33,7 +33,7 @@
     </symbiota2-expansion-panel>
 </div>
 <div *ngIf='!block'>
-    No profile available.
+    {{"taxon.profile.no.description" | translate}}
 </div>
 
 <!--

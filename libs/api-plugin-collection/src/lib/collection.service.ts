@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
     Collection,
-    CollectionCategoryLink
+    CollectionCategoryLink, CollectionStat
 } from '@symbiota2/api-database';
 import { DeepPartial, Repository } from 'typeorm';
 import { CollectionFindAllParams } from './dto/coll-find-all.input.dto';
@@ -17,7 +17,9 @@ export class CollectionService extends BaseService<Collection> {
         @Inject(Collection.PROVIDER_ID)
         private readonly collections: Repository<Collection>,
         @Inject(CollectionCategoryLink.PROVIDER_ID)
-        private readonly categoryLinks: Repository<CollectionCategoryLink>) {
+        private readonly categoryLinks: Repository<CollectionCategoryLink>,
+        @Inject(CollectionStat.PROVIDER_ID)
+        private readonly collectionStats: Repository<CollectionStat>) {
 
         super(collections);
     }
@@ -92,8 +94,18 @@ export class CollectionService extends BaseService<Collection> {
     async updateByID(id: number, data: DeepPartial<Collection>): Promise<Collection> {
         const updateResult = await this.collections.update({ id }, data);
         if (updateResult.affected > 0) {
+            await this.updateLastModified(id);
             return this.findByID(id);
         }
         return null;
+    }
+
+    /**
+     * Updates the
+     */
+    async updateLastModified(id: number): Promise<void> {
+        await this.collectionStats.update(id, {
+            lastModifiedTimestamp: new Date()
+        });
     }
 }

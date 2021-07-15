@@ -5,16 +5,19 @@ import { SitemapComponent } from "./pages/sitemap/sitemap.component";
 import { UserProfileComponent } from './pages/user-profile/user-profile.component';
 import { CreateUserProfileComponent } from './pages/create-user-profile/create-user-profile.component';
 import {
+    ROUTE_PASSWORD_RESET,
     ROUTE_SITEMAP,
     ROUTE_USER_CREATE,
     ROUTE_USER_PROFILE
 } from '@symbiota2/ui-common';
+import { PasswordResetComponent } from './pages/password-reset/password-reset.component';
 
 const defaultRoutes: Route[] = [
     { path: HomeComponent.ROUTE, component: HomeComponent },
     { path: ROUTE_SITEMAP, component: SitemapComponent },
     { path: ROUTE_USER_PROFILE, component: UserProfileComponent },
     { path: ROUTE_USER_CREATE, component: CreateUserProfileComponent },
+    { path: ROUTE_PASSWORD_RESET, component: PasswordResetComponent }
 ];
 
 /**

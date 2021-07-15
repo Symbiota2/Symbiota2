@@ -1,7 +1,9 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
 import { Collection } from '../../dto/Collection.output.dto';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { map } from 'rxjs/operators';
+import { formToQueryParams } from '@symbiota2/ui-common';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'symbiota2-collection-editor',
@@ -9,9 +11,16 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
     styleUrls: ['./collection-editor.component.scss']
 })
 export class CollectionEditorComponent implements OnInit {
-    constructor(
-        @Inject(MAT_DIALOG_DATA) public readonly collection: Collection,
-        private readonly dialogRef: MatDialogRef<CollectionEditorComponent>) { }
+    @Input()
+    collection!: Partial<Collection>;
+
+    @Output()
+    submitClicked = new EventEmitter<void>();
+
+    @Output()
+    resetClicked = new EventEmitter<void>();
+
+    constructor() { }
 
     controlName = new FormControl('');
     controlCode = new FormControl('');
@@ -20,8 +29,8 @@ export class CollectionEditorComponent implements OnInit {
     controlUrl = new FormControl('');
     controlContact = new FormControl('');
     controlEmail = new FormControl('');
-    controlLat = new FormControl(0.0, [Validators.min(-90), Validators.max(90)]);
-    controlLng = new FormControl(0.0, [Validators.min(-180), Validators.max(180)]);
+    controlLat = new FormControl(null, [Validators.min(-90), Validators.max(90)]);
+    controlLng = new FormControl(null, [Validators.min(-180), Validators.max(180)]);
     controlType = new FormControl('');
     controlMgmtType = new FormControl('');
     controlRightsHolder = new FormControl('');
@@ -45,23 +54,12 @@ export class CollectionEditorComponent implements OnInit {
         'accessRights': this.controlAccessRights,
     });
 
+    @Output()
+    collectionChange: Observable<Partial<Collection>> = this.form.valueChanges.pipe(
+        map(() => this.form.value)
+    );
+
     ngOnInit() {
-        this.onReset();
-    }
-
-    onEditLogo() {
-        // TODO: add functionality
-    }
-
-    onSubmit() {
-        this.dialogRef.close(this.form.value);
-    }
-
-    onReset() {
         this.form.patchValue(this.collection);
-    }
-
-    onClose() {
-        this.dialogRef.close(null);
     }
 }

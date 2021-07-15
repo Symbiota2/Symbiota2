@@ -1,6 +1,6 @@
 {
-  "name": "@symbiota2/api-jobs",
-  "version": "0.0.3",
+  "name": "@symbiota2/api-email",
+  "version": "0.0.1",
   "license": "GPL-3.0-or-later",
   "peerDependencies": {
     "@nestjs/common": "^7.6.13",

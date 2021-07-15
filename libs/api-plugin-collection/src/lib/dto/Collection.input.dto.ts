@@ -1,6 +1,7 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsString, IsOptional, IsInt, MaxLength, IsNumber, IsEnum, IsNumberString } from 'class-validator';
 import { ApiCollectionInput } from '@symbiota2/data-access';
+import { Transform } from 'class-transformer';
 
 export class CollectionInputDto implements ApiCollectionInput {
 
@@ -49,11 +50,19 @@ export class CollectionInputDto implements ApiCollectionInput {
     email: string;
 
     @ApiProperty({ required: false })
+    @Transform((lat) => {
+        lat = parseFloat(lat)
+        return Number.isNaN(lat) ? null : lat;
+    })
     @IsNumber()
     @IsOptional()
     latitude: number;
 
     @ApiProperty({ required: false })
+    @Transform((lng) => {
+        lng = parseFloat(lng)
+        return Number.isNaN(lng) ? null : lng;
+    })
     @IsNumber()
     @IsOptional()
     longitude: number;

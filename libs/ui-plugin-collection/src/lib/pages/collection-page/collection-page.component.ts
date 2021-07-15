@@ -1,10 +1,7 @@
-import {
-    Component,
-    OnInit,
-} from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { filter, map, switchMap, take } from 'rxjs/operators';
-import { combineLatest, Observable, of } from 'rxjs';
+import { catchError, filter, map, switchMap, take, tap } from 'rxjs/operators';
+import { combineLatest, Observable, of, throwError } from 'rxjs';
 import { CollectionService } from '../../services/collection.service';
 import { Collection } from '../../dto/Collection.output.dto';
 import {
@@ -14,19 +11,18 @@ import {
 import { MatDialog } from '@angular/material/dialog';
 import {
     AlertService,
-    User,
     UserService
 } from '@symbiota2/ui-common';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { CollectionEditorComponent } from '../../components/collection-editor/collection-editor.component';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ROUTE_COLLECTION_LIST } from '../../routes';
+import { CollectionEditorDialogComponent } from '../../components/collection-editor-dialog/collection-editor-dialog.component';
 
 @Component({
     selector: 'symbiota2-collection-page',
     templateUrl: './collection-page.component.html',
     styleUrls: ['./collection-page.component.scss']
 })
-export class CollectionPage implements OnInit {
+export class CollectionPage {
     private static readonly ROUTE_PARAM_COLLID = 'collectionID';
     private static readonly USER_COLLECTIONS_LINK: CollectionProfileLink = {
         text: 'Back to collections',
@@ -34,9 +30,66 @@ export class CollectionPage implements OnInit {
         routerLink: `/${ROUTE_COLLECTION_LIST}`,
     };
 
-    public collection: Collection = null;
-    public links: CollectionProfileLink[] = [];
-    public currentUser: User = null;
+    public collection = this.currentRoute.paramMap.pipe(
+        map((params) => {
+            return (
+                params.has(CollectionPage.ROUTE_PARAM_COLLID) ?
+                    parseInt(params.get(CollectionPage.ROUTE_PARAM_COLLID)) :
+                    -1
+            );
+        }),
+        tap((collectionID) => {
+            this.collections.setCollectionID(collectionID);
+        }),
+        switchMap(() => {
+            return this.collections.currentCollection;
+        }),
+        tap((collection) => {
+            if (collection === null) {
+                this.router.navigate(['']);
+                this.alerts.showError('Collection not found');
+            }
+        })
+    );
+
+    public links: Observable<CollectionProfileLink[]> = this.collection.pipe(
+        switchMap((collection) => {
+            return this.profileService.links(collection.id);
+        }),
+        map((links) => {
+            return [
+                CollectionPage.USER_COLLECTIONS_LINK,
+                ...links
+            ];
+        })
+    );
+
+    public userCanEdit = combineLatest([
+        this.userService.currentUser,
+        this.collection
+    ]).pipe(
+        map(([user, collection]) => {
+            return !!user && !!collection && user.canEditCollection(collection.id);
+        })
+    );
+
+    public collectionHomePage = this.collection.pipe(
+        map((collection) => {
+            if (collection?.homePage) {
+                return this.sanitizer.bypassSecurityTrustUrl(collection.homePage);
+            }
+            return null;
+        })
+    );
+
+    public geoReferencedPercent = this.collection.pipe(
+        map((collection) => {
+            if (collection?.stats?.recordCount > 0) {
+                return Math.round(collection.stats.georeferencedCount / collection.stats.recordCount * 100);
+            }
+            return 0;
+        })
+    );
 
     constructor(
         private readonly userService: UserService,
@@ -48,79 +101,25 @@ export class CollectionPage implements OnInit {
         private readonly dialog: MatDialog,
         private readonly sanitizer: DomSanitizer) { }
 
-    ngOnInit(): void {
-        this.currentRoute.paramMap.pipe(
-            map((params) => {
-                return (
-                    params.has(CollectionPage.ROUTE_PARAM_COLLID) ?
-                        parseInt(params.get(CollectionPage.ROUTE_PARAM_COLLID)) :
-                        -1
-                );
-            }),
-            switchMap((collectionID) => this.loadCollection(collectionID)),
-            switchMap((collection) => {
-                this.collection = collection;
-                return this.profileService.links(collection.id);
-            })
-        ).subscribe((links) => {
-            this.links = [
-                CollectionPage.USER_COLLECTIONS_LINK,
-                ...links
-            ];
-        });
-
-        this.userService.currentUser.subscribe((user) => {
-            this.currentUser = user;
-        });
-    }
-
     onEdit() {
-        const dialog = this.dialog.open(
-            CollectionEditorComponent,
-            { data: this.collection, disableClose: true }
-        );
-
-        combineLatest([
-            dialog.afterClosed(),
-            this.userService.currentUser
-        ]).pipe(
+        this.collection.pipe(
+            filter((collection) => collection !== null),
             take(1),
-            filter(([data, currentUser]) => {
-                return data !== null && currentUser !== null;
-            }),
-            switchMap(([collectionData, currentUser]) => {
-                return this.collections.updateByID(
-                    this.collection.id,
-                    currentUser.token,
-                    collectionData
+            switchMap((collection) => {
+                const dialog = this.dialog.open(
+                    CollectionEditorDialogComponent,
+                    { data: collection, disableClose: true }
                 );
+
+                return dialog.afterClosed().pipe(
+                    take(1),
+                    map((collectionData) => {
+                        if (collectionData !== null) {
+                            return this.collections.updateCurrentCollection(collectionData);
+                        }
+                    })
+                )
             })
-        ).subscribe((collection) => {
-            this.collection = collection;
-        });
-    }
-
-    collectionHomePage(): SafeUrl {
-        if (this.collection?.homePage) {
-            return this.sanitizer.bypassSecurityTrustUrl(this.collection.homePage);
-        }
-        return null;
-    }
-
-    georeferencedPercent(): number {
-        if (this.collection?.stats?.recordCount > 0) {
-            return Math.round(this.collection.stats.georeferencedCount / this.collection.stats.recordCount * 100);
-        }
-        return 0;
-    }
-
-    private loadCollection(id: number): Observable<Collection> {
-        if (id === -1 || Number.isNaN(id)) {
-            this.router.navigate(["/"]);
-            return of(null);
-        }
-        else {
-            return this.collections.findByID(id);
-        }
+        ).subscribe();
     }
 }

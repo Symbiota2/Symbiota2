@@ -22,12 +22,8 @@
       "@symbiota2/ui-plugin-collection": [
         "libs/ui-plugin-collection/src/index.ts"
       ],
-      "@symbiota2/ui-plugin-image": [
-        "libs/ui-plugin-image/src/index.ts"
-      ],
-      "@symbiota2/ui-plugin-taxonomy": [
-        "libs/ui-plugin-taxonomy/src/index.ts"
-      ],
+      "@symbiota2/ui-plugin-image": ["libs/ui-plugin-image/src/index.ts"],
+      "@symbiota2/ui-plugin-taxonomy": ["libs/ui-plugin-taxonomy/src/index.ts"],
       "@symbiota2/api-common": ["libs/api-common/src/index.ts"],
       "@symbiota2/api-config": ["libs/api-config/src/index.ts"],
       "@symbiota2/api-database": ["libs/api-database/src/index.ts"],
@@ -38,9 +34,7 @@
       "@symbiota2/api-plugin-occurrence": [
         "libs/api-plugin-occurrence/src/index.ts"
       ],
-      "@symbiota2/api-plugin-image": [
-        "libs/api-plugin-image/src/index.ts"
-      ],
+      "@symbiota2/api-plugin-image": ["libs/api-plugin-image/src/index.ts"],
       "@symbiota2/api-plugin-taxonomy": [
         "libs/api-plugin-taxonomy/src/index.ts"
       ],
@@ -51,7 +45,9 @@
       ],
       "@symbiota2/ui-plugin-geography": [
         "libs/ui-plugin-geography/src/index.ts"
-      ]
+      ],
+      "@symbiota2/dwc": ["libs/dwc/src/index.ts"],
+      "@symbiota2/api-email": ["libs/api-email/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "data"]

@@ -13,11 +13,21 @@ export const ENV_DB_HOST = 'DATABASE_HOST';
 export const ENV_DB_PORT = 'DATABASE_PORT';
 export const ENV_DB_NAME = 'DATABASE_NAME';
 export const ENV_DB_PATH = 'DATABASE_PATH';
+
+export const ENV_REDIS_HOST = 'REDIS_HOST';
+export const ENV_REDIS_PORT = 'REDIS_PORT';
+
+export const ENV_SMTP_HOST = 'SMTP_HOST';
+export const ENV_SMTP_PORT = 'SMTP_PORT';
+export const ENV_SMTP_USER = 'SMTP_USER';
+export const ENV_SMTP_PASSWORD = 'SMTP_PASSWORD';
+export const ENV_SMTP_SENDER = 'SMTP_SENDER';
 // ======================================
 
 // ===== Configuration defaults =====
 export const DEFAULT_PORT = '8080';
 export const DEFAULT_ENV = 'production';
+export const DEFAULT_DATA_DIR = path.join(process.cwd(), 'data');
 
 export const DEFAULT_DB_TYPE = 'mariadb';
 export const DEFAULT_DB_USER = 'root';
@@ -26,7 +36,15 @@ export const DEFAULT_DB_HOST = '127.0.0.1';
 export const DEFAULT_DB_PORT = '3306';
 export const DEFAULT_DB_NAME = 'symbiota';
 export const DEFAULT_DB_PATH = ':memory:';
-export const DEFAULT_DATA_DIR = path.join(process.cwd(), 'data');
+
+export const DEFAULT_REDIS_HOST = '127.0.0.1';
+export const DEFAULT_REDIS_PORT = '6379';
+
+export const DEFAULT_SMTP_HOST = '127.0.0.1';
+export const DEFAULT_SMTP_PORT = '25';
+export const DEFAULT_SMTP_USER = '';
+export const DEFAULT_SMTP_PASSWORD = '';
+export const DEFAULT_SMTP_SENDER = 'noreply@symbiota2.org';
 
 export const ENV_ENABLE_AUTH = 'ENABLE_AUTH';
 export const DEFAULT_ENABLE_AUTH = '1';
@@ -57,6 +75,17 @@ export default function configBuilder(): Record<string, string> {
         [ENV_DB_PATH]: process.env[ENV_DB_PATH] || DEFAULT_DB_PATH,
 
         // Protect routes
-        [ENV_ENABLE_AUTH]: process.env[ENV_ENABLE_AUTH] || DEFAULT_ENABLE_AUTH
+        [ENV_ENABLE_AUTH]: process.env[ENV_ENABLE_AUTH] || DEFAULT_ENABLE_AUTH,
+
+        // Redis
+        [ENV_REDIS_HOST]: process.env[ENV_REDIS_HOST] || DEFAULT_REDIS_HOST,
+        [ENV_REDIS_PORT]: process.env[ENV_REDIS_PORT] || DEFAULT_REDIS_PORT,
+
+        // Emails
+        [ENV_SMTP_HOST]: process.env[ENV_SMTP_HOST] || DEFAULT_SMTP_HOST,
+        [ENV_SMTP_PORT]: process.env[ENV_SMTP_PORT] || DEFAULT_SMTP_PORT,
+        [ENV_SMTP_USER]: process.env[ENV_SMTP_USER] || DEFAULT_SMTP_USER,
+        [ENV_SMTP_PASSWORD]: process.env[ENV_SMTP_PASSWORD] || DEFAULT_SMTP_PASSWORD,
+        [ENV_SMTP_SENDER]: process.env[ENV_SMTP_SENDER] || DEFAULT_SMTP_SENDER
     };
 }

@@ -19,6 +19,10 @@ export class CollectionInstitutionOutputDto implements ApiCollectionInstitutionO
 
     @ApiProperty()
     @Expose()
+    code: string;
+
+    @ApiProperty()
+    @Expose()
     name: string;
 }
 

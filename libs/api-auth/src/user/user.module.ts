@@ -6,6 +6,9 @@ import { UserRoleController } from './controllers/user-role.controller';
 import { TokenService } from './services/token.service';
 import { AppConfigModule } from '@symbiota2/api-config';
 import { AppJwtModule } from '../app-jwt.module';
+import { PasswordResetProcessor } from './services/password-reset.processor';
+import { PasswordResetQueue } from './services/password-reset.queue';
+import { EmailModule } from '@symbiota2/api-email';
 
 /**
  * Module for user authorization and profile management.
@@ -15,11 +18,14 @@ import { AppJwtModule } from '../app-jwt.module';
     imports: [
         AppJwtModule,
         AppConfigModule,
-        DatabaseModule
+        DatabaseModule,
+        EmailModule,
+        PasswordResetQueue
     ],
     providers: [
         UserService,
-        TokenService
+        TokenService,
+        PasswordResetProcessor
     ],
     controllers: [
         UserController,

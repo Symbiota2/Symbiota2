@@ -67,6 +67,34 @@ import { EntityProvider } from '../../entity-provider.class';
 @Index('Index_latestDateCollected', ['latestDateCollected'])
 @Entity('omoccurrences')
 export class Occurrence extends EntityProvider {
+    // https://dwc.tdwg.org/terms/#occurrence
+    static readonly DWCA_FIELD_MAP = new Map<string, keyof Occurrence>([
+        // Record level
+        ['modified', 'lastModifiedTimestamp'],
+        ['collectionID', 'collectionID'],
+        ['datasetID', 'datasetID'],
+        ['ownerInstitutionCode', 'ownerInstitutionCode'],
+        ['basisOfRecord', 'basisOfRecord'],
+        ['dynamicProperties', 'dynamicProperties'],
+
+        // Occurrence level
+        ['occurrenceID', 'occurrenceGUID'],
+        ['catalogNumber', 'catalogNumber'],
+        ['recordNumber', 'recordNumber'],
+        ['recordedBy', 'recordedBy'],
+        ['individualCount', 'individualCount'],
+        ['sex', 'sex'],
+        ['lifeStage', 'lifeStage'],
+        ['reproductiveCondition', 'reproductiveCondition'],
+        ['behavior', 'behavior'],
+        ['establishmentMeans', 'establishmentMeans'],
+        ['preparations', 'preparations'],
+        ['disposition', 'disposition'],
+        ['associatedTaxa', 'associatedTaxa'],
+        ['otherCatalogNumbers', 'otherCatalogNumbers'],
+        ['occurrenceRemarks', 'occurrenceRemarks']
+    ]);
+
     @PrimaryGeneratedColumn({ type: 'int', name: 'occid', unsigned: true })
     id: number;
 

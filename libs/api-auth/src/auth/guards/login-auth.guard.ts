@@ -19,7 +19,6 @@ export class LoginAuthGuard extends AuthGuard('local') implements CanActivate {
         if (!this.configService.isAuthEnabled()) {
             return true;
         }
-
         return super.canActivate(context) as Promise<boolean>;
     }
 }

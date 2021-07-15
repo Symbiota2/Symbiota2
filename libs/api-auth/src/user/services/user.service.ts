@@ -53,7 +53,10 @@ export class UserService extends BaseService<User> {
      * provided.
      */
     async findAll(fields?: [keyof User]): Promise<User[]> {
-        return this.userRepo.find({ select: fields });
+        if (fields) {
+            return this.userRepo.find({ select: fields });
+        }
+        return this.userRepo.find();
     }
 
     /**
@@ -68,18 +71,18 @@ export class UserService extends BaseService<User> {
     }
 
     /**
-     * Changes the password for the user with the given uid/oldPassword.
-     * If uid or oldPassword is incorrect, no user will be updated.
+     * Resets the password for the given username and returns the user's email
+     * address
      */
-    async changePassword(uid: number, oldPassword: string, newPassword: string): Promise<boolean> {
-        const updateResult = await this.userRepo.createQueryBuilder()
+    async resetPassword(username: string, newPassword: string): Promise<string> {
+        await this.userRepo.createQueryBuilder()
             .update()
             .set({ password: () => `PASSWORD('${newPassword}')` })
-            .where('uid = :uid', { uid })
-            .andWhere('password = PASSWORD(:oldPassword)', { oldPassword })
+            .where('username = :username', { username })
             .execute();
 
-        return updateResult.affected > 0;
+        const user = await this.userRepo.findOne({ username }, { select: ['email'] });
+        return user ? user.email : null;
     }
 
     /**

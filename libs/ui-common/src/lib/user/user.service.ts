@@ -5,7 +5,7 @@ import { ApiClientService } from "../api-client";
 import { plainToClass } from "class-transformer";
 import {
     catchError,
-    delay,
+    delay, filter,
     map,
     shareReplay,
     skip,
@@ -15,7 +15,6 @@ import {
 import { ApiLoginResponse } from "@symbiota2/data-access";
 import { AlertService } from "../alert";
 import { HttpErrorResponse } from "@angular/common/http";
-import { UserModule } from "./user.module";
 import jwtDecode from "jwt-decode";
 import {
     ApiCreateUserData,
@@ -189,23 +188,33 @@ export class UserService {
 
     /**
      * Change a password via the API
-     * @param uid The uid of the user whose password we're changing
-     * @param oldPassword The old password
+     * @param username The username whose password we're changing
      * @param newPassword The new password
      * @return Observable<string> An error, if any
      */
-    changePassword(uid: number, oldPassword: string, newPassword: string): Observable<string | null> {
-        const req = this.api.queryBuilder(`${this.api.apiRoot()}/users/${uid}/changePassword`)
-            .patch()
-            .body({ oldPassword, newPassword })
-            .build();
+    changePassword(username: string, newPassword: string): Observable<string | null> {
+        return this.currentUser.pipe(
+            take(1),
+            filter((user) => user !== null),
+            switchMap((user) => {
+                const req = this.api.queryBuilder(`${this.api.apiRoot()}/users/${user.uid}/changePassword`)
+                    .patch()
+                    .addJwtAuth(user.token)
+                    .body({
+                        username,
+                        newPassword: newPassword
+                    })
+                    .build();
 
-        return this.api.send(req).pipe(
-            catchError((err: HttpErrorResponse) => {
-                if (err.error && err.error.message) {
-                    return of(err.error.message);
-                }
-                return of('Unknown error');
+                return this.api.send(req).pipe(
+                    map(() => null),
+                    catchError((err: HttpErrorResponse) => {
+                        if (err.error && err.error.message) {
+                            return of(err.error.message);
+                        }
+                        return of('Unknown error');
+                    })
+                );
             })
         );
     }
@@ -238,8 +247,6 @@ export class UserService {
                 if (userData) {
                     const refreshIn = userData.millisUntilExpires() - UserService.ONE_MINUTE;
                     this.refreshSubscription = of(0).pipe(delay(refreshIn)).subscribe(() => {
-                        // TODO: Remove this
-                        console.debug(`Refreshed at ${(new Date()).toLocaleTimeString()}`);
                         this.refresh().subscribe();
                     });
                 }

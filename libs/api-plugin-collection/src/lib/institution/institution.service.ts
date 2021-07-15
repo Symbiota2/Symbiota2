@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Institution } from '@symbiota2/api-database';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { BaseService } from '@symbiota2/api-common';
 
 type InstitutionFindAllParams = {
@@ -18,9 +18,8 @@ type InstitutionFindAllParams = {
 export class InstitutionService extends BaseService<Institution> {
     constructor(
         @Inject(Institution.PROVIDER_ID)
-        private readonly institutions: Repository<Institution>) {
-
-        super(institutions);
+        private readonly institutionRepo: Repository<Institution>) {
+        super(institutionRepo);
     }
 
     /**
@@ -29,10 +28,37 @@ export class InstitutionService extends BaseService<Institution> {
      */
     findAll(params?: InstitutionFindAllParams): Promise<Institution[]> {
         const { limit, offset, ...qParams } = params;
-        return this.institutions.find({
+        return this.institutionRepo.find({
+            select: ['id', 'name'],
             where: qParams,
             take: limit,
             skip: offset
+        });
+    }
+
+    /**
+     * Creates a new institution
+     * @param data The fields for the institution
+     */
+    create(data: DeepPartial<Institution>): Promise<Institution> {
+        const institution = this.institutionRepo.create(data);
+        return this.institutionRepo.save(institution);
+    }
+
+    /**
+     * Updates the institution with the given ID
+     * @param id The id of the institution to update
+     * @param data The institution fields to update
+     */
+    async update(id: number, data: DeepPartial<Institution>): Promise<Institution> {
+        const institution = await this.institutionRepo.findOne(id, { select: ['id'] });
+        if (!institution) {
+            return null;
+        }
+        return this.institutionRepo.save({
+            id,
+            ...data,
+            lastModifiedTimestamp: new Date()
         });
     }
 }

@@ -29,6 +29,7 @@ import { CreateUserProfileComponent } from './pages/create-user-profile/create-u
 import { TaxonomyPlugin } from '@symbiota2/ui-plugin-taxonomy';
 import { ErrorComponent } from './pages/create-user-profile/error-component/error.component';
 import { PasswordFormValidator } from './pages/user-profile/password-validator.directive';
+import { PasswordResetComponent } from './pages/password-reset/password-reset.component';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -52,7 +53,8 @@ const PLUGINS = [
     BannerComponent,
     CreateUserProfileComponent,
     ErrorComponent,
-    PasswordFormValidator
+    PasswordFormValidator,
+    PasswordResetComponent
   ],
     imports: [
         AlertModule,

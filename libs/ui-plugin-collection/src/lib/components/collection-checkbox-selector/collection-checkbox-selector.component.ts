@@ -12,6 +12,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { CollectionListItem } from '../../dto/Collection.output.dto';
 import { CollectionCategory } from '../../dto/Category.output.dto';
+import { filter, map } from 'rxjs/operators';
 
 const ROOT_NODE_ID = 65536;
 
@@ -43,22 +44,19 @@ class TreeNode {
 
 @Injectable()
 export class CollectionTreeData {
-    public data: EventEmitter<TreeNode[]>;
+    public data = this.collectionService.categories.pipe(
+        map((categories) => {
+            const rootNode = new TreeNode(ROOT_NODE_ID, '');
 
-    constructor(private collectionService: CollectionService) {
-        this.data = new EventEmitter<TreeNode[]>();
-
-        const rootNode = new TreeNode(ROOT_NODE_ID, '');
-
-        this.collectionService.categories().subscribe((categories) => {
             categories.forEach((category) => {
                 rootNode.children.push(this.buildTreeData(category));
             });
 
-            this.data.emit([rootNode]);
-            this.data.complete();
-        });
-    }
+            return [rootNode];
+        })
+    );
+
+    constructor(private collectionService: CollectionService) { }
 
     buildTreeData(currentNode: CollectionListItem | CollectionCategory): TreeNode {
         const newNode = new TreeNode(
