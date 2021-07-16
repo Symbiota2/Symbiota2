@@ -10,8 +10,7 @@ import {
     UserProfileTab, NavBarLink
 } from '@symbiota2/ui-common';
 import { MatIconModule } from '@angular/material/icon';
-import {MatSelectModule} from '@angular/material/select';
-import {MatRadioModule} from '@angular/material/radio';  
+import { MatSelectModule } from "@angular/material/select";
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { UserProfileCollectionTab } from './components/user-profile-collection-tab/user-profile-collection-tab.component';
@@ -37,6 +36,7 @@ import { CollectionCardComponent } from './components/collection-card/collection
 import { CollectionEditorComponent } from './components/collection-editor/collection-editor.component';
 import { CollectionEditorDialogComponent } from './components/collection-editor-dialog/collection-editor-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { CollectionNewCollectionComponent } from "./components/collection-new-collection/collection-new-collection.component";
 import { CollectionNewPage } from './pages/collection-new-page/collection-new-page.component';
 
 @NgModule({
@@ -50,7 +50,8 @@ import { CollectionNewPage } from './pages/collection-new-page/collection-new-pa
         CollectionCardComponent,
         CollectionEditorComponent,
         CollectionEditorDialogComponent,
-        CollectionNewPage
+        CollectionNewPage,
+        CollectionNewCollectionComponent
     ],
   imports: [
     AppTranslationModule,
@@ -69,7 +70,8 @@ import { CollectionNewPage } from './pages/collection-new-page/collection-new-pa
     ReactiveFormsModule,
     SymbiotaComponentModule,
     MatInputModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSelectModule
   ],
     providers: [
         CollectionService,
