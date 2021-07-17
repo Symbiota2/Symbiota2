@@ -8,6 +8,6 @@ import { Component } from '@angular/core';
     templateUrl: './sitemap.component.html',
     styleUrls: ['./sitemap.component.scss']
 })
-export class SitemapComponent {
+export class SitemapPage {
     constructor() {}
 }

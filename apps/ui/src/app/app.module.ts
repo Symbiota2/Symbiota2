@@ -16,20 +16,21 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { MaterialModule } from "./material.module";
-import { HomeComponent } from "./pages/home/home.component";
-import { SitemapComponent } from "./pages/sitemap/sitemap.component";
-import { UserProfileComponent } from "./pages/user-profile/user-profile.component";
+import { HomePage } from "./pages/home/home.component";
+import { SitemapPage } from "./pages/sitemap/sitemap.component";
+import { UserProfilePage } from "./pages/user-profile/user-profile.component";
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { LoginDialog } from "./components/login-dialog/login-dialog.component";
 import { FooterComponent } from './components/footer/footer.component';
 import { BannerComponent } from './components/banner/banner.component';
 import { CollectionPlugin } from "@symbiota2/ui-plugin-collection";
 import { OccurrencePlugin } from '@symbiota2/ui-plugin-occurrence';
-import { CreateUserProfileComponent } from './pages/create-user-profile/create-user-profile.component';
+import { CreateUserProfilePage } from './pages/create-user-profile/create-user-profile.component';
 import { TaxonomyPlugin } from '@symbiota2/ui-plugin-taxonomy';
 import { ErrorComponent } from './pages/create-user-profile/error-component/error.component';
 import { PasswordFormValidator } from './pages/user-profile/password-validator.directive';
-import { PasswordResetComponent } from './pages/password-reset/password-reset.component';
+import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.component';
+import { ForgotUsernamePage } from './pages/forgot-username/forgot-username.component';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -44,17 +45,18 @@ const PLUGINS = [
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent,
-    SitemapComponent,
-    UserProfileComponent,
+    HomePage,
+    SitemapPage,
+    UserProfilePage,
     NavbarComponent,
     LoginDialog,
     FooterComponent,
     BannerComponent,
-    CreateUserProfileComponent,
+    CreateUserProfilePage,
     ErrorComponent,
     PasswordFormValidator,
-    PasswordResetComponent
+    ForgotPasswordPage,
+    ForgotUsernamePage
   ],
     imports: [
         AlertModule,

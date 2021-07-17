@@ -33,7 +33,7 @@ import { ApiUserRole } from '@symbiota2/data-access';
     templateUrl: './user-profile.component.html',
     styleUrls: ['./user-profile.component.scss']
 })
-export class UserProfileComponent implements OnInit, OnDestroy, AfterViewInit {
+export class UserProfilePage implements OnInit, OnDestroy, AfterViewInit {
     @ViewChildren('extraTabs', { read: ViewContainerRef })
     public pluginTabContainers: QueryList<ViewContainerRef>;
 

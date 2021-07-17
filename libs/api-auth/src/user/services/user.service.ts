@@ -30,6 +30,17 @@ export class UserService extends BaseService<User> {
     }
 
     /**
+     * Returns the user with the given email address from the database. An
+     * optional list of fields can be provided
+     */
+    async findByEmail(email: string, fields?: Array<keyof User>): Promise<User> {
+        return this.userRepo.findOne({
+            select: fields,
+            where: { email }
+        });
+    }
+
+    /**
      * Returns the user with the given login/password from the database. An
      * optional list of fields can be provided.
      */
