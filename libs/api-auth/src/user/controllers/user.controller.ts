@@ -30,10 +30,12 @@ import { SuperAdminGuard } from '../../auth/guards/super-admin/super-admin.guard
 import { FindAllQuery } from '../dto/find-all-query.dto';
 import { CreateUserInputDto } from '../dto/create-user.input.dto';
 import { InjectQueue } from '@nestjs/bull';
-import { QUEUE_ID_PASSWORD_RESET } from '../services/password-reset.queue';
+import { QUEUE_ID_FORGOT_PASSWORD } from '../services/forgot-password.queue';
 import { Queue } from 'bull';
-import { ResetPasswordInputDto } from '../dto/reset-password.input.dto';
+import { ForgotPasswordInputDto } from '../dto/forgot-password.input.dto';
 import { AuthenticatedRequest, TokenService } from '@symbiota2/api-auth';
+import { ForgotUsernameInputDto } from '../dto/forgot-username.input.dto';
+import { QUEUE_ID_FORGOT_USERNAME } from '../services/forgot-username.queue';
 
 /**
  * Routes for getting/setting user data
@@ -43,7 +45,8 @@ import { AuthenticatedRequest, TokenService } from '@symbiota2/api-auth';
 export class UserController {
     constructor(
         private readonly userService: UserService,
-        @InjectQueue(QUEUE_ID_PASSWORD_RESET) private readonly passwordResetQueue: Queue) { }
+        @InjectQueue(QUEUE_ID_FORGOT_PASSWORD) private readonly forgotPasswordQueue: Queue,
+        @InjectQueue(QUEUE_ID_FORGOT_USERNAME) private readonly forgotUsernameQueue: Queue,) { }
 
     @Post()
     @ApiOperation({
@@ -136,7 +139,14 @@ export class UserController {
     @Post('forgotPassword')
     @ApiOperation({ summary: 'Post with a username to receive a password reset email' })
     @HttpCode(HttpStatus.NO_CONTENT)
-    async resetPassword(@Body() { username }: ResetPasswordInputDto): Promise<void> {
-        await this.passwordResetQueue.add({ username });
+    async forgotPassword(@Body() { username }: ForgotPasswordInputDto): Promise<void> {
+        await this.forgotPasswordQueue.add({ username });
+    }
+
+    @Post('forgotUsername')
+    @ApiOperation({ summary: 'Post with an email address to receive a username email' })
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async forgotUsername(@Body() { email }: ForgotUsernameInputDto): Promise<void> {
+        await this.forgotUsernameQueue.add({ email });
     }
 }

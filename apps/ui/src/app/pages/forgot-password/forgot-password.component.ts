@@ -7,12 +7,12 @@ import { of } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
-    selector: 'symbiota2-password-reset',
-    templateUrl: './password-reset.component.html',
-    styleUrls: ['./password-reset.component.scss']
+    selector: 'symbiota2-forgot-password',
+    templateUrl: './forgot-password.component.html',
+    styleUrls: ['./forgot-password.component.scss']
 })
-export class PasswordResetComponent {
-    private static readonly API_ROUTE_PASSWORD_RESET = 'users/forgotPassword';
+export class ForgotPasswordPage {
+    private static readonly API_ROUTE_FORGOT_PASSWORD = 'users/forgotPassword';
 
     formControlUsername = new FormControl('');
     form = new FormGroup({ 'username': this.formControlUsername });
@@ -23,7 +23,7 @@ export class PasswordResetComponent {
         private readonly api: ApiClientService) { }
 
     onSubmit() {
-        const req = this.api.queryBuilder(`${this.api.apiRoot()}/${PasswordResetComponent.API_ROUTE_PASSWORD_RESET}`)
+        const req = this.api.queryBuilder(`${this.api.apiRoot()}/${ForgotPasswordPage.API_ROUTE_FORGOT_PASSWORD}`)
             .post()
             .body(this.form.value)
             .build();

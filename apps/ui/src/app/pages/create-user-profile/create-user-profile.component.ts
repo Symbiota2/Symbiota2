@@ -25,7 +25,7 @@ import {
 import { DOCUMENT } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
-import { UserProfileComponent } from '../user-profile/user-profile.component';
+import { UserProfilePage } from '../user-profile/user-profile.component';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { combineAll, map, startWith, switchMap, tap } from 'rxjs/operators';
 
@@ -37,7 +37,7 @@ import { combineAll, map, startWith, switchMap, tap } from 'rxjs/operators';
     templateUrl: './create-user-profile.component.html',
     styleUrls: ['./create-user-profile.component.scss']
 })
-export class CreateUserProfileComponent implements OnInit {
+export class CreateUserProfilePage implements OnInit {
     readonly PASSWORD_MIN_CHARS = 8;
 
     readonly usernameField = new FormControl('', [Validators.required]);

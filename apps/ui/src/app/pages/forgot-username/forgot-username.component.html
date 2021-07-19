@@ -1,14 +1,14 @@
 <!-- TODO: i18n -->
 <div id='container' fxLayout='column' fxLayoutAlign='center center' fxLayoutGap='1rem'>
-    <h1>Reset password</h1>
+    <h1>Retrieve username</h1>
     <mat-form-field>
-        <mat-label>Username</mat-label>
-        <input matInput [formControl]='formControlUsername'>
+        <mat-label>Email address</mat-label>
+        <input matInput [formControl]='controlEmail'>
     </mat-form-field>
     <button
         mat-raised-button
         color='primary'
-        [disabled]='form.value["username"].length === 0'
+        [disabled]='form.value["email"].length === 0 || !form.valid'
         (click)='onSubmit()'
     >
         Submit

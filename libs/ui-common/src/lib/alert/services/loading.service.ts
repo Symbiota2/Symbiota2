@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, timer } from 'rxjs';
 import {
     distinctUntilChanged,
-    map,
+    map, sampleTime,
     shareReplay
 } from 'rxjs/operators';
 import { AlertModule } from "../alert.module";
@@ -15,6 +15,7 @@ export class LoadingService {
 
     isLoading = this.loadingCounter.pipe(
         map((loadingCounter) => loadingCounter > 0),
+        sampleTime(100),
         distinctUntilChanged(),
         shareReplay(1)
     );
