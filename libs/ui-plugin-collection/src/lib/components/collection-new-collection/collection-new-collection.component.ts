@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder } from "@angular/forms";
+import { CollectionService } from "../../services/collection.service";
 
 @Component({
   selector: 'symbiota2-collection-new-collection',
