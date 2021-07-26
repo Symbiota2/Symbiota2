@@ -25,6 +25,7 @@ import { CollectionService } from './services/collection.service';
 import { CollectionProfileService } from './services/collection-profile.service';
 import { CollectionLogoComponent } from './components/collection-logo/collection-logo.component';
 import { MatInputModule } from '@angular/material/input';
+import {MatDividerModule} from '@angular/material/divider'; 
 import {
     ROUTE_COLLECTION_LIST,
     ROUTE_COLLECTION_PROFILE,
@@ -71,7 +72,8 @@ import { CollectionNewPage } from './pages/collection-new-page/collection-new-pa
     SymbiotaComponentModule,
     MatInputModule,
     MatDialogModule,
-    MatSelectModule
+    MatSelectModule,
+    MatDividerModule
   ],
     providers: [
         CollectionService,

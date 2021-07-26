@@ -1,101 +1,244 @@
-<p>collection-new-collection works!</p>
 <form [formGroup]="newCollectionForm" (ngSubmit)="onSubmit()">
     <div fxLayout="column">
-        <div fxLayout="row wrap" fxLayoutGap="20px">
-            <mat-form-field>
+        <div
+            fxLayout="row"
+            fxLayoutAlign="start end"
+            fxLayoutGap="2rem"
+            fxLayoutGap="1rem"
+            fxLayout.lt-md="column"
+            fxLayoutAlign.lt-md="start"
+        >
+            <symbiota2-collection-logo
+                size="8rem"
+                src="{{ newCollectionForm.value.icon }}"
+                id="logo"
+            >
+            </symbiota2-collection-logo>
+            <mat-form-field id="name_form" fxFlex="25">
+                <mat-label>Collection Name</mat-label>
+                <input matInput formControlName="collectionName" />
+                <mat-error
+                    *ngIf="newCollectionForm.get('collectionName').hasError('required')"
+                >
+                    Collection Name is <strong>required</strong>
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field id="code_form" fxFlex="10">
                 <mat-label>Collection Code</mat-label>
                 <input matInput formControlName="code" />
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>Collection Name</mat-label>
-                <input matInput formControlName="name" />
+                <mat-error
+                    *ngIf="newCollectionForm.get('code').hasError('required')"
+                >
+                    Collection Code is <strong>required</strong>
+                </mat-error>
             </mat-form-field>
         </div>
-        <mat-form-field>
-            <mat-label>Description</mat-label>
-            <textarea matInput formControlName="desc"></textarea>
-        </mat-form-field>
-        <mat-form-field>
-            <mat-label>Homepage</mat-label>
-            <input matInput type="url" formControlName="homepage" />
-        </mat-form-field>
-        <mat-form-field>
-            <mat-label>Contact</mat-label>
-            <input matInput type="url" formControlName="contact" />
-        </mat-form-field>
-        <mat-form-field>
-            <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" />
-        </mat-form-field>
-        <mat-form-field>
-            <mat-label>latitude</mat-label>
-            <input
-                matInput
-                type="number"
-                step="0.000001"
-                formControlName="latitude"
-            />
-        </mat-form-field>
-        <mat-form-field>
-            <mat-label>longitude</mat-label>
-            <input
-                matInput
-                type="number"
-                step="0.000001"
-                formControlName="longitude"
-            />
-        </mat-form-field>
-        <mat-form-field>
-            <mat-label>Category</mat-label>
-            <mat-select formControlName="category">
-                <!-- //TODO: api will handle populating categories -->
-                <mat-option value="one">category one</mat-option>
-                <mat-option value="two">category two</mat-option>
-            </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-            <mat-label>License</mat-label>
-            <input matInput type="url" formControlName="license" />
-        </mat-form-field>
-        <mat-checkbox
-            value="publishToAggregators"
-            formControlName="aggregators"
+        <div
+            class="form-subgroup"
+            fxLayout="row"
+            fxLayoutAlign="start end"
+            fxLayoutGap="2rem"
+            fxLayout.lt-md="column"
+            fxLayoutAlign.lt-md="start"
+            fxLayoutGap.lt-md="1rem"
         >
-            Publish to Aggregators</mat-checkbox
+            <mat-form-field fxFlex="10">
+                <mat-label>Icon URL</mat-label>
+                <input matInput formControlName="icon" />
+            </mat-form-field>
+            <mat-form-field fxFlex="30" appearance="fill">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description"></textarea>
+            </mat-form-field>
+        </div>
+        <div
+            fxLayout="row"
+            fxLayoutGap="5rem"
+            fxLayoutGap="1rem"
+            fxLayout.lt-md="column"
         >
-        <mat-form-field>
-            <mat-label>Icon URL</mat-label>
-            <input matInput formControlName="icon" />
-        </mat-form-field>
-        <mat-form-field>
-            <mat-label>Collection Type</mat-label>
-            <mat-select formControlName="type">
-                <!-- //TODO: api will handle populating collection types -->
-                <mat-option value="preservedSpecimens"
-                    >Preserved Specimens</mat-option
+            <div fxLayout="column" fxFlex="25">
+                <mat-form-field>
+                    <mat-label>Homepage</mat-label>
+                    <input matInput type="url" formControlName="homepage" />
+                    <mat-error
+                        *ngIf="
+                            newCollectionForm
+                                .get('homepage')
+                                .hasError('required')
+                        "
+                    >
+                        homepage is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Contact</mat-label>
+                    <input matInput type="url" formControlName="contact" />
+                    <mat-error
+                        *ngIf="
+                            newCollectionForm
+                                .get('contact')
+                                .hasError('required')
+                        "
+                    >
+                        contact is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" formControlName="email" />
+                    <mat-error
+                        *ngIf="
+                            newCollectionForm.get('email').hasError('required')
+                        "
+                    >
+                        an email is <strong>required</strong>
+                    </mat-error>
+                    <mat-error
+                        *ngIf="newCollectionForm.get('email').hasError('email')"
+                    >
+                        email not valid
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>License</mat-label>
+                    <input matInput type="url" formControlName="license" />
+                    <mat-error
+                        *ngIf="
+                            newCollectionForm
+                                .get('license')
+                                .hasError('required')
+                        "
+                    >
+                        license is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div fxLayout="column">
+                <mat-form-field>
+                    <mat-label>Category</mat-label>
+                    <mat-select formControlName="category">
+                        <!-- //TODO: api will handle populating categories -->
+                        <mat-option value="one">category one</mat-option>
+                        <mat-option value="two">category two</mat-option>
+                    </mat-select>
+                    <mat-error
+                        *ngIf="
+                            newCollectionForm
+                                .get('category')
+                                .hasError('required')
+                        "
+                    >
+                        please select a category
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Collection Type</mat-label>
+                    <mat-select formControlName="type">
+                        <!-- //TODO: api will handle populating collection types -->
+                        <mat-option value="Preserved Specimens"
+                            >Preserved Specimens</mat-option
+                        >
+                        <mat-option value="General Observations"
+                            >General Observations</mat-option
+                        >
+                    </mat-select>
+                    <mat-error
+                        *ngIf="
+                            newCollectionForm.get('type').hasError('required')
+                        "
+                    >
+                        please select a Collection Type
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Management</mat-label>
+                    <mat-select formControlName="management">
+                        <!-- //TODO: api will handle populating collection types -->
+                        <mat-option value="snapshot">Snapshot</mat-option>
+                        <mat-option value="liveData">Live Data</mat-option>
+                    </mat-select>
+                    <mat-error
+                        *ngIf="
+                            newCollectionForm
+                                .get('management')
+                                .hasError('required')
+                        "
+                    >
+                        please select a Management
+                    </mat-error>
+                </mat-form-field>
+                <mat-checkbox
+                    value="publishToAggregators"
+                    formControlName="aggregators"
+                    id="checkbox"
                 >
-                <mat-option value="generalObservations"
-                    >General Observations</mat-option
+                    Publish to Aggregators</mat-checkbox
                 >
-            </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-            <mat-label>Management</mat-label>
-            <mat-select formControlName="management">
-                <!-- //TODO: api will handle populating collection types -->
-                <mat-option value="snapshot">Snapshot</mat-option>
-                <mat-option value="liveData">Live Data</mat-option>
-            </mat-select>
-        </mat-form-field>
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutGap="5rem" fxLayout.lt-md="column">
+            <mat-form-field>
+                <mat-label>latitude</mat-label>
+                <input
+                    matInput
+                    type="number"
+                    step=".1"
+                    formControlName="latitude"
+                />
+                <mat-error
+                    *ngIf="
+                        newCollectionForm.get('latitude').hasError('required')
+                    "
+                >
+                    latitude is <strong> required </strong>
+                </mat-error>
+                <mat-error
+                    *ngIf="
+                        newCollectionForm.get('latitude').hasError('min') ||
+                        newCollectionForm.get('latitude').hasError('max')
+                    "
+                >
+                    please enter valid latitude
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>longitude</mat-label>
+                <input
+                    matInput
+                    type="number"
+                    step=".1"
+                    formControlName="longitude"
+                />
+                <mat-error
+                    *ngIf="
+                        newCollectionForm.get('longitude').hasError('required')
+                    "
+                >
+                    longitude is <strong> required </strong>
+                </mat-error>
+                <mat-error
+                    *ngIf="
+                        newCollectionForm.get('longitude').hasError('min') ||
+                        newCollectionForm.get('longitude').hasError('max') ||
+                        newCollectionForm.get('longitude').hasError('number')
+                    "
+                >
+                    please enter valid longitude
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div fxLayoutAlign="start" fxLayoutAlign.lt-md="center">
+            <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="!newCollectionForm.valid"
+            >
+                Create New Collection
+            </button>
+        </div>
     </div>
-    <button
-        mat-raised-button
-        color="primary"
-        type="submit"
-        [disabled]="!newCollectionForm.valid"
-    >
-        Submit
-    </button>
     <p><b>Form Status:</b> {{ newCollectionForm.status }}</p>
     <pre> <b>Form Values:</b> {{newCollectionForm.value | json}}</pre>
 </form>
