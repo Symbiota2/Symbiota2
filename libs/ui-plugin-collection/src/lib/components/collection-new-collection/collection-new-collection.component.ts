@@ -49,8 +49,7 @@ export class CollectionNewCollectionComponent implements OnInit {
 
   onSubmit(): void {
     var newCollection = new CollectionInputDto(this.newCollectionForm.value);
-    this.collections.createNewCollection(newCollection, this.user.token).subscribe(collection => //TODO: reroute to col page
-      );
+    this.collections.createNewCollection(newCollection, this.user.token).subscribe();
     console.log(this.newCollectionForm.value);
   }
 
