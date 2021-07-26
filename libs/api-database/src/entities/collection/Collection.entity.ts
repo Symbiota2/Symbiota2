@@ -35,7 +35,7 @@ export class Collection extends EntityProvider {
     id: number;
 
     @Column('varchar', { name: 'InstitutionCode', length: 45 })
-    institutionCode: string;
+    institutionCode: string = ""
 
     @Column('varchar', { name: 'CollectionCode', nullable: true, length: 45 })
     collectionCode: string;

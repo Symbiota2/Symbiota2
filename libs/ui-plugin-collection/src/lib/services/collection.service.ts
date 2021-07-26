@@ -1,27 +1,38 @@
 import {
     BehaviorSubject,
-    combineLatest, merge,
+    combineLatest,
+    merge,
     Observable,
-    of, ReplaySubject,
-    throwError
+    of,
+    ReplaySubject,
+    throwError,
 } from 'rxjs';
 import { CollectionCategory } from '../dto/Category.output.dto';
 import {
     AlertService,
-    ApiClientService, formToQueryParams, UserService
+    ApiClientService,
+    formToQueryParams,
+    UserService,
 } from '@symbiota2/ui-common';
 import {
-    catchError, debounceTime, distinctUntilChanged,
+    catchError,
+    debounceTime,
+    distinctUntilChanged,
     filter,
-    map, shareReplay, startWith,
-    switchMap, take, tap
+    map,
+    shareReplay,
+    startWith,
+    switchMap,
+    take,
+    tap,
 } from 'rxjs/operators';
 import { Collection, CollectionListItem } from '../dto/Collection.output.dto';
 import { Injectable, EventEmitter } from '@angular/core';
 import { CollectionInputDto } from '../dto/Collection.input.dto';
 import {
     ApiCollectionCategoryOutput,
-    ApiCollectionListItem, ApiCollectionOutput
+    ApiCollectionListItem,
+    ApiCollectionOutput,
 } from '@symbiota2/data-access';
 
 interface FindAllParams {
@@ -35,17 +46,23 @@ export class CollectionService {
     private readonly COLLECTION_BASE_URL = `${this.api.apiRoot()}/collections`;
     private readonly CATEGORY_BASE_URL = `${this.COLLECTION_BASE_URL}/categories`;
 
-    private readonly currentCategories = new BehaviorSubject<ApiCollectionCategoryOutput[]>([]);
-    private readonly collectionQueryParams = new BehaviorSubject<FindAllParams>(null);
+    private readonly currentCategories = new BehaviorSubject<
+        ApiCollectionCategoryOutput[]
+    >([]);
+    private readonly collectionQueryParams = new BehaviorSubject<FindAllParams>(
+        null
+    );
     private readonly currentCollectionID = new BehaviorSubject<number>(-1);
-    private readonly updateCollectionData = new ReplaySubject<Partial<CollectionInputDto>>();
+    private readonly updateCollectionData = new ReplaySubject<
+        Partial<CollectionInputDto>
+    >();
 
     currentCollection: Observable<Collection> = merge(
         this.currentCollectionID.pipe(
             distinctUntilChanged(),
             switchMap((id) => {
                 if (id > 0) {
-                    return this.fetchCollectionByID(id)
+                    return this.fetchCollectionByID(id);
                 }
                 return of(null);
             })
@@ -54,7 +71,7 @@ export class CollectionService {
             switchMap((collectionData) => {
                 return combineLatest([
                     this.users.currentUser,
-                    this.currentCollectionID
+                    this.currentCollectionID,
                 ]).pipe(
                     take(1),
                     filter(([currentUser, currentCollectionID]) => {
@@ -68,7 +85,9 @@ export class CollectionService {
                         );
                     }),
                     catchError((e) => {
-                        this.alerts.showError(`Cannot update collection: ${e.message}`);
+                        this.alerts.showError(
+                            `Cannot update collection: ${e.message}`
+                        );
                         return of(null);
                     }),
                     filter((collection) => collection !== null)
@@ -89,9 +108,30 @@ export class CollectionService {
     constructor(
         private readonly api: ApiClientService,
         private readonly users: UserService,
-        private readonly alerts: AlertService) {
-
+        private readonly alerts: AlertService
+    ) {
         this.refreshCategories();
+    }
+
+    createNewCollection(
+        collectionData: Partial<CollectionInputDto>,
+        userToken: string
+    ): Observable<Collection> {
+        const req = this.api
+            .queryBuilder(this.COLLECTION_BASE_URL)
+            .post()
+            .body(collectionData)
+            .addJwtAuth(userToken)
+            .build();
+
+        return this.api.send(req).pipe(
+            map((collection: ApiCollectionOutput) => {
+                if (collection === null) {
+                    return null;
+                }
+                return new Collection(collection);
+            })
+        );
     }
 
     setCollectionID(id: number) {
@@ -101,8 +141,7 @@ export class CollectionService {
     setCollectionQueryParams(findAllParams?: FindAllParams) {
         if (findAllParams) {
             this.collectionQueryParams.next(findAllParams);
-        }
-        else {
+        } else {
             this.collectionQueryParams.next(null);
         }
     }
@@ -112,22 +151,25 @@ export class CollectionService {
     }
 
     refreshCategories() {
-        const req = this.api.queryBuilder(this.CATEGORY_BASE_URL)
-            .get()
-            .build();
+        const req = this.api.queryBuilder(this.CATEGORY_BASE_URL).get().build();
 
-        this.api.send(req).pipe(
-            map((categoryJsonLst: ApiCollectionCategoryOutput[]) => {
-                return categoryJsonLst.map((cat) => {
-                    return new CollectionCategory(cat);
-                });
-            })
-        ).subscribe((categories) => {
-            this.currentCategories.next(categories);
-        });
+        this.api
+            .send(req)
+            .pipe(
+                map((categoryJsonLst: ApiCollectionCategoryOutput[]) => {
+                    return categoryJsonLst.map((cat) => {
+                        return new CollectionCategory(cat);
+                    });
+                })
+            )
+            .subscribe((categories) => {
+                this.currentCategories.next(categories);
+            });
     }
 
-    private fetchCollectionList(findAllParams?: FindAllParams): Observable<CollectionListItem[]> {
+    private fetchCollectionList(
+        findAllParams?: FindAllParams
+    ): Observable<CollectionListItem[]> {
         const url = this.api.queryBuilder(this.COLLECTION_BASE_URL).get();
 
         if (findAllParams) {
@@ -138,7 +180,9 @@ export class CollectionService {
 
         return this.api.send(url.build()).pipe(
             map((collections: ApiCollectionListItem[]) => {
-                return collections.map((collection) => new CollectionListItem(collection));
+                return collections.map(
+                    (collection) => new CollectionListItem(collection)
+                );
             })
         );
     }
@@ -160,10 +204,11 @@ export class CollectionService {
     private updateByCollectionID(
         id: number,
         userToken: string,
-        collectionData: Partial<CollectionInputDto>): Observable<Collection> {
-
+        collectionData: Partial<CollectionInputDto>
+    ): Observable<Collection> {
         const url = `${this.COLLECTION_BASE_URL}/${id}`;
-        const req = this.api.queryBuilder(url)
+        const req = this.api
+            .queryBuilder(url)
             .patch()
             .body(collectionData)
             .addJwtAuth(userToken)
