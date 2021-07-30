@@ -9,29 +9,74 @@
             fxLayoutAlign.lt-md="start"
         >
             <symbiota2-collection-logo
-                size="8rem"
+                size="5rem"
                 src="{{ newCollectionForm.value.icon }}"
                 id="logo"
             >
             </symbiota2-collection-logo>
-            <mat-form-field id="name_form" fxFlex="25">
-                <mat-label>Collection Name</mat-label>
-                <input matInput formControlName="collectionName" />
-                <mat-error
-                    *ngIf="newCollectionForm.get('collectionName').hasError('required')"
+            <div>
+                <div
+                    fxLayout="row"
+                    fxLayout.lt-md="column"
+                    fxLayoutGap="2rem"
+                    fxLayoutGap.lt-md="1rem"
                 >
-                    Collection Name is <strong>required</strong>
-                </mat-error>
-            </mat-form-field>
-            <mat-form-field id="code_form" fxFlex="10">
-                <mat-label>Collection Code</mat-label>
-                <input matInput formControlName="code" />
-                <mat-error
-                    *ngIf="newCollectionForm.get('code').hasError('required')"
+                    <mat-form-field id="name_form" fxFlex="80">
+                        <mat-label>Collection Name</mat-label>
+                        <input matInput formControlName="collectionName" />
+                        <mat-error
+                            *ngIf="
+                                newCollectionForm
+                                    .get('collectionName')
+                                    .hasError('required')
+                            "
+                        >
+                            Collection Name is <strong>required</strong>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field id="code_form" fxFlex="30">
+                        <mat-label>Collection Code</mat-label>
+                        <input matInput formControlName="code" />
+                        <mat-error
+                            *ngIf="
+                                newCollectionForm
+                                    .get('code')
+                                    .hasError('required')
+                            "
+                        >
+                            Collection Code is <strong>required</strong>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div
+                    fxLayout="row"
+                    fxLayoutAlign="start center"
+                    fxLayoutGap="2rem"
                 >
-                    Collection Code is <strong>required</strong>
-                </mat-error>
-            </mat-form-field>
+                    <mat-form-field fxFlex="100">
+                        <mat-label>Institution</mat-label>
+                        <mat-select formControlName="institutionID">
+                            <mat-option
+                                *ngFor="let i of inst"
+                                value="{{ i.id }}"
+                                >{{ i.name }}</mat-option
+                            >
+                        </mat-select>
+                        <mat-error
+                            *ngIf="
+                                newCollectionForm
+                                    .get('management')
+                                    .hasError('required')
+                            "
+                        >
+                            please select a Management
+                        </mat-error>
+                    </mat-form-field>
+                    <button (click)="onAddNewInst()">
+                        <mat-icon color="primary"> add_circle_outline</mat-icon>
+                    </button>
+                </div>
+            </div>
         </div>
         <div
             class="form-subgroup"
@@ -115,10 +160,10 @@
                 </mat-form-field>
             </div>
             <div fxLayout="column">
-                <mat-form-field>
+                <!-- 
+                    <mat-form-field>
                     <mat-label>Category</mat-label>
                     <mat-select formControlName="category">
-                        <!-- //TODO: api will handle populating categories -->
                         <mat-option value="one">category one</mat-option>
                         <mat-option value="two">category two</mat-option>
                     </mat-select>
@@ -131,7 +176,7 @@
                     >
                         please select a category
                     </mat-error>
-                </mat-form-field>
+                </mat-form-field> -->
                 <mat-form-field>
                     <mat-label>Collection Type</mat-label>
                     <mat-select formControlName="type">
@@ -177,13 +222,18 @@
                 >
             </div>
         </div>
-        <div fxLayout="row" fxLayoutGap="5rem" fxLayout.lt-md="column">
+        <div
+            fxLayout="row"
+            fxLayoutGap="5rem"
+            fxLayoutGap.lt-md="1rem"
+            fxLayout.lt-md="column"
+        >
             <mat-form-field>
                 <mat-label>latitude</mat-label>
                 <input
                     matInput
                     type="number"
-                    step=".1"
+                    step=".0001"
                     formControlName="latitude"
                 />
                 <mat-error
@@ -207,7 +257,7 @@
                 <input
                     matInput
                     type="number"
-                    step=".1"
+                    step=".0001"
                     formControlName="longitude"
                 />
                 <mat-error
@@ -239,6 +289,9 @@
             </button>
         </div>
     </div>
-    <p><b>Form Status:</b> {{ newCollectionForm.status }}</p>
-    <pre> <b>Form Values:</b> {{newCollectionForm.value | json}}</pre>
+    <div>
+        <button mat-raised-button color="primary" (click)="populate()">Magic Button</button>
+    </div>
+    <!-- <p><b>Form Status:</b> {{ newCollectionForm.status }}</p>
+    <pre> <b>Form Values:</b> {{newCollectionForm.value | json}}</pre> -->
 </form>

@@ -22,6 +22,7 @@ import { CollectionPage } from './pages/collection-page/collection-page.componen
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CollectionService } from './services/collection.service';
+import { InstitutionService } from "./services/institution.service";
 import { CollectionProfileService } from './services/collection-profile.service';
 import { CollectionLogoComponent } from './components/collection-logo/collection-logo.component';
 import { MatInputModule } from '@angular/material/input';
@@ -39,6 +40,8 @@ import { CollectionEditorDialogComponent } from './components/collection-editor-
 import { MatDialogModule } from '@angular/material/dialog';
 import { CollectionNewCollectionComponent } from "./components/collection-new-collection/collection-new-collection.component";
 import { CollectionNewPage } from './pages/collection-new-page/collection-new-page.component';
+import { InstitutionNewComponent } from './components/institution-new/institution-new.component';
+import { InstitutionNewDialogComponent } from './components/institution-new-dialog/institution-new-dialog.component';
 
 @NgModule({
     declarations: [
@@ -52,7 +55,9 @@ import { CollectionNewPage } from './pages/collection-new-page/collection-new-pa
         CollectionEditorComponent,
         CollectionEditorDialogComponent,
         CollectionNewPage,
-        CollectionNewCollectionComponent
+        CollectionNewCollectionComponent,
+        InstitutionNewComponent,
+        InstitutionNewDialogComponent
     ],
   imports: [
     AppTranslationModule,
@@ -77,7 +82,8 @@ import { CollectionNewPage } from './pages/collection-new-page/collection-new-pa
   ],
     providers: [
         CollectionService,
-        CollectionProfileService
+        CollectionProfileService,
+        InstitutionService
     ],
     exports: [
         CollectionCheckboxSelectorComponent,

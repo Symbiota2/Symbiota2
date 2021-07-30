@@ -5,8 +5,8 @@ import {
     NestInterceptor
 } from '@nestjs/common';
 import { Express, Request } from 'express';
-import fs from 'fs';
-import csv from 'csv-parser';
+import * as fs from 'fs';
+import * as csv from 'csv-parser';
 import { parse as pathParse, join as pathJoin } from 'path';
 import JSONStream from 'JSONStream';
 
