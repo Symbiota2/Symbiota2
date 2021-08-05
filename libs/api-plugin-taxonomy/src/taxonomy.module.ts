@@ -4,6 +4,8 @@ import { TaxonService } from './taxon/taxon.service'
 import { TaxonController } from './taxon/taxon.controller'
 import {TaxonomicAuthorityService} from "./taxonomicAuthority/taxonomicAuthority.service"
 import {TaxonomicAuthorityController} from "./taxonomicAuthority/taxonomicAuthority.controller"
+import {TaxonomicUnitService} from "./taxonomicUnit/taxonomicUnit.service"
+import {TaxonomicUnitController} from "./taxonomicUnit/taxonomicUnit.controller"
 import {TaxonomicStatusService} from "./taxonomicStatus/taxonomicStatus.service"
 import {TaxonomicStatusController} from "./taxonomicStatus/taxonomicStatus.controller"
 import {TaxonDescriptionBlockController} from "./taxonDescriptionBlock/taxonDescriptionBlock.controller"
@@ -32,6 +34,7 @@ import { TaxonProfilePublicationController } from './taxonProfilePublication/tax
         TaxonService,
         TaxonVernacularService,
         TaxonomicAuthorityService,
+        TaxonomicUnitService,
         TaxonomicStatusService,
         TaxonomicEnumTreeService,
         TaxonDescriptionBlockService,
@@ -46,6 +49,7 @@ import { TaxonProfilePublicationController } from './taxonProfilePublication/tax
         TaxonController,
         TaxonVernacularController,
         TaxonomicAuthorityController,
+        TaxonomicUnitController,
         TaxonomicStatusController,
         TaxonomicEnumTreeController,
         TaxonDescriptionBlockController,
@@ -60,6 +64,7 @@ import { TaxonProfilePublicationController } from './taxonProfilePublication/tax
         TaxonService,
         TaxonVernacularService,
         TaxonomicAuthorityService,
+        TaxonomicUnitService,
         TaxonomicStatusService,
         TaxonomicEnumTreeService,
         TaxonDescriptionBlockService,

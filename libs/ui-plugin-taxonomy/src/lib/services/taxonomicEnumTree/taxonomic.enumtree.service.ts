@@ -41,6 +41,26 @@ export class TaxonomicEnumTreeService {
             )
     }
 
+
+    /*
+    Find all of the descendants for a given taxon id and taxa authorityid
+    */
+    findDescendants(tid: number, authorityID: number): Observable<TaxonomicEnumTreeListItem[]> {
+        const url = this.createQueryBuilder()
+            .findDescendants()
+            .taxonID(tid)
+            .authorityID(authorityID)
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build();
+        return this.apiClient.send<any, Record<string, unknown>[]>(query)
+            .pipe(
+                map((taxonenumtree) => taxonenumtree.map((o) => {
+                    return TaxonomicEnumTreeListItem.fromJSON(o);
+                }))
+            )
+    }
+
     /*
     Find all of the ancestors for a given taxon id and taxa authorityid as taxon records
      */

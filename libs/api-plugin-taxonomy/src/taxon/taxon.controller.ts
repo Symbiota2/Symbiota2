@@ -5,7 +5,6 @@ import {
     TaxonDto
 } from './dto/TaxonDto';
 import { TaxonFindAllParams } from './dto/taxon-find-all.input.dto';
-import { TaxonNamesDto } from './dto/Taxon.names.dto';
 import { TaxonFindNamesParams } from './dto/taxon-find-names.input.dto';
 
 @ApiTags('Taxon')
@@ -31,7 +30,7 @@ export class TaxonController {
 
     // Get a list of all the scientific names
     @Get('scientificNames')
-    @ApiResponse({ status: HttpStatus.OK, type: TaxonNamesDto })
+    @ApiResponse({ status: HttpStatus.OK, type: String })
     @ApiOperation({
         summary: "Retrieve a list of scientific names.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
@@ -45,7 +44,7 @@ export class TaxonController {
 
     // Get a list of all the scientific names
     @Get('scientificNamesPlusAuthors')
-    @ApiResponse({ status: HttpStatus.OK, type: TaxonNamesDto })
+    @ApiResponse({ status: HttpStatus.OK, type: String })
     @ApiOperation({
         summary: "Retrieve a list of scientific names and authors.  The list can be narrowed by taxa authority and/or taxon IDs."
     })

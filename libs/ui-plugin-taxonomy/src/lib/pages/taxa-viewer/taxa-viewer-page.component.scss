@@ -47,6 +47,10 @@
     width: 100%;
 }
 
+.taxonlink {
+    text-decoration: none;
+}
+
 .name-autocomplete-full-width {
     width: 100%;
 }
@@ -62,5 +66,5 @@
     min-width: 0;
     height: 10px;
     flex-shrink: 0;
-    line-height: 10px;
+    line-height: 0px;
 }

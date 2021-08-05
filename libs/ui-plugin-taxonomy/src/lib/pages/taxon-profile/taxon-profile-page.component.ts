@@ -79,7 +79,7 @@ export class TaxonProfilePageComponent implements OnInit {
     loadProfile(taxonID: number) {
 
         this.taxonDescriptionBlockService.findBlockByTaxonID(taxonID).subscribe((block) => {
-            console.log("s is " + block.descriptionStatements.length)
+            //console.log("s is " + block.descriptionStatements.length)
             if (block.descriptionStatements.length > 0) {
                 this.descriptions = block.descriptionStatements.sort((a,b) => a.sortSequence - b.sortSequence)
             } else {

@@ -1,4 +1,4 @@
-import { Q_PARAM_TAXAIDS, Q_PARAM_AUTHORITYID } from '../../../constants';
+import { Q_PARAM_TAXAIDS, Q_PARAM_AUTHORITYID, Q_PARAM_PARTIALNAME } from '../../../constants';
 
 export class TaxonQueryBuilder {
     protected baseUrl: string
@@ -6,6 +6,7 @@ export class TaxonQueryBuilder {
     protected nameUrl: URL
     protected url: URL
     _authorityID: string
+    _partialName: string
 
     constructor(apiBaseUrl: string) {
         this.baseUrl = apiBaseUrl
@@ -57,10 +58,18 @@ class FindScientificNameBuilder extends TaxonQueryBuilder {
         return this
     }
 
+    partialName(name : string): FindScientificNameBuilder {
+        this._partialName = name
+        return this
+    }
+
     build(): string {
         this.url.pathname = `${this.url.pathname}/${this._scientificName}`
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
+        }
+        if (this._partialName) {
+            this.url.searchParams.append(Q_PARAM_PARTIALNAME, this._partialName)
         }
         return super.build()
     }
@@ -102,11 +111,18 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
         return this
     }
 
+    partialName(name : string): FindAllScientificNamesBuilder {
+        this._partialName = name
+        return this
+    }
+
     build(): string {
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
         }
-
+        if (this._partialName) {
+            this.url.searchParams.append(Q_PARAM_PARTIALNAME, this._partialName)
+        }
         return super.build()
     }
 }
@@ -125,9 +141,18 @@ class FindAllScientificNamesPlusAuthorsBuilder extends TaxonQueryBuilder {
         return this
     }
 
+    partialName(name : string): FindAllScientificNamesPlusAuthorsBuilder {
+        this._partialName = name
+        return this
+    }
+
     build(): string {
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
+        }
+
+        if (this._partialName) {
+            this.url.searchParams.append(Q_PARAM_PARTIALNAME, this._partialName)
         }
         return super.build();
     }

@@ -87,6 +87,10 @@ export class TaxonDto {
 
     @ApiProperty()
     @Expose()
+    acceptedTaxonStatuses: TaxonomicStatusDto[];
+
+    @ApiProperty()
+    @Expose()
     lastModifiedTimestamp: Date | null;
 
     @ApiProperty()

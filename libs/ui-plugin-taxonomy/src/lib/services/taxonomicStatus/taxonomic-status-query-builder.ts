@@ -15,6 +15,10 @@ export class TaxonomicStatusQueryBuilder {
         return this
     }
 
+    findSynonyms() : FindSynonymsBuilder {
+        return new FindSynonymsBuilder(this.baseUrl)
+    }
+
     findChildren() : FindChildrenBuilder {
         return new FindChildrenBuilder(this.baseUrl)
     }
@@ -49,6 +53,26 @@ class FindOneBuilder extends TaxonomicStatusQueryBuilder {
     }
 }
 
+class FindSynonymsBuilder extends TaxonomicStatusQueryBuilder {
+    protected _taxonID: number = null
+
+    constructor(apiBaseUrl: string) {
+        super(apiBaseUrl)
+        this.baseUrl = apiBaseUrl
+        this.url = new URL(`${apiBaseUrl}/taxonomicStatus/synonyms`)
+    }
+
+    taxonID(id: number): FindSynonymsBuilder {
+        this._taxonID = id
+        this.url = new URL(`${this.baseUrl}/taxonomicStatus/synonyms/${id}`)
+        return this
+    }
+
+    build(): string {
+        return super.build();
+    }
+}
+
 class FindChildrenBuilder extends TaxonomicStatusQueryBuilder {
     protected _taxonID: number = null
 
@@ -65,8 +89,6 @@ class FindChildrenBuilder extends TaxonomicStatusQueryBuilder {
     }
 
     build(): string {
-        //this.url = new URL(`${this.url.pathname}/scientificNames`)
-        //this.url = this.namesUrl
         return super.build();
     }
 }

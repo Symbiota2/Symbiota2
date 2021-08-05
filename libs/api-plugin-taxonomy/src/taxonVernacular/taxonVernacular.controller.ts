@@ -55,7 +55,7 @@ export class TaxonVernacularController {
     @ApiOperation({
         summary: "Get a list of all of the common names, optionally using a list of taxon ids and limited to a specific taxonomic authority"
     })
-    async findAllCommonNames(@Query() findAllParams: TaxonVernacularFindAllParams): Promise<string[]> {
+    async findAllCommonNames(@Query() findAllParams: TaxonVernacularFindParams): Promise<string[]> {
         const myRows = await this.myService.findAllCommonNames(findAllParams)
         const names = myRows.map(async (row) => {
             return row.vernacularName
@@ -71,7 +71,7 @@ export class TaxonVernacularController {
     @ApiOperation({
         summary: "Get a list of all of the common names for a given (natural) language, optionally using a list of taxon ids and limited to a specific taxonomic authority"
     })
-    async findAllCommonNamesByLanguage(@Param('language') language: string, @Query() findAllParams: TaxonVernacularFindAllParams): Promise<string[]> {
+    async findAllCommonNamesByLanguage(@Param('language') language: string, @Query() findAllParams: TaxonVernacularFindParams): Promise<string[]> {
         const myRows = await this.myService.findAllCommonNamesByLanguage(language,findAllParams)
         const names = myRows.map(async (row) => {
             return row.vernacularName

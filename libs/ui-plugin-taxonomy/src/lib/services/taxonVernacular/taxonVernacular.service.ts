@@ -36,19 +36,21 @@ export class TaxonVernacularService {
         return this.apiClient.send<any, TaxonVernacularListItem>(query)
     }
 
-    findAllCommonNamesByLanguage(language: string, authorityID?: number): Observable<string[]> {
+    findAllCommonNamesByLanguage(language: string, partialName: string, authorityID?: number): Observable<string[]> {
         const url = this.createQueryBuilder()
             .findAllCommonNamesByLanguage(language)
             .authorityID(authorityID)
+            .partialName(partialName)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)
     }
 
-    findAllCommonNames(authorityID?: number): Observable<string[]> {
+    findAllCommonNames(partialName: string, authorityID?: number): Observable<string[]> {
         const url = this.createQueryBuilder()
             .findAllCommonNames()
             .authorityID(authorityID)
+            .partialName(partialName)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)

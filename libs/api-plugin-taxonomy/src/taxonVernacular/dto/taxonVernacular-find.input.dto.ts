@@ -18,4 +18,8 @@ export class TaxonVernacularFindParams extends BaseFindAllParams {
     @IsOptional()
     taxonAuthorityID: number
 
+    @ApiProperty({ name: 'partialName', type: String, required: false })
+    @Type(() => String)
+    @IsOptional()
+    partialName: string
 }

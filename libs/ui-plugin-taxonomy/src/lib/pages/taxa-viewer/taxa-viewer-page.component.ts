@@ -16,6 +16,8 @@ import { TranslateService } from '@ngx-translate/core'
 /**
  * Taxonomic data with nested structure.
  * Each node has a name and an optional list of children.
+ * The expanded flag is set if the node is expanded (already has children listed)
+ * The synonym flag is set if this is a synonym
  */
 interface TaxonNode {
     name: string
@@ -34,7 +36,7 @@ interface TaxonNode {
 
 export class TaxaViewerPageComponent implements OnInit {
     nameControl = new FormControl()
-    nameOptions: string[]
+    nameOptions: string[] = []
     hasAuthors = false
     includeAuthors = false
     language = "none"
@@ -42,7 +44,6 @@ export class TaxaViewerPageComponent implements OnInit {
     languageList = []
     taxonomicAuthorityList = []
     taxonomicAuthorityID = 1 // Set the default taxa authority id
-    filteredOptions: Observable<string[]>
     treeControl = new NestedTreeControl<TaxonNode>((node) => node.children);
     dataSource = new MatTreeNestedDataSource<TaxonNode>()
     dataChange = new BehaviorSubject<TaxonNode[]>([])
@@ -51,8 +52,9 @@ export class TaxaViewerPageComponent implements OnInit {
     private isLoading = false
     isNotExpanded = ( node: TaxonNode) =>
         !node.expanded //&& !!node.children && node.children.length > 0;
-    isSynonym = ( node: TaxonNode) =>
-        node.synonym
+    isSynonym = ( node: TaxonNode) => node.synonym
+    hasNestedChild = (_: number, nodeData: TaxonNode) =>
+        nodeData.children !== undefined ? nodeData.children.length > 0 : false
     public readonly PAGE_SEARCH_CRITERIA = 0
     public readonly PAGE_SEARCH_RESULTS = 1
     public currentPage = this.PAGE_SEARCH_CRITERIA
@@ -78,25 +80,23 @@ export class TaxaViewerPageComponent implements OnInit {
      */
     languageChangeAction(language) {
         this.language = language
-        this.loadCommonNames()
     }
 
     /*
     Taxonomic authority has a new value
      */
     authorityChangeAction() {
-        // If the authority changes
-        this.loadNames()
+        // If the authority changes...
     }
 
     /*
     Reload the names as needed
      */
-    loadNames() {
+    loadNames(partialName) {
         if (this.kindOfName == 'Scientific') {
-            this.loadScientificNames()
+            this.loadScientificNames(partialName)
         } else {
-            this.loadCommonNames()
+            this.loadCommonNames(partialName)
         }
     }
 
@@ -104,47 +104,37 @@ export class TaxaViewerPageComponent implements OnInit {
     Called when the choice of scientific vs. common is changed
      */
     configureChangeAction() {
-        this.loadNames()
+        this.nameOptions = []
+        this.nameControl.setValue("")
+    }
+
+    /*
+    Reload the names as a user types
+     */
+    onKey(event) {
+        if (event.target.value) {
+            const partialName = event.target.value
+            this.loadNames(partialName)
+        }
     }
 
     /*
     Called when Angular starts
      */
     ngOnInit() {
-
-        // Set up a filter on the names to only show names after 2 chars are typed
-        this.filteredOptions = this.nameControl.valueChanges.pipe(
-            startWith(''),
-            map((value) => (value.length >= 1 ? this._filter(value) : []))
-        );
-
         // Load the authorities
         this.loadAuthorities()
 
         // Get the common languages for display in the menu
         this.loadVernacularLanguages()
-
-        // Load the names for the name completion list
-        this.loadNames()
-
-    }
-
-    /*
-    Map value to lower case
-     */
-    private _filter(value: string): string[] {
-        const filterValue = value.toLowerCase();
-
-        return this.nameOptions.filter(
-            (option) => option.toLowerCase().indexOf(filterValue) === 0
-        );
     }
 
     /*
     Load the taxa authorities
      */
     public loadAuthorities() {
-        this.taxonomicAuthorityService.findAll().subscribe((authorities) => {
+        this.taxonomicAuthorityService.findAll()
+            .subscribe((authorities) => {
             this.taxonomicAuthorityList = authorities
         })
 
@@ -162,7 +152,8 @@ export class TaxaViewerPageComponent implements OnInit {
     Load the languages for vernacular names
      */
     public loadVernacularLanguages() {
-        this.taxonVernacularService.findAllLanguages(this.taxonomicAuthorityID).subscribe((language) => {
+        this.taxonVernacularService.findAllLanguages(this.taxonomicAuthorityID)
+            .subscribe((language) => {
             this.languageList = language
         })
     }
@@ -170,18 +161,18 @@ export class TaxaViewerPageComponent implements OnInit {
     /*
     Load the common names using the chosen language
      */
-    public loadCommonNames() {
+    public loadCommonNames(partialName) {
         const language = this.language
-        this.nameControl.setValue("")
-        this.nameOptions = []
 
         // If the language is not set, load all of the common names
         if (this.language == "none") {
-            this.taxonVernacularService.findAllCommonNames(this.taxonomicAuthorityID).subscribe((names) => {
+            this.taxonVernacularService.findAllCommonNames(partialName, this.taxonomicAuthorityID)
+                .subscribe((names) => {
                 this.nameOptions = names
             })
         } else {
-            this.taxonVernacularService.findAllCommonNamesByLanguage(language, this.taxonomicAuthorityID).subscribe((names) => {
+            this.taxonVernacularService.findAllCommonNamesByLanguage(language, partialName, this.taxonomicAuthorityID)
+                .subscribe((names) => {
                 this.nameOptions = names
             })
         }
@@ -189,24 +180,22 @@ export class TaxaViewerPageComponent implements OnInit {
     }
 
     /*
-    Load all of the desired Scientific names into a list
+    Load Scientific names that start with partialName into a list
      */
-    public loadScientificNames() {
-        this.nameControl.setValue("")
+    public loadScientificNames(partialName) {
         this.nameOptions= []
         if (this.hasAuthors) {
-            this.taxaService.findAllScientificNamesPlusAuthors(this.taxonomicAuthorityID).subscribe((names) => {
+            this.taxaService.findAllScientificNamesPlusAuthors(partialName, this.taxonomicAuthorityID)
+                .subscribe((names) => {
                 this.nameOptions = names
             })
         } else {
-            this.taxaService.findAllScientificNames(this.taxonomicAuthorityID).subscribe((names) => {
+            this.taxaService.findAllScientificNames(partialName, this.taxonomicAuthorityID)
+                .subscribe((names) => {
                 this.nameOptions = names
             })
         }
     }
-
-    hasNestedChild = (_: number, nodeData: TaxonNode) =>
-        nodeData.children !== undefined ? nodeData.children.length > 0 : false
 
     /*
     Find the children and ancestors for the given sciname
@@ -217,117 +206,157 @@ export class TaxaViewerPageComponent implements OnInit {
         const childrenSynonyms = {}
 
         // Look up the scientific name first
-        this.taxaService.findScientificName(sciname,this.taxonomicAuthorityID).subscribe((taxon) => {
+        this.taxaService.findScientificName(sciname.trim(),this.taxonomicAuthorityID)
+            .subscribe((taxon) => {
             this.taxon = taxon
             let taxonID = taxon.id
             let baseNode: TaxonNode = { name: sciname, taxonID: taxonID, author: taxon.author, expanded: true, synonym: false, children: []}
 
             // Is this taxon a synonym?
-            this.taxonomicStatusService.findAll({taxonIDs: [taxon.id], taxonomicAuthorityID: this.taxonomicAuthorityID} ).subscribe((myStatii) => {
+            this.taxonomicStatusService.findAll(
+                {taxonIDs: [taxon.id], taxonomicAuthorityID: this.taxonomicAuthorityID} )
+                .subscribe((myStatii) => {
                 myStatii.forEach((myStatus) => {
                     if (taxonID != myStatus.taxonIDAccepted) {
-                        //console.log("Found synonym " + taxonID)
+                        // I am a synonym, let's look for the accepted id information
                         taxonID = myStatus.taxonIDAccepted
-                        this.taxaService.findByID(myStatus.taxonIDAccepted, this.taxonomicAuthorityID).subscribe( (myTaxon) => {
-                            baseNode.name = myTaxon.scientificName
-                            baseNode.taxonID = myTaxon.id
-                            const synNode: TaxonNode = {name: sciname, taxonID: myTaxon.id, author: myTaxon.author, expanded: false, synonym: true, children: []}
-                            baseNode.children = [synNode]
+                        this.taxaService.findByID(myStatus.taxonIDAccepted, this.taxonomicAuthorityID)
+                            .subscribe( (myTaxon) => {
+                                baseNode.name = myTaxon.scientificName
+                                baseNode.taxonID = myTaxon.id
+                                // Remove the synNode, taken care of below in processing children?
+                                //const synNode: TaxonNode = {name: sciname, taxonID: taxon.id, author: taxon.author, expanded: false, synonym: true, children: []}
+                                //baseNode.children = [synNode]
+                                baseNode.children = []
+                                baseNode.expanded = true
+                                baseNode.synonym = false
                         })
                     }
                 })
-            })
-
-            // Build the children, first get the children
-            this.taxonomicStatusService.findChildren(taxonID, this.taxonomicAuthorityID).subscribe((taxonStatii) => {
-                // Need a list of the children tids to fetch their names
-                const childrenTids = []
-                taxonStatii.forEach(function (rec) {
-                    //if (rec.taxonID !== taxon.id) childrenTids.push(rec.taxonID)
-                    const acceptedId = rec.taxonIDAccepted
-                    if (rec.taxonID !== acceptedId) {
-                        // This is a synonym
-                        //console.log("found child synonym " + rec.taxonID)
-                        if (childrenSynonyms[acceptedId]) {
-                            // Have seen this accepted name before
-                            childrenSynonyms[acceptedId].concat(rec.taxonID)
+                // Build the children, first get the children
+                this.taxonomicStatusService.findChildren(taxonID, this.taxonomicAuthorityID)
+                    .subscribe((taxonStatii) => {
+                    // Need a list of the children tids to fetch their names
+                    const childrenTids = []
+                    taxonStatii.forEach(function (rec) {
+                        const acceptedId = rec.taxonIDAccepted
+                        if (rec.taxonID !== acceptedId) {
+                            // This is a synonym
+                            if (childrenSynonyms[acceptedId]) {
+                                // Have seen this accepted name before
+                                childrenSynonyms[acceptedId].concat(rec.taxonID)
+                            } else {
+                                //childrenTids.push(acceptedId)
+                                childrenSynonyms[acceptedId] = [rec.taxonID]
+                            }
                         } else {
-                            childrenTids.push(acceptedId)
-                            childrenSynonyms[acceptedId] = [rec.taxonID]
+                            childrenTids.push(rec.taxonID)
                         }
-                    } else {
-                        childrenTids.push(rec.taxonID)
+                    })
+
+                    // Fetch the scientific names of the children
+                    if (childrenTids.length == 0) {
+
+                        // There are no children
+                        //const baseNode: TaxonNode = { name: sciname, expanded: true, synonym: false, children: []}
+
+                        // Fetch ancestors
+                        this.fetchSynonyms(taxon.id, baseNode)
+                        return
                     }
+
+                    // Get the names of the children
+                    this.taxaService.findAll(this.taxonomicAuthorityID,{taxonIDs: childrenTids})
+                        .subscribe((t) => {
+                        t.forEach(function (r) {
+                            const child : TaxonNode = {
+                                name: r.scientificName,
+                                taxonID: r.id,
+                                author: r.author,
+                                expanded: false,
+                                synonym: false,
+                                children: []
+                            }
+                            children.push(child)
+                            // Update the synonym map with the sciname
+                            if (childrenSynonyms[r.id]) {
+                                childrenSynonyms[r.scientificName] = childrenSynonyms[r.id]
+                                delete childrenSynonyms[r.id]
+                            }
+                        })
+
+                        // Children array is the scientific names of the children
+                        children = children.sort(function (a, b) {
+                            return (a.name > b.name ? 1 : -1)
+                        })
+
+                        children.forEach((childItem) => {
+                            if (childrenSynonyms[childItem.name]) {
+                                const childList = []
+                                this.taxaService.findAll(this.taxonomicAuthorityID,{ taxonIDs: childrenSynonyms[childItem.name] }).subscribe((s) => {
+
+                                    s.forEach(function(synonym) {
+                                        // Add the synonym to a list of children
+                                        const childItem: TaxonNode = {
+                                            name: synonym.scientificName,
+                                            taxonID: synonym.id,
+                                            author: synonym.author,
+                                            expanded: false,
+                                            synonym: true,
+                                            children: []
+                                        }
+
+                                        childList.push(childItem)
+                                    })
+                                })
+                                childItem.children = childList
+                            }
+                            baseNode.children.push(childItem)
+                        })
+
+                        baseNode.synonym = false
+                        baseNode.expanded = true
+
+                        //this.fetchAncestors(taxonID,baseNode)
+                        this.fetchSynonyms(taxonID, baseNode)
+                    })
                 })
+            })
+        })
 
-                // Fetch the scientific names of the children
-                if (childrenTids.length == 0) {
+    }
 
-                    // There are no children
-                    //const baseNode: TaxonNode = { name: sciname, expanded: true, synonym: false, children: []}
-
-                    // Fetch ancestors
-                    this.fetchAncestors(taxon.id, baseNode)
-                    return
+    /*
+    Grab the synonyms for the current node and then go on and grab the ancestors
+     */
+    private fetchSynonyms(taxonid, baseNode) {
+        this.taxonomicStatusService.findSynonyms(baseNode.taxonID,this.taxonomicAuthorityID)
+            .subscribe( (syn) => {
+            let synonymList = []
+            syn.forEach(function(synonym) {
+                // Add the synonym to a list of synonyms
+                const synonymItem: TaxonNode = {
+                    name: synonym.taxon.scientificName,
+                    taxonID: synonym.taxon.id,
+                    author: synonym.taxon.author,
+                    expanded: false,
+                    synonym: true,
+                    children: []
                 }
 
-                // Get the names of the children
-                this.taxaService.findAll(this.taxonomicAuthorityID,{taxonIDs: childrenTids}).subscribe((t) => {
-                    t.forEach(function (r) {
-                        //console.log(" name is " + r.scientificName)
-                        const child : TaxonNode = {
-                            name: r.scientificName,
-                            taxonID: r.id,
-                            author: r.author,
-                            expanded: false,
-                            synonym: false,
-                            children: []
-                        }
-                        children.push(child)
-                        // Update the synonym map with the sciname
-                        if (childrenSynonyms[r.id]) {
-                            childrenSynonyms[r.scientificName] = childrenSynonyms[r.id]
-                            delete childrenSynonyms[r.id]
-                        }
-                    })
-
-                    // Children array is the scientific names of the children
-                    children = children.sort(function (a, b) {
-                        return a.name - b.name
-                    })
-
-                    children.forEach((childItem) => {
-                        if (childrenSynonyms[childItem.name]) {
-                            const childList = []
-                            this.taxaService.findAll(this.taxonomicAuthorityID,{ taxonIDs: childrenSynonyms[childItem.name] }).subscribe((s) => {
-
-                                s.forEach(function(synonym) {
-                                    // Add the synonym to a list of children
-                                    const childItem: TaxonNode = {
-                                        name: synonym.scientificName,
-                                        taxonID: synonym.id,
-                                        author: synonym.author,
-                                        expanded: false,
-                                        synonym: true,
-                                        children: []
-                                    }
-
-                                    childList.push(childItem)
-                                })
-                            })
-                            childItem.children = childList
-                        }
-                        baseNode.children.push(childItem)
-                    })
-
-                    baseNode.synonym = false
-                    baseNode.expanded = true
-
-                    // Fetch ancestors
-                    this.fetchAncestors(taxonID,baseNode)
-
-                })
+                synonymList.push(synonymItem)
             })
+            // Sort the list of synonyms
+            synonymList = synonymList.sort(function (a, b) {
+                return 0 - (a.name > b.name ? 1 : -1)
+            })
+
+            // Add to children of the baseNode
+            synonymList.forEach((syn) => {
+                baseNode.children.unshift(syn)
+            })
+            // Fetch ancestors
+            this.fetchAncestors(taxonid,baseNode)
         })
     }
 
@@ -344,21 +373,55 @@ export class TaxaViewerPageComponent implements OnInit {
                     .sort(function (a, b) {
                         return b.rankID - a.rankID;
                     })
-                    .reduce<any[]>((a, b) => {
-                        // Check to see if this name is a duplicate
-                        if (b.scientificName == a[0].name) {
-                            return a  // Yes a duplicate, so skip
-                        }
-                        // Build a new parent node
-                        const item: TaxonNode = {
-                            name: b.scientificName,
-                            taxonID: b.id,
-                            author: b.author,
+                    .map((item) => {
+                        const itemNode: TaxonNode = {
+                            name: item.scientificName,
+                            taxonID: item.id,
+                            author: item.author,
                             expanded: false,
                             synonym: false,
-                            children: a,
+                            children: [],
                         }
-                        return [item]
+                        // Process the synonyms
+                        if (item.acceptedTaxonStatuses) {
+                            let synonymList = []
+
+                            // Run through the list of taxonomic statuses
+                            item.acceptedTaxonStatuses.forEach((synonym) => {
+
+                                // Is it really a synonym?
+                                if (synonym.taxonIDAccepted != synonym.taxonID) {
+
+                                    // Found a synonym, add it to the list of synonyms
+                                    const synonymItem: TaxonNode = {
+                                        name: synonym.taxon.scientificName,
+                                        taxonID: synonym.taxon.id,
+                                        author: synonym.taxon.author,
+                                        expanded: false,
+                                        synonym: true,
+                                        children: []
+                                    }
+                                    synonymList.push(synonymItem)
+                                }
+
+                            })
+
+                            // Sort the list of synonyms
+                            synonymList = synonymList.sort(function (a, b) {
+                                return 0 - (a.name > b.name ? 1 : -1)
+                            })
+
+                            // Add the synonym list as children of the itemNode
+                            itemNode.children = synonymList
+                        }
+
+                        return itemNode
+                    })
+                    .reduce<TaxonNode[]>((a , b: TaxonNode ) => {
+
+                        // Add the child node in the tree to its parent up the tree
+                        b.children.push(a[0])
+                        return [b]
                     }, [baseNode])
 
                 // We have all of the ancestors in the tree
@@ -378,7 +441,8 @@ export class TaxaViewerPageComponent implements OnInit {
             const tid = taxon.taxonID
 
             // lookup its name by tid
-            this.taxaService.findByID(tid, this.taxonomicAuthorityID).subscribe((taxonRec) => {
+            this.taxaService.findByID(tid, this.taxonomicAuthorityID)
+                .subscribe((taxonRec) => {
 
                 // Go find the ancestors for this name
                 this.buildTree(taxonRec.scientificName)
@@ -406,10 +470,12 @@ export class TaxaViewerPageComponent implements OnInit {
         let childrenTids  = []
 
         // Match the name to a taxon id
-        this.taxaService.findScientificName(node.name, this.taxonomicAuthorityID).subscribe((taxon) => {
+        //this.taxaService.findScientificName(node.name,
+        //    this.taxonomicAuthorityID).subscribe((taxon) => {
 
             // The status table has the direct parent, so lookup its children there
-            this.taxonomicStatusService.findChildren(taxon.id, this.taxonomicAuthorityID).subscribe((taxonStatus) => {
+            this.taxonomicStatusService.findChildren(node.taxonID,
+                this.taxonomicAuthorityID).subscribe((taxonStatus) => {
 
                 // For each one found, add its list of taxon ids to the children list
                 // TODO: should this be just one, due to taxa authority id?
@@ -445,7 +511,6 @@ export class TaxaViewerPageComponent implements OnInit {
                     // Sort and format the children as tree nodes
                     const childrenTree = []
                     children.sort((a,b) => a.scientificName - b.scientificName).forEach((item) => {
-                        //console.log(" what is name " + item.scientificName)
                         const baseNode: TaxonNode = {
                             name: item.scientificName,
                             taxonID: item.id,
@@ -464,9 +529,116 @@ export class TaxaViewerPageComponent implements OnInit {
                     this.refreshTree()
                 })
             })
+        //})
+    }
+
+    /*
+    Expand a node in the tree by finding its descendants
+     */
+    private fetchDescendants(node: TaxonNode) {
+
+        let descTids  = []
+
+        // Match the name to a taxon id
+        this.taxaService.findScientificName(node.name, this.taxonomicAuthorityID).subscribe((taxon) => {
+
+            // The enum table has the descendants so look them up there
+            this.taxonomicEnumTreeService.findDescendants(taxon.id, this.taxonomicAuthorityID).subscribe((taxonET) => {
+
+                // For each one found, add its list of taxon ids to the children list
+                // TODO: should this be just one, due to taxa authority id?
+                taxonET.forEach(function(rec) {
+                    descTids = descTids.concat(rec.taxonID.toString())
+                })
+
+                // Check to see if there are any children
+                if (descTids.length == 0) {
+                    // There are no children (current node is a leaf node)
+                    // Mark that current node should be expanded to show children
+                    node.expanded = true
+
+                    // Redraw the tree and exit
+                    this.refreshTree()
+                    return
+                }
+
+                // Need to build up a tree of descendants
+                let descendants = []
+
+                // Look up the names by their ids
+                this.taxonomicStatusService
+                    .findAll( {taxonIDs: descTids, taxonomicAuthorityID: this.taxonomicAuthorityID})
+                    .subscribe((t) => {
+                        descendants = t
+                        let myMap = {}
+                        let nodeMap = {}
+                        nodeMap[node.taxonID] = node
+
+                        // Need to build the descendant tree
+                        // First build a map of parents to children
+                        descendants.forEach((c) => {
+                            const node : TaxonNode = {
+                                name: c.taxon.scientificName,
+                                taxonID: c.taxonID,
+                                author: c.taxon.author,
+                                expanded: true,
+                                synonym: false,
+                                children: [],
+                            }
+                            nodeMap[c.taxonID] = node
+                            if (!myMap[c.parentTaxonID]) {
+                                myMap[c.parentTaxonID] = []
+                            }
+                            myMap[c.parentTaxonID].push(c.taxonID)
+                        })
+
+                        // Next build tree
+                        this.fillInDescendants(taxon.id, myMap, nodeMap)
+
+                        /*
+                        // Sort and format the children as tree nodes
+                        const childrenTree = []
+                        children.sort((a,b) => a.scientificName - b.scientificName).forEach((item) => {
+                            //console.log(" what is name " + item.scientificName)
+                            const baseNode: TaxonNode = {
+                                name: item.scientificName,
+                                taxonID: item.id,
+                                author: item.author,
+                                expanded: false,
+                                synonym: false,
+                                children: [] }
+                            childrenTree.push(baseNode)
+                        })
+
+                        // Update the current node with its new children
+                        node.children = childrenTree
+                        node.expanded = true
+
+
+                         */
+                        // Refresh the tree
+                        this.refreshTree()
+
+                    })
+            })
         })
     }
 
+    // Build up a tree of descendants nodes, one node at a time
+    fillInDescendants(taxonid, descMap, nodeMap) {
+        // Check that the node is a parent
+        if (!descMap[taxonid]) {
+            // I'm a leaf return my children
+            return nodeMap[taxonid]
+        }
+        const node = nodeMap[taxonid]
+        descMap[taxonid].forEach((child) => {
+            const childNode = this.fillInDescendants(child, descMap, nodeMap)
+            node.children.push(childNode)
+            }
+        )
+        return node
+    }
     @ViewChild('tree') tree
 
     loadChildren(node: TaxonNode) : void {

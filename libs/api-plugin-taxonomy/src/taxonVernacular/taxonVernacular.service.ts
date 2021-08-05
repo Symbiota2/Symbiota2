@@ -4,6 +4,7 @@ import { In, Repository } from 'typeorm';
 import { TaxonVernacularFindAllParams } from './dto/taxonVernacular-find-all.input.dto';
 import { BaseService } from '@symbiota2/api-common';
 import { TaxonVernacularFindParams } from './dto/taxonVernacular-find.input.dto';
+import { TaxonFindNamesParams } from '../taxon/dto/taxon-find-names.input.dto';
 
 
 @Injectable()
@@ -70,7 +71,7 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
         // Check if there is a taxonAuthorityID specified
         if (qParams.taxonAuthorityID) {
             const whereClause = (qParams.id)? "o.taxonID in " + params.id : "true"
-            const names = await this.myRepository.createQueryBuilder('o')
+            const qb = this.myRepository.createQueryBuilder('o')
                 .select([
                     'o.vernacularName'
                 ])
@@ -80,22 +81,32 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
                 .andWhere("o.vernacularName IS NOT NULL AND " + whereClause)
                 .groupBy('o.vernacularName')  // For distinct
                 .orderBy("o.vernacularName")
-                .getMany()
+                .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
 
-            return names
+
+            if (qParams.partialName) {
+                qb.andWhere('o.vernacularName LIKE :name', {name: params.partialName + '%'})
+            }
+
+            return await qb.getMany()
 
         } else {
             const whereClause = (qParams.id)? "o.taxonID in " + params.id : "true"
-            const names = await this.myRepository.createQueryBuilder('o')
+            const qb = this.myRepository.createQueryBuilder('o')
                 .select([
                     'o.vernacularName'
                 ])
                 .where("o.vernacularName IS NOT NULL AND " + whereClause)
                 .groupBy('o.vernacularName')  // For distinct
                 .orderBy("o.vernacularName")
-                .getMany()
+                .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
 
-            return names
+
+            if (qParams.partialName) {
+                qb.andWhere('o.vernacularName LIKE :name', {name: params.partialName + '%'})
+            }
+
+            return await qb.getMany()
         }
     }
 
@@ -104,7 +115,7 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
         const { ...qParams } = params
         const whereClause = (qParams.id)? "o.taxonID in " + params.id : "true"
         if (qParams.taxonAuthorityID) {
-            const names = await this.myRepository.createQueryBuilder('o')
+            const qb = this.myRepository.createQueryBuilder('o')
                 .select([
                     'o.vernacularName'
                 ])
@@ -114,21 +125,29 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
                 .andWhere("o.language = '" + language + "' AND o.vernacularName IS NOT NULL AND " + whereClause)
                 .groupBy('o.vernacularName')  // For distinct
                 .orderBy("o.vernacularName")
-                .getMany()
+                .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
 
-            return names
+            if (qParams.partialName) {
+                qb.andWhere('o.vernacularName LIKE :name', {name: params.partialName + '%'})
+            }
+
+            return await qb.getMany()
 
         } else {
-            const names = await this.myRepository.createQueryBuilder('o')
+            const qb = this.myRepository.createQueryBuilder('o')
                 .select([
                     'o.vernacularName'
                 ])
                 .where("o.language = '" + language + "' AND o.vernacularName IS NOT NULL AND " + whereClause)
                 .groupBy('o.vernacularName')  // For distinct
                 .orderBy("o.vernacularName")
-                .getMany()
+                .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
 
-            return names
+            if (qParams.partialName) {
+                qb.andWhere('o.vernacularName LIKE :name', {name: params.partialName + '%'})
+            }
+
+            return await qb.getMany()
         }
     }
 

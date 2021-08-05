@@ -1,4 +1,4 @@
-import { Q_PARAM_AUTHORITYID, Q_PARAM_TAXAIDS } from '../../../constants';
+import { Q_PARAM_AUTHORITYID, Q_PARAM_PARTIALNAME, Q_PARAM_TAXAIDS } from '../../../constants';
 
 export class TaxonVernacularQueryBuilder {
     protected baseUrl: string
@@ -89,6 +89,7 @@ class FindOneBuilder extends TaxonVernacularQueryBuilder {
 
 class FindAllLanguagesBuilder extends TaxonVernacularQueryBuilder {
     protected _authorityID: number
+    protected _partialName: string
 
     constructor(apiBaseUrl: string) {
         super(apiBaseUrl)
@@ -101,9 +102,18 @@ class FindAllLanguagesBuilder extends TaxonVernacularQueryBuilder {
         return this
     }
 
+    partialName(name: string): FindAllLanguagesBuilder {
+        this._partialName = name
+        return this
+    }
+
     build(): string {
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
+
+        if (this._partialName) {
+            this.url.searchParams.append(Q_PARAM_PARTIALNAME, this._partialName)
         }
         return super.build();
     }
@@ -111,6 +121,7 @@ class FindAllLanguagesBuilder extends TaxonVernacularQueryBuilder {
 
 class FindAllCommonNamesByLanguageBuilder extends TaxonVernacularQueryBuilder {
     protected _authorityID: number
+    protected _partialName: string
 
     constructor(apiBaseUrl: string, language: string) {
         super(apiBaseUrl)
@@ -123,9 +134,17 @@ class FindAllCommonNamesByLanguageBuilder extends TaxonVernacularQueryBuilder {
         return this
     }
 
+    partialName(partialName: string): FindAllCommonNamesByLanguageBuilder {
+        this._partialName = partialName
+        return this
+    }
+
     build(): string {
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
+        if (this._partialName) {
+            this.url.searchParams.append(Q_PARAM_PARTIALNAME, this._partialName)
         }
         return super.build();
     }
@@ -133,6 +152,7 @@ class FindAllCommonNamesByLanguageBuilder extends TaxonVernacularQueryBuilder {
 
 class FindAllCommonNamesBuilder extends TaxonVernacularQueryBuilder {
     protected _authorityID: number
+    protected _partialName: string
 
     constructor(apiBaseUrl: string) {
         super(apiBaseUrl)
@@ -145,9 +165,17 @@ class FindAllCommonNamesBuilder extends TaxonVernacularQueryBuilder {
         return this
     }
 
+    partialName(partialName: string): FindAllCommonNamesBuilder {
+        this._partialName = partialName
+        return this
+    }
+
     build(): string {
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
+        if (this._partialName) {
+            this.url.searchParams.append(Q_PARAM_PARTIALNAME, this._partialName)
         }
         return super.build();
     }

@@ -23,6 +23,22 @@ export class TaxonomicStatusService {
     }
 
 
+    findSynonyms(tid: number, taxonomicAuthorityID: number): Observable<TaxonomicStatusListItem[]> {
+        const url = this.createQueryBuilder()
+            .taxonomicAuthorityID(taxonomicAuthorityID)
+            .findSynonyms()
+            .taxonID(tid)
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build();
+        return this.apiClient.send<any, Record<string, unknown>[]>(query)
+            .pipe(
+                map((taxonstatus) => taxonstatus.map((o) => {
+                    return TaxonomicStatusListItem.fromJSON(o);
+                }))
+            )
+    }
+
     findChildren(tid: number, taxonomicAuthorityID: number): Observable<TaxonomicStatusListItem[]> {
         const url = this.createQueryBuilder()
             .taxonomicAuthorityID(taxonomicAuthorityID)

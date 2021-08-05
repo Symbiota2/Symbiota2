@@ -37,6 +37,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
 import { TaxonProfilePageComponent } from './pages';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 
 @NgModule({
@@ -65,7 +66,8 @@ import { TaxonProfilePageComponent } from './pages';
     MatCheckboxModule,
     MatListModule,
     MatRadioModule,
-    SymbiotaComponentModule
+    SymbiotaComponentModule,
+    ScrollingModule
   ],
     declarations: [
         TaxaSearchPage,
