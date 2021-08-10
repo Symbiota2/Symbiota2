@@ -1,11 +1,17 @@
-import { Controller, Get, HttpStatus, NotFoundException, Param } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    HttpStatus,
+    NotFoundException,
+    Param,
+    SerializeOptions
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
     CategoryOutputDto
 } from './dto/category.output.dto';
 import { CategoryService } from './category.service';
 import { CollectionService } from '../collection.service';
-import { map } from 'rxjs/operators';
 
 @ApiTags('Collections')
 @Controller('collections/categories')
@@ -15,10 +21,9 @@ export class CategoryController {
         private readonly categories: CategoryService) { }
 
     @Get()
-    @ApiOperation({
-        summary: "Retrieve a list of collection categories"
-    })
+    @ApiOperation({ summary: "Retrieve a list of collection categories" })
     @ApiResponse({ status: HttpStatus.OK, type: CategoryOutputDto, isArray: true })
+    @SerializeOptions({ groups: ['list'] })
     async getCategoryList(): Promise<CategoryOutputDto[]> {
         const categories = await this.categories.findAll();
 
@@ -41,10 +46,9 @@ export class CategoryController {
     }
 
     @Get(':id')
-    @ApiOperation({
-        summary: "Retrieve a collection category by ID"
-    })
+    @ApiOperation({ summary: "Retrieve a collection category by ID" })
     @ApiResponse({ status: HttpStatus.OK, type: CategoryOutputDto })
+    @SerializeOptions({ groups: ['single'] })
     async getCategory(@Param('id') id: number): Promise<CategoryOutputDto> {
         const [category, collections] = await Promise.all([
             this.categories.findByID(id),
