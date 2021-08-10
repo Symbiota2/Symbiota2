@@ -16,7 +16,6 @@ export class InstitutionNewComponent implements OnInit {
     @Output()
     submitClicked = new EventEmitter<Institution>();
 
-
     private user: User;
 
     constructor(
@@ -27,8 +26,16 @@ export class InstitutionNewComponent implements OnInit {
 
     newInstForm = this.fb.group({
         code: ['', Validators.required],
-        name: ['', Validators.required, InstitutionAsyncValidators.nameTaken(this.institutions)],
-        address1: ['', Validators.required],
+        name: [
+            '',
+            Validators.required,
+            InstitutionAsyncValidators.nameTaken(this.institutions),
+        ],
+        address1: [
+            '',
+            Validators.required,
+            InstitutionAsyncValidators.codeTaken(this.institutions),
+        ],
         address2: [''],
         city: ['', Validators.required],
         stateProvince: ['', Validators.required],
@@ -46,12 +53,13 @@ export class InstitutionNewComponent implements OnInit {
     }
 
     onSubmit(): void {
-        if(this.user.isSuperAdmin()){ //NOTE: user is required to be superAdmin to create new institution
+        if (this.user.isSuperAdmin()) {
+            //NOTE: user is required to be superAdmin to create new institution
             var newInst = new InstitutionInputDto(this.newInstForm.value);
             this.institutions
                 .createInstitution(newInst, this.user.token)
-                .subscribe(inst => {
-                  this.submitClicked.emit(inst);
+                .subscribe((inst) => {
+                    this.submitClicked.emit(inst);
                 });
         }
     }

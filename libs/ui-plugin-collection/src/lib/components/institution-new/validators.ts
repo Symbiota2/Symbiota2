@@ -19,4 +19,16 @@ export class InstitutionAsyncValidators {
                 );
         };
     }
+
+    static codeTaken(inst: InstitutionService): AsyncValidatorFn {
+        return (control: AbstractControl): Observable<ValidationErrors> => {
+            return inst
+                .isCodeTaken(control.value)
+                .pipe(
+                    map((result: boolean) =>
+                        result ? { codeTaken: result } : null
+                    )
+                );
+        };
+    }
 }

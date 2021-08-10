@@ -1,6 +1,6 @@
 <form [formGroup]="newInstForm" (ngSubmit)="onSubmit()" fxLayout="column">
     <div fxLayout="row wrap" fxLayoutGap="2em grid">
-        <mat-form-field fxFlex='70'>
+        <mat-form-field fxFlex="70">
             <mat-label>Institution Name</mat-label>
             <input formControlName="name" matInput />
             <mat-error *ngIf="newInstForm.get('name').hasError('required')">
@@ -10,11 +10,18 @@
                 Name already in use
             </mat-error>
         </mat-form-field>
-        <mat-form-field fxFlex='30'>
+        <mat-form-field fxFlex="30">
             <mat-label>Institution Code</mat-label>
-            <input formControlName="code" matInput />
+            <input
+                formControlName="code"
+                matInput
+                oninput="this.value = this.value.toUpperCase()"
+            />
             <mat-error *ngIf="newInstForm.get('code').hasError('required')">
                 Code is <strong>required</strong>
+            </mat-error>
+            <mat-error *ngIf="newInstForm.get('code').hasError('codeTaken')">
+                Code already in use
             </mat-error>
         </mat-form-field>
     </div>

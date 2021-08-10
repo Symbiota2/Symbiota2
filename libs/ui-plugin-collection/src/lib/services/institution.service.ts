@@ -48,6 +48,19 @@ export class InstitutionService {
         }))
     }
 
+    isCodeTaken(code: string): Observable<boolean> {
+        return this.getInstitutions().pipe(map(instList => {
+            for(var index = 0; index < instList.length; index++)
+            {
+                if(instList[index].code === code)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }))
+    }
+
     createInstitution(
         institutionData: Partial<InstitutionInputDto>,
         userToken: string

@@ -45,7 +45,11 @@
                     </mat-form-field>
                     <mat-form-field id="code_form" fxFlex="30">
                         <mat-label>Collection Code</mat-label>
-                        <input matInput formControlName="code" />
+                        <input
+                            matInput
+                            formControlName="code"
+                            oninput="this.value = this.value.toUpperCase()"
+                        />
                         <mat-error
                             *ngIf="
                                 newCollectionForm
