@@ -5,7 +5,6 @@ export interface ApiCollectionInstitutionOutput {
 }
 
 export interface ApiInstitutionOutput extends ApiCollectionInstitutionOutput {
-    code: string;
     address1: string;
     address2: string;
     city: string;
@@ -18,6 +17,22 @@ export interface ApiInstitutionOutput extends ApiCollectionInstitutionOutput {
     url: string;
     notes: string;
     initialTimestamp: string;
+}
+
+export interface ApiInstitutionInput{
+    code: string;
+    name: string
+    address1: string;
+    address2: string;
+    city: string;
+    stateProvince: string;
+    postalCode: string;
+    country: string;
+    phone: string;
+    contact: string;
+    email: string;
+    url: string;
+    notes: string;
 }
 
 export interface ApiCollectionStatsOutput {

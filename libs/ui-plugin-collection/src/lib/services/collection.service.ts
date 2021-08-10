@@ -167,6 +167,24 @@ export class CollectionService {
             });
     }
 
+    isNameTaken(name: string): Observable<boolean>{
+
+        var result = of(false);
+        
+        this.collectionList.pipe(
+            map(collections => {
+                collections.forEach( collection => {
+                    if(collection.collectionName === name)
+                    {
+                        result = of(true);
+                    }
+                })
+            })
+        ).subscribe();
+
+        return result;
+    }
+
     private fetchCollectionList(
         findAllParams?: FindAllParams
     ): Observable<CollectionListItem[]> {

@@ -1,24 +1,29 @@
 import { Component, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Inject } from '@nestjs/common';
 import { Institution } from '@symbiota2/api-database';
 
 @Component({
-  selector: 'symbiota2-institution-new-dialog',
-  templateUrl: './institution-new-dialog.component.html',
-  styleUrls: ['./institution-new-dialog.component.scss']
+    selector: 'symbiota2-institution-new-dialog',
+    templateUrl: './institution-new-dialog.component.html',
+    styleUrls: ['./institution-new-dialog.component.scss'],
 })
 export class InstitutionNewDialogComponent implements OnInit {
 
-  constructor(private readonly dialogRef: MatDialogRef<InstitutionNewDialogComponent>) { }
+    inst: Institution;
 
-  ngOnInit(): void {
-  }
+    constructor(
+        private readonly dialogRef: MatDialogRef<InstitutionNewDialogComponent>
+    ) {}
 
-  onSubmit() {
-    this.dialogRef.close();
-  }
+    ngOnInit(): void {}
 
-  onClose() {
-    this.dialogRef.close(null);
-}
+    onSubmit($event) {
+        this.inst = $event;
+        this.dialogRef.close(this.inst);
+    }
+
+    onClose() {
+        this.dialogRef.close(null);
+    }
 }

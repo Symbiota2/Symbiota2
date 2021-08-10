@@ -6,6 +6,9 @@
             <mat-error *ngIf="newInstForm.get('name').hasError('required')">
                 Institution Name is <strong>required</strong>
             </mat-error>
+            <mat-error *ngIf="newInstForm.get('name').hasError('nameTaken')">
+                Name already in use
+            </mat-error>
         </mat-form-field>
         <mat-form-field>
             <mat-label>Institution Code</mat-label>

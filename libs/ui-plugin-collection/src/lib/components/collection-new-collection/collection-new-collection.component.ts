@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { Validators, FormBuilder } from '@angular/forms';
+import { Validators, FormBuilder, FormControl } from '@angular/forms';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
 import { CollectionService } from '../../services/collection.service';
 import { User, UserService } from '@symbiota2/ui-common';
 import { map } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { Institution } from '@symbiota2/api-database';
 import { InstitutionService } from '../../services/institution.service';
 import { MatDialog } from '@angular/material/dialog';
 import { InstitutionNewDialogComponent } from '../institution-new-dialog/institution-new-dialog.component';
 import { Router } from '@angular/router';
 import { ROUTE_COLLECTION_PROFILE } from '../../routes';
+import { CollectionAsyncValidators } from './validators';
 
 @Component({
     selector: 'symbiota2-collection-new-collection',
@@ -21,7 +23,11 @@ export class CollectionNewCollectionComponent implements OnInit {
     inst: Institution[];
 
     newCollectionForm = this.fb.group({
-        collectionName: ['', Validators.required],
+        collectionName: [
+            '',
+            Validators.required,
+            CollectionAsyncValidators.nameTaken(this.collections),
+        ],
         code: ['', Validators.required],
         institutionID: ['0', Validators.required],
         description: ['', Validators.required],
@@ -62,21 +68,34 @@ export class CollectionNewCollectionComponent implements OnInit {
         var newCollection = new CollectionInputDto(
             this.newCollectionForm.value
         );
-        this.collections
-            .createNewCollection(newCollection, this.user.token)
-            .subscribe((collection) =>
-                this.rt.navigate([
-                    '/' +
-                        ROUTE_COLLECTION_PROFILE.replace(
-                            ':collectionID',
-                            collection.id.toString()
-                        ),
-                ])
-            );
+        if (this.user.isSuperAdmin()) {
+            //NOTE: requires user to be super admin to create new collections
+            this.collections
+                .createNewCollection(newCollection, this.user.token)
+                .subscribe((collection) =>
+                    this.rt.navigate([
+                        '/' +
+                            ROUTE_COLLECTION_PROFILE.replace(
+                                ':collectionID',
+                                collection.id.toString()
+                            ),
+                    ])
+                );
+        }
     }
 
     onAddNewInst(): void {
-        this.dialog.open(InstitutionNewDialogComponent, { disableClose: true });
+        const dialog = this.dialog.open(InstitutionNewDialogComponent, {
+            disableClose: true,
+        });
+        dialog.afterClosed().subscribe((inst: Institution) => {
+            if (inst !== null) {
+                this.inst.push(inst);
+                this.newCollectionForm
+                    .get('institutionID')
+                    .setValue(String(inst.id));
+            }
+        });
     }
 
     getInstitutions(): void {

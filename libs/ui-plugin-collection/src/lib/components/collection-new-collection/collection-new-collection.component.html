@@ -1,4 +1,4 @@
-<form [formGroup]="newCollectionForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="newCollectionForm">
     <div fxLayout="column">
         <div
             fxLayout="row"
@@ -32,6 +32,15 @@
                             "
                         >
                             Collection Name is <strong>required</strong>
+                        </mat-error>
+                        <mat-error
+                            *ngIf="
+                                newCollectionForm
+                                    .get('collectionName')
+                                    .hasError('nameTaken')
+                            "
+                        >
+                            Name already in use
                         </mat-error>
                     </mat-form-field>
                     <mat-form-field id="code_form" fxFlex="30">
@@ -283,6 +292,7 @@
                 mat-raised-button
                 color="primary"
                 type="submit"
+                (click)="onSubmit()"
                 [disabled]="!newCollectionForm.valid"
             >
                 Create New Collection
@@ -290,8 +300,10 @@
         </div>
     </div>
     <div>
-        <button mat-raised-button color="primary" (click)="populate()">Magic Button</button>
+        <button mat-raised-button color="primary" (click)="populate()">
+            Magic Button
+        </button>
     </div>
-    <!-- <p><b>Form Status:</b> {{ newCollectionForm.status }}</p>
-    <pre> <b>Form Values:</b> {{newCollectionForm.value | json}}</pre> -->
+    <p><b>Form Status:</b> {{ newCollectionForm.status }}</p>
+    <pre> <b>Form Values:</b> {{newCollectionForm.value | json}}</pre>
 </form>
