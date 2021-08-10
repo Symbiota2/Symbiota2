@@ -5,7 +5,6 @@ import {
 } from './dto/category.output.dto';
 import { CategoryService } from './category.service';
 import { CollectionService } from '../collection.service';
-import { CollectionListItem } from '../dto/CollectionListItem.output.dto';
 import { map } from 'rxjs/operators';
 
 @ApiTags('Collections')
@@ -27,7 +26,7 @@ export class CategoryController {
             ...categories.map(async (category) => {
                 const dto = new CategoryOutputDto(category);
                 const collections = await this.collections.findByCategory(category.id);
-                dto.collections = collections.map((coll) => new CollectionListItem(coll));
+                dto.collections = collections;
                 return dto;
             }),
             this.collections.findUncategorized().then((collections) => {
@@ -35,7 +34,7 @@ export class CategoryController {
                     id: -1,
                     category: 'Uncategorized',
                     icon: null,
-                    collections: collections.map((c) => new CollectionListItem(c))
+                    collections: collections
                 }
             }),
         ]);
@@ -57,7 +56,7 @@ export class CategoryController {
         }
 
         const dto = new CategoryOutputDto(category);
-        dto.collections = collections.map(c => new CollectionListItem(c));
+        dto.collections = collections;
         return dto;
     }
 }

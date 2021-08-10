@@ -13,6 +13,8 @@ export class CollectionListItem implements ApiCollectionListItem {
     @Expose() id: number;
     @Expose() collectionName: string;
     @Expose() icon: string;
+    @Expose() institution: ApiCollectionInstitutionOutput;
+    @Expose() collectionCode: string;
 }
 
 @Exclude()
@@ -21,8 +23,6 @@ export class Collection extends CollectionListItem implements ApiCollectionOutpu
         super(collection);
     }
 
-    @Expose() collectionCode: string;
-    @Expose() institution: ApiCollectionInstitutionOutput;
     @Expose() stats: ApiCollectionStatsOutput;
     @Expose() fullDescription: string;
     @Expose() homePage: string;

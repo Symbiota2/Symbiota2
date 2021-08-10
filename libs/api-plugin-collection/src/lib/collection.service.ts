@@ -6,7 +6,6 @@ import {
 import { DeepPartial, Repository } from 'typeorm';
 import { CollectionFindAllParams } from './dto/coll-find-all.input.dto';
 import { BaseService } from '@symbiota2/api-common';
-import { CollectionListItem } from './dto/CollectionListItem.output.dto';
 
 /**
  * Service for manipulating specimen collections
@@ -33,7 +32,6 @@ export class CollectionService extends BaseService<Collection> {
         const { orderBy, ...qParams } = params;
 
         return this.collections.find({
-            select: ['id', 'icon', 'collectionName', 'email'],
             order: { [orderBy]: 'ASC' },
             where: qParams.id ? { id: qParams.id } : {}
         });
@@ -45,15 +43,15 @@ export class CollectionService extends BaseService<Collection> {
      * @return CollectionListItem[] The list of collections for the given
      * categoryID
      */
-    async findByCategory(categoryID: number): Promise<CollectionListItem[]> {
+    async findByCategory(categoryID: number): Promise<Collection[]> {
         // This is too slow without using query builder to filter out fields
         const links = await this.categoryLinks.createQueryBuilder('l')
-            .select(['l.categoryID', 'collection.id', 'collection.icon', 'collection.collectionName'])
+            .select()
             .where({ categoryID })
             .leftJoin('l.collection', 'collection')
             .orderBy('collection.collectionName', 'ASC')
             .getMany();
-        return Promise.all(links.map(async (l) => new CollectionListItem(await l.collection)));
+        return Promise.all(links.map(async (l) => await l.collection));
     }
 
     /**
@@ -61,18 +59,18 @@ export class CollectionService extends BaseService<Collection> {
      * category
      * @return CollectionListItem[] The list of uncategoried collections
      */
-    async findUncategorized(): Promise<CollectionListItem[]> {
+    async findUncategorized(): Promise<Collection[]> {
         const subquery = await this.categoryLinks.createQueryBuilder('l')
             .select(['l.collectionID'])
             .distinct(true);
 
         const collections = await this.collections.createQueryBuilder('c')
-            .select(['c.id', 'c.icon', 'c.collectionName'])
+            .select()
             .where(`c.id not in (${subquery.getQuery()})`)
             .orderBy('c.collectionName', 'ASC')
             .getMany();
 
-        return collections.map((c) => new CollectionListItem(c));
+        return collections;
     }
 
     /**

@@ -5,7 +5,6 @@ export interface ApiCollectionInstitutionOutput {
 }
 
 export interface ApiInstitutionOutput extends ApiCollectionInstitutionOutput {
-    code: string;
     address1: string;
     address2: string;
     city: string;
@@ -17,7 +16,7 @@ export interface ApiInstitutionOutput extends ApiCollectionInstitutionOutput {
     email: string;
     url: string;
     notes: string;
-    initialTimestamp: string;
+    initialTimestamp: string | Date;
 }
 
 export interface ApiCollectionStatsOutput {
@@ -31,6 +30,7 @@ export interface ApiCollectionStatsOutput {
 
 export interface ApiCollectionListItem {
     id: number;
+    collectionCode: string;
     collectionName: string;
     icon: string;
 }

@@ -10,7 +10,7 @@ import {
     Delete,
     NotFoundException,
     Patch,
-    UseGuards,
+    UseGuards, SerializeOptions
 } from '@nestjs/common';
 import {
     ApiTags,
@@ -19,7 +19,6 @@ import {
     ApiOperation
 } from '@nestjs/swagger';
 import { CollectionService } from './collection.service';
-import { CollectionOutputDto } from './dto/Collection.output.dto';
 import { CollectionFindAllParams } from './dto/coll-find-all.input.dto';
 import { InstitutionService } from './institution/institution.service';
 import {
@@ -30,7 +29,7 @@ import { JwtAuthGuard } from '@symbiota2/api-auth';
 import {
     ProtectCollection
 } from './collection-edit-guard/protect-collection.decorator';
-import { CollectionListItem } from './dto/CollectionListItem.output.dto';
+import { Collection } from '@symbiota2/api-database';
 
 /**
  * API routes for manipulating specimen collections
@@ -49,35 +48,36 @@ export class CollectionController {
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        type: CollectionListItem,
+        type: Collection,
         isArray: true
     })
-    async findAll(@Query() findAllParams: CollectionFindAllParams): Promise<CollectionListItem[]> {
+    @SerializeOptions({ groups: ['list'] })
+    async findAll(@Query() findAllParams: CollectionFindAllParams): Promise<Collection[]> {
         const collections = await this.collections.findAll(findAllParams);
 
         if (collections.length === 0) {
             throw new NotFoundException();
         }
 
-        return collections.map((c) => new CollectionListItem(c));
+        return collections;
     }
 
     @Get(':id')
     @ApiOperation({
         summary: "Retrieve a specimen collection by ID"
     })
-    @ApiResponse({ status: HttpStatus.OK, type: CollectionOutputDto })
-    async findByID(@Param('id') id: number): Promise<CollectionOutputDto> {
+    @ApiResponse({ status: HttpStatus.OK, type: Collection })
+    @SerializeOptions({ groups: ['single'] })
+    async findByID(@Param('id') id: number): Promise<Collection> {
         const collection = await this.collections.findByID(id);
 
         if (collection === null) {
             throw new NotFoundException();
         }
 
-        const collectionDto = new CollectionOutputDto(collection);
-        collectionDto.institution = await collection.institution;
-        collectionDto.stats = await collection.collectionStats;
-        return collectionDto;
+        collection.institution = await collection.institution;
+        collection.collectionStats = await collection.collectionStats;
+        return collection;
     }
 
     @Post()
@@ -87,10 +87,13 @@ export class CollectionController {
     @HttpCode(HttpStatus.OK)
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiResponse({ status: HttpStatus.OK, type: CollectionOutputDto })
-    async create(@Body() data: CollectionInputDto): Promise<CollectionOutputDto> {
+    @ApiResponse({ status: HttpStatus.OK, type: Collection })
+    @SerializeOptions({ groups: ['single'] })
+    async create(@Body() data: CollectionInputDto): Promise<Collection> {
         const collection = await this.collections.create(data);
-        return new CollectionOutputDto(collection);
+        collection.collectionStats = await collection.collectionStats;
+        collection.institution = await collection.institution;
+        return collection;
     }
 
     @Delete(':id')
@@ -112,17 +115,17 @@ export class CollectionController {
         summary: "Update a specimen collection by ID"
     })
     @ProtectCollection('id')
-    @ApiResponse({ status: HttpStatus.OK, type: CollectionOutputDto })
-    async updateByID(@Param('id') id: number, @Body() data: UpdateCollectionInputDto): Promise<CollectionOutputDto> {
+    @ApiResponse({ status: HttpStatus.OK, type: Collection })
+    @SerializeOptions({ groups: ['single'] })
+    async updateByID(@Param('id') id: number, @Body() data: UpdateCollectionInputDto): Promise<Collection> {
         const collection = await this.collections.updateByID(id, data);
         if (!collection) {
             throw new NotFoundException();
         }
 
-        const collectionDto = new CollectionOutputDto(collection);
-        collectionDto.stats = await collection.collectionStats;
-        collectionDto.institution = await collection.institution;
+        collection.collectionStats = await collection.collectionStats;
+        collection.institution = await collection.institution;
 
-        return collectionDto;
+        return collection;
     }
 }

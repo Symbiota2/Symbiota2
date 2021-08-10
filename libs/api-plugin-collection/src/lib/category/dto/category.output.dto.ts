@@ -4,7 +4,6 @@ import {
     CollectionCategory
 } from '@symbiota2/api-database';
 import { ApiProperty } from '@nestjs/swagger';
-import { CollectionListItem } from '../../dto/CollectionListItem.output.dto';
 import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 
 @Exclude()
@@ -21,10 +20,10 @@ export class CategoryOutputDto implements ApiCollectionCategoryOutput {
     @Expose()
     icon: string;
 
-    @ApiProperty({ type: CollectionListItem, isArray: true })
+    @ApiProperty({ type: Collection, isArray: true })
     @Expose()
-    @Type(() => CollectionListItem)
-    collections: CollectionListItem[] = [];
+    @Type(() => Collection)
+    collections: Collection[] = [];
 
     constructor(category: CollectionCategory) {
         Object.assign(this, category);

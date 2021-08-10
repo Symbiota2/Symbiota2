@@ -26,20 +26,30 @@ import { SpeciesProcessorNLP } from '../species-processor/SpeciesProcessorNLP.en
 import { Occurrence } from '../occurrence/Occurrence.entity';
 import { OccurrenceExchange } from '../occurrence/OccurrenceExchange.entity';
 import { EntityProvider } from '../../entity-provider.class';
+import { Exclude, Expose, Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+import { ApiCollectionOutput } from '@symbiota2/data-access';
 
+@Exclude()
 @Index('Index_inst', ['institutionCode', 'collectionCode'], { unique: true })
 @Index(['institutionID'])
 @Entity('omcollections')
-export class Collection extends EntityProvider {
+export class Collection extends EntityProvider implements ApiCollectionOutput {
+    @ApiProperty()
+    @Expose({ groups: ['single', 'list'] })
     @PrimaryGeneratedColumn({ type: 'int', name: 'CollID', unsigned: true })
     id: number;
 
     @Column('varchar', { name: 'InstitutionCode', length: 45 })
     institutionCode: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single', 'list'] })
     @Column('varchar', { name: 'CollectionCode', nullable: true, length: 45 })
     collectionCode: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single', 'list'] })
     @Column('varchar', { name: 'CollectionName', length: 150 })
     collectionName: string;
 
@@ -49,9 +59,13 @@ export class Collection extends EntityProvider {
     @Column('varchar', { name: 'datasetName', nullable: true, length: 100 })
     datasetName: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('int', { name: 'iid', nullable: true, unsigned: true })
     institutionID: number | null;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', {
         name: 'fulldescription',
         nullable: true,
@@ -59,18 +73,28 @@ export class Collection extends EntityProvider {
     })
     fullDescription: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'Homepage', nullable: true, length: 250 })
     homePage: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'IndividualUrl', nullable: true, length: 500 })
     individualUrl: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'Contact', nullable: true, length: 250 })
     contact: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'email', nullable: true, length: 45 })
     email: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('decimal', {
         name: 'latitudedecimal',
         nullable: true,
@@ -79,6 +103,8 @@ export class Collection extends EntityProvider {
     })
     latitude: number;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('decimal', {
         name: 'longitudedecimal',
         nullable: true,
@@ -87,9 +113,13 @@ export class Collection extends EntityProvider {
     })
     longitude: number;
 
+    @ApiProperty()
+    @Expose({ groups: ['single', 'list'] })
     @Column('varchar', { name: 'icon', nullable: true, length: 250 })
     icon: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', {
         name: 'CollType',
         comment: 'Preserved Specimens, General Observations, Observations',
@@ -98,6 +128,8 @@ export class Collection extends EntityProvider {
     })
     type: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', {
         name: 'ManagementType',
         nullable: true,
@@ -107,6 +139,8 @@ export class Collection extends EntityProvider {
     })
     managementType: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('int', {
         name: 'PublicEdits',
         unsigned: true,
@@ -114,6 +148,8 @@ export class Collection extends EntityProvider {
     })
     publicEdits: number;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'collectionguid', nullable: true, length: 45 })
     collectionGUID: string;
 
@@ -123,12 +159,18 @@ export class Collection extends EntityProvider {
     @Column('varchar', { name: 'guidtarget', nullable: true, length: 45 })
     guidTarget: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'rightsHolder', nullable: true, length: 250 })
     rightsHolder: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'rights', nullable: true, length: 250 })
     rights: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'usageTerm', nullable: true, length: 250 })
     usageTerm: string;
 
@@ -152,12 +194,16 @@ export class Collection extends EntityProvider {
     })
     bibliographicCitation: string;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('varchar', { name: 'accessrights', nullable: true, length: 1000 })
     accessRights: string;
 
     @Column('int', { name: 'SortSeq', nullable: true, unsigned: true })
     sortSequence: number | null;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
     @Column('timestamp', {
         name: 'InitialTimeStamp',
         default: () => 'CURRENT_TIMESTAMP()',
@@ -171,17 +217,21 @@ export class Collection extends EntityProvider {
         () => CollectionStat,
         (omcollectionstats) => omcollectionstats.collection
     )
-    collectionStats: Promise<CollectionStat>;
+    collectionStats: Promise<CollectionStat> | CollectionStat;
 
     @OneToMany(() => CollectionCategoryLink, (omcollcatlink) => omcollcatlink.collection)
     collectionCategoryLinks: Promise<CollectionCategoryLink[]>;
 
+    @ApiProperty()
+    @Expose({ groups: ['single'] })
+    @Type(() => Institution)
     @ManyToOne(() => Institution, (institutions) => institutions.collections, {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
     })
     @JoinColumn([{ name: 'iid'}])
-    institution: Promise<Institution>;
+    // @ts-ignore
+    institution: Promise<Institution> | Institution;
 
     @OneToOne(
         () => CrowdSourceCentral,
