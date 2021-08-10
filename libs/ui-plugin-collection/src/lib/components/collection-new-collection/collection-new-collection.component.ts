@@ -86,6 +86,7 @@ export class CollectionNewCollectionComponent implements OnInit {
 
     onAddNewInst(): void {
         const dialog = this.dialog.open(InstitutionNewDialogComponent, {
+            width: '50vw',
             disableClose: true,
         });
         dialog.afterClosed().subscribe((inst: Institution) => {
