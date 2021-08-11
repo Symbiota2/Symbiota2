@@ -58,6 +58,15 @@
                         >
                             Collection Code is <strong>required</strong>
                         </mat-error>
+                        <mat-error
+                            *ngIf="
+                                newCollectionForm
+                                    .get('code')
+                                    .hasError('codeTaken')
+                            "
+                        >
+                            Code already in use
+                        </mat-error>
                     </mat-form-field>
                 </div>
                 <div
@@ -71,7 +80,7 @@
                             <mat-option
                                 *ngFor="let i of inst"
                                 value="{{ i.id }}"
-                                >{{ i.name }}</mat-option
+                                >{{ i.name }} ({{ i.code }})</mat-option
                             >
                         </mat-select>
                         <mat-error
@@ -172,12 +181,10 @@
                 </mat-form-field>
             </div>
             <div fxLayout="column" fxFlex="30">
-                <!-- 
-                    <mat-form-field>
+                <mat-form-field>
                     <mat-label>Category</mat-label>
                     <mat-select formControlName="category">
-                        <mat-option value="one">category one</mat-option>
-                        <mat-option value="two">category two</mat-option>
+                        <mat-option *ngFor="let cat of categories" value="{{cat.id}}">{{cat.category}}</mat-option>
                     </mat-select>
                     <mat-error
                         *ngIf="
@@ -188,7 +195,7 @@
                     >
                         please select a category
                     </mat-error>
-                </mat-form-field> -->
+                </mat-form-field>
                 <mat-form-field>
                     <mat-label>Collection Type</mat-label>
                     <mat-select formControlName="type">

@@ -12,6 +12,7 @@ import { InstitutionNewDialogComponent } from '../institution-new-dialog/institu
 import { Router } from '@angular/router';
 import { ROUTE_COLLECTION_PROFILE } from '../../routes';
 import { CollectionAsyncValidators } from './validators';
+import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 
 @Component({
     selector: 'symbiota2-collection-new-collection',
@@ -21,6 +22,7 @@ import { CollectionAsyncValidators } from './validators';
 export class CollectionNewCollectionComponent implements OnInit {
     user: User;
     inst: Institution[];
+    categories: ApiCollectionCategoryOutput[];
 
     newCollectionForm = this.fb.group({
         collectionName: [
@@ -28,7 +30,11 @@ export class CollectionNewCollectionComponent implements OnInit {
             Validators.required,
             CollectionAsyncValidators.nameTaken(this.collections),
         ],
-        code: ['', Validators.required],
+        code: [
+            '',
+            Validators.required,
+            CollectionAsyncValidators.codeTaken(this.collections),
+        ],
         institutionID: ['0', Validators.required],
         description: ['', Validators.required],
         homepage: ['', Validators.required],
@@ -42,7 +48,7 @@ export class CollectionNewCollectionComponent implements OnInit {
             '0',
             [Validators.required, Validators.min(-180), Validators.max(180)],
         ],
-        // category: ['', Validators.required],
+        category: ['', Validators.required],
         license: ['', Validators.required],
         aggregators: [false],
         icon: [''],
@@ -61,6 +67,7 @@ export class CollectionNewCollectionComponent implements OnInit {
 
     ngOnInit(): void {
         this.getUser();
+        this.getCategories();
         this.getInstitutions();
     }
 
@@ -99,11 +106,18 @@ export class CollectionNewCollectionComponent implements OnInit {
         });
     }
 
+    getCategories(): void {
+        this.collections.categories.subscribe(
+            (categories) => (this.categories = categories)
+        );
+    }
+
     getInstitutions(): void {
         this.institutions
             .getInstitutions()
             .subscribe((institutions) => (this.inst = institutions));
     }
+
     getUser(): void {
         this.users.currentUser
             .pipe(

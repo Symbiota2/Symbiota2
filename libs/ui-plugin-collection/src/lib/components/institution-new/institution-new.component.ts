@@ -25,17 +25,17 @@ export class InstitutionNewComponent implements OnInit {
     ) {}
 
     newInstForm = this.fb.group({
-        code: ['', Validators.required],
+        code: [
+            '',
+            Validators.required,
+            InstitutionAsyncValidators.codeTaken(this.institutions),
+        ],
         name: [
             '',
             Validators.required,
             InstitutionAsyncValidators.nameTaken(this.institutions),
         ],
-        address1: [
-            '',
-            Validators.required,
-            InstitutionAsyncValidators.codeTaken(this.institutions),
-        ],
+        address1: ['', Validators.required],
         address2: [''],
         city: ['', Validators.required],
         stateProvince: ['', Validators.required],

@@ -185,6 +185,19 @@ export class CollectionService {
         return result;
     }
 
+    isCodeTaken(code: string): Observable<boolean> {
+        return this.collectionList.pipe(map(instList => {
+            for(var index = 0; index < instList.length; index++)
+            {
+                if(instList[index].collectionCode === code)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }))
+    }
+
     private fetchCollectionList(
         findAllParams?: FindAllParams
     ): Observable<CollectionListItem[]> {

@@ -20,4 +20,16 @@ export class CollectionAsyncValidators {
                 );
         };
     }
+
+    static codeTaken(collections: CollectionService): AsyncValidatorFn {
+        return (control: AbstractControl): Observable<ValidationErrors> => {
+            return collections
+                .isCodeTaken(control.value)
+                .pipe(
+                    map((result: boolean) =>
+                        result ? { codeTaken: true } : null
+                    )
+                );
+        };
+    }
 }
