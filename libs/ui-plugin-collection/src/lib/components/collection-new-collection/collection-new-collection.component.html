@@ -3,7 +3,6 @@
         <div
             fxLayout="row"
             fxLayoutAlign="start end"
-            fxLayoutGap="2rem"
             fxLayoutGap="1rem"
             fxLayout.lt-md="column"
             fxLayoutAlign.lt-md="start"
@@ -14,7 +13,7 @@
                 id="logo"
             >
             </symbiota2-collection-logo>
-            <div>
+            <div fxFlex="50">
                 <div
                     fxLayout="row"
                     fxLayout.lt-md="column"
@@ -100,11 +99,11 @@
             fxLayoutAlign.lt-md="start"
             fxLayoutGap.lt-md="1rem"
         >
-            <mat-form-field fxFlex="10">
+            <mat-form-field fxFlex="20">
                 <mat-label>Icon URL</mat-label>
                 <input matInput formControlName="icon" />
             </mat-form-field>
-            <mat-form-field fxFlex="28" appearance="fill">
+            <mat-form-field fxFlex="34" appearance="fill">
                 <mat-label>Description</mat-label>
                 <textarea matInput formControlName="description"></textarea>
             </mat-form-field>
@@ -172,7 +171,7 @@
                     </mat-error>
                 </mat-form-field>
             </div>
-            <div fxLayout="column">
+            <div fxLayout="column" fxFlex="30">
                 <!-- 
                     <mat-form-field>
                     <mat-label>Category</mat-label>
