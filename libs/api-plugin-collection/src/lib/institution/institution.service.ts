@@ -29,7 +29,7 @@ export class InstitutionService extends BaseService<Institution> {
     findAll(params?: InstitutionFindAllParams): Promise<Institution[]> {
         const { limit, offset, ...qParams } = params;
         return this.institutionRepo.find({
-            select: ['id', 'name'],
+            select: ['id', 'code', 'name'],
             where: qParams,
             take: limit,
             skip: offset

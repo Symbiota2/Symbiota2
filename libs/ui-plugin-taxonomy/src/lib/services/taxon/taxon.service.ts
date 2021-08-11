@@ -32,26 +32,27 @@ export class TaxonService {
             .findScientificName()
             .authorityID(authorityID)
             .scientificName(sciname)
-            .authorityID(authorityID)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, Record<string, unknown>>(query)
             .pipe(map((o) => Taxon.fromJSON(o)))
     }
 
-    findAllScientificNames(authorityID?): Observable<string[]> {
+    findAllScientificNames(partialName, authorityID?): Observable<string[]> {
         const url = this.createQueryBuilder()
             .findAllScientificNames()
             .authorityID(authorityID)
+            .partialName(partialName)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)
     }
 
-    findAllScientificNamesPlusAuthors(authorityID?): Observable<string[]> {
+    findAllScientificNamesPlusAuthors(partialName, authorityID?): Observable<string[]> {
         const url = this.createQueryBuilder()
             .findAllScientificNamesPlusAuthors()
             .authorityID(authorityID)
+            .partialName(partialName)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)

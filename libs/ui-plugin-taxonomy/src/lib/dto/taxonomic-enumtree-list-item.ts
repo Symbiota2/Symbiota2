@@ -1,4 +1,6 @@
-import { Exclude, Expose, plainToClass } from 'class-transformer';
+import { Exclude, Expose, plainToClass, Type } from 'class-transformer';
+import { TaxonListItem } from './taxon-list-item';
+import { TaxonomicStatusListItem } from './taxon-status-list-item';
 
 @Exclude()
 export class TaxonomicEnumTreeListItem {
@@ -7,8 +9,9 @@ export class TaxonomicEnumTreeListItem {
     @Expose() taxonAuthorityID: number;
     @Expose() parentTaxonID: number;
     //@Expose() taxon: Promise<TaxonListItem>;
-    //@Expose() parent: TaxonListItem;
-    @Expose() initialTimestamp: Date;
+    @Type(() => TaxonListItem)
+    @Expose() parent: TaxonListItem;
+    @Expose() initialTimestamp: Date
 
     static fromJSON(taxonJSON: Record<string, unknown>): TaxonomicEnumTreeListItem {
         return plainToClass(

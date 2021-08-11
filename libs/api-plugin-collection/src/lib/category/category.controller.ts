@@ -1,12 +1,17 @@
-import { Controller, Get, HttpStatus, NotFoundException, Param } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    HttpStatus,
+    NotFoundException,
+    Param,
+    SerializeOptions
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
     CategoryOutputDto
 } from './dto/category.output.dto';
 import { CategoryService } from './category.service';
 import { CollectionService } from '../collection.service';
-import { CollectionListItem } from '../dto/CollectionListItem.output.dto';
-import { map } from 'rxjs/operators';
 
 @ApiTags('Collections')
 @Controller('collections/categories')
@@ -16,10 +21,9 @@ export class CategoryController {
         private readonly categories: CategoryService) { }
 
     @Get()
-    @ApiOperation({
-        summary: "Retrieve a list of collection categories"
-    })
+    @ApiOperation({ summary: "Retrieve a list of collection categories" })
     @ApiResponse({ status: HttpStatus.OK, type: CategoryOutputDto, isArray: true })
+    @SerializeOptions({ groups: ['list'] })
     async getCategoryList(): Promise<CategoryOutputDto[]> {
         const categories = await this.categories.findAll();
 
@@ -27,7 +31,7 @@ export class CategoryController {
             ...categories.map(async (category) => {
                 const dto = new CategoryOutputDto(category);
                 const collections = await this.collections.findByCategory(category.id);
-                dto.collections = collections.map((coll) => new CollectionListItem(coll));
+                dto.collections = collections;
                 return dto;
             }),
             this.collections.findUncategorized().then((collections) => {
@@ -35,17 +39,16 @@ export class CategoryController {
                     id: -1,
                     category: 'Uncategorized',
                     icon: null,
-                    collections: collections.map((c) => new CollectionListItem(c))
+                    collections: collections
                 }
             }),
         ]);
     }
 
     @Get(':id')
-    @ApiOperation({
-        summary: "Retrieve a collection category by ID"
-    })
+    @ApiOperation({ summary: "Retrieve a collection category by ID" })
     @ApiResponse({ status: HttpStatus.OK, type: CategoryOutputDto })
+    @SerializeOptions({ groups: ['single'] })
     async getCategory(@Param('id') id: number): Promise<CategoryOutputDto> {
         const [category, collections] = await Promise.all([
             this.categories.findByID(id),
@@ -57,7 +60,7 @@ export class CategoryController {
         }
 
         const dto = new CategoryOutputDto(category);
-        dto.collections = collections.map(c => new CollectionListItem(c));
+        dto.collections = collections;
         return dto;
     }
 }

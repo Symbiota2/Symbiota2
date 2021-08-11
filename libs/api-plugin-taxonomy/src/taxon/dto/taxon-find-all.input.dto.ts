@@ -21,6 +21,11 @@ export class TaxonFindAllParams extends BaseFindAllParams {
     @IsOptional()
     taxonAuthorityID: number
 
+    @ApiProperty({ name: 'partialName', type: String, required: false })
+    @Type(() => String)
+    @IsOptional()
+    partialName: string
+
     @Min(0)
     @Max(TaxonFindAllParams.MAX_LIMIT)
     limit: number = TaxonFindAllParams.DEFAULT_LIMIT

@@ -12,18 +12,20 @@ import { OccurrenceLoan } from '../occurrence/OccurrenceLoan.entity';
 import { User } from '../user/User.entity';
 import { EntityProvider } from '../../entity-provider.class';
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
+import { ApiInstitutionOutput } from '@symbiota2/data-access';
 
+@Exclude()
 @Index(['lastModifiedUID'])
 @Entity('institutions')
-export class Institution extends EntityProvider {
+export class Institution extends EntityProvider implements ApiInstitutionOutput {
     @ApiProperty()
     @Expose({ groups: ['single', 'list'] })
     @PrimaryGeneratedColumn({ type: 'int', name: 'iid', unsigned: true })
     id: number;
 
     @ApiProperty()
-    @Expose({ groups: ['single'] })
+    @Expose({ groups: ['single', 'list'] })
     @Column('varchar', { name: 'InstitutionCode', length: 45 })
     code: string;
 

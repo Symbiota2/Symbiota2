@@ -15,6 +15,10 @@ export class TaxonomicEnumTreeQueryBuilder {
         return new FindAncestorsBuilder(this.baseUrl)
     }
 
+    findDescendants() : FindDescendantsBuilder {
+        return new FindDescendantsBuilder(this.baseUrl)
+    }
+
     findAncestorTaxons() : FindAncestorTaxonsBuilder {
         return new FindAncestorTaxonsBuilder(this.baseUrl)
     }
@@ -73,6 +77,36 @@ class FindAncestorsBuilder extends TaxonomicEnumTreeQueryBuilder {
     taxonID(id: number): FindAncestorsBuilder {
         this._taxonID = id
         this.url = new URL(`${this.baseUrl}/taxonomicEnumTree/ancestors/${id}`)
+        return this
+    }
+
+    build(): string {
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
+
+        return super.build();
+    }
+}
+
+class FindDescendantsBuilder extends TaxonomicEnumTreeQueryBuilder {
+    protected _taxonID: number = null
+    protected _authorityID: number
+
+    constructor(apiBaseUrl: string) {
+        super(apiBaseUrl)
+        this.baseUrl = apiBaseUrl
+        this.url = new URL(`${apiBaseUrl}/taxonomicEnumTree/descendants`)
+    }
+
+    authorityID(authorityID: number): FindDescendantsBuilder {
+        this._authorityID = authorityID
+        return this
+    }
+
+    taxonID(id: number): FindDescendantsBuilder {
+        this._taxonID = id
+        this.url = new URL(`${this.baseUrl}/taxonomicEnumTree/descendants/${id}`)
         return this
     }
 

@@ -29,7 +29,6 @@ import fs from 'fs';
 import JSONStream from 'JSONStream';
 import {
     ApiFileInput,
-    CsvInterceptor
 } from '@symbiota2/api-common';
 import { DeepPartial } from 'typeorm';
 import { Occurrence } from '@symbiota2/api-database';

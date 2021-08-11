@@ -23,21 +23,25 @@ export class TaxonService extends BaseService<Taxon>{
             // Have to use query builder since filter on nested relations does not work
             const qb = this.myRepository.createQueryBuilder('o')
                 .leftJoin('o.taxonStatuses', 'c')
-                .take(limit)
-                .skip(offset)
+                //.take(limit)
+
                 .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
 
             if (qParams.id) {
                 qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
+            } else {
+                // limit only if we don't have a list of ids
+                qb.take(limit)
+                qb.skip(offset)
             }
-
             return qb.getMany()
         } else {
             // Can use nested relations
             return (qParams.id)?
                 await this.myRepository.find({
-                    take: limit,
-                    skip: offset,
+                    // No limit or offset if we have a list of ids
+                    // take: limit,
+                    // skip: offset,
                     where: { id: In(params.id) }})
                 : await this.myRepository.find({
                     take: limit,
@@ -49,27 +53,34 @@ export class TaxonService extends BaseService<Taxon>{
     Project the author and sciname from the taxa table using possibly a list of taxaIDs and an authority ID
      */
     async findAllScientificNamesPlusAuthors(params?: TaxonFindNamesParams): Promise<Taxon[]> {
-        const { ...qParams } = params
+        const { limit,...qParams } = params
         if (qParams.taxonAuthorityID) {
             const qb = this.myRepository.createQueryBuilder('o')
                 .select([
                     'o.scientificName',
                     'o.author'
                 ])
+                .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
                 .innerJoin('o.taxonStatuses', 'c')
                 .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
 
             if (qParams.id) {
                 qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
             }
-            return qb.getMany()
+
+            if (qParams.partialName) {
+                qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
+            }
+            return await qb.getMany()
         } else {
             return (qParams.id)?
                 await this.myRepository.find({
                     select: ["scientificName", "author"],
-                    where: { id: In(params.id) }})
+                    where: { id: In(params.id) },
+                    take: TaxonFindAllParams.MAX_LIMIT})
                 : await this.myRepository.find({
-                    select: ["scientificName", "author"]
+                    select: ["scientificName", "author"],
+                    take: TaxonFindAllParams.MAX_LIMIT
                 })
         }
     }
@@ -79,27 +90,33 @@ export class TaxonService extends BaseService<Taxon>{
      */
     async findAllScientificNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         //console.log("Taxon service: finding scientific names")
-        const { ...qParams } = params
+        const { limit,...qParams } = params
 
         if (qParams.taxonAuthorityID) {
             const qb = this.myRepository.createQueryBuilder('o')
                 .select([
                     'o.scientificName'
                 ])
+                .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
                 .innerJoin('o.taxonStatuses', 'c')
                 .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
 
+            if (qParams.partialName) {
+                qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
+            }
             if (qParams.id) {
                 qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
             }
-            return qb.getMany()
+            return await qb.getMany()
         } else {
             return (qParams.id)?
                 await this.myRepository.find({
                     select: ["scientificName"],
-                    where: { id: In(params.id) }})
+                    where: { id: In(params.id) },
+                    take: TaxonFindAllParams.MAX_LIMIT})
                 : await this.myRepository.find({
-                    select: ["scientificName"]
+                    select: ["scientificName"],
+                    take: TaxonFindAllParams.MAX_LIMIT
                 })
         }
     }
@@ -116,7 +133,7 @@ export class TaxonService extends BaseService<Taxon>{
                 .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
                 .andWhere('o.scientificName = :sciname', {sciname: sciname})
 
-            return qb.getMany()
+            return await qb.getMany()
         } else {
             return await this.myRepository.find({ where: { scientificName: sciname } })
         }

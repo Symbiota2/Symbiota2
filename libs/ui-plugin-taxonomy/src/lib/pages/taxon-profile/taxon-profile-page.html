@@ -8,10 +8,10 @@
         <table >
             <tr>
                 <td>
-                    <img *ngIf='image' src="{{image.url}}"/>
+                    <img *ngIf='image' src="http://openherbarium.org{{image.url}}"/>
                     <span *ngIf='!image'>{{"taxon.profile.no.image" | translate}}</span>
                     <br/>
-                    <span style='text-aligh:right'>{{image.photographerName}}</span>
+                    <span *ngIf='image' style='text-aligh:right'>{{image.photographerName}}</span>
                 </td>
                 <td>
                     <div *ngIf='block.caption' style='text-align:right'>
@@ -20,7 +20,7 @@
                     </div>
                     <span *ngIf="descriptions.length > 0">
                         <span *ngFor="let d of descriptions">
-                            <b *ngIf='d.displayHeader == 1'>{{d.heading}}</b>&nbsp;{{d.statement}}
+                            <b *ngIf='d.displayHeader == 1'>{{d.heading}}</b>&nbsp;<div [innerHTML]="d.statement"></div>
                         </span>
                     </span>
                     <span *ngIf='descriptions.length == 0'>

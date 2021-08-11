@@ -1,11 +1,11 @@
 import { Exclude, Expose } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
-import { Taxon } from '@symbiota2/api-database'
+import { TaxaEnumTreeEntry, Taxon } from '@symbiota2/api-database';
 import { TaxonDto } from '../../taxon/dto/TaxonDto'
 
 @Exclude()
 export class TaxonomicEnumTreeDto {
-    constructor(taxaEnumTree: TaxonomicEnumTreeDto) {
+    constructor(taxaEnumTree: TaxaEnumTreeEntry) {
         Object.assign(this, taxaEnumTree)
     }
 

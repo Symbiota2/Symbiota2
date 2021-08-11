@@ -6,6 +6,7 @@ import {
 } from './dto/TaxonomicEnumTreeDto';
 import { TaxonomicEnumTreeFindAllParams } from './dto/taxonomicEnumTree-find-all.input.dto';
 import { TaxonDto } from '../taxon/dto/TaxonDto';
+import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
 
 @ApiTags('TaxonomicEnumTree')
 @Controller('taxonomicEnumTree')
@@ -38,8 +39,17 @@ export class TaxonomicEnumTreeController {
         const taxons = await this.myService.findAncestors(taxonid, findAllParams)
         const taxonDtos = taxons.map(async (c) => {
             const parentTaxon = await c.parentTaxon
-            const taxon = new TaxonomicEnumTreeDto(c)
-            return new TaxonDto(parentTaxon)
+            const acceptedStatuses = await parentTaxon.acceptedTaxonStatuses
+            const synonyms = []
+            for (const s of acceptedStatuses) {
+                const synstatus = new TaxonomicStatusDto(s)
+                const t = await s.taxon
+                synstatus.taxon = new TaxonDto(t)
+                synonyms.push(synstatus)
+            }
+            const taxon = new TaxonDto(parentTaxon)
+            taxon.acceptedTaxonStatuses = synonyms
+            return taxon
         })
         return Promise.all(taxonDtos)
     }
@@ -53,8 +63,18 @@ export class TaxonomicEnumTreeController {
         const taxons = await this.myService.findAncestors(taxonid, findAllParams)
         const taxonDtos = taxons.map(async (c) => {
             const parentTaxon = await c.parentTaxon
+            const acceptedStatuses = await parentTaxon.acceptedTaxonStatuses
+            const synonyms = []
+            for (const s of acceptedStatuses) {
+                const synstatus = new TaxonomicStatusDto(s)
+                const t = await s.taxon
+                synstatus.taxon = new TaxonDto(t)
+                synonyms.push(synstatus)
+                }
             const taxon = new TaxonomicEnumTreeDto(c)
             taxon.parent = new TaxonDto(parentTaxon)
+            taxon.parent.acceptedTaxonStatuses = synonyms
+
             return taxon
         });
         return Promise.all(taxonDtos)

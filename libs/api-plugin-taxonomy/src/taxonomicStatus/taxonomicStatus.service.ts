@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { In, Repository } from 'typeorm'
+import { In, Repository, Not } from 'typeorm'
 import { TaxonomicStatusFindAllParams } from './dto/taxonomicStatus-find-all.input.dto'
 import { BaseService } from '@symbiota2/api-common'
 import { TaxonomicStatus } from '@symbiota2/api-database'
@@ -23,8 +23,6 @@ export class TaxonomicStatusService extends BaseService<TaxonomicStatus>{
             (qParams.id) ?
                 await this.myRepository.find({
                     relations: ["parentTaxon", "taxon"],
-                    take: limit,
-                    skip: offset,
                     where: { taxonAuthorityID: params.taxonAuthorityID, taxonID: In(params.id)}})
                 : await this.myRepository.find({
                     relations: ["parentTaxon", "taxon"],
@@ -32,8 +30,22 @@ export class TaxonomicStatusService extends BaseService<TaxonomicStatus>{
                     skip: offset,
                     where: { taxonAuthorityID: params.taxonAuthorityID}})
             : (qParams.id) ?
-                await this.myRepository.find({relations: ["parentTaxon", "taxon"], take: limit, skip: offset, where: { taxonID: In(params.id)}})
+                await this.myRepository.find({relations: ["parentTaxon", "taxon"], where: { taxonID: In(params.id)}})
                 : await this.myRepository.find({relations: ["parentTaxon", "taxon"], take: limit, skip: offset})
+    }
+
+    /*
+  Find the children taxon using a taxon id and optionally a taxa authority id
+   */
+    async findSynonyms(taxonid: number, params?: TaxonomicStatusFindAllParams): Promise<TaxonomicStatus[]> {
+        const { limit, offset, ...qParams } = params
+
+        // A potential synonym has the tidaccepted of the tid
+        const synonyms = await this.myRepository.find(
+            {relations: ["taxon"],
+                where: {taxonIDAccepted: taxonid, taxonID: Not(taxonid)}}
+        )
+        return synonyms
     }
 
     /*
@@ -44,7 +56,7 @@ export class TaxonomicStatusService extends BaseService<TaxonomicStatus>{
 
         // The taxstatus table has a parenttid field
         // Fetch the children
-        const children = await this.myRepository.find({relations: ["parentTaxon", "taxon"], where: {parentTaxonID: taxonid}})
+        const children = await this.myRepository.find({relations: ["taxon"], where: {parentTaxonID: taxonid}})
         return children
     }
 

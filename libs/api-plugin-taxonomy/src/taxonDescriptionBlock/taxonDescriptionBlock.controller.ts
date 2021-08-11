@@ -46,6 +46,9 @@ export class TaxonDescriptionBlockController {
     })
     async findBlockAndImages(@Param('taxonID') taxonID: number): Promise<TaxonDescriptionBlockDto> {
         const block = await this.myService.findBlockAndImagesForTaxon(taxonID)
+        if (!block) {
+            return null
+        }
         const dto = new TaxonDescriptionBlockDto(block)
         const statements = await block.descriptionStatements
         const taxon = await block.taxon

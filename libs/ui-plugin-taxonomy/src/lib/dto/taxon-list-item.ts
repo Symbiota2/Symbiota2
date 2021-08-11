@@ -1,5 +1,7 @@
-import { Exclude, Expose, plainToClass } from 'class-transformer';
+import { Exclude, Expose, plainToClass, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { TaxonDescriptionStatementListItem } from './taxonDescriptionStatement-list-item';
+import { TaxonomicStatusListItem } from './taxon-status-list-item';
 
 @Exclude()
 export class TaxonListItem {
@@ -19,6 +21,8 @@ export class TaxonListItem {
     @Expose() source: string
     @Expose() notes: string
     @Expose() hybrid: string
+    @Type(() => TaxonomicStatusListItem)
+    @Expose() acceptedTaxonStatuses: TaxonomicStatusListItem[]
     @Expose() securityStatus: number
     @Expose() lastModifiedUID: number | null
 //    @Expose() lastModifiedTimestamp: Date | null

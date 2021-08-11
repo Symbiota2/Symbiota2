@@ -4,6 +4,7 @@ import { Type } from 'class-transformer'
 import { BaseFindAllParams } from '@symbiota2/api-common'
 
 export class TaxonFindNamesParams extends BaseFindAllParams {
+    static readonly MAX_LIMIT = 100
 
     @ApiProperty({ name: 'id[]', type: [Number], required: false })
     @Type(() => Number)
@@ -17,4 +18,9 @@ export class TaxonFindNamesParams extends BaseFindAllParams {
     @IsInt({ each: true })
     @IsOptional()
     taxonAuthorityID: number
+
+    @ApiProperty({ name: 'partialName', type: String, required: false })
+    @Type(() => String)
+    @IsOptional()
+    partialName: string
 }
