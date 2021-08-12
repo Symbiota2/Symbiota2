@@ -43,17 +43,9 @@ export class TaxonEditorPageComponent implements OnInit {
 
     data: TaxonVernacularListItem[] = []
     dataSource = new MatTableDataSource(this.data)
-
-    commonNameControl = new FormControl()
-    commonLanguageControl = new FormControl()
-    commonNotesControl = new FormControl()
-    commonSourceControl = new FormControl()
-    commonSortSequenceControl = new FormControl()
     private taxonID: string
     languageList = []
     common: CommonInfo
-    taxonomicAuthorityList = []
-    taxonomicAuthorityID = 1 // Set the default taxa authority id
 
     constructor(
         //private readonly userService: UserService,  // TODO: needed for species hiding
@@ -119,20 +111,23 @@ export class TaxonEditorPageComponent implements OnInit {
 
     openDialog(action, obj) {
         obj.action = action
-        const dialogRef = this.dialog.open(TaxonEditorDialogComponent, {
-            width: '250px',
-            data: obj
-        })
+        const dialogRef = (action == 'Delete') ?
+            this.dialog.open(TaxonEditorDialogComponent, {
+                width: '100',
+                data: obj
+            })
+            : this.dialog.open(TaxonEditorDialogComponent, {
+                width: '80%',
+                data: obj
+            })
 
         dialogRef.afterClosed().subscribe(result => {
-            if (result.event == 'Add') {
-                this.addRowData(result.data)
-            } else if (result.event == 'Update') {
+            if (result.event == 'Update') {
                 this.updateRowData(result.data)
             } else if (result.event == 'Delete') {
                 this.deleteRowData(result.data)
             }
-        });
+        })
     }
 
     addRowData(row_obj) {

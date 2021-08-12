@@ -35,5 +35,10 @@
   "taxon.editor.common.notes" : "Notes",
   "taxon.editor.common.source" : "Source",
   "taxon.editor.common.sortSequence" : "Sort Sequence",
-  "taxon.editor.add.button.label" : "Add"
+  "taxon.editor.add.button.label" : "Add a Common Name",
+  "taxon.editor.dialog.confirm.delete" : "Confirm Delete",
+  "taxon.editor.dialog.cancel" : "Cancel",
+  "taxon.editor.dialog.edit" : "Edit",
+  "taxon.editor.dialog.delete" : "Delete",
+  "taxon.editor.dialog.update" : "Save"
 }
