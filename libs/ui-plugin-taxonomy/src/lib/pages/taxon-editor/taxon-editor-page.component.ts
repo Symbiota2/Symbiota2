@@ -39,7 +39,7 @@ const ELEMENT_DATA: CommonInfo[] = [
 })
 
 export class TaxonEditorPageComponent implements OnInit {
-    displayedColumns = ['name', 'language', 'notes', 'sortSequence', 'source']
+    displayedColumns = ['name', 'language', 'notes', 'sortSequence', 'source', 'action']
 
     data: TaxonVernacularListItem[] = []
     dataSource = new MatTableDataSource(this.data)
@@ -78,10 +78,9 @@ export class TaxonEditorPageComponent implements OnInit {
 
         this.currentRoute.paramMap.subscribe(params => {
             this.taxonID = params.get('taxonID')
+            // Load the authorities
+            this.loadCommonNames(parseInt(this.taxonID))
         })
-
-        // Load the authorities
-        this.loadCommonNames(parseInt(this.taxonID))
 
     }
 

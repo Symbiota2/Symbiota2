@@ -21,7 +21,6 @@ export class TaxonEditorDialogComponent {
         public dialogRef: MatDialogRef<TaxonEditorDialogComponent>,
         //@Optional() is used to prevent error if no data is passed
         @Optional() @Inject(MAT_DIALOG_DATA) public data: UsersData) {
-        console.log(data)
         this.local_data = {...data}
         this.action = this.local_data.action
     }
