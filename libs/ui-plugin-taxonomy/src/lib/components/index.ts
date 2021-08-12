@@ -1,2 +1,1 @@
-// export * from './search-result/taxa-search-result.component';
-
+export * from './taxon-editor-dialog/taxon-editor-dialog.component'

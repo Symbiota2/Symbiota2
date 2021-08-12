@@ -40,7 +40,7 @@ export class TaxonProfilePageComponent implements OnInit {
     public descriptions: TaxonDescriptionStatementListItem[]
     public block: TaxonDescriptionBlockListItem
     public image: ImageListItem
-    private taxonID: string
+    taxonID: string
 
     constructor(
         //private readonly userService: UserService,  // TODO: needed for species hiding
@@ -64,12 +64,9 @@ export class TaxonProfilePageComponent implements OnInit {
 
         this.currentRoute.paramMap.subscribe(params => {
             this.taxonID = params.get('taxonID')
+            // Load the authorities
+            this.loadProfile(parseInt(this.taxonID))
         })
-
-        console.log(" what " + this.taxonID)
-        //this.taxonID = "93"
-        // Load the authorities
-        this.loadProfile(parseInt(this.taxonID))
 
     }
 

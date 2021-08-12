@@ -10,7 +10,6 @@ import {
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TaxonomicEnumTreeService } from '@symbiota2/ui-plugin-taxonomy'
 import { BehaviorSubject, Observable } from 'rxjs'
-import { map, startWith } from 'rxjs/operators'
 import { TranslateService } from '@ngx-translate/core'
 
 /**

@@ -45,6 +45,19 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
     }
 
     /*
+    Find all of the taxonVernacular rows for a specific taxon id
+     */
+    async findByTaxonID(taxonID: number): Promise<TaxonVernacular[]> {
+        const qb = this.myRepository.createQueryBuilder('o')
+            .leftJoin('o.taxon', 't')
+            .leftJoin('t.taxonStatuses', 's')
+            .where('o.taxonID = :id', { id: taxonID})
+
+        return qb.getMany()
+
+    }
+
+    /*
      Get a list of all of the languages
      */
     async findAllLanguages(): Promise<TaxonVernacular[]> {
@@ -170,7 +183,7 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
         }
     }
 
-    async findByTID(id: number): Promise<TaxonVernacular> {
+    async findByID(id: number): Promise<TaxonVernacular> {
         return await this.myRepository.findOne({where: {id: id}})
     }
 

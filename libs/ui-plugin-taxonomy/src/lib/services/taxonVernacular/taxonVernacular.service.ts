@@ -7,7 +7,7 @@ import { TaxonVernacularQueryBuilder } from './taxonVernacular-query-builder';
 import { TaxonVernacularListItem } from '../../dto/taxonVernacular-list-item';
 
 interface FindAllParams {
-    taxonIDs: number[]
+    IDs: number[]
     limit?: number
 }
 
@@ -68,9 +68,23 @@ export class TaxonVernacularService {
     findAll(authorityID?: number, params?: FindAllParams): Observable<TaxonVernacularListItem[]> {
         const url = this.createQueryBuilder()
             .findAll()
-            .taxonIDs(params.taxonIDs)
+            .IDs(params?.IDs)
             .authorityID(authorityID)
-            .build();
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build();
+        return this.apiClient.send<any, Record<string, unknown>[]>(query)
+            .pipe(
+                map((taxons) => taxons.map((o) => {
+                    return TaxonVernacularListItem.fromJSON(o);
+                }))
+            );
+    }
+
+    findByTaxonID(taxonID: number): Observable<TaxonVernacularListItem[]> {
+        const url = this.createQueryBuilder()
+            .findByTaxonID(taxonID)
+            .build()
 
         const query = this.apiClient.queryBuilder(url).get().build();
         return this.apiClient.send<any, Record<string, unknown>[]>(query)

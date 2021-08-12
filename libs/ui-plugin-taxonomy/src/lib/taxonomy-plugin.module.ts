@@ -38,6 +38,10 @@ import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
 import { TaxonProfilePageComponent } from './pages';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatTableModule } from '@angular/material/table';
+import { TaxonEditorDialogComponent } from './components';
+import { TaxonEditorPageComponent } from './pages/taxon-editor/taxon-editor-page.component';
 
 
 @NgModule({
@@ -67,12 +71,16 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     MatListModule,
     MatRadioModule,
     SymbiotaComponentModule,
-    ScrollingModule
+    ScrollingModule,
+    MatTabsModule,
+    MatTableModule
   ],
     declarations: [
         TaxaSearchPage,
         TaxaViewerPageComponent,
         TaxonProfilePageComponent,
+        TaxonEditorPageComponent,
+        TaxonEditorDialogComponent,
     ],
     providers: [
         TaxonService,
@@ -86,12 +94,15 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     entryComponents: [
         TaxaSearchPage,
         TaxonProfilePageComponent,
-        TaxaViewerPageComponent
+        TaxaViewerPageComponent,
+        TaxonEditorPageComponent,
+        TaxonEditorDialogComponent,
     ]
 })
 export class TaxonomyPlugin extends SymbiotaUiPlugin {
     private static SEARCH_TAXA_ROUTE = "taxonomy/search"
     private static TAXA_VIEWER_ROUTE = "taxonomy/viewer"
+    private static TAXON_EDITOR_ROUTE = "taxon/editor/:taxonID"
     private static TAXON_PROFILE_ROUTE = "taxon/profile/:taxonID"
 
     constructor() {
@@ -111,6 +122,10 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
             {
                 path: TaxonomyPlugin.TAXA_VIEWER_ROUTE,
                 component: TaxaViewerPageComponent
+            },
+            {
+                path: TaxonomyPlugin.TAXON_EDITOR_ROUTE,
+                component: TaxonEditorPageComponent
             }
         ];
     }
