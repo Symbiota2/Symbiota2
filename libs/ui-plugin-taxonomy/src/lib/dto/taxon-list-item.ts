@@ -21,7 +21,7 @@ export class TaxonListItem {
     @Expose() source: string
     @Expose() notes: string
     @Expose() hybrid: string
-    @Type(() => TaxonomicStatusListItem)
+ //   @Type(() => TaxonomicStatusListItem)
     @Expose() acceptedTaxonStatuses: TaxonomicStatusListItem[] | []
     @Expose() securityStatus: number
     @Expose() lastModifiedUID: number | null

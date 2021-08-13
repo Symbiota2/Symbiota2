@@ -106,7 +106,6 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
     private static TAXON_PROFILE_ROUTE = "taxon/profile/:taxonID"
 
     constructor() {
-        console.log("got here")
         super();
     }
 
