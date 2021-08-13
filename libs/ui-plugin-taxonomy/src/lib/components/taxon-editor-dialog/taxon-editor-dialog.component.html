@@ -1,8 +1,56 @@
 <!-- <h1 mat-dialog-title>Row Action :: <strong>{{action}}</strong></h1> -->
 <div mat-dialog-content>
-    <mat-form-field *ngIf="action != 'Delete'; else elseTemplate">
-        <input placeholder="{{action}} Name" matInput [(ngModel)]="local_data.name">
-    </mat-form-field>
+        <form *ngIf="action == 'Update'; else elseTemplate" class="name-autocomplete-form">
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.editor.common.name' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.vernacularName"
+                       [(ngModel)]="local_data.vernacularName"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.editor.common.language' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.language"
+                       [(ngModel)]="local_data.language"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.editor.common.notes' | translate}}</mat-label>
+                <input matInput
+                       [value]="local_data.notes"
+                       [(ngModel)]="local_data.notes"
+                       [ngModelOptions]="{standalone: true}">
+                <!-- <mat-icon matSuffix>mode_edit</mat-icon> -->
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.editor.common.source' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.source"
+                       [(ngModel)]="local_data.source"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.editor.common.sortSequence' | translate}}</mat-label>
+                <input matInput
+                       maxlength="3"
+                       [value]="local_data.sortSequence"
+                       [(ngModel)]="local_data.sortSequence"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+            <!--
+            <mat-form-field class="name-autocomplete-full-width">
+                <input placeholder="{{'taxon.editor.common.sortSequence' | translate}}"
+                       type="text"
+                       aria-label="String"
+                       matInput
+                       [formControl]="commonSortSequenceControl">
+            </mat-form-field>
+            -->
+        </form>
     <ng-template #elseTemplate>
         {{'taxon.editor.dialog.confirm.delete' | translate}}<b>{{local_data.name}}</b>?
     </ng-template>

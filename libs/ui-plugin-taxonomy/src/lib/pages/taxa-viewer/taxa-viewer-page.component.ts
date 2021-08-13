@@ -9,7 +9,7 @@ import {
     TaxonService, TaxonVernacularService
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TaxonomicEnumTreeService } from '@symbiota2/ui-plugin-taxonomy'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { BehaviorSubject } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 
 /**
@@ -54,9 +54,6 @@ export class TaxaViewerPageComponent implements OnInit {
     isSynonym = ( node: TaxonNode) => node.synonym
     hasNestedChild = (_: number, nodeData: TaxonNode) =>
         nodeData.children !== undefined ? nodeData.children.length > 0 : false
-    public readonly PAGE_SEARCH_CRITERIA = 0
-    public readonly PAGE_SEARCH_RESULTS = 1
-    public currentPage = this.PAGE_SEARCH_CRITERIA
     private taxon: TaxonListItem
 
     constructor(
@@ -72,6 +69,17 @@ export class TaxaViewerPageComponent implements OnInit {
         private readonly translate: TranslateService
     ) {
         this.dataSource.data = []
+    }
+
+    /*
+    Called when Angular starts
+    */
+    ngOnInit() {
+        // Load the authorities
+        this.loadAuthorities()
+
+        // Get the common languages for display in the menu
+        this.loadVernacularLanguages()
     }
 
     /*
@@ -118,17 +126,6 @@ export class TaxaViewerPageComponent implements OnInit {
     }
 
     /*
-    Called when Angular starts
-     */
-    ngOnInit() {
-        // Load the authorities
-        this.loadAuthorities()
-
-        // Get the common languages for display in the menu
-        this.loadVernacularLanguages()
-    }
-
-    /*
     Load the taxa authorities
      */
     public loadAuthorities() {
@@ -138,7 +135,6 @@ export class TaxaViewerPageComponent implements OnInit {
         })
 
     }
-
 
     /*
     Load the kingdoms -- currently not implemented or used
@@ -658,35 +654,4 @@ export class TaxaViewerPageComponent implements OnInit {
 
     }
 
-    /*
-    Not used, probably can delete
-
-    async onSwitchPage(page: number) {
-        await this.router.navigate([], {
-            relativeTo: this.currentRoute,
-            queryParams: {
-                page: page,
-            },
-        })
-    }
-
-     */
-
-    /*
-    Not used, probably can delete
-
-    async onPrevious() {
-        return this.onSwitchPage(this.currentPage - 1);
-    }
-
-     */
-
-    /*
-    Not used, probably can delete
-
-    async onNext() {
-        return this.onSwitchPage(this.currentPage + 1)
-    }
-
-     */
 }

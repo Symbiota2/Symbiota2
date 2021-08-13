@@ -1,16 +1,12 @@
-#window {
-    width: 50vw;
-    min-height: 75vh;
-
-    @media only screen and (max-height: 600px) {
-        width: 100vw;
-        min-height: 100vh;
-    }
-}
-
-h1 {
-    margin: 0 1rem;
-}
+//#window {
+//    width: 50vw;
+//    min-height: 75vh;
+//
+//    @media only screen and (max-height: 600px) {
+//        width: 100vw;
+//        min-height: 100vh;
+//    }
+//}
 
 #editor {
     margin-top: 2rem;
@@ -20,27 +16,6 @@ h1 {
     margin-left: auto;
 }
 
-//#editLogo {
-//    position: absolute;
-//    top: 0;
-//    left: 0;
-//    z-index: 1000;
-//
-//    display: flex;
-//    justify-content: center;
-//    align-items: center;
-//
-//    width: 100%;
-//    height: 100%;
-//    border-radius: 50%;
-//
-//    background: rgba(0, 0, 0, 0.75);
-//    color: white;
-//
-//    opacity: 0;
-//    transition: opacity 0.5s;
-//
-//    &:hover {
-//        opacity: 1;
-//    }
-//}
+mat-form-field {
+    width: 100%;
+}

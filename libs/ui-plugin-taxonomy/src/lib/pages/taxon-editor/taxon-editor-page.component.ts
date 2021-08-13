@@ -1,36 +1,25 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NestedTreeControl } from '@angular/cdk/tree';
-import { MatTreeNestedDataSource } from '@angular/material/tree';
 import {
     TaxonListItem, TaxonomicAuthorityService,
     TaxonomicStatusService,
     TaxonService, TaxonVernacularListItem, TaxonVernacularService
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TaxonomicEnumTreeService } from '@symbiota2/ui-plugin-taxonomy'
-import { BehaviorSubject, Observable } from 'rxjs'
-import { map, startWith } from 'rxjs/operators'
 import { TranslateService } from '@ngx-translate/core'
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { TaxonEditorDialogComponent } from '../../components';
 
-/**
- * Information about a common name
- */
-interface CommonInfo {
+
+export interface CommonNameInfo {
     name: string
     notes: string
     source: string
     language: string
     sortSequence: number
 }
-
-const ELEMENT_DATA: CommonInfo[] = [
-    { name: 'Hydrogen Hydrogen Hydrogen', language: "English", sortSequence: 1, notes: 'H', source: "Yes" },
-    { name: 'Hhkhjk', language: "English", sortSequence: 1, notes: 'H', source: "Yes" },
-];
 
 @Component({
     selector: 'taxon-editor',
@@ -40,12 +29,12 @@ const ELEMENT_DATA: CommonInfo[] = [
 
 export class TaxonEditorPageComponent implements OnInit {
     displayedColumns = ['name', 'language', 'notes', 'sortSequence', 'source', 'action']
-
     data: TaxonVernacularListItem[] = []
     dataSource = new MatTableDataSource(this.data)
     private taxonID: string
     languageList = []
-    common: CommonInfo
+    common: CommonNameInfo
+    private idCounter = 0
 
     constructor(
         //private readonly userService: UserService,  // TODO: needed for species hiding
@@ -83,9 +72,6 @@ export class TaxonEditorPageComponent implements OnInit {
 
         this.taxonVernacularService.findByTaxonID(taxonID)
             .subscribe((itemList) => {
-                //console.log("s is " + itemList.length)
-                //console.log("name is " + itemList[0].vernacularName)
-
                 this.data = itemList
                 this.dataSource = new MatTableDataSource(this.data)
                 itemList.forEach((item) => {
@@ -101,11 +87,9 @@ export class TaxonEditorPageComponent implements OnInit {
      Add a row to the common names
      */
     onAddCommonName() {
+        const temp = new TaxonVernacularListItem()
+        temp.id = this.idCounter-- // Set the ID to a nonexistent value
         this.data.push(new TaxonVernacularListItem())
-        const temp = this.data
-        this.data = []
-        this.data = temp
-        console.log(" new data " + this.data.length)
         this.dataSource = new MatTableDataSource(this.data)
     }
 
@@ -130,35 +114,26 @@ export class TaxonEditorPageComponent implements OnInit {
         })
     }
 
-    addRowData(row_obj) {
-        /*
-        var d = new Date();
-        this.dataSource.push({
-            id:d.getTime(),
-            name:row_obj.name
-        });
-        this.table.renderRows();
-        */
-    }
-
     updateRowData(row_obj) {
-        /*
-        this.dataSource = this.dataSource.filter((value,key)=>{
+        this.data = this.data.filter((value,key)=>{
             if(value.id == row_obj.id){
-                value.name = row_obj.name;
+                // copy temporary info to display info
+                value.vernacularName = row_obj.vernacularName
+                value.source = row_obj.source
+                value.sortSequence = row_obj.sortSequence
+                value.notes = row_obj.notes
+                value.language = row_obj.language
             }
-            return true;
-        });
-
-         */
+            return true
+        })
     }
 
     deleteRowData(row_obj) {
-        /*
-        this.dataSource = this.dataSource.filter((value,key)=>{
-            return value.id != row_obj.id;
-        });
-         */
+        console.log("made it here")
+        this.data = this.data.filter((value,key)=>{
+            return value.id != row_obj.id
+        })
+        this.dataSource = new MatTableDataSource(this.data)
     }
 
 }

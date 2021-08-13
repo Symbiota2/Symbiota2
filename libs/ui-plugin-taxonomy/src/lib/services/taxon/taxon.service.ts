@@ -2,7 +2,6 @@ import { Observable, of } from 'rxjs'
 import { ApiClientService, AppConfigService } from '@symbiota2/ui-common'
 import { catchError, map } from 'rxjs/operators'
 import { Injectable } from '@angular/core'
-import { HttpParams } from '@angular/common/http'
 import { Taxon, TaxonListItem } from '../../dto'
 import { TaxonQueryBuilder } from './taxon-query-builder'
 

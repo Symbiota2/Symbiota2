@@ -2,7 +2,6 @@ import { Observable, of } from 'rxjs';
 import { ApiClientService, AppConfigService } from '@symbiota2/ui-common';
 import { catchError, map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { HttpParams } from '@angular/common/http';
 import { TaxonomicEnumTreeQueryBuilder } from './taxonomic-enumtree-query-builder';
 import { TaxonomicEnumTreeListItem } from '../../dto/taxonomic-enumtree-list-item';
 import { TaxonListItem } from '../../dto';
@@ -40,7 +39,6 @@ export class TaxonomicEnumTreeService {
                 }))
             )
     }
-
 
     /*
     Find all of the descendants for a given taxon id and taxa authorityid

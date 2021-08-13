@@ -5,8 +5,6 @@ import {
     TaxonDescriptionBlockListItem,
     TaxonDescriptionBlockService,
     TaxonDescriptionStatementListItem,
-    TaxonDescriptionStatementService,
-    TaxonListItem,
     TaxonomicStatusService,
     TaxonService, TaxonVernacularService
 } from '@symbiota2/ui-plugin-taxonomy';
@@ -32,11 +30,6 @@ interface TaxonNode {
 export class TaxonProfilePageComponent implements OnInit {
     nameControl = new FormControl()
 
-    private isLoading = false
-    public readonly PAGE_SEARCH_CRITERIA = 0
-    public readonly PAGE_SEARCH_RESULTS = 1
-    public currentPage = this.PAGE_SEARCH_CRITERIA
-    private taxon: TaxonListItem
     public descriptions: TaxonDescriptionStatementListItem[]
     public block: TaxonDescriptionBlockListItem
     public image: ImageListItem
@@ -46,10 +39,8 @@ export class TaxonProfilePageComponent implements OnInit {
         //private readonly userService: UserService,  // TODO: needed for species hiding
         private readonly taxaService: TaxonService,
         private readonly taxonDescriptionBlockService: TaxonDescriptionBlockService,
-        //private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
         private readonly taxonomicStatusService: TaxonomicStatusService,
         private readonly taxonVernacularService: TaxonVernacularService,
-        //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
         private router: Router,
         private formBuilder: FormBuilder,
         private currentRoute: ActivatedRoute
@@ -89,7 +80,6 @@ export class TaxonProfilePageComponent implements OnInit {
         })
     }
 
-
     /*
     Called when the taxon is chosen to display
      */
@@ -97,36 +87,4 @@ export class TaxonProfilePageComponent implements OnInit {
 
 
     }
-
-    /*
-    Not used, probably can delete
-
-    async onSwitchPage(page: number) {
-        await this.router.navigate([], {
-            relativeTo: this.currentRoute,
-            queryParams: {
-                page: page,
-            },
-        })
-    }
-
-     */
-
-    /*
-    Not used, probably can delete
-
-    async onPrevious() {
-        return this.onSwitchPage(this.currentPage - 1);
-    }
-
-     */
-
-    /*
-    Not used, probably can delete
-
-    async onNext() {
-        return this.onSwitchPage(this.currentPage + 1)
-    }
-
-     */
 }
