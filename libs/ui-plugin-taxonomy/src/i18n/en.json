@@ -25,5 +25,20 @@
   "taxon.profile.title": "Taxon Profile",
   "taxon.profile.no.image": "Image not yet available.",
   "taxon.profile.no.profile": "Profile not yet available.",
-  "taxon.profile.no.description": "Description not yet available."
+  "taxon.profile.no.description": "Description not yet available.",
+  "taxon.editor.title" : "Taxon Editor",
+  "taxon.editor.description" : "Description",
+  "taxon.editor.descriptionBlock" : "Description Block",
+  "taxon.editor.common" : "Common/Vernacular Name",
+  "taxon.editor.common.name" : "Name",
+  "taxon.editor.common.language" : "Language",
+  "taxon.editor.common.notes" : "Notes",
+  "taxon.editor.common.source" : "Source",
+  "taxon.editor.common.sortSequence" : "Sort Sequence",
+  "taxon.editor.add.button.label" : "Add a Common Name",
+  "taxon.editor.dialog.confirm.delete" : "Confirm Delete",
+  "taxon.editor.dialog.cancel" : "Cancel",
+  "taxon.editor.dialog.edit" : "Edit",
+  "taxon.editor.dialog.delete" : "Delete",
+  "taxon.editor.dialog.update" : "Save"
 }

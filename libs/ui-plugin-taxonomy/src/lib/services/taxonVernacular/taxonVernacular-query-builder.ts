@@ -8,11 +8,15 @@ export class TaxonVernacularQueryBuilder {
 
     constructor(apiBaseUrl: string) {
         this.baseUrl = apiBaseUrl
-        this.url = new URL(`${apiBaseUrl}/taxon`)
+        this.url = new URL(`${apiBaseUrl}/taxonVernacular`)
     }
 
     findCommonName(name: string) : FindCommonNameBuilder {
         return new FindCommonNameBuilder(this.baseUrl,name)
+    }
+
+    findByTaxonID(taxonID: number) : FindByTaxonIDBuilder {
+        return new FindByTaxonIDBuilder(this.baseUrl,taxonID)
     }
 
     findAllCommonNamesByLanguage(language: string) : FindAllCommonNamesByLanguageBuilder {
@@ -150,6 +154,19 @@ class FindAllCommonNamesByLanguageBuilder extends TaxonVernacularQueryBuilder {
     }
 }
 
+class FindByTaxonIDBuilder extends TaxonVernacularQueryBuilder {
+
+    constructor(apiBaseUrl: string, taxonID: number) {
+        super(apiBaseUrl)
+        this.baseUrl = apiBaseUrl
+        this.url = new URL(`${apiBaseUrl}/taxonVernacular/taxonID/${taxonID}`)
+    }
+
+    build(): string {
+        return super.build();
+    }
+}
+
 class FindAllCommonNamesBuilder extends TaxonVernacularQueryBuilder {
     protected _authorityID: number
     protected _partialName: string
@@ -185,13 +202,13 @@ class FindAllBuilder extends TaxonVernacularQueryBuilder {
     protected _taxonIDs: number[] = []
     protected _authorityID: number
 
-    taxonIDs(ids: number[]): FindAllBuilder {
+    IDs(ids: number[]): FindAllBuilder {
         this._taxonIDs = ids
         return this
     }
 
     authorityID(authorityID: number): FindAllBuilder {
-        this._authorityID = authorityID
+        if (authorityID) this._authorityID = authorityID
         return this
     }
 

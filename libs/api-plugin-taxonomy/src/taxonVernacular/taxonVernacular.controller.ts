@@ -1,11 +1,26 @@
-import { Controller, Get, Param, Query, Post, Body, HttpStatus, HttpCode, Delete, NotFoundException, Patch } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Param,
+    Query,
+    Post,
+    Body,
+    HttpStatus,
+    HttpCode,
+    Delete,
+    NotFoundException,
+    Patch,
+    UseGuards
+} from '@nestjs/common';
 import { TaxonVernacularService } from './taxonVernacular.service';
-import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import {
     TaxonVernacularOutputDto
 } from './dto/TaxonVernacular.output.dto';
 import { TaxonVernacularFindAllParams } from './dto/taxonVernacular-find-all.input.dto';
 import { TaxonVernacularFindParams } from './dto/taxonVernacular-find.input.dto';
+import { JwtAuthGuard } from '@symbiota2/api-auth';
+import { TaxonVernacularInputDto } from './dto/TaxonVernacular.input.dto';
 
 @ApiTags('TaxonVernacular')
 @Controller('taxonVernacular')
@@ -19,7 +34,7 @@ export class TaxonVernacularController {
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: TaxonVernacularOutputDto, isArray: true })
     @ApiOperation({
-        summary: "Fetch all of the taxon vernacular records, optionally limited to a specific taxonomic authority and list of taxon ids"
+        summary: "Fetch all of the taxon vernacular records, optionally limited to a specific taxonomic authority and list of taxon vernacular ids (note not taxon IDs)"
     })
     async findAll(@Query() findAllParams: TaxonVernacularFindAllParams): Promise<TaxonVernacularOutputDto[]> {
         const taxons = await this.myService.findAll(findAllParams)
@@ -27,6 +42,23 @@ export class TaxonVernacularController {
             const taxon = new TaxonVernacularOutputDto(c)
             return taxon
         });
+        return Promise.all(taxonDtos)
+    }
+
+    /*
+    Get the records for a specific taxon ID
+     */
+    @Get('taxonID/:taxonID')
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonVernacularOutputDto, isArray: true })
+    @ApiOperation({
+        summary: "Fetch all of the taxon vernacular records for a specific taxon ID"
+    })
+    async findByTaxonID(@Param('taxonID') taxonID: number): Promise<TaxonVernacularOutputDto[]> {
+        const taxons = await this.myService.findByTaxonID(taxonID)
+        const taxonDtos = taxons.map(async (c) => {
+            const taxon = new TaxonVernacularOutputDto(c)
+            return taxon
+        })
         return Promise.all(taxonDtos)
     }
 
@@ -95,16 +127,57 @@ export class TaxonVernacularController {
         //}
     }
 
-    // TODO: Add taxa authority
-    @Get(':taxonid')
+    @Get(':id')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonVernacularOutputDto })
     @ApiOperation({
-        summary: "Use a taxon id to get a taxon vernacular record"
+        summary: "Use a taxon vernacular id (not a taxonID) to get a taxon vernacular record"
     })
-    async findByTID(@Param('taxonid') id: number): Promise<TaxonVernacularOutputDto> {
-        const taxon = await this.myService.findByTID(id)
+    async findByID(@Param('id') id: number): Promise<TaxonVernacularOutputDto> {
+        const taxon = await this.myService.findByID(id)
         const dto = new TaxonVernacularOutputDto(taxon)
         return dto
+    }
+
+    @Post()
+    @ApiOperation({
+        summary: "Create a new taxon vernacular record"
+    })
+    @HttpCode(HttpStatus.OK)
+    //@UseGuards(JwtAuthGuard)
+    //@ApiBearerAuth()
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonVernacularOutputDto })
+    async create(@Body() data: TaxonVernacularInputDto): Promise<TaxonVernacularOutputDto> {
+        const vernacular = await this.myService.create(data)
+        return new TaxonVernacularOutputDto(vernacular)
+    }
+
+    @Delete(':id')
+    @ApiOperation({
+        summary: "Delete a taxon vernacular record by ID"
+    })
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiResponse({ status: HttpStatus.NO_CONTENT })
+    async deleteByID(@Param('id') id: number): Promise<void> {
+        const vernacular = await this.myService.deleteByID(id)
+        if (!vernacular) {
+            throw new NotFoundException()
+        }
+    }
+
+    @Patch(':id')
+    @ApiOperation({
+        summary: "Update a taxon vernacular record by ID"
+    })
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonVernacularOutputDto })
+    async updateByID(@Param('id') id: number, @Body() data: TaxonVernacularOutputDto): Promise<TaxonVernacularOutputDto> {
+        const vernacular = await this.myService.updateByID(id, data)
+        if (!vernacular) {
+            throw new NotFoundException()
+        }
+
+        const vernacularDto = new TaxonVernacularOutputDto(vernacular)
+
+        return vernacularDto
     }
 
 }
