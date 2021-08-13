@@ -10,8 +10,8 @@ export class TaxonomicEnumTreeListItem {
     @Expose() parentTaxonID: number;
     //@Expose() taxon: Promise<TaxonListItem>;
     @Type(() => TaxonListItem)
-    @Expose() parent: TaxonListItem;
-    @Expose() initialTimestamp: Date
+    @Expose() parent: TaxonListItem | null
+    @Expose() initialTimestamp: Date | null
 
     static fromJSON(taxonJSON: Record<string, unknown>): TaxonomicEnumTreeListItem {
         return plainToClass(

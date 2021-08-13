@@ -14,11 +14,11 @@ export class TaxonomicStatusListItem {
     @Expose() notes: string | null
     @Expose() initialTimestamp: Date
     @Type(() => TaxonomicStatusListItem)
-    @Expose() children: TaxonomicStatusListItem[]
+    @Expose() children: TaxonomicStatusListItem[] | []
     @Type(() => TaxonListItem)
-    @Expose() parent: TaxonListItem
+    @Expose() parent: TaxonListItem | null
     @Type(() => TaxonListItem)
-    @Expose() taxon: TaxonListItem
+    @Expose() taxon: TaxonListItem | null
 
     static fromJSON(taxonomicStatusJSON: Record<string, unknown>): TaxonomicStatusListItem {
         return plainToClass(
