@@ -1,0 +1,8 @@
+<mat-tab-group mat-align-tabs="start">
+    <button class="editor-button" (click)="onAddCommonName()">{{"taxon.editor.add.button.label" | translate}} </button>
+    <ng-template *ngFor='let block of blocks'>
+        <mat-tab label="{{block.caption}}">
+            <taxon-description-editor></taxon-description-editor>
+        </mat-tab>
+    </ng-template>
+</mat-tab-group>

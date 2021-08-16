@@ -1,0 +1,87 @@
+
+<form (ngSubmit)="onSubmit()">
+    <button class="editor-button" (click)="onAddCommonName()">{{"taxon.editor.add.button.label" | translate}} </button>
+    <mat-table #table [dataSource]="dataSource">
+
+        <!-- Position Column
+        <ng-container matColumnDef="position">
+            <mat-header-cell *matHeaderCellDef> No. </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.position}} </mat-cell>
+        </ng-container>
+        -->
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>{{"taxon.editor.common.name" | translate}}</mat-header-cell>
+            <mat-cell *matCellDef="let element">
+                {{element.vernacularName}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Notes Column -->
+        <ng-container matColumnDef="notes">
+            <mat-header-cell *matHeaderCellDef>{{"taxon.editor.common.notes" | translate}}</mat-header-cell>
+            <mat-cell *matCellDef="let element">
+                {{element.notes}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Language Column -->
+        <ng-container matColumnDef="language">
+            <mat-header-cell *matHeaderCellDef>{{"taxon.editor.common.language" | translate}}</mat-header-cell>
+            <mat-cell *matCellDef="let element">
+                {{element.language}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Source Column -->
+        <ng-container matColumnDef="source">
+            <mat-header-cell *matHeaderCellDef>{{"taxon.editor.common.source" | translate}}</mat-header-cell>
+            <mat-cell *matCellDef="let element">
+                {{element.source}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sort Sequence Column -->
+        <ng-container matColumnDef="sortSequence">
+            <mat-header-cell *matHeaderCellDef>{{'taxon.editor.common.sortSequence' | translate}}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.sortSequence}} </mat-cell>
+            <!--
+            <mat-cell *matCellDef="let element">
+                <mat-form-field floatLabel="never" appearance="fill">
+                    <input matInput placeholder="{{'taxon.editor.common.sortSequence' | translate}}"
+                           [value]="element.sortSequence"
+                           [(ngModel)]="element.sortSequence"
+                           [ngModelOptions]="{standalone: true}">
+                </mat-form-field>
+            </mat-cell>
+            -->
+        </ng-container>
+
+        <!-- Action Column -->
+        <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef> {{'taxon.editor.common.action' | translate}} </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+                <button class="editor-button" (click)="openDialog('Update',element)">{{'taxon.editor.dialog.edit' | translate}}</button>
+                <button class="editor-button" (click)="openDialog('Delete',element)">{{'taxon.editor.dialog.delete' | translate}}</button>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Language Column
+        <ng-container matColumnDef="language">
+            <mat-header-cell *matHeaderCellDef>{{"taxon.editor.common.language" | translate}}</mat-header-cell>
+            <mat-cell *matCellDef="let element">
+                <mat-form-field floatLabel="never" appearance="fill">
+                    <mat-select [(value)]="element.language"
+                                placeholder="{{'taxon.editor.common.language' | translate}}">
+                        <mat-option>None</mat-option>
+                        <mat-option value="Yes">Yes</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </mat-cell>
+        </ng-container>
+         -->
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+</form>

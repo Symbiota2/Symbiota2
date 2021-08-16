@@ -1,9 +1,10 @@
 import { Exclude, Expose, plainToClass, Type } from 'class-transformer';
 import { TaxonListItem } from '@symbiota2/ui-plugin-taxonomy';
 import { ImageListItem } from '@symbiota2/ui-plugin-image';
+import { TaxonOnlyListItem } from './taxon-only-list-item';
 
 @Exclude()
-export class TaxonomicStatusListItem {
+export class TaxonomicStatusOnlyListItem {
     @Expose() taxonID: number
     @Expose() taxonIDAccepted: number
     @Expose() taxonAuthorityID: number
@@ -13,16 +14,12 @@ export class TaxonomicStatusListItem {
     @Expose() unacceptabilityReason: string | null
     @Expose() notes: string | null
     @Expose() initialTimestamp: Date
-    @Type(() => TaxonomicStatusListItem)
-    @Expose() children: TaxonomicStatusListItem[] | []
-    @Type(() => TaxonListItem)
-    @Expose() parent: TaxonListItem | null
-    @Type(() => TaxonListItem)
-    @Expose() taxon: TaxonListItem | null
+    @Type(() => TaxonOnlyListItem)
+    @Expose() taxon: TaxonOnlyListItem | null
 
-    static fromJSON(taxonomicStatusJSON: Record<string, unknown>): TaxonomicStatusListItem {
+    static fromJSON(taxonomicStatusJSON: Record<string, unknown>): TaxonomicStatusOnlyListItem {
         return plainToClass(
-            TaxonomicStatusListItem,
+            TaxonomicStatusOnlyListItem,
             taxonomicStatusJSON,
             { excludeExtraneousValues: true, enableImplicitConversion: true }
         );

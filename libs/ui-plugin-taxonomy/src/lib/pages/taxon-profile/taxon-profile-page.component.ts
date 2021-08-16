@@ -5,8 +5,6 @@ import {
     TaxonDescriptionBlockListItem,
     TaxonDescriptionBlockService,
     TaxonDescriptionStatementListItem,
-    TaxonDescriptionStatementService,
-    TaxonListItem,
     TaxonomicStatusService,
     TaxonService, TaxonVernacularService
 } from '@symbiota2/ui-plugin-taxonomy';
@@ -32,11 +30,6 @@ interface TaxonNode {
 export class TaxonProfilePageComponent implements OnInit {
     nameControl = new FormControl()
 
-    private isLoading = false
-    public readonly PAGE_SEARCH_CRITERIA = 0
-    public readonly PAGE_SEARCH_RESULTS = 1
-    public currentPage = this.PAGE_SEARCH_CRITERIA
-    private taxon: TaxonListItem
     public descriptions: TaxonDescriptionStatementListItem[]
     public block: TaxonDescriptionBlockListItem
     public image: ImageListItem
@@ -44,12 +37,10 @@ export class TaxonProfilePageComponent implements OnInit {
 
     constructor(
         //private readonly userService: UserService,  // TODO: needed for species hiding
-        private readonly taxaService: TaxonService,
+        //private readonly taxaService: TaxonService,
         private readonly taxonDescriptionBlockService: TaxonDescriptionBlockService,
-        //private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
-        private readonly taxonomicStatusService: TaxonomicStatusService,
-        private readonly taxonVernacularService: TaxonVernacularService,
-        //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
+        //private readonly taxonomicStatusService: TaxonomicStatusService,
+        //private readonly taxonVernacularService: TaxonVernacularService,
         private router: Router,
         private formBuilder: FormBuilder,
         private currentRoute: ActivatedRoute
@@ -74,59 +65,19 @@ export class TaxonProfilePageComponent implements OnInit {
     Load the taxon profile
      */
     loadProfile(taxonID: number) {
-
-        this.taxonDescriptionBlockService.findBlockByTaxonID(taxonID).subscribe((block) => {
-            //console.log("s is " + block.descriptionStatements.length)
-            if (block.descriptionStatements.length > 0) {
-                this.descriptions = block.descriptionStatements.sort((a,b) => a.sortSequence - b.sortSequence)
-            } else {
-                this.descriptions = [] // TODO set up a dummy record saying no description
-            }
-            this.block = block
-            if (block.images.length > 0) {
-                this.image = block.images[0]
-            }
+        this.taxonDescriptionBlockService.findBlocksByTaxonID(taxonID).subscribe((blocks) => {
+            blocks.forEach((block) => {
+                // TODO: Fix to add tabs for multiple description blocks
+                if (block.descriptionStatements.length > 0) {
+                    this.descriptions = block.descriptionStatements.sort((a,b) => a.sortSequence - b.sortSequence)
+                } else {
+                    this.descriptions = [] // TODO set up a dummy record saying no description
+                }
+                this.block = block
+                if (block.images.length > 0) {
+                    this.image = block.images[0]
+                }
+            })
         })
     }
-
-
-    /*
-    Called when the taxon is chosen to display
-     */
-    onSubmit(): void {
-
-
-    }
-
-    /*
-    Not used, probably can delete
-
-    async onSwitchPage(page: number) {
-        await this.router.navigate([], {
-            relativeTo: this.currentRoute,
-            queryParams: {
-                page: page,
-            },
-        })
-    }
-
-     */
-
-    /*
-    Not used, probably can delete
-
-    async onPrevious() {
-        return this.onSwitchPage(this.currentPage - 1);
-    }
-
-     */
-
-    /*
-    Not used, probably can delete
-
-    async onNext() {
-        return this.onSwitchPage(this.currentPage + 1)
-    }
-
-     */
 }

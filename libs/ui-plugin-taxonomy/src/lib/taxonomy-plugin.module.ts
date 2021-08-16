@@ -40,9 +40,13 @@ import { TaxonProfilePageComponent } from './pages';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
-import { TaxonEditorDialogComponent } from './components';
-import { TaxonEditorPageComponent } from './pages/taxon-editor/taxon-editor-page.component';
-
+import {
+    TaxonDescriptionDialogComponent,
+    TaxonEditorDialogComponent,
+    TaxonVernacularEditorComponent,
+    TaxonDescriptionEditorComponent
+} from './components';
+import { TaxonEditorPageComponent } from './pages'
 
 @NgModule({
   imports: [
@@ -81,6 +85,9 @@ import { TaxonEditorPageComponent } from './pages/taxon-editor/taxon-editor-page
         TaxonProfilePageComponent,
         TaxonEditorPageComponent,
         TaxonEditorDialogComponent,
+        TaxonVernacularEditorComponent,
+        TaxonDescriptionDialogComponent,
+        TaxonDescriptionEditorComponent
     ],
     providers: [
         TaxonService,
@@ -89,7 +96,7 @@ import { TaxonEditorPageComponent } from './pages/taxon-editor/taxon-editor-page
         TaxonVernacularService,
         TaxonDescriptionBlockService,
         TaxonDescriptionStatementService,
-        TaxonomicAuthorityService
+        TaxonomicAuthorityService,
     ],
     entryComponents: [
         TaxaSearchPage,
@@ -97,6 +104,9 @@ import { TaxonEditorPageComponent } from './pages/taxon-editor/taxon-editor-page
         TaxaViewerPageComponent,
         TaxonEditorPageComponent,
         TaxonEditorDialogComponent,
+        TaxonVernacularEditorComponent,
+        TaxonDescriptionDialogComponent,
+        TaxonDescriptionEditorComponent,
     ]
 })
 export class TaxonomyPlugin extends SymbiotaUiPlugin {
@@ -135,7 +145,6 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
             {
                 url: `/${TaxonomyPlugin.TAXA_VIEWER_ROUTE}`,
                 name: "core.layout.header.topnav.taxonomy.viewer.link"
-                //name: "Taxa Viewer"
             }
         ]
     }

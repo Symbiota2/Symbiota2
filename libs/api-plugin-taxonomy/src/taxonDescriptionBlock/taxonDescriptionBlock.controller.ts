@@ -26,37 +26,40 @@ export class TaxonDescriptionBlockController {
         return Promise.all(dtos)
     }
 
-    @Get('block/:taxonID')
+    @Get('blocks/:taxonID')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDescriptionBlockDto, isArray: true })
     @ApiOperation({
-        summary: "Retrieve a list of taxon description statements using a taxon ID."
+        summary: "Retrieve a list of taxon description blocks and statements using a taxon ID."
     })
-    async findDescriptions(@Param('taxonID') taxonID: number): Promise<TaxonDescriptionBlockDto> {
-        const block = await this.myService.findBlockForTaxon(taxonID)
-        const dto = new TaxonDescriptionBlockDto(block)
-        const statements = await block.descriptionStatements
-        dto.descriptionStatements = statements.map(c => new TaxonDescriptionStatementDto(c))
-        return dto
+    async findDescriptions(@Param('taxonID') taxonID: number): Promise<TaxonDescriptionBlockDto[]> {
+        const blocks = await this.myService.findBlocksForTaxon(taxonID)
+        const dtos = blocks.map(async (block) => {
+            const dto = new TaxonDescriptionBlockDto(block)
+            const statements = await block.descriptionStatements
+            dto.descriptionStatements = statements.map(c => new TaxonDescriptionStatementDto(c))
+            return dto
+        })
+        return Promise.all(dtos)
     }
 
-    @Get('blockAndImages/:taxonID')
+    @Get('blocksAndImages/:taxonID')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDescriptionBlockDto, isArray: true })
     @ApiOperation({
-        summary: "Retrieve a list of taxon description statements using a taxon ID."
+        summary: "Retrieve a list of taxon blocks, descriptions, and images using a taxon ID."
     })
-    async findBlockAndImages(@Param('taxonID') taxonID: number): Promise<TaxonDescriptionBlockDto> {
-        const block = await this.myService.findBlockAndImagesForTaxon(taxonID)
-        if (!block) {
-            return null
-        }
-        const dto = new TaxonDescriptionBlockDto(block)
-        const statements = await block.descriptionStatements
-        const taxon = await block.taxon
-        dto.taxon = new TaxonDto(taxon)
-        const images = await taxon.images
-        dto.images = images.map(c => new ImageDto(c))
-        dto.descriptionStatements = statements.map(c => new TaxonDescriptionStatementDto(c))
-        return dto
+    async findBlocksAndImages(@Param('taxonID') taxonID: number): Promise<TaxonDescriptionBlockDto[]> {
+        const blocks = await this.myService.findBlocksAndImagesForTaxon(taxonID)
+        const dtos = blocks.map(async (block) => {
+            const dto = new TaxonDescriptionBlockDto(block)
+            const statements = await block.descriptionStatements
+            const taxon = await block.taxon
+            dto.taxon = new TaxonDto(taxon)
+            const images = await taxon.images
+            dto.images = images.map(c => new ImageDto(c))
+            dto.descriptionStatements = statements.map(c => new TaxonDescriptionStatementDto(c))
+            return dto
+        })
+        return Promise.all(dtos)
     }
 
     @Get(':id')

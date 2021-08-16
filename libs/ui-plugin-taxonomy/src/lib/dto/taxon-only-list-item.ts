@@ -2,10 +2,9 @@ import { Exclude, Expose, plainToClass, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { TaxonDescriptionStatementListItem } from './taxonDescriptionStatement-list-item';
 import { TaxonomicStatusListItem } from './taxon-status-list-item';
-import { TaxonomicStatusOnlyListItem } from './taxon-status-only-list-item';
 
 @Exclude()
-export class TaxonListItem {
+export class TaxonOnlyListItem {
     @Expose() id: number
     @Expose() kingdomName: string
     @Expose() rankID: number | null
@@ -22,16 +21,14 @@ export class TaxonListItem {
     @Expose() source: string
     @Expose() notes: string
     @Expose() hybrid: string
-    @Type(() => TaxonomicStatusOnlyListItem)
-    @Expose() acceptedTaxonStatuses: TaxonomicStatusOnlyListItem[] | []
     @Expose() securityStatus: number
     @Expose() lastModifiedUID: number | null
 //    @Expose() lastModifiedTimestamp: Date | null
 //    @Expose() initialTimestamp: Date
 
-    static fromJSON(taxonJSON: Record<string, unknown>): TaxonListItem {
+    static fromJSON(taxonJSON: Record<string, unknown>): TaxonOnlyListItem {
         return plainToClass(
-            TaxonListItem,
+            TaxonOnlyListItem,
             taxonJSON,
             { excludeExtraneousValues: true, enableImplicitConversion: true }
         );

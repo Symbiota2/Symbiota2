@@ -2,9 +2,9 @@ import { Observable, of } from 'rxjs';
 import { ApiClientService, AppConfigService } from '@symbiota2/ui-common';
 import { catchError, map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { HttpParams } from '@angular/common/http';
 import { TaxonomicStatusQueryBuilder } from './taxonomic-status-query-builder';
 import { TaxonomicStatusListItem } from '../../dto/taxon-status-list-item';
+import { TaxonomicStatusOnlyListItem } from '../../dto/taxon-status-only-list-item';
 
 interface FindParams {
     taxonIDs: number[]
@@ -23,7 +23,7 @@ export class TaxonomicStatusService {
     }
 
 
-    findSynonyms(tid: number, taxonomicAuthorityID: number): Observable<TaxonomicStatusListItem[]> {
+    findSynonyms(tid: number, taxonomicAuthorityID: number): Observable<TaxonomicStatusOnlyListItem[]> {
         const url = this.createQueryBuilder()
             .taxonomicAuthorityID(taxonomicAuthorityID)
             .findSynonyms()
