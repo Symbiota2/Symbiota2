@@ -15,8 +15,8 @@ export class TaxonDescriptionBlockQueryBuilder {
         return new FindAllBuilder(this.baseUrl)
     }
 
-    findBlockByTaxonID(tid: number): FindBlockByTaxonIDBuilder {
-        return new FindBlockByTaxonIDBuilder(this.baseUrl,tid)
+    findBlocksByTaxonID(tid: number): FindBlocksByTaxonIDBuilder {
+        return new FindBlocksByTaxonIDBuilder(this.baseUrl,tid)
     }
 
     findOne(): FindOneBuilder {
@@ -59,14 +59,14 @@ class FindAllBuilder extends TaxonDescriptionBlockQueryBuilder {
     }
 }
 
-class FindBlockByTaxonIDBuilder extends TaxonDescriptionBlockQueryBuilder {
+class FindBlocksByTaxonIDBuilder extends TaxonDescriptionBlockQueryBuilder {
     protected _taxonID: number
 
     constructor(apiBaseUrl: string, tid: number) {
         super(apiBaseUrl)
         this._taxonID = tid
         this.baseUrl = apiBaseUrl
-        this.url = new URL(`${apiBaseUrl}/taxonDescriptionBlock/blockAndImages/` + tid.toString())
+        this.url = new URL(`${apiBaseUrl}/taxonDescriptionBlock/blocksAndImages/` + tid.toString())
     }
 
     build(): string {

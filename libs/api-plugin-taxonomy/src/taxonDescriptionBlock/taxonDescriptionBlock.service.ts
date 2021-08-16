@@ -29,17 +29,17 @@ export class TaxonDescriptionBlockService extends BaseService<TaxonDescriptionBl
     /*
     Fetch the block data for a given taxon id.
     */
-    async findBlockForTaxon(taxonID): Promise<TaxonDescriptionBlock> {
+    async findBlocksForTaxon(taxonID): Promise<TaxonDescriptionBlock[]> {
         return await
-            this.myRepository.findOne({ relations: ["descriptionStatements"], where: { taxonID: taxonID}})
+            this.myRepository.find({ relations: ["descriptionStatements"], where: { taxonID: taxonID}})
     }
 
     /*
 Fetch the block data for a given taxon id.
 */
-    async findBlockAndImagesForTaxon(taxonID): Promise<TaxonDescriptionBlock> {
+    async findBlocksAndImagesForTaxon(taxonID): Promise<TaxonDescriptionBlock[]> {
         return await
-            this.myRepository.findOne({
+            this.myRepository.find({
                 relations: ["descriptionStatements","taxon","taxon.images"],
                 where: { taxonID: taxonID}})
     }

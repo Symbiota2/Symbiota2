@@ -41,21 +41,25 @@ export class TaxonDescriptionBlockService {
             );
     }
 
-    findBlockByTaxonID(tid): Observable<TaxonDescriptionBlockListItem> {
+    findBlocksByTaxonID(tid): Observable<TaxonDescriptionBlockListItem[]> {
         const url = this.createQueryBuilder()
-            .findBlockByTaxonID(tid)
+            .findBlocksByTaxonID(tid)
             .build()
 
         const query = this.apiClient.queryBuilder(url).get().build();
-        return this.apiClient.send<any, Record<string, unknown>>(query)
-            .pipe(map((o) => TaxonDescriptionBlockListItem.fromJSON(o)))
+        return this.apiClient.send<any, Record<string, unknown>[]>(query)
+            .pipe(
+                map((descriptions) => descriptions.map((o) => {
+                    return TaxonDescriptionBlockListItem.fromJSON(o)
+                }))
+            )
     }
 
     findByID(id: number): Observable<TaxonDescriptionBlockListItem> {
         const url = this.createQueryBuilder()
             .findOne()
             .id(id)
-            .build();
+            .build()
 
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, Record<string, unknown>>(query)

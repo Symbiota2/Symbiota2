@@ -43,10 +43,10 @@ import { MatTableModule } from '@angular/material/table';
 import {
     TaxonDescriptionDialogComponent,
     TaxonEditorDialogComponent,
-    TaxonVernacularEditorComponent
+    TaxonVernacularEditorComponent,
+    TaxonDescriptionEditorComponent
 } from './components';
-import { TaxonEditorPageComponent } from './pages/taxon-editor/taxon-editor-page.component';
-
+import { TaxonEditorPageComponent } from './pages'
 
 @NgModule({
   imports: [
@@ -86,7 +86,8 @@ import { TaxonEditorPageComponent } from './pages/taxon-editor/taxon-editor-page
         TaxonEditorPageComponent,
         TaxonEditorDialogComponent,
         TaxonVernacularEditorComponent,
-        TaxonDescriptionDialogComponent
+        TaxonDescriptionDialogComponent,
+        TaxonDescriptionEditorComponent
     ],
     providers: [
         TaxonService,
@@ -105,6 +106,7 @@ import { TaxonEditorPageComponent } from './pages/taxon-editor/taxon-editor-page
         TaxonEditorDialogComponent,
         TaxonVernacularEditorComponent,
         TaxonDescriptionDialogComponent,
+        TaxonDescriptionEditorComponent,
     ]
 })
 export class TaxonomyPlugin extends SymbiotaUiPlugin {
