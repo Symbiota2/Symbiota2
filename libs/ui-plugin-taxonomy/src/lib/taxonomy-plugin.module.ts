@@ -40,7 +40,11 @@ import { TaxonProfilePageComponent } from './pages';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
-import { TaxonEditorDialogComponent } from './components';
+import {
+    TaxonDescriptionDialogComponent,
+    TaxonEditorDialogComponent,
+    TaxonVernacularEditorComponent
+} from './components';
 import { TaxonEditorPageComponent } from './pages/taxon-editor/taxon-editor-page.component';
 
 
@@ -81,6 +85,8 @@ import { TaxonEditorPageComponent } from './pages/taxon-editor/taxon-editor-page
         TaxonProfilePageComponent,
         TaxonEditorPageComponent,
         TaxonEditorDialogComponent,
+        TaxonVernacularEditorComponent,
+        TaxonDescriptionDialogComponent
     ],
     providers: [
         TaxonService,
@@ -89,7 +95,7 @@ import { TaxonEditorPageComponent } from './pages/taxon-editor/taxon-editor-page
         TaxonVernacularService,
         TaxonDescriptionBlockService,
         TaxonDescriptionStatementService,
-        TaxonomicAuthorityService
+        TaxonomicAuthorityService,
     ],
     entryComponents: [
         TaxaSearchPage,
@@ -97,6 +103,8 @@ import { TaxonEditorPageComponent } from './pages/taxon-editor/taxon-editor-page
         TaxaViewerPageComponent,
         TaxonEditorPageComponent,
         TaxonEditorDialogComponent,
+        TaxonVernacularEditorComponent,
+        TaxonDescriptionDialogComponent,
     ]
 })
 export class TaxonomyPlugin extends SymbiotaUiPlugin {
