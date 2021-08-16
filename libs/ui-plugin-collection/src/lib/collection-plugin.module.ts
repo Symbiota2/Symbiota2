@@ -27,6 +27,7 @@ import { CollectionProfileService } from './services/collection-profile.service'
 import { CollectionLogoComponent } from './components/collection-logo/collection-logo.component';
 import { MatInputModule } from '@angular/material/input';
 import {MatDividerModule} from '@angular/material/divider'; 
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {
     ROUTE_COLLECTION_LIST,
     ROUTE_COLLECTION_PROFILE,
@@ -78,7 +79,8 @@ import { InstitutionNewDialogComponent } from './components/institution-new-dial
     MatInputModule,
     MatDialogModule,
     MatSelectModule,
-    MatDividerModule
+    MatDividerModule,
+    MatTooltipModule
   ],
     providers: [
         CollectionService,

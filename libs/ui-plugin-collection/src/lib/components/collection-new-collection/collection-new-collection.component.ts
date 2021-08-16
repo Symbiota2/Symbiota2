@@ -14,6 +14,10 @@ import { ROUTE_COLLECTION_PROFILE } from '../../routes';
 import { CollectionAsyncValidators } from './validators';
 import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 
+
+//TODO: add back end support for additional fields
+//TODO: add category functionality
+
 @Component({
     selector: 'symbiota2-collection-new-collection',
     templateUrl: './collection-new-collection.component.html',
@@ -36,10 +40,14 @@ export class CollectionNewCollectionComponent implements OnInit {
             CollectionAsyncValidators.codeTaken(this.collections),
         ],
         institutionID: ['0', Validators.required],
-        description: ['', Validators.required],
+        description: [''],
         homepage: ['', Validators.required],
+        role: [''],
         contact: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
+        role2: [''],
+        contact2:[''],
+        email2:['', Validators.email],
         latitude: [
             '0',
             [Validators.required, Validators.min(-90), Validators.max(90)],
@@ -93,7 +101,7 @@ export class CollectionNewCollectionComponent implements OnInit {
 
     onAddNewInst(): void {
         const dialog = this.dialog.open(InstitutionNewDialogComponent, {
-            width: '50vw',
+            width: '100vw',
             disableClose: true,
         });
         dialog.afterClosed().subscribe((inst: Institution) => {

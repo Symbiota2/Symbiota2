@@ -167,35 +167,45 @@ export class CollectionService {
             });
     }
 
-    isNameTaken(name: string): Observable<boolean>{
-
+    isNameTaken(name: string): Observable<boolean> {
         var result = of(false);
-        
-        this.collectionList.pipe(
-            map(collections => {
-                collections.forEach( collection => {
-                    if(collection.collectionName === name)
-                    {
-                        result = of(true);
-                    }
+
+        this.collectionList
+            .pipe(
+                map((collections) => {
+                    collections.forEach((collection) => {
+                        if (collection.collectionName === name) {
+                            result = of(true);
+                        }
+                    });
                 })
-            })
-        ).subscribe();
+            )
+            .subscribe();
 
         return result;
     }
 
     isCodeTaken(code: string): Observable<boolean> {
-        return this.collectionList.pipe(map(instList => {
-            for(var index = 0; index < instList.length; index++)
-            {
-                if(instList[index].collectionCode === code)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }))
+        var result = of(false);
+
+        this.collectionList
+            .pipe(
+                map((collection) => {
+                    for (var index = 0; index < collection.length; index++) {
+                        if (
+                            collection[index].collectionCode !== null &&
+                            collection[index].collectionCode.toLowerCase() ===
+                                code.toLowerCase()
+                        ) {
+                            console.log(collection[index].collectionCode);
+                            result = of(true);
+                        }
+                    }
+                })
+            )
+            .subscribe();
+
+        return result;
     }
 
     private fetchCollectionList(
