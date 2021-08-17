@@ -2,15 +2,15 @@
 <div mat-dialog-content>
         <form *ngIf="action == 'Update'; else elseTemplate" class="name-autocomplete-form">
             <mat-form-field appearance="fill">
-                <mat-label>{{'taxon.editor.common.name' | translate}}</mat-label>
+                <mat-label>{{'taxon.description.editor.caption' | translate}}</mat-label>
                 <input matInput
                        maxlength="100"
-                       [value]="local_data.vernacularName"
-                       [(ngModel)]="local_data.vernacularName"
+                       [value]="local_data.caption"
+                       [(ngModel)]="local_data.caption"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
             <mat-form-field appearance="fill">
-                <mat-label>{{'taxon.editor.common.language' | translate}}</mat-label>
+                <mat-label>{{'taxon.description.editor.language' | translate}}</mat-label>
                 <input matInput
                        maxlength="100"
                        [value]="local_data.language"
@@ -18,27 +18,35 @@
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
             <mat-form-field appearance="fill">
-                <mat-label>{{'taxon.editor.common.notes' | translate}}</mat-label>
+                <mat-label>{{'taxon.description.editor.source' | translate}}</mat-label>
                 <input matInput
-                       [value]="local_data.notes"
-                       [(ngModel)]="local_data.notes"
+                       [value]="local_data.source"
+                       [(ngModel)]="local_data.source"
                        [ngModelOptions]="{standalone: true}">
                 <!-- <mat-icon matSuffix>mode_edit</mat-icon> -->
             </mat-form-field>
             <mat-form-field appearance="fill">
-                <mat-label>{{'taxon.editor.common.source' | translate}}</mat-label>
+                <mat-label>{{'taxon.description.editor.sourceUrl' | translate}}</mat-label>
                 <input matInput
                        maxlength="100"
-                       [value]="local_data.source"
-                       [(ngModel)]="local_data.source"
+                       [value]="local_data.sourceUrl"
+                       [(ngModel)]="local_data.sourceUrl"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
             <mat-form-field appearance="fill">
-                <mat-label>{{'taxon.editor.common.sortSequence' | translate}}</mat-label>
+                <mat-label>{{'taxon.description.editor.notes' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.notes"
+                       [(ngModel)]="local_data.notes"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.description.editor.displayLevel' | translate}}</mat-label>
                 <input matInput
                        maxlength="3"
-                       [value]="local_data.sortSequence"
-                       [(ngModel)]="local_data.sortSequence"
+                       [value]="local_data.displayLevel"
+                       [(ngModel)]="local_data.displayLevel"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
             <!--

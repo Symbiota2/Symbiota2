@@ -1,8 +1,19 @@
-<mat-tab-group mat-align-tabs="start">
-    <button class="editor-button" (click)="onAddCommonName()">{{"taxon.editor.add.button.label" | translate}} </button>
-    <ng-template *ngFor='let block of blocks'>
-        <mat-tab label="{{block.caption}}">
-            <taxon-description-editor></taxon-description-editor>
-        </mat-tab>
-    </ng-template>
-</mat-tab-group>
+<div>
+    <button class="editor-button" (click)="onAddDescriptionBlock()">
+        {{"taxon.description.editor.add.button.label" | translate}}
+    </button>
+    <div *ngFor='let block of blocks'>
+        <symbiota2-expansion-panel label='{{block.caption}}'>
+            <div><b>{{"taxon.description.editor.caption" | translate}}</b>: {{block.caption}}</div>
+            <div><b>{{"taxon.description.editor.language" | translate}}</b>: {{block.language}}</div>
+            <div><b>{{"taxon.description.editor.source" | translate}}</b>: {{block.source}}</div>
+            <div><b>{{"taxon.description.editor.sourceUrl" | translate}}</b>: {{block.sourceUrl}}</div>
+            <div><b>{{"taxon.description.editor.notes" | translate}}</b>: {{block.notes}}</div>
+            <div><b>{{"taxon.description.editor.displayLevel" | translate}}</b>: {{block.displayLevel}}</div>
+            <div>
+                <button class="editor-button" (click)="openDialog('Update',block)">{{'taxon.editor.dialog.edit' | translate}}</button>
+                <button class="editor-button" (click)="openDialog('Delete',block)">{{'taxon.editor.dialog.delete' | translate}}</button>
+            </div>
+        </symbiota2-expansion-panel>
+    </div>
+</div>

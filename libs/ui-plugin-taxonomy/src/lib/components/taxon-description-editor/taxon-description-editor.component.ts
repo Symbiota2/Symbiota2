@@ -6,7 +6,7 @@ import {
     TaxonListItem, TaxonomicAuthorityService,
     TaxonomicStatusService,
     TaxonService, TaxonVernacularListItem, TaxonVernacularService,
-    TaxonomicEnumTreeService
+    TaxonomicEnumTreeService, TaxonDescriptionDialogComponent
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TranslateService } from '@ngx-translate/core'
 import { MatTableDataSource } from '@angular/material/table';
@@ -29,7 +29,6 @@ export interface BlockInfo {
 })
 
 export class TaxonDescriptionEditorComponent implements OnInit {
-    displayedColumns = ['name', 'language', 'notes', 'sortSequence', 'source', 'action']
     blocks: TaxonDescriptionBlockListItem[] = []
     dataSource = this.blocks
     private taxonID: string
@@ -70,19 +69,14 @@ export class TaxonDescriptionEditorComponent implements OnInit {
 
         this.taxonBlockService.findBlocksByTaxonID(taxonID)
             .subscribe((itemList) => {
-                this.blocks= itemList
+                this.blocks = itemList
                 this.dataSource = this.blocks
                 itemList.forEach((item) => {
                 })
             })
     }
 
-    /*
-     Add a row to the common names
-     */
-    onAddCommonName() {
-        const temp = new TaxonDescriptionBlockListItem()
-        temp.id = this.idCounter-- // Set the ID to a nonexistent value
+    onAddDescriptionBlock() {
         this.blocks.push(new TaxonDescriptionBlockListItem())
         this.dataSource = this.blocks
     }
@@ -90,11 +84,11 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     openDialog(action, obj) {
         obj.action = action
         const dialogRef = (action == 'Delete') ?
-            this.dialog.open(TaxonEditorDialogComponent, {
+            this.dialog.open(TaxonDescriptionDialogComponent, {
                 width: '100',
                 data: obj
             })
-            : this.dialog.open(TaxonEditorDialogComponent, {
+            : this.dialog.open(TaxonDescriptionDialogComponent, {
                 width: '80%',
                 data: obj
             })

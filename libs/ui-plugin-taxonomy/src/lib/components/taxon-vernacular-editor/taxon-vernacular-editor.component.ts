@@ -32,8 +32,6 @@ export class TaxonVernacularEditorComponent implements OnInit {
     dataSource = new MatTableDataSource(this.data)
     private taxonID: string
     languageList = []
-    //common: CommonNameInfo
-    private idCounter = 0
 
     constructor(
         //private readonly userService: UserService,  // TODO: needed for species hiding
@@ -86,8 +84,6 @@ export class TaxonVernacularEditorComponent implements OnInit {
      Add a row to the common names
      */
     onAddCommonName() {
-        const temp = new TaxonVernacularListItem()
-        temp.id = this.idCounter-- // Set the ID to a nonexistent value
         this.data.push(new TaxonVernacularListItem())
         this.dataSource = new MatTableDataSource(this.data)
     }

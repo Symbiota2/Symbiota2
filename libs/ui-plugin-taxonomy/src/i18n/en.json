@@ -41,5 +41,12 @@
   "taxon.editor.dialog.cancel" : "Cancel",
   "taxon.editor.dialog.edit" : "Edit",
   "taxon.editor.dialog.delete" : "Delete",
-  "taxon.editor.dialog.update" : "Save"
+  "taxon.editor.dialog.update" : "Save",
+  "taxon.description.editor.caption" : "Caption",
+  "taxon.description.editor.language" : "Language",
+  "taxon.description.editor.source" : "Source",
+  "taxon.description.editor.sourceUrl" : "Source URL",
+  "taxon.description.editor.notes" : "Notes",
+  "taxon.description.editor.displayLevel" : "Display Level",
+  "taxon.description.editor.add.button.label" : "Add a Description Block"
 }
