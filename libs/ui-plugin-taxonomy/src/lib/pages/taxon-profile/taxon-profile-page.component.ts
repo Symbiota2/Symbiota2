@@ -48,4 +48,8 @@ export class TaxonProfilePageComponent implements OnInit {
             this.blocks = blocks
         })
     }
+
+    goToLink(url: string){
+        window.open("taxon/editor/" + url, "_blank");
+    }
 }

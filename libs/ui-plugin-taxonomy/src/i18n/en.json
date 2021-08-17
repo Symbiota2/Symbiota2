@@ -29,6 +29,7 @@
   "taxon.editor.title" : "Taxon Editor",
   "taxon.editor.description" : "Description",
   "taxon.editor.descriptionBlock" : "Description Block",
+  "taxon.editor.images" : "Images",
   "taxon.editor.common" : "Common/Vernacular Name",
   "taxon.editor.common.name" : "Name",
   "taxon.editor.common.language" : "Language",
@@ -48,5 +49,12 @@
   "taxon.description.editor.sourceUrl" : "Source URL",
   "taxon.description.editor.notes" : "Notes",
   "taxon.description.editor.displayLevel" : "Display Level",
-  "taxon.description.editor.add.button.label" : "Add a Description Block"
+  "taxon.description.editor.statements" : "Statement(s)",
+  "taxon.description.editor.add.button.label" : "Add a Description Block",
+  "taxon.editor.link.label" : "Edit Taxon",
+  "taxon.description.editor.statement.heading": "Heading",
+  "taxon.description.editor.statement.displayHeader": "Display heading?",
+  "taxon.description.editor.statement.statement": "Statement",
+  "taxon.description.editor.statement.sortSequence": "Sort Sequence",
+  "taxon.description.editor.add.statement.button.label": "Add Statement"
 }

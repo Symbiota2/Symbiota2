@@ -14,6 +14,28 @@
                 <button class="editor-button" (click)="openDialog('Update',block)">{{'taxon.editor.dialog.edit' | translate}}</button>
                 <button class="editor-button" (click)="openDialog('Delete',block)">{{'taxon.editor.dialog.delete' | translate}}</button>
             </div>
+            <symbiota2-expansion-panel label='{{"taxon.description.editor.statements" | translate}}'>
+                <button class="editor-button" (click)="onAddStatement(block)">
+                    {{"taxon.description.editor.add.statement.button.label" | translate}}
+                </button>
+                <hr/>
+                <div *ngFor='let statement of block.descriptionStatements'>
+                    <div>
+                        <b>{{"taxon.description.editor.statement.heading" | translate}}</b>: {{statement.heading}}
+                        <br/>
+                        <b>{{"taxon.description.editor.statement.displayHeader" | translate}}</b>: {{statement.displayHeader}}
+                        <br/>
+                        <b>{{"taxon.description.editor.statement.sortSequence" | translate}}</b>: {{statement.sortSequence}}
+                        <br/>
+                        <b>{{"taxon.description.editor.statement.statement" | translate}}</b>:  <span [innerHTML]="statement.statement"></span>
+                    </div>
+                    <div>
+                        <button class="editor-button" (click)="openStatementDialog('Update',statement)">{{'taxon.editor.dialog.edit' | translate}}</button>
+                        <button class="editor-button" (click)="openStatementDialog('Delete',statement)">{{'taxon.editor.dialog.delete' | translate}}</button>
+                    </div>
+                    <hr/>
+                </div>
+            </symbiota2-expansion-panel>
         </symbiota2-expansion-panel>
     </div>
 </div>

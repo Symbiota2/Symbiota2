@@ -1,0 +1,44 @@
+<!-- <h1 mat-dialog-title>Row Action :: <strong>{{action}}</strong></h1> -->
+<div mat-dialog-content>
+        <form *ngIf="action == 'Update'; else elseTemplate" class="name-autocomplete-form">
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.description.editor.statement.heading' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.heading"
+                       [(ngModel)]="local_data.heading"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.description.editor.statement.displayHeader' | translate}}</mat-label>
+                <input matInput
+                       maxlength="1"
+                       [value]="local_data.displayHeader"
+                       [(ngModel)]="local_data.displayHeader"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.description.editor.statement.sortSequence' | translate}}</mat-label>
+                <input matInput
+                       maxlength="3"
+                       [value]="local_data.sortSequence"
+                       [(ngModel)]="local_data.sortSequence"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.description.editor.statement.statement' | translate}}</mat-label>
+                <input matInput
+                       [value]="local_data.statement"
+                       [(ngModel)]="local_data.statement"
+                       [ngModelOptions]="{standalone: true}">
+                <!-- <mat-icon matSuffix>mode_edit</mat-icon> -->
+            </mat-form-field>
+        </form>
+    <ng-template #elseTemplate>
+        {{'taxon.editor.dialog.confirm.delete' | translate}}?
+    </ng-template>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="doAction()">{{action}}</button>
+    <button mat-button (click)="closeDialog()" mat-flat-button color="warn">{{'taxon.editor.dialog.cancel' | translate}}</button>
+</div>

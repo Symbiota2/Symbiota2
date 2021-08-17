@@ -1,10 +1,11 @@
 <div>
     <h1>{{"taxon.profile.title" | translate}}</h1>
 </div>
+<button appearance='fill' (click)="goToLink(taxonID)">{{"taxon.editor.link.label" | translate}}</button>
 <mat-tab-group *ngIf="blocks.length > 0" mat-align-tabs="start">
     <mat-tab *ngFor='let block of blocks' label='{{block.caption}}'>
         <symbiota2-expansion-panel label='{{block.taxon.scientificName}}'>
-            <table >
+            <table>
                 <tr>
                     <td>
                         <img *ngIf='block.images?.length > 0' src="http://openherbarium.org{{block.images[0].url}}"/>
