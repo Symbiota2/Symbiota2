@@ -7,6 +7,10 @@ import { AppConfigModule, AppConfigService } from '@symbiota2/api-config';
 import { join as pathJoin } from 'path';
 import { promises as fsPromises } from 'fs';
 import { SymbiotaApiPlugin } from '@symbiota2/api-common';
+import { OccurrenceUploadCleanupQueue } from './queues/occurrence-upload-cleanup.queue';
+import { OccurrenceUploadCleanupProcessor } from './queues/occurrence-upload-cleanup.processor';
+import { OccurrenceUploadQueue } from './queues/occurrence-upload.queue';
+import { OccurrenceUploadProcessor } from './queues/occurrence-upload.processor';
 
 /**
  * Module for retrieving occurrence records from the database
@@ -40,9 +44,15 @@ import { SymbiotaApiPlugin } from '@symbiota2/api-common';
                 }
             },
             inject: [AppConfigService]
-        })
+        }),
+        OccurrenceUploadCleanupQueue,
+        OccurrenceUploadQueue
     ],
-    providers: [OccurrenceService],
+    providers: [
+        OccurrenceService,
+        OccurrenceUploadCleanupProcessor,
+        OccurrenceUploadProcessor,
+    ],
     controllers: [OccurrenceController]
 })
 export class OccurrenceModule extends SymbiotaApiPlugin { }

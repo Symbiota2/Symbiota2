@@ -1,0 +1,26 @@
+<!-- TODO: i18n -->
+<div id='container'>
+    <mat-dialog-content>
+        <div fxLayout='column' fxLayoutGap='1rem'>
+            <ul>
+                <li>
+                    {{ data.newRecords | number }} new occurrences will be created
+                </li>
+                <li>
+                    {{ data.updatedRecords | number }} existing occurrences will be updated
+                </li>
+                <li>
+                    {{ data.nullRecords | number }} records don't have a value for the
+                    unique ID column and will be skipped
+                </li>
+            </ul>
+            <div>
+                Continue uploading?
+            </div>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-raised-button color='primary' (click)='onConfirm()'>Confirm</button>
+        <button mat-raised-button (click)='onCancel()'>Cancel</button>
+    </mat-dialog-actions>
+</div>

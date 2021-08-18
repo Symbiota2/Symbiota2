@@ -1,0 +1,21 @@
+<!-- TODO: i18n -->
+<div id='header' fxLayoutAlign='start center' fxLayoutGap='1rem'>
+    <ng-container *ngIf='(collections.currentCollection | async) as collection'>
+        <symbiota2-collection-logo
+            [src]='collection.icon'
+            [collectionID]='collection.id'
+        >
+        </symbiota2-collection-logo>
+    </ng-container>
+    <h1>Occurrence Upload</h1>
+</div>
+<div class='my2' fxLayout='row' fxLayoutGap='1rem'>
+    <symbiota2-file-upload-field [formControl]='fileInput'></symbiota2-file-upload-field>
+    <button
+        mat-flat-button color='primary'
+        (click)='onUpload()'
+        [disabled]='!fileInput.value'
+    >
+        Upload
+    </button>
+</div>

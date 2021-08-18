@@ -2,6 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpRequest } from '@angular/common/http';
 import { ApiStateProvinceQueryInput } from '@symbiota2/data-access';
 
+export interface CountryQueryParams {
+    countryTerm?: string;
+    limit?: number;
+}
+
 @Injectable()
 export class GeographyQueryBuilder {
     protected apiUrl: string;
@@ -52,6 +57,7 @@ export class ContinentQueryBuilder extends GeographyQueryBuilder {
 
 export class CountryQueryBuilder extends GeographyQueryBuilder {
     protected countryID: number = null;
+    protected queryParams = {};
 
     constructor(apiUrl: string) {
         super(apiUrl);
@@ -63,7 +69,8 @@ export class CountryQueryBuilder extends GeographyQueryBuilder {
         return this;
     }
 
-    findAll() {
+    findAll(params: CountryQueryParams) {
+        this.queryParams = params;
         return this;
     }
 
@@ -72,7 +79,14 @@ export class CountryQueryBuilder extends GeographyQueryBuilder {
         if (this.countryID) {
             url = `${url}/${this.countryID}`;
         }
-        return url;
+
+        const urlObj = new URL(url);
+        if (this.queryParams) {
+            Object.keys(this.queryParams).forEach((k) => {
+                urlObj.searchParams.set(k, this.queryParams[k].toString());
+            })
+        }
+        return urlObj.toString();
     }
 }
 

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, of, ReplaySubject } from 'rxjs';
 import { ApiClientService } from '@symbiota2/ui-common';
 import { GeographyQueryBuilder } from './query-builder';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { ProvinceListItem } from './dto/province';
 import {
     ApiStateProvinceListItemOutput,
@@ -33,12 +33,12 @@ export class StateProvinceService {
         const url = this.queryBuilder.provinces().findAll(params).build();
         const query = this.api.queryBuilder(url).get().build();
 
-        this.api.send<unknown, ApiStateProvinceListItemOutput[]>(query).pipe(
+        this.api.send<unknown, ApiStateProvinceListItemOutput[]>(query, { skipLoading: true }).pipe(
             catchError((e) => {
                 console.error(e);
                 return of([] as ApiStateProvinceListItemOutput[]);
             }),
-            map((provinces) => {
+            tap((provinces) => {
                 const provinceObjs = provinces.map((province) => new ProvinceListItem(province));
                 this._provinces.next(provinceObjs);
             })

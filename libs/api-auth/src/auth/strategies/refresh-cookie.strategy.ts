@@ -2,9 +2,9 @@ import { Strategy } from 'passport-cookie';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from '@symbiota2/api-database';
-import { TokenService } from '../../user/services/token.service';
+import { TokenService } from '../../user/services/token/token.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../../user/services/user.service';
+import { UserService } from '../../user/services/user/user.service';
 import { AuthenticatedRequest } from '../dto/authenticated-request';
 
 /**

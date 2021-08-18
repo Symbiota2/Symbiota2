@@ -4,7 +4,10 @@ services:
     image: "mariadb:10.5"
     container_name: s2-mariadb
     environment:
+      TZ: "America/Phoenix"
       MYSQL_ROOT_PASSWORD: password
+    # To allow for big BLOB values; default is 64M
+    command: ["--max_allowed_packet=256M"]
     volumes:
       - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
       - "s2-db:/var/lib/mysql"
@@ -12,6 +15,7 @@ services:
 
   redis:
     image: "redis:6"
+    container_name: s2-redis
     command: "redis-server --appendonly yes"
     volumes: ["redis:/data"]
     ports: ["6379:6379"]

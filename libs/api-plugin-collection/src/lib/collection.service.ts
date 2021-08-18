@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
     Collection,
-    CollectionCategoryLink, CollectionStat
+    CollectionCategoryLink, CollectionStat, Occurrence, TaxaEnumTreeEntry, Taxon
 } from '@symbiota2/api-database';
 import { DeepPartial, Repository } from 'typeorm';
 import { CollectionFindAllParams } from './dto/coll-find-all.input.dto';
@@ -18,9 +18,19 @@ export class CollectionService extends BaseService<Collection> {
         @Inject(CollectionCategoryLink.PROVIDER_ID)
         private readonly categoryLinks: Repository<CollectionCategoryLink>,
         @Inject(CollectionStat.PROVIDER_ID)
-        private readonly collectionStats: Repository<CollectionStat>) {
+        private readonly collectionStats: Repository<CollectionStat>,
+        @Inject(Occurrence.PROVIDER_ID)
+        private readonly occurrenceRepo: Repository<Occurrence>) {
 
         super(collections);
+    }
+
+    async findByID(id: number): Promise<Collection> {
+        const collection = await this.collections.findOne(id, { relations: ['institution', 'collectionStats'] });
+        if (!collection) {
+            return null;
+        }
+        return collection;
     }
 
     /**
@@ -105,5 +115,27 @@ export class CollectionService extends BaseService<Collection> {
         await this.collectionStats.update(id, {
             lastModifiedTimestamp: new Date()
         });
+    }
+
+    // TODO: Finish this
+    async updateStats(id: number): Promise<boolean> {
+        // TODO: How to do georeferencedCount?
+        const counts = await this.occurrenceRepo.createQueryBuilder('c')
+            .select([
+                'COUNT(*) as recordCount',
+                'COUNT(DISTINCT family) as familyCount',
+                'COUNT(DISTINCT genus) as genusCount',
+                'COUNT(DISTINCT scientificName) as speciesCount',
+            ])
+            .where({ collectionID: id })
+            .execute();
+
+        const stats = await this.collectionStats.findOne({ collectionID: id });
+        if (!stats) {
+            return false;
+        }
+
+        await this.collectionStats.save({ ...stats, ...counts });
+        return true;
     }
 }

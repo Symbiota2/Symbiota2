@@ -12,7 +12,7 @@ import {
 export class DwCArchiveParser {
     private static readonly SCHEMA_VERSION = 'http://rs.tdwg.org/dwc/text/tdwg_dwc_text.xsd';
 
-    static parse<T>(filePath: string, cb: DwCAParseCallback<T>) {
+    static parse(filePath: string, cb: DwCAParseCallback<DwCAMeta>) {
         const fileName = path.basename(filePath);
         const extractDirPrefix = path.join(tmpdir(), fileName.replace(/.zip$/, "-"));
 

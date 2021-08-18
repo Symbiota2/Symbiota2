@@ -18,10 +18,10 @@ import { AppConfigService } from '@symbiota2/api-config';
 import { Request, Response } from 'express';
 import { RefreshCookieStrategy } from './strategies/refresh-cookie.strategy';
 import { RefreshCookieGuard } from './guards';
-import { TokenService } from '../user/services/token.service';
+import { TokenService } from '../user/services/token/token.service';
 import { AccessTokenOutputDto } from './dto/access-token-output.dto';
 import { AuthenticatedRequest } from './dto/authenticated-request';
-import { UserService } from '../user/services/user.service';
+import { UserService } from '../user/services/user/user.service';
 
 /**
  * Routes for authenticating users

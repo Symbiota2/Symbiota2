@@ -51,7 +51,6 @@ export class CollectionController {
         type: Collection,
         isArray: true
     })
-    @SerializeOptions({ groups: ['list'] })
     async findAll(@Query() findAllParams: CollectionFindAllParams): Promise<Collection[]> {
         const collections = await this.collections.findAll(findAllParams);
 
@@ -75,8 +74,6 @@ export class CollectionController {
             throw new NotFoundException();
         }
 
-        collection.institution = await collection.institution;
-        collection.collectionStats = await collection.collectionStats;
         return collection;
     }
 

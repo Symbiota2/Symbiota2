@@ -2,11 +2,19 @@
     <mat-label>{{ label | translate }}</mat-label>
     <input
         matInput
+        [ngModel]='value'
+        (ngModelChange)='onChange($event)'
+        (blur)='onTouched()'
         [type]='type'
-        [formControl]='control'
         [step]='type === "number" ? 0.00001 : null'
+        [matAutocomplete]='autocomplete'
     >
     <a [href]='helpLink' class='invisible-btn' matSuffix>
         <mat-icon color='primary'>help</mat-icon>
     </a>
+    <mat-autocomplete #autocomplete="matAutocomplete">
+        <mat-option *ngFor="let option of (autoCompleteItems | async)" [value]="option">
+            {{ option }}
+        </mat-option>
+    </mat-autocomplete>
 </mat-form-field>

@@ -1,7 +1,7 @@
 import { Injectable, ExecutionContext, CanActivate } from '@nestjs/common';
 import { AppConfigService } from '@symbiota2/api-config';
 import { AuthenticatedRequest } from '../dto/authenticated-request';
-import { TokenService } from '../../user/services/token.service';
+import { TokenService } from '../../user/services/token/token.service';
 
 /**
  * Guard that makes sure the current user's uid matches the 'id' request

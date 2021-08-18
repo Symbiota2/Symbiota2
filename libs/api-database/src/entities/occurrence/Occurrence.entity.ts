@@ -1,12 +1,13 @@
 import {
+    BeforeInsert, BeforeUpdate,
     Column,
-    Entity,
+    Entity, getConnection,
     Index,
     JoinColumn,
     ManyToOne,
     OneToMany,
     OneToOne,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn, Repository
 } from 'typeorm';
 import { OccurrenceVerification } from './OccurrenceVerification.entity';
 import { OccurrenceLithostratigraphy } from './OccurrenceLithostratigraphy.entity';
@@ -36,9 +37,10 @@ import { Taxon } from '../taxonomy/Taxon.entity';
 import { User } from '../user/User.entity';
 import { OccurrenceDatasetLink } from './OccurrenceDatasetLink.entity';
 import { EntityProvider } from '../../entity-provider.class';
+import { TaxaEnumTreeEntry, TaxonomicUnit } from '../taxonomy';
 
 @Index('Index_collid', ['collectionID', 'dbpk'], { unique: true })
-@Index('Index_sciname', ['sciname'])
+@Index(['scientificName'])
 @Index('Index_family', ['family'])
 @Index('Index_country', ['country'])
 @Index('Index_state', ['stateProvince'])
@@ -149,21 +151,11 @@ export class Occurrence extends EntityProvider {
     @Column('varchar', { name: 'datasetID', nullable: true, length: 255 })
     datasetID: string;
 
-    @Column('varchar', { name: 'institutionCode', nullable: true, length: 64 })
-    institutionCode: string;
-
-    @Column('varchar', { name: 'collectionCode', nullable: true, length: 64 })
-    collectionCode: string;
-
     @Column('varchar', { name: 'family', nullable: true, length: 255 })
     family: string;
 
-    // TODO: How can we name these to better distinguish between the two?
     @Column('varchar', { name: 'scientificName', nullable: true, length: 255 })
     scientificName: string;
-
-    @Column('varchar', { name: 'sciname', nullable: true, length: 255 })
-    sciname: string;
 
     @Column('int', { name: 'tidinterpreted', nullable: true, unsigned: true })
     taxonID: number | null;
@@ -301,7 +293,7 @@ export class Occurrence extends EntityProvider {
     @Column('varchar', {
         name: 'informationWithheld',
         nullable: true,
-        length: 250,
+        length: 500,
     })
     informationWithheld: string;
 
@@ -719,4 +711,86 @@ export class Occurrence extends EntityProvider {
         (omoccurdatasetlink) => omoccurdatasetlink.occurrence
     )
     datasetLinks: Promise<OccurrenceDatasetLink[]>;
+
+    @BeforeUpdate()
+    async updateLastModified() {
+        this.lastModifiedTimestamp = new Date();
+    }
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    async resolveTaxonomy() {
+        const connection = getConnection();
+        const taxonRankRepo = connection.getRepository(TaxonomicUnit);
+        const taxonRepo = connection.getRepository(Taxon);
+        const taxaEnumRepo = connection.getRepository(TaxaEnumTreeEntry);
+
+        this.taxonID = null;
+        this.family = null;
+        this.genus = null;
+
+        const taxon = await taxonRepo.findOne(
+            { scientificName: this.scientificName },
+            { select: ['id'] }
+        );
+
+        if (!taxon) {
+            return;
+        }
+
+        const allKingdomRanks = await taxonRankRepo.find({ rankName: 'Kingdom' });
+        const allKingdoms = await taxonRepo.createQueryBuilder('t')
+            .select('t.id')
+            .where('t.scientificName IN (:...isIn)', { isIn: allKingdomRanks.map((r) => r.kingdomName) })
+            .execute();
+
+        const kingdomEnumEntry = await taxaEnumRepo.findOne({
+            taxonID: taxon.id,
+            parentTaxonID: allKingdoms.map((k) => k.id)
+        });
+
+        if (!kingdomEnumEntry) {
+            return;
+        }
+
+        const kingdom = await kingdomEnumEntry.parentTaxon;
+
+        const [familyRank, genusRank] = await Promise.all([
+            taxonRankRepo.findOne(
+                { rankName: 'Family', kingdomName: kingdom.scientificName },
+                { select: ['id'] }
+            ),
+            taxonRankRepo.findOne(
+                { rankName: 'Genus', kingdomName: kingdom.scientificName },
+                { select: ['id'] }
+            ),
+        ]);
+
+        const family = await Occurrence.lookupAncestor(
+            taxaEnumRepo,
+            taxon.id,
+            familyRank.rankID
+        );
+        const genus = await Occurrence.lookupAncestor(
+            taxaEnumRepo,
+            taxon.id,
+            genusRank.rankID
+        );
+
+        this.taxonID = taxon.id;
+        this.genus = genus ? genus.scientificName : null;
+        this.family = family ? family.scientificName : null;
+        this.scientificNameAuthorship = taxon.author;
+    }
+
+    private static async lookupAncestor(taxaEnumRepo: Repository<TaxaEnumTreeEntry>, childTaxonID: number, rankID: number): Promise<Taxon> {
+        const ancestor = await taxaEnumRepo.createQueryBuilder('te')
+            .select()
+            .innerJoin(Taxon, 'parent', 'te.parentTaxonID = parent.id')
+            .where('te.taxonID = :taxonID', { taxonID: childTaxonID })
+            .andWhere('parent.rankID = :rankID', { rankID })
+            .limit(1)
+            .execute();
+        return ancestor.length > 0 ? ancestor[0] : null;
+    }
 }
