@@ -8,6 +8,7 @@ import { ImageModule } from '@symbiota2/api-plugin-image'
 import { TaxonomyModule } from '@symbiota2/api-plugin-taxonomy'
 import { GeographyModule } from '@symbiota2/api-plugin-geography'
 import { BullModule } from '@nestjs/bull';
+import { DatabaseModule } from '@symbiota2/api-database';
 
 const ENABLED_PLUGINS = [
     CollectionModule,
@@ -35,7 +36,7 @@ const ENABLED_PLUGINS = [
                 }
             }),
             inject: [AppConfigService],
-            imports: [AppConfigModule]
+            imports: [AppConfigModule, DatabaseModule]
         }),
         ApiPluginModule.configure(ENABLED_PLUGINS)
     ]

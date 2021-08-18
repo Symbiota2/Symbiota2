@@ -30,16 +30,18 @@ import { MatDatepickerModule } from "@angular/material/datepicker";
 import { FlexModule } from "@angular/flex-layout";
 import { MatExpansionModule } from '@angular/material/expansion';
 import { OccurrenceService } from './services/occurrence.service';
-import { OccurrenceUploadComponent } from './pages/occurrence-upload/occurrence-upload.component';
+import { OccurrenceUploadPage } from './pages/occurrence-upload/occurrence-upload-page.component';
 import { OccurrenceCreateComponent } from './pages/occurrence-create/occurrence-create.component';
 import { OccurrenceEditorComponent } from './components/occurrence-editor/occurrence-editor.component';
 import { OccurrenceFieldComponent } from './components/occurrence-editor/occurrence-field/occurrence-field.component';
-import { OccurrenceExtraFieldComponent } from './components/occurrence-editor/occurrence-extra-field/occurrence-extra-field.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
     ROUTE_CREATE_OCCURRENCE,
     ROUTE_SEARCH_OCCURRENCES,
-    ROUTE_SEARCH_RESULTS, ROUTE_SPATIAL_MODULE
+    ROUTE_SEARCH_RESULTS,
+    ROUTE_SPATIAL_MODULE,
+    ROUTE_UPLOAD,
+    ROUTE_UPLOAD_FIELD_MAP
 } from './routes';
 import { MatTableModule } from '@angular/material/table';
 import { OccurrenceSearchResults } from './services/occurrence-search-result.service';
@@ -50,6 +52,10 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { SpatialModulePage } from './pages/spatial-module/spatial-module-page.component';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
+import { OccurrenceUploadFieldMapPage } from './pages/occurrence-upload/field-map/field-map.component';
+import { OccurrenceUploadService } from './services/occurrence-upload.service';
+import { FieldMapSelectComponent } from './pages/occurrence-upload/field-map/field-map-select-component/field-map-select.component';
+import { ConfirmDialogComponent } from './pages/occurrence-upload/field-map/confirm-dialog-component/confirm-dialog.component';
 
 @NgModule({
     imports: [
@@ -86,7 +92,8 @@ import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
     ],
     providers: [
         OccurrenceSearchResults,
-        OccurrenceService
+        OccurrenceService,
+        OccurrenceUploadService
     ],
     declarations: [
         DatePickerComponent,
@@ -94,12 +101,14 @@ import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
         OccurrenceSearchResultModalComponent,
         OccurrenceSearchResultsPage,
         SelectComponent,
-        OccurrenceUploadComponent,
+        OccurrenceUploadPage,
         OccurrenceCreateComponent,
         OccurrenceEditorComponent,
         OccurrenceFieldComponent,
-        OccurrenceExtraFieldComponent,
         SpatialModulePage,
+        OccurrenceUploadFieldMapPage,
+        FieldMapSelectComponent,
+        ConfirmDialogComponent,
     ],
     entryComponents: [
         OccurrenceSearchCollectionsPage,
@@ -128,13 +137,14 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
             };
         });
 
-        // collectionProfile.putLink((collectionID) => {
-        //     return {
-        //         text: "Upload occurrences",
-        //         routerLink: `/${ROUTE_UPLOAD}`,
-        //         queryParams: { 'collectionID': collectionID }
-        //     };
-        // });
+        collectionProfile.putLink((collectionID) => {
+            return {
+                text: "Upload occurrences",
+                routerLink: `/${ROUTE_UPLOAD}`,
+                requiresLogin: true,
+                queryParams: { 'collectionID': collectionID }
+            };
+        });
     }
 
     static routes(): Route[] {
@@ -155,10 +165,14 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
                 path: ROUTE_SEARCH_RESULTS,
                 component: OccurrenceSearchResultsPage
             },
-            // {
-            //     path: ROUTE_UPLOAD,
-            //     component: OccurrenceUploadComponent
-            // },
+            {
+                path: ROUTE_UPLOAD,
+                component: OccurrenceUploadPage
+            },
+            {
+                path: ROUTE_UPLOAD_FIELD_MAP,
+                component: OccurrenceUploadFieldMapPage
+            },
         ];
     }
 

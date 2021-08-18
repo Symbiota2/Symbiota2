@@ -4,3 +4,4 @@ export * from './base.service';
 export * from './csv.interceptor';
 export * from './decorators';
 export * from './plugin';
+export * from './file-utils';

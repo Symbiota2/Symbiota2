@@ -22,7 +22,7 @@ export class Collection extends CollectionListItem implements ApiCollectionOutpu
         super(collection);
     }
 
-    @Expose() stats: ApiCollectionStatsOutput;
+    @Expose() collectionStats: ApiCollectionStatsOutput;
     @Expose() institution: ApiCollectionInstitutionOutput;
     @Expose() fullDescription: string;
     @Expose() homePage: string;

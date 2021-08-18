@@ -41,21 +41,24 @@ class CreateOneBuilder extends OccurrenceQueryBuilder {
     }
 
     build(): string {
-        this.url.pathname = `${this.url.pathname}/${this._collectionID}`;
+        this.url.searchParams.set('collectionID', this._collectionID.toString());
         return super.build();
     }
 }
 
 class UploadBuilder extends OccurrenceQueryBuilder {
-    protected _collectionID: number;
+    private _id: number = null;
 
-    collectionID(id: number): UploadBuilder {
-        this._collectionID = id;
+    id(id: number): UploadBuilder {
+        this._id = id;
         return this;
     }
 
     build(): string {
-        this.url.pathname = `${this.url.pathname}/${this._collectionID}/upload`;
+        this.url.pathname = `${this.url.pathname}/upload`;
+        if (this._id) {
+            this.url.pathname += `/${this._id}`;
+        }
         return super.build();
     }
 }

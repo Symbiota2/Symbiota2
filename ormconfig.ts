@@ -10,7 +10,10 @@ const ENTITIES_DIR = path.join(API_DATABASE_PLUGIN_DIR, 'src', 'entities');
 const MIGRATIONS_DIR = path.join(API_DATABASE_PLUGIN_DIR, 'src', 'migrations');
 
 async function bootstrap(): Promise<ConnectionOptions> {
-    const app = await NestFactory.createApplicationContext(AppConfigModule);
+    const app = await NestFactory.createApplicationContext(
+        AppConfigModule,
+        { logger: ['error'] }
+    );
     const appConfig = app.get(AppConfigService);
 
     const entitiesFiles = glob.sync(path.join(ENTITIES_DIR, "**", "*.entity.ts"));
@@ -18,6 +21,7 @@ async function bootstrap(): Promise<ConnectionOptions> {
 
     return {
         ...appConfig.databaseConfiguration(),
+        logging: ['error'],
         entities: entitiesFiles,
         migrations: migrationsFiles,
         cli: {
@@ -27,4 +31,6 @@ async function bootstrap(): Promise<ConnectionOptions> {
     };
 }
 
-module.exports = bootstrap();
+const exp = bootstrap();
+module.exports = exp;
+export default exp;

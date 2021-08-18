@@ -14,9 +14,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { LoginDialog } from '../login-dialog/login-dialog.component';
 import { Router } from '@angular/router';
 import { HomePage } from '../../pages/home/home.component';
-import { UserProfilePage } from '../../pages/user-profile/user-profile.component';
-import { CreateUserProfilePage } from '../../pages/create-user-profile/create-user-profile.component';
-import { SitemapPage } from '../../pages/sitemap/sitemap.component';
+import { ApiUserNotification } from '@symbiota2/data-access';
+import { NotificationDialog } from './notification-dialog/notification-dialog.component';
 
 @Component({
     selector: 'symbiota2-navbar',
@@ -24,9 +23,12 @@ import { SitemapPage } from '../../pages/sitemap/sitemap.component';
     styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-    user: User = null;
     navigationData: any;
     pluginLinks: NavBarLink[] = [];
+
+    currentUser = this.userService.currentUser;
+    notifications = this.userService.notifications;
+    notificationCount = this.userService.notificationCount;
 
     readonly ROUTE_HOME = HomePage.ROUTE;
     readonly ROUTE_PROFILE = ROUTE_USER_PROFILE;
@@ -41,11 +43,16 @@ export class NavbarComponent implements OnInit {
         private readonly plugins: PluginService,
         private readonly router: Router) { }
 
-    ngOnInit() {
-        this.userService.currentUser.subscribe((userData) => {
-            this.user = userData;
-        });
+    isToday(date: Date) {
+        const today = new Date();
+        return (
+            date.getFullYear() === today.getFullYear() &&
+            date.getMonth() === today.getMonth() &&
+            date.getDate() === today.getDate()
+        );
+    }
 
+    ngOnInit() {
         this.plugins.navBarLinks$.subscribe((links) => {
             this.pluginLinks = links;
         });
@@ -61,8 +68,32 @@ export class NavbarComponent implements OnInit {
         });
     }
 
-    useLanguage(event): void {
-        this.translate.use(event.value);
+    onNotificationClicked(notification: ApiUserNotification) {
+        const notificationDialog = this.dialog.open(
+            NotificationDialog,
+            {
+                minWidth: "25%",
+                minHeight: "25%",
+                maxWidth: "75%",
+                maxHeight: "75%",
+                disableClose: true,
+                data: notification
+            }
+        );
+
+        notificationDialog.afterClosed().subscribe((shouldDelete) => {
+            if (shouldDelete) {
+                this.userService.deleteNotification(notification.id);
+            }
+        })
+    }
+
+    useLanguage(language: string) {
+        this.translate.use(language);
+    }
+
+    clearNotifications() {
+        this.userService.deleteAllNotifications();
     }
 
     get currentLang(): string {

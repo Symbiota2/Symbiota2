@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { OccurrenceQueryBuilder } from './occurrence-query-builder';
 import {
+    AlertService,
     ApiClientService,
     AppConfigService,
     UserService
@@ -8,7 +9,9 @@ import {
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { Occurrence } from '../dto';
-import { ApiOccurrence } from '@symbiota2/data-access';
+import {
+    ApiOccurrence,
+} from '@symbiota2/data-access';
 import { OccurrenceSearchResults } from './occurrence-search-result.service';
 
 type OptionalJSON = Record<string, unknown> | null;
@@ -19,6 +22,7 @@ export class OccurrenceService {
 
     constructor(
         public readonly searchResults: OccurrenceSearchResults,
+        private readonly alerts: AlertService,
         private readonly user: UserService,
         private readonly apiClient: ApiClientService,
         private readonly appConfig: AppConfigService) { }
@@ -73,32 +77,6 @@ export class OccurrenceService {
                 )
             })
         )
-    }
-
-    postCsv(collectionID: number, csv: File): Observable<boolean> {
-        const url = this.createUrlBuilder()
-            .upload()
-            .collectionID(collectionID)
-            .build();
-        const body = new FormData();
-        body.append('file', csv);
-
-        return this.jwtToken.pipe(
-            switchMap((token) => {
-                const query = this.apiClient.queryBuilder(url).fileUpload()
-                    .addJwtAuth(token)
-                    .body(body)
-                    .build();
-
-                return this.apiClient.send(query).pipe(
-                    map(() => true),
-                    catchError((e) => {
-                        console.error(e);
-                        return of(false);
-                    })
-                );
-            }),
-        );
     }
 
     private createUrlBuilder(): OccurrenceQueryBuilder {
