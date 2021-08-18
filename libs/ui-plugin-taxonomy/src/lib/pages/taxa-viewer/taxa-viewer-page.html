@@ -86,8 +86,8 @@
                            [formControl]="nameControl"
                            [matAutocomplete]="auto">
                     <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-                        <mat-option *ngFor="let option of nameOptions" [value]="option">
-                            {{option}}
+                        <mat-option *ngFor="let option of nameOptions" [value]="nameFor(option)">
+                            {{nameFor(option)}} <small>{{authorFor(option)}}</small>
                         </mat-option>
                     </mat-autocomplete>
                 </mat-form-field>
@@ -105,12 +105,15 @@
                         <mat-icon class="mat-icon-rtl-mirror">
                             {{treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right'}}
                         </mat-icon>
-                        &nbsp; &nbsp; <a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>{{node.name}}</a>&nbsp; &nbsp;<span *ngIf='includeAuthors'>{{node.author}}</span>
+                        &nbsp; &nbsp; <a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>{{node.name}}</a>
+                        <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small>
                     </button>
-                    <span *ngIf='!isNotExpanded(node)'> &nbsp; &nbsp; <a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>{{node.name}}</a> &nbsp; &nbsp;<span *ngIf='includeAuthors'>{{node.author}}</span></span>
+                    <span *ngIf='!isNotExpanded(node)'> &nbsp; &nbsp; <a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>{{node.name}}</a>
+                        <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small></span>
                     </span>
                     <span *ngIf='isSynonym(node)'>
-                     &nbsp; &nbsp; <a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>[{{node.name}}]</a> &nbsp; &nbsp;<span *ngIf='includeAuthors'>{{node.author}}</span>
+                     &nbsp; &nbsp; <a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>[{{node.name}}]</a>
+                        <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small>
                     </span>
                 </li>
             </mat-tree-node>
@@ -122,14 +125,16 @@
                         <mat-icon class="mat-icon-rtl-mirror">
                             {{treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right'}}
                         </mat-icon>
-                            &nbsp; &nbsp; <a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>{{node.name}}</a> &nbsp; &nbsp;<span *ngIf='includeAuthors'>{{node.author}}</span>
+                            &nbsp; &nbsp; <a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>{{node.name}}</a>
+                        <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small>
                     </button>
                     <ul>
                         <ng-container matTreeNodeOutlet></ng-container>
                     </ul>
                 </li>
                 <li *ngIf='!isNotExpanded(node)'>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>{{node.name}}</a> &nbsp; &nbsp;<span *ngIf='includeAuthors'>{{node.author}}</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>{{node.name}}</a>
+                    <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small>
                     <ul >
                         <ng-container matTreeNodeOutlet></ng-container>
                     </ul>

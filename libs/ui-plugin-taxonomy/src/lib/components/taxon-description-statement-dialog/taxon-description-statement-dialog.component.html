@@ -27,10 +27,18 @@
             </mat-form-field>
             <mat-form-field appearance="fill">
                 <mat-label>{{'taxon.description.editor.statement.statement' | translate}}</mat-label>
+                <textarea matInput
+                          cdkTextareaAutosize
+                          cdkAutosizeMinRows="1"
+                          [value]="local_data.statement"
+                          [(ngModel)]="local_data.statement"
+                          [ngModelOptions]="{standalone: true}"></textarea>
+                <!--
                 <input matInput
                        [value]="local_data.statement"
                        [(ngModel)]="local_data.statement"
                        [ngModelOptions]="{standalone: true}">
+                       -->
                 <!-- <mat-icon matSuffix>mode_edit</mat-icon> -->
             </mat-form-field>
         </form>

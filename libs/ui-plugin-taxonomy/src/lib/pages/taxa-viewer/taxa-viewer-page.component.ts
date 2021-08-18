@@ -82,6 +82,13 @@ export class TaxaViewerPageComponent implements OnInit {
         this.loadVernacularLanguages()
     }
 
+    nameFor(option) {
+        return this.hasAuthors? option.split(' -')[0] : option
+    }
+
+    authorFor(option) {
+        return this.hasAuthors? option.split(' -')[1] : ""
+    }
     /*
     The vernacular language menu has a new choice
      */
