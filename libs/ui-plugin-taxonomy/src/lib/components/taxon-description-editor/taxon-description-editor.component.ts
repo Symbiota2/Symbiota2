@@ -84,8 +84,6 @@ export class TaxonDescriptionEditorComponent implements OnInit {
             .subscribe((itemList) => {
                 this.blocks = itemList
                 this.dataSource = this.blocks
-                itemList.forEach((item) => {
-                })
             })
     }
 
