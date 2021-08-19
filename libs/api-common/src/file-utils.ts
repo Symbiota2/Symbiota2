@@ -43,4 +43,5 @@ export async function* csvIterator<RowType>(filePath: string, bufSize = DEFAULT_
             rowBuffer.push(row);
         }
     }
+    yield rowBuffer;
 }
