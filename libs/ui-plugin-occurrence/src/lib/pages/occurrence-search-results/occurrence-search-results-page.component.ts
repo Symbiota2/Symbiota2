@@ -31,7 +31,7 @@ export class OccurrenceSearchResultsPage implements OnInit {
     readonly SHOW_COLUMNS = [
         'occurrenceID',
         'catalogNumber',
-        'sciName',
+        'scientificName',
         'collection',
         'latitude',
         'longitude'

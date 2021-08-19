@@ -38,6 +38,7 @@ import { TraitAttribute } from '../trait/TraitAttribute.entity';
 import { Unknown } from '../unknown-taxon/Unknown.entity';
 import { UserAccessToken } from './UserAccessToken.entity';
 import { UserRole } from './UserRole.entity';
+import { UserNotification } from './UserNotification.entity';
 
 @Index('Index_email', ['email', 'lastName'], { unique: true })
 @Index('Index_username_password', ['username', 'password'])
@@ -271,4 +272,7 @@ export class User extends EntityProvider {
 
     @OneToMany(() => Unknown, (unknowns) => unknowns.user)
     unknowns: Promise<Unknown[]>;
+
+    @OneToMany(() => UserNotification, (notification) => notification.user)
+    notifications: Promise<UserNotification[]>;
 }

@@ -31,7 +31,7 @@ export class OccurrenceListItem implements ApiOccurrenceListItem {
 
     @ApiProperty()
     @Expose()
-    sciname: string;
+    scientificName: string;
 
     @ApiProperty()
     @Expose()

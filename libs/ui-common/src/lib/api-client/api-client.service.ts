@@ -7,6 +7,10 @@ import { filter, finalize, map } from 'rxjs/operators';
 import { ApiClientModule } from './api-client.module';
 import { LoadingService } from '../alert';
 
+interface SendOpts {
+    skipLoading?: boolean;
+}
+
 @Injectable({
     providedIn: ApiClientModule
 })
@@ -24,12 +28,20 @@ export class ApiClientService {
         return new ApiQueryBuilder(url);
     }
 
-    send<RequestType, ResponseType>(query: HttpRequest<RequestType>): Observable<ResponseType> {
-        this.loading.start()
+    send<RequestType, ResponseType>(query: HttpRequest<RequestType>, opts?: SendOpts): Observable<ResponseType> {
+        const skipLoading = opts && opts.skipLoading === true;
+
+        if (!skipLoading) {
+            this.loading.start()
+        }
         return this.http.request<ResponseType>(query).pipe(
             filter((httpEvent) => httpEvent.type === HttpEventType.Response),
             map((httpResponse) => (httpResponse as HttpResponse<ResponseType>).body),
-            finalize(() => this.loading.end())
+            finalize(() => {
+                if (!skipLoading) {
+                    this.loading.end()
+                }
+            })
         );
     }
 }

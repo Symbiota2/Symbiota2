@@ -11,7 +11,7 @@ import { Collection } from './Collection.entity';
 import { OccurrenceLoan } from '../occurrence/OccurrenceLoan.entity';
 import { User } from '../user/User.entity';
 import { EntityProvider } from '../../entity-provider.class';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { ApiInstitutionOutput } from '@symbiota2/data-access';
 
@@ -20,17 +20,17 @@ import { ApiInstitutionOutput } from '@symbiota2/data-access';
 @Entity('institutions')
 export class Institution extends EntityProvider implements ApiInstitutionOutput {
     @ApiProperty()
-    @Expose({ groups: ['single', 'list'] })
+    @Expose()
     @PrimaryGeneratedColumn({ type: 'int', name: 'iid', unsigned: true })
     id: number;
 
     @ApiProperty()
-    @Expose({ groups: ['single', 'list'] })
+    @Expose()
     @Column('varchar', { name: 'InstitutionCode', length: 45 })
     code: string;
 
     @ApiProperty()
-    @Expose({ groups: ['single', 'list'] })
+    @Expose()
     @Column('varchar', { name: 'InstitutionName', length: 150 })
     name: string;
 
@@ -126,3 +126,5 @@ export class Institution extends EntityProvider implements ApiInstitutionOutput 
     @JoinColumn([{ name: 'modifieduid', referencedColumnName: 'uid' }])
     lastModifiedUser: Promise<User>;
 }
+
+export class InstitutionListItem extends PickType(Institution, ['id', 'code', 'name']) { }

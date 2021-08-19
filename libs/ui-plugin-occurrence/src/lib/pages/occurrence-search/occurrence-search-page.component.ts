@@ -29,7 +29,7 @@ export class OccurrenceSearchCollectionsPage implements OnInit {
     readonly taxonCriteriaOptions = [
         { i18n: 'plugins.occurrence.search.taxonCriteria.familyOrSciName', value: 'familyOrSciName' },
         { i18n: 'plugins.occurrence.search.taxonCriteria.family', value: 'family' },
-        { i18n: 'plugins.occurrence.search.taxonCriteria.sciName', value: 'sciName' },
+        { i18n: 'plugins.occurrence.search.taxonCriteria.sciName', value: 'scientificName' },
         { i18n: 'plugins.occurrence.search.taxonCriteria.higherTaxon', value: 'higherTaxon' },
         { i18n: 'plugins.occurrence.search.taxonCriteria.commonName', value: 'commonName' },
     ];

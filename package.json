@@ -27,7 +27,7 @@
     "lint": "nx workspace-lint && nx lint",
     "nx": "nx",
     "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points",
-    "sql": "cross-env TS_NODE_PROJECT=tsconfig.cli.json node -r ts-node/register -r tsconfig-paths/register -r typeorm --require glob bin/run-sql.ts",
+    "sql": "cross-env TS_NODE_PROJECT=apps/api/tsconfig.app.json node -r ts-node/register -r tsconfig-paths/register -r typeorm --require glob bin/run-sql.ts",
     "start": "concurrently -r npm:start:prod:*",
     "start:dev": "concurrently -r npm:start:dev:*",
     "start:dev:ui": "nx serve ui",

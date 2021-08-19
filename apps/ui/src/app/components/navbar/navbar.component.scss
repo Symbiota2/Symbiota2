@@ -5,9 +5,14 @@
     width: 100%;
     height: 100%;
 
+    padding: 0 2rem;
+
     background-color: $primaryColor;
     color: white;
-    font-size: 0.8rem;
+
+    &, & * {
+        font-size: 0.8rem;
+    }
 }
 
 a {
@@ -15,33 +20,87 @@ a {
     color: white;
     cursor: pointer;
 
+    &.mat-menu-item {
+        &, &:hover {
+            color: black;
+        }
+    }
+
     &:hover, &:active {
         color: lightgray;
     }
 }
 
-.navigation-items {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+#side-nav-toggle {
+    height: 100%;
+    margin-left: 0.2rem;
+    color: white;
 }
 
-#right-links, #left-links {
-    @include mx(1.1rem);
-}
+#lang-select {
+    padding: 0.5rem;
+    color: white;
+    background-color: transparent;
+    border: none;
 
-#navigation-items-sub {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-
-    a {
-        color: black;
+    &:hover {
+        cursor: pointer;
+        background-color: rgba(0, 0, 0, 0.05);
     }
 }
 
-#side-nav-toggle {
-    height: 100%;
-    margin-left: 20px;
-    color: white;
+#user-menu {
+    .mat-icon {
+        margin-left: 1rem;
+        display: inline;
+        vertical-align: middle;
+        font-size: 1rem;
+    }
+}
+
+#divider {
+    height: 50%;
+    border-color: rgba(255, 255, 255, 0.5);
+    margin: 0 0.5rem;
+}
+
+#notification-icon {
+    font-size: 1.25rem !important;
+}
+
+::ng-deep .mat-menu-panel {
+    max-width: fit-content !important;
+}
+
+.notification {
+    max-width: 10rem;
+    height: auto;
+
+    margin-top: 0;
+    margin-bottom: 0;
+
+    padding-top: 0;
+    padding-bottom: 0;
+
+    p {
+        text-overflow: ellipsis;
+        overflow-x: hidden;
+
+        margin: 0;
+        padding: 0;
+    }
+
+    .createdAt {
+        font-size: 0.5rem;
+        color: rgb(100, 100, 100);
+        text-align: right;
+    }
+}
+
+#notification-actions {
+    margin: 0.5rem 0;
+
+    button {
+        font-size: 0.6rem;
+    }
 }

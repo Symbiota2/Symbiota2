@@ -1,0 +1,58 @@
+<!-- TODO: i18n -->
+<div fxLayout='row' fxLayoutGap='1rem' fxLayoutAlign='start center'>
+    <div id='header' fxLayout='row' fxLayoutGap='1rem'>
+        <ng-container *ngIf='(collection.currentCollection | async) as collection'>
+            <symbiota2-collection-logo
+                [src]='collection.icon'
+                [collectionID]='collection.id'
+            >
+            </symbiota2-collection-logo>
+        </ng-container>
+        <div fxLayout='column' fxLayoutGap='0.5rem'>
+            <h1>Occurrence Upload: Field Mapping</h1>
+            <p>
+                Please map the fields in your upload to Symbiota2 fields.
+            </p>
+        </div>
+    </div>
+    <mat-form-field id='unique-id'>
+        <mat-label>Unique ID Column</mat-label>
+        <mat-select [formControl]='uniqueIDField'>
+            <mat-option *ngFor='let opt of (uniqueIDOptions | async)' [value]='opt'>
+                {{ opt }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <small class='error' *ngIf='!uniqueIDField.valid'>
+        Please select a field that uniquely identifies each row within this collection
+    </small>
+</div>
+
+<div id='table-container'>
+    <mat-paginator [hidePageSize]='true' [pageSizeOptions]='[10]'></mat-paginator>
+    <table mat-table [dataSource]='dataSource'>
+        <ng-container matColumnDef="uploadField">
+            <th mat-header-cell *matHeaderCellDef>Upload Data Field</th>
+            <td mat-cell *matCellDef="let row">{{ row.fieldName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="apiFields">
+            <th mat-header-cell *matHeaderCellDef>Symbiota2 Field</th>
+            <td mat-cell *matCellDef="let row">
+                <symbiota2-field-map-select
+                    (valueChanged)='setFieldMapValue(row.fieldName, $event)'
+                    [value]='row.value'
+                    [options]='row.options'
+                >
+                </symbiota2-field-map-select>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef='["uploadField", "apiFields"]'></tr>
+        <tr mat-row *matRowDef='let row; columns: ["uploadField", "apiFields"];'></tr>
+    </table>
+    <button class='begin' mat-raised-button color='primary' [disabled]='!uniqueIDField.valid' (click)='onSubmit()'>
+        Begin upload
+    </button>
+</div>
+

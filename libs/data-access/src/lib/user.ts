@@ -99,3 +99,9 @@ export interface ApiLoginRequest {
 export interface ApiLoginResponse {
     accessToken: string;
 }
+
+export interface ApiUserNotification {
+    id: number;
+    message: string;
+    createdAt: Date;
+}

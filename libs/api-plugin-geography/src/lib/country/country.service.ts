@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { GeoThesaurusCountry } from '@symbiota2/api-database';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 
 type FindAllReturn = Pick<GeoThesaurusCountry, 'id' | 'continentID' | 'acceptedID' | 'countryTerm'>;
 
@@ -16,10 +16,13 @@ export class CountryService {
     /**
      * Retrieve a list of countries from the database
      */
-    async findAll(): Promise<FindAllReturn[]> {
+    async findAll(searchTerm?: string, take = null): Promise<FindAllReturn[]> {
+        const where = searchTerm ? { countryTerm: Like(`${searchTerm}%`) } : null;
         return this.countryRepo.find({
             select: ['id', 'continentID', 'acceptedID', 'countryTerm'],
-            order: { 'countryTerm': 'ASC' }
+            order: { 'countryTerm': 'ASC' },
+            where: where,
+            take: take
         });
     }
 

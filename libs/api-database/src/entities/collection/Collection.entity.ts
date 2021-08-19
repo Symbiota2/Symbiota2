@@ -11,16 +11,14 @@ import {
 import { AdminStat } from '../AdminStat.entity';
 import { CollectionStat } from './CollectionStat.entity';
 import { CollectionCategoryLink } from './CollectionCategoryLink.entity';
-import { Institution } from './Institution.entity';
+import { Institution, InstitutionListItem } from './Institution.entity';
 import { CrowdSourceCentral } from '../crowd-source/CrowdSourceCentral.entity';
 import { ReferenceCollectionLink } from '../reference/ReferenceCollectionLink.entity';
 import { SpeciesProcessorProject } from '../species-processor/SpeciesProcessorProject.entity';
-import { SpeciesUploadTemp } from '../upload/SpeciesUploadTemp.entity';
 import { CollectionContact } from './CollectionContact.entity';
 import { OccurrenceLoan } from '../occurrence/OccurrenceLoan.entity';
 import { SecondaryCollection } from './SecondaryCollection.entity';
 import { CollectionPublication } from './CollectionPublication.entity';
-import { SpeciesUploadParameter } from '../upload/SpeciesUploadParameter.entity';
 import { OccurrenceDataset } from '../occurrence/OccurrenceDataset.entity';
 import { SpeciesProcessorNLP } from '../species-processor/SpeciesProcessorNLP.entity';
 import { Occurrence } from '../occurrence/Occurrence.entity';
@@ -36,7 +34,7 @@ import { ApiCollectionOutput } from '@symbiota2/data-access';
 @Entity('omcollections')
 export class Collection extends EntityProvider implements ApiCollectionOutput {
     @ApiProperty()
-    @Expose({ groups: ['single', 'list'] })
+    @Expose()
     @PrimaryGeneratedColumn({ type: 'int', name: 'CollID', unsigned: true })
     id: number;
 
@@ -44,12 +42,12 @@ export class Collection extends EntityProvider implements ApiCollectionOutput {
     institutionCode: string;
 
     @ApiProperty()
-    @Expose({ groups: ['single', 'list'] })
+    @Expose()
     @Column('varchar', { name: 'CollectionCode', nullable: true, length: 45 })
     collectionCode: string;
 
     @ApiProperty()
-    @Expose({ groups: ['single', 'list'] })
+    @Expose()
     @Column('varchar', { name: 'CollectionName', length: 150 })
     collectionName: string;
 
@@ -59,8 +57,6 @@ export class Collection extends EntityProvider implements ApiCollectionOutput {
     @Column('varchar', { name: 'datasetName', nullable: true, length: 100 })
     datasetName: string;
 
-    @ApiProperty()
-    @Expose({ groups: ['single'] })
     @Column('int', { name: 'iid', nullable: true, unsigned: true })
     institutionID: number | null;
 
@@ -217,19 +213,23 @@ export class Collection extends EntityProvider implements ApiCollectionOutput {
         () => CollectionStat,
         (omcollectionstats) => omcollectionstats.collection
     )
+    @ApiProperty({ type: CollectionStat })
+    @Expose({ groups: ['single'] })
+    @Type(() => CollectionStat)
+    // @ts-ignore
     collectionStats: Promise<CollectionStat> | CollectionStat;
 
     @OneToMany(() => CollectionCategoryLink, (omcollcatlink) => omcollcatlink.collection)
     collectionCategoryLinks: Promise<CollectionCategoryLink[]>;
 
-    @ApiProperty()
-    @Expose({ groups: ['single'] })
-    @Type(() => Institution)
     @ManyToOne(() => Institution, (institutions) => institutions.collections, {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
     })
     @JoinColumn([{ name: 'iid'}])
+    @ApiProperty({ type: InstitutionListItem })
+    @Expose({ groups: ['single'] })
+    @Type(() => Institution)
     // @ts-ignore
     institution: Promise<Institution> | Institution;
 
@@ -251,9 +251,6 @@ export class Collection extends EntityProvider implements ApiCollectionOutput {
     )
     specimenProcessorProjects: Promise<SpeciesProcessorProject[]>;
 
-    @OneToMany(() => SpeciesUploadTemp, (uploadspectemp) => uploadspectemp.collection)
-    uploadSpeciesTmps: SpeciesUploadTemp[];
-
     @OneToMany(
         () => CollectionContact,
         (omcollectioncontacts) => omcollectioncontacts.collection
@@ -274,12 +271,6 @@ export class Collection extends EntityProvider implements ApiCollectionOutput {
         (omcollpublications) => omcollpublications.collection
     )
     collectionPublications: Promise<CollectionPublication[]>;
-
-    @OneToMany(
-        () => SpeciesUploadParameter,
-        (uploadspecparameters) => uploadspecparameters.collection
-    )
-    speciesUploadParameters: Promise<SpeciesUploadParameter[]>;
 
     @OneToMany(() => OccurrenceDataset, (omoccurdatasets) => omoccurdatasets.collection)
     datasets: Promise<OccurrenceDataset[]>;
