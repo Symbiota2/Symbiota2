@@ -2,13 +2,14 @@ import {
     Column,
     Entity,
     JoinColumn,
-    OneToOne,
+    OneToOne, Repository
 } from 'typeorm';
 import { Collection } from './Collection.entity';
 import { EntityProvider } from '../../entity-provider.class';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { ApiCollectionStatsOutput } from '@symbiota2/data-access';
+import { Occurrence } from '../occurrence/Occurrence.entity';
 
 @Entity('omcollectionstats')
 export class CollectionStat extends EntityProvider implements ApiCollectionStatsOutput {
@@ -67,4 +68,38 @@ export class CollectionStat extends EntityProvider implements ApiCollectionStats
     )
     @JoinColumn([{ name: 'collid', referencedColumnName: 'id' }])
     collection: Promise<Collection>;
+
+    async recalculate(occurrences: Repository<Occurrence>): Promise<void> {
+        const [recordCount, speciesCount, familyCount, genusCount, geoRefCount] = await Promise.all([
+            occurrences.count({ collectionID: this.collectionID }),
+            occurrences.createQueryBuilder('o')
+                .select('COUNT(DISTINCT o.scientificName) as cnt')
+                .where('o.collectionID = :collectionID', { collectionID: this.collectionID })
+                .andWhere('o.family is not null')
+                .getRawOne<{ cnt: number }>(),
+            occurrences.createQueryBuilder('o')
+                .select('COUNT(DISTINCT o.family) as cnt')
+                .where('o.collectionID = :collectionID', { collectionID: this.collectionID })
+                .andWhere('o.family is not null')
+                .getRawOne<{ cnt: number }>(),
+            occurrences.createQueryBuilder('o')
+                .select('COUNT(DISTINCT o.genus) as cnt')
+                .where('o.collectionID = :collectionID', { collectionID: this.collectionID })
+                .andWhere('o.genus is not null')
+                .getRawOne<{ cnt: number }>(),
+            occurrences.createQueryBuilder('o')
+                .select('COUNT(*) as cnt')
+                .where('o.collectionID = :collectionID', { collectionID: this.collectionID })
+                .andWhere('o.latitude is not null')
+                .andWhere('o.longitude is not null')
+                .getRawOne<{ cnt: number }>(),
+        ]);
+
+        this.recordCount = recordCount;
+        this.speciesCount = speciesCount.cnt;
+        this.familyCount = familyCount.cnt;
+        this.genusCount = genusCount.cnt;
+        this.georeferencedCount = geoRefCount.cnt;
+        this.lastModifiedTimestamp = new Date();
+    }
 }

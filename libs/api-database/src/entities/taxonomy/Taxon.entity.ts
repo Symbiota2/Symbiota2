@@ -6,7 +6,7 @@ import {
     ManyToOne,
     OneToMany,
     OneToOne,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn, Repository
 } from 'typeorm';
 import { Unknown } from '../unknown-taxon';
 import { TaxonMap } from './TaxonMap.entity';
@@ -232,4 +232,14 @@ export class Taxon extends EntityProvider {
 
     @OneToMany(() => CharacteristicTaxonLink, (kmchartaxalink) => kmchartaxalink.taxon)
     characteristicLinks: Promise<CharacteristicTaxonLink[]>;
+
+    async lookupAncestor(taxonRepo: Repository<Taxon>, rankID: number): Promise<Taxon> {
+        return await taxonRepo.createQueryBuilder('t')
+            .select()
+            .innerJoin(TaxaEnumTreeEntry, 'te', 't.id = te.parentTaxonID')
+            .where('te.taxonID = :taxonID', { taxonID: this.id })
+            .andWhere('t.rankID = :rankID', { rankID })
+            .take(1)
+            .getOne();
+    }
 }

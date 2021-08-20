@@ -116,26 +116,4 @@ export class CollectionService extends BaseService<Collection> {
             lastModifiedTimestamp: new Date()
         });
     }
-
-    // TODO: Finish this
-    async updateStats(id: number): Promise<boolean> {
-        // TODO: How to do georeferencedCount?
-        const counts = await this.occurrenceRepo.createQueryBuilder('c')
-            .select([
-                'COUNT(*) as recordCount',
-                'COUNT(DISTINCT family) as familyCount',
-                'COUNT(DISTINCT genus) as genusCount',
-                'COUNT(DISTINCT scientificName) as speciesCount',
-            ])
-            .where({ collectionID: id })
-            .execute();
-
-        const stats = await this.collectionStats.findOne({ collectionID: id });
-        if (!stats) {
-            return false;
-        }
-
-        await this.collectionStats.save({ ...stats, ...counts });
-        return true;
-    }
 }

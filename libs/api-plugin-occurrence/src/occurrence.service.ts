@@ -355,23 +355,30 @@ export class OccurrenceService {
         const uniqueFieldValues = new Set();
         let nulls = 0;
 
-        for await (const batch of csvIterator<DeepPartial<Occurrence>>(csvFile)) {
-            for (const row of batch) {
-                const fieldVal = row[uniqueField];
-                if (fieldVal) {
-                    uniqueFieldValues.add(fieldVal);
-                }
-                else {
-                    nulls += 1;
+        try {
+            for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
+                for (const row of batch) {
+                    const fieldVal = row[uniqueField];
+                    if (fieldVal) {
+                        uniqueFieldValues.add(fieldVal);
+                    }
+                    else {
+                        nulls += 1;
+                    }
                 }
             }
+        } catch (e) {
+            throw new Error('Error parsing CSV');
         }
 
         return { uniqueValues: [...uniqueFieldValues], nulls };
     }
 
     async countOccurrences(collectionID: number, field: string, isIn: any[]): Promise<number> {
-        // TODO: This binary comparison is a pain, the collation of all tables should be migrated to utf8mb4_bin
+        if (isIn.length === 0) {
+            return 0;
+        }
+
         const result = await this.occurrenceRepo.createQueryBuilder('o')
             .select([`COUNT(DISTINCT o.${field}) as cnt`])
             .where(`o.collectionID = :collectionID`, { collectionID })

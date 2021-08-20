@@ -37,6 +37,7 @@ import { CollectionIDQueryParam } from './dto/collection-id-query-param';
 import { AuthenticatedRequest, JwtAuthGuard } from '@symbiota2/api-auth';
 import { OccurrenceHeaderMapBody } from './dto/occurrence-header-map.input.dto';
 import { Occurrence, OccurrenceUpload } from '@symbiota2/api-database';
+import * as path from 'path';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -124,7 +125,7 @@ export class OccurrenceController {
             headers.forEach((h) => headerMap[h] = '');
 
             upload = await this.occurrenceService.createUpload(
-                file.path,
+                path.resolve(file.path),
                 file.mimetype,
                 headerMap
             );

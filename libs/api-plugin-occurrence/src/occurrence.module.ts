@@ -11,6 +11,7 @@ import { OccurrenceUploadCleanupQueue } from './queues/occurrence-upload-cleanup
 import { OccurrenceUploadCleanupProcessor } from './queues/occurrence-upload-cleanup.processor';
 import { OccurrenceUploadQueue } from './queues/occurrence-upload.queue';
 import { OccurrenceUploadProcessor } from './queues/occurrence-upload.processor';
+import { CollectionModule } from '@symbiota2/api-plugin-collection';
 
 /**
  * Module for retrieving occurrence records from the database
@@ -45,6 +46,7 @@ import { OccurrenceUploadProcessor } from './queues/occurrence-upload.processor'
             },
             inject: [AppConfigService]
         }),
+        CollectionModule,
         OccurrenceUploadCleanupQueue,
         OccurrenceUploadQueue
     ],

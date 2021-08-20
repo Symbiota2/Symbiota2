@@ -176,13 +176,6 @@ export class Occurrence extends EntityProvider {
     })
     infraspecificEpithet: string;
 
-    @Column('varchar', {
-        name: 'scientificNameAuthorship',
-        nullable: true,
-        length: 255,
-    })
-    scientificNameAuthorship: string;
-
     @Column('text', { name: 'taxonRemarks', nullable: true })
     taxonRemarks: string;
 
@@ -712,85 +705,67 @@ export class Occurrence extends EntityProvider {
     )
     datasetLinks: Promise<OccurrenceDatasetLink[]>;
 
+    @BeforeInsert()
+    async clearTaxonomy() {
+        // The only way these should be set is through populateTaxonomy()
+        this.taxonID = null;
+        this.family = null;
+        this.genus = null;
+    }
+
     @BeforeUpdate()
     async updateLastModified() {
         this.lastModifiedTimestamp = new Date();
     }
 
-    @BeforeInsert()
-    @BeforeUpdate()
-    async resolveTaxonomy() {
-        const connection = getConnection();
-        const taxonRankRepo = connection.getRepository(TaxonomicUnit);
-        const taxonRepo = connection.getRepository(Taxon);
-        const taxaEnumRepo = connection.getRepository(TaxaEnumTreeEntry);
+    async populateTaxonomy(
+        taxonRepo: Repository<Taxon>,
+        familyRankID: number,
+        genusRankID: number) {
 
-        this.taxonID = null;
-        this.family = null;
-        this.genus = null;
-
-        const taxon = await taxonRepo.findOne(
-            { scientificName: this.scientificName },
-            { select: ['id'] }
-        );
-
-        if (!taxon) {
+        // It's already populated
+        if (this.taxonID && this.family && this.genus) {
             return;
         }
 
-        const allKingdomRanks = await taxonRankRepo.find({ rankName: 'Kingdom' });
-        const allKingdoms = await taxonRepo.createQueryBuilder('t')
-            .select('t.id')
-            .where('t.scientificName IN (:...isIn)', { isIn: allKingdomRanks.map((r) => r.kingdomName) })
-            .execute();
-
-        const kingdomEnumEntry = await taxaEnumRepo.findOne({
-            taxonID: taxon.id,
-            parentTaxonID: allKingdoms.map((k) => k.id)
-        });
-
-        if (!kingdomEnumEntry) {
+        if (!this.scientificName) {
+            this.taxonID = null;
+            this.family = null;
+            this.genus = null;
             return;
         }
 
-        const kingdom = await kingdomEnumEntry.parentTaxon;
+        let taxon: Taxon;
+        if (!this.taxonID) {
+            taxon = await taxonRepo.findOne(
+                { scientificName: this.scientificName },
+                { select: ['id', 'author'] }
+            );
 
-        const [familyRank, genusRank] = await Promise.all([
-            taxonRankRepo.findOne(
-                { rankName: 'Family', kingdomName: kingdom.scientificName },
-                { select: ['id'] }
-            ),
-            taxonRankRepo.findOne(
-                { rankName: 'Genus', kingdomName: kingdom.scientificName },
-                { select: ['id'] }
-            ),
-        ]);
+            if (!taxon) {
+                this.family = null;
+                this.genus = null;
+                return;
+            }
 
-        const family = await Occurrence.lookupAncestor(
-            taxaEnumRepo,
-            taxon.id,
-            familyRank.rankID
-        );
-        const genus = await Occurrence.lookupAncestor(
-            taxaEnumRepo,
-            taxon.id,
-            genusRank.rankID
-        );
+            this.taxonID = taxon.id;
+        }
+        else {
+            taxon = await this.taxon;
+        }
 
-        this.taxonID = taxon.id;
-        this.genus = genus ? genus.scientificName : null;
-        this.family = family ? family.scientificName : null;
-        this.scientificNameAuthorship = taxon.author;
-    }
+        if (!(this.family || this.genus)) {
+            const family = await taxon.lookupAncestor(
+                taxonRepo,
+                familyRankID
+            );
+            const genus = await taxon.lookupAncestor(
+                taxonRepo,
+                genusRankID
+            );
 
-    private static async lookupAncestor(taxaEnumRepo: Repository<TaxaEnumTreeEntry>, childTaxonID: number, rankID: number): Promise<Taxon> {
-        const ancestor = await taxaEnumRepo.createQueryBuilder('te')
-            .select()
-            .innerJoin(Taxon, 'parent', 'te.parentTaxonID = parent.id')
-            .where('te.taxonID = :taxonID', { taxonID: childTaxonID })
-            .andWhere('parent.rankID = :rankID', { rankID })
-            .limit(1)
-            .execute();
-        return ancestor.length > 0 ? ancestor[0] : null;
+            this.genus = genus ? genus.scientificName : null;
+            this.family = family ? family.scientificName : null;
+        }
     }
 }

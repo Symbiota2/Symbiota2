@@ -73,7 +73,6 @@ export class GeographyController {
     })
     @ApiResponse({ status: HttpStatus.OK, type: CountryListItem, isArray: true })
     async countryList(@Query() params: CountryFindAllQuery): Promise<CountryListItem[]> {
-        console.log(params);
         const countries = await this.countries.findAll(
             params.countryTerm,
             params.limit ? params.limit : null

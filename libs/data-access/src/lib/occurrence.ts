@@ -139,7 +139,6 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     samplingEffort: string;
     samplingProtocol: string;
     scientificName: string;
-    scientificNameAuthorship: string;
     sex: string;
     specificEpithet: string;
     startDayOfYear: number | null;

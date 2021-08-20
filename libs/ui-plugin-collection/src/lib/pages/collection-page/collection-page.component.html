@@ -68,6 +68,7 @@
                     <li>{{ collection.collectionStats.genusCount | number }} genera</li>
                     <li>{{ collection.collectionStats.speciesCount | number }} species</li>
                 </ul>
+                <small>Last updated {{ collection.collectionStats.lastModifiedTimestamp | date: 'medium' }}</small>
             </div>
         </div>
     </div>

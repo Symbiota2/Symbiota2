@@ -1,10 +1,11 @@
 import {
+    InjectQueue,
     OnQueueCompleted,
     OnQueueFailed,
     Process,
     Processor
 } from '@nestjs/bull';
-import { Job } from 'bull';
+import { Job, Queue } from 'bull';
 import { Inject, Logger } from '@nestjs/common';
 import {
     CollectionStat,
@@ -15,6 +16,10 @@ import {
 import { DeepPartial, Repository } from 'typeorm';
 import { QUEUE_ID_OCCURRENCE_UPLOAD } from './occurrence-upload.queue';
 import { csvIterator } from '@symbiota2/api-common';
+import {
+    CollectionStatsUpdateJob,
+    QUEUE_ID_COLLECTION_STATS_UPDATE
+} from '@symbiota2/api-plugin-collection';
 
 export interface OccurrenceUploadJob {
     uid: number;
@@ -41,7 +46,9 @@ export class OccurrenceUploadProcessor {
         @Inject(TaxonomicUnit.PROVIDER_ID)
         private readonly taxonRanks: Repository<TaxonomicUnit>,
         @Inject(TaxaEnumTreeEntry.PROVIDER_ID)
-        private readonly taxaEnumTree: Repository<TaxaEnumTreeEntry>) { }
+        private readonly taxaEnumTree: Repository<TaxaEnumTreeEntry>,
+        @InjectQueue(QUEUE_ID_COLLECTION_STATS_UPDATE)
+        private readonly collectionStatsUpdateQueue: Queue<CollectionStatsUpdateJob>) { }
 
     // TODO: Wrap in a transaction? Right now each chunk goes straight to the database until a failure occurs
     @Process()
@@ -130,11 +137,12 @@ export class OccurrenceUploadProcessor {
 
             // Update
             if (dbOccurrence) {
-                allOccurrenceUpdates.push({
-                    ...dbOccurrence,
-                    ...occurrenceData,
-                    id: dbOccurrence.id
-                })
+                for (const [k, v] of Object.entries(occurrenceData)) {
+                    if (k in dbOccurrence) {
+                        dbOccurrence[k] = v;
+                    }
+                }
+                allOccurrenceUpdates.push(dbOccurrence);
             }
             // Insert
             else {
@@ -152,35 +160,7 @@ export class OccurrenceUploadProcessor {
     }
 
     private async onCSVComplete(uid: number, collectionID: number) {
-        const [stats, recordCount, familyCount, genusCount, geoRefCount] = await Promise.all([
-            this.collectionStats.findOne({ collectionID }),
-            this.occurrences.count({ collectionID }),
-            this.occurrences.createQueryBuilder('o')
-                .select('COUNT(*) as cnt')
-                .where('o.collectionID = :collectionID', { collectionID })
-                .andWhere('o.family is not null')
-                .getRawOne<{ cnt: number }>(),
-            this.occurrences.createQueryBuilder('o')
-                .select('COUNT(*) as cnt')
-                .where('o.collectionID = :collectionID', { collectionID })
-                .andWhere('o.genus is not null')
-                .groupBy('o.genus')
-                .getRawOne<{ cnt: number }>(),
-            this.occurrences.createQueryBuilder('o')
-                .select('COUNT(*) as cnt')
-                .where('o.collectionID = :collectionID', { collectionID })
-                .andWhere('o.latitude is not null')
-                .andWhere('o.longitude is not null')
-                .getRawOne<{ cnt: number }>(),
-        ]);
-
-        stats.recordCount = recordCount;
-        stats.familyCount = familyCount.cnt;
-        stats.genusCount = genusCount.cnt;
-        stats.georeferencedCount = geoRefCount.cnt;
-        stats.lastModifiedTimestamp = new Date();
-
-        await this.collectionStats.save(stats);
+        await this.collectionStatsUpdateQueue.add({ collectionID });
         await this.notifications.save({
             uid,
             message: `Your upload to collectionID ${collectionID} has completed`
