@@ -11,14 +11,14 @@ import {
     ForbiddenException,
     HttpCode,
     Post,
-    Req, BadRequestException
+    Req, BadRequestException, UnauthorizedException, Delete
 } from '@nestjs/common';
 import {
     ApiBearerAuth, ApiOperation,
     ApiResponse,
     ApiTags
 } from '@nestjs/swagger';
-import { UserService } from '../services/user.service';
+import { UserService } from '../services/user/user.service';
 import {
     UserOutputDto
 } from '../dto/user.output.dto';
@@ -30,12 +30,14 @@ import { SuperAdminGuard } from '../../auth/guards/super-admin/super-admin.guard
 import { FindAllQuery } from '../dto/find-all-query.dto';
 import { CreateUserInputDto } from '../dto/create-user.input.dto';
 import { InjectQueue } from '@nestjs/bull';
-import { QUEUE_ID_FORGOT_PASSWORD } from '../services/forgot-password.queue';
+import { QUEUE_ID_FORGOT_PASSWORD } from '../services/queues/forgot-password.queue';
 import { Queue } from 'bull';
 import { ForgotPasswordInputDto } from '../dto/forgot-password.input.dto';
 import { AuthenticatedRequest, TokenService } from '@symbiota2/api-auth';
 import { ForgotUsernameInputDto } from '../dto/forgot-username.input.dto';
-import { QUEUE_ID_FORGOT_USERNAME } from '../services/forgot-username.queue';
+import { QUEUE_ID_FORGOT_USERNAME } from '../services/queues/forgot-username.queue';
+import { NotificationService } from '../services/notification/notification.service';
+import { UserNotification } from '@symbiota2/api-database';
 
 /**
  * Routes for getting/setting user data
@@ -45,6 +47,7 @@ import { QUEUE_ID_FORGOT_USERNAME } from '../services/forgot-username.queue';
 export class UserController {
     constructor(
         private readonly userService: UserService,
+        private readonly notificationService: NotificationService,
         @InjectQueue(QUEUE_ID_FORGOT_PASSWORD) private readonly forgotPasswordQueue: Queue,
         @InjectQueue(QUEUE_ID_FORGOT_USERNAME) private readonly forgotUsernameQueue: Queue,) { }
 

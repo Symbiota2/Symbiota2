@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { combineLatest, Observable, of, throwError } from 'rxjs';
 import { CollectionService } from '../../services/collection.service';
-import { Collection } from '../../dto/Collection.output.dto';
 import {
     CollectionProfileLink,
     CollectionProfileService,
@@ -96,12 +95,8 @@ export class CollectionPage {
 
     public geoReferencedPercent = this.collection.pipe(
         map((collection) => {
-            if (collection?.stats?.recordCount > 0) {
-                return Math.round(
-                    (collection.stats.georeferencedCount /
-                        collection.stats.recordCount) *
-                        100
-                );
+            if (collection?.collectionStats?.recordCount > 0) {
+                return Math.round(collection.collectionStats.georeferencedCount / collection.collectionStats.recordCount * 100);
             }
             return 0;
         })

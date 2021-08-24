@@ -44,7 +44,10 @@ import {
     TaxonDescriptionDialogComponent,
     TaxonEditorDialogComponent,
     TaxonVernacularEditorComponent,
-    TaxonDescriptionEditorComponent
+    TaxonDescriptionEditorComponent,
+    TaxonDescriptionStatementDialogComponent,
+    TaxonTaxonEditorComponent,
+    TaxonTaxonDialogComponent
 } from './components';
 import { TaxonEditorPageComponent } from './pages'
 
@@ -87,7 +90,10 @@ import { TaxonEditorPageComponent } from './pages'
         TaxonEditorDialogComponent,
         TaxonVernacularEditorComponent,
         TaxonDescriptionDialogComponent,
-        TaxonDescriptionEditorComponent
+        TaxonDescriptionEditorComponent,
+        TaxonDescriptionStatementDialogComponent,
+        TaxonTaxonEditorComponent,
+        TaxonTaxonDialogComponent
     ],
     providers: [
         TaxonService,
@@ -107,6 +113,9 @@ import { TaxonEditorPageComponent } from './pages'
         TaxonVernacularEditorComponent,
         TaxonDescriptionDialogComponent,
         TaxonDescriptionEditorComponent,
+        TaxonDescriptionStatementDialogComponent,
+        TaxonTaxonEditorComponent,
+        TaxonTaxonDialogComponent
     ]
 })
 export class TaxonomyPlugin extends SymbiotaUiPlugin {

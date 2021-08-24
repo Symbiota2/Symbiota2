@@ -3,17 +3,23 @@ import {
     SetMetadata,
     UseGuards
 } from '@nestjs/common';
-import { JwtAuthGuard } from '@symbiota2/api-auth';
 import {
-    CollectionEditGuard,
-    META_KEY_COLLID_ROUTE_PARAM
+    CollectionEditGuard, META_KEY_COLLID_IN_QUERY,
+    META_KEY_COLLID_PARAM
 } from './collection-edit.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
-export function ProtectCollection(collectionIDParam: string) {
+interface ProtectCollectionOpts {
+    isInQuery?: boolean;
+}
+
+export function ProtectCollection(collectionIDParam: string, opts?: ProtectCollectionOpts) {
+    const isInQuery = opts && opts.isInQuery && opts.isInQuery === true;
+
     return applyDecorators(
-        SetMetadata(META_KEY_COLLID_ROUTE_PARAM, collectionIDParam),
+        SetMetadata(META_KEY_COLLID_PARAM, collectionIDParam),
+        SetMetadata(META_KEY_COLLID_IN_QUERY, isInQuery),
         ApiBearerAuth(),
-        UseGuards(JwtAuthGuard, CollectionEditGuard)
+        UseGuards(CollectionEditGuard)
     );
 }

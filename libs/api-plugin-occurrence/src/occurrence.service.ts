@@ -1,5 +1,5 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { Occurrence } from '@symbiota2/api-database';
+import { Occurrence, OccurrenceUploadFieldMap } from '@symbiota2/api-database';
 import { DeepPartial, Repository } from 'typeorm';
 import { FindAllParams } from './dto/find-all-input.dto';
 import {
@@ -7,8 +7,18 @@ import {
     ApiTaxonSearchCriterion
 } from '@symbiota2/data-access';
 import { Geometry } from 'wkx';
+import { InjectQueue } from '@nestjs/bull';
+import { QUEUE_ID_OCCURRENCE_UPLOAD_CLEANUP } from './queues/occurrence-upload-cleanup.queue';
+import { Queue } from 'bull';
+import { OccurrenceUploadCleanupJob } from './queues/occurrence-upload-cleanup.processor';
+import { OccurrenceUpload } from '../../api-database/src/entities/upload/OccurrenceUpload.entity';
+import fs from 'fs';
+import csv from 'csv-parser';
+import { QUEUE_ID_OCCURRENCE_UPLOAD } from './queues/occurrence-upload.queue';
+import { OccurrenceUploadJob } from './queues/occurrence-upload.processor';
+import { csvIterator } from '@symbiota2/api-common';
 
-type _OccurrenceFindAllItem = Pick<Occurrence, 'id' | 'catalogNumber' | 'taxonID' | 'sciname' | 'latitude' | 'longitude'>;
+type _OccurrenceFindAllItem = Pick<Occurrence, 'id' | 'catalogNumber' | 'taxonID' | 'scientificName' | 'latitude' | 'longitude'>;
 type OccurrenceFindAllItem = _OccurrenceFindAllItem & { collection: ApiCollectionListItem };
 
 type OccurrenceFindAllList = {
@@ -23,7 +33,13 @@ type OccurrenceFindAllList = {
 export class OccurrenceService {
     constructor(
         @Inject(Occurrence.PROVIDER_ID)
-        private readonly occurrenceRepo: Repository<Occurrence>) { }
+        private readonly occurrenceRepo: Repository<Occurrence>,
+        @Inject(OccurrenceUpload.PROVIDER_ID)
+        private readonly uploadRepo: Repository<OccurrenceUpload>,
+        @InjectQueue(QUEUE_ID_OCCURRENCE_UPLOAD_CLEANUP)
+        private readonly uploadCleanupQueue: Queue<OccurrenceUploadCleanupJob>,
+        @InjectQueue(QUEUE_ID_OCCURRENCE_UPLOAD)
+        private readonly uploadQueue: Queue<OccurrenceUploadJob>) { }
 
     /**
      * Retrieves a list of occurrence records
@@ -38,7 +54,7 @@ export class OccurrenceService {
                 'o.id',
                 'o.catalogNumber',
                 'o.taxonID',
-                'o.sciname',
+                'o.scientificName',
                 'o.latitude',
                 'o.longitude',
                 'c.id',
@@ -63,14 +79,14 @@ export class OccurrenceService {
             switch (findAllOpts.taxonSearchCriterion) {
                 case ApiTaxonSearchCriterion.familyOrSciName:
                     qb.andWhere(
-                        '(o.sciname LIKE :sciNameOrFamily or o.family LIKE :sciNameOrFamily)',
+                        '(o.scientificName LIKE :sciNameOrFamily or o.family LIKE :sciNameOrFamily)',
                         { sciNameOrFamily: searchStr }
                     );
                     break;
-                case ApiTaxonSearchCriterion.sciName:
+                case ApiTaxonSearchCriterion.scientificName:
                     qb.andWhere(
-                        'o.sciname LIKE :sciname',
-                        { sciname: searchStr }
+                        'o.scientificName LIKE :scientificName',
+                        { scientificName: searchStr }
                     );
                     break;
                 case ApiTaxonSearchCriterion.family:
@@ -235,6 +251,10 @@ export class OccurrenceService {
      * @return ApiOccurrence The occurrence record
      */
     async findByID(id: number): Promise<ApiOccurrence> {
+        if (!Number.isInteger(id)) {
+            throw new BadRequestException('ID must be an integer');
+        }
+
         const { collection, ...props } = await this.occurrenceRepo.findOne(
             { id },
             { relations: ['collection'] }
@@ -274,5 +294,102 @@ export class OccurrenceService {
             .insert()
             .values(occurrences)
             .execute();
+    }
+
+    /**
+     * Returns a list of the fields of the occurrence entity
+     */
+    getOccurrenceFields(): string[] {
+        const entityColumns = this.occurrenceRepo.metadata.columns;
+        return entityColumns.map((c) => c.propertyName);
+    }
+
+    /**
+     * Creates a new upload in the database
+     * @param filePath The path to the file containing occurrences
+     * @param mimeType The mimeType of the file
+     * @param fieldMap Object describing how upload fields map to the occurrence database
+     */
+    async createUpload(filePath: string, mimeType: string, fieldMap: OccurrenceUploadFieldMap): Promise<OccurrenceUpload> {
+        let upload = this.uploadRepo.create({ filePath, mimeType, fieldMap, uniqueIDField: 'catalogNumber' });
+        upload = await this.uploadRepo.save(upload);
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        await this.uploadCleanupQueue.add({
+            id: upload.id,
+            deleteAfter: tomorrow,
+        });
+
+        return upload;
+    }
+
+    async patchUploadFieldMap(id: number, uniqueIDField: string, fieldMap: OccurrenceUploadFieldMap): Promise<OccurrenceUpload> {
+        const upload = await this.uploadRepo.findOne(id);
+        if (!upload) {
+            return null;
+        }
+        await this.uploadRepo.save({
+            ...upload,
+            uniqueIDField,
+            fieldMap
+        });
+        return upload;
+    }
+
+    async findUploadByID(id: number): Promise<OccurrenceUpload> {
+        return this.uploadRepo.findOne(id);
+    }
+
+    async deleteUploadByID(id: number): Promise<boolean> {
+        const upload = await this.uploadRepo.delete({ id });
+        return upload.affected > 0;
+    }
+
+    /**
+     * @return Object The value of uniqueField for each row in
+     * csvFile along with a count of the null values
+     */
+    async countCSVNonNull(csvFile: string, uniqueField: string): Promise<{ uniqueValues: any[], nulls: number }> {
+        const uniqueFieldValues = new Set();
+        let nulls = 0;
+
+        try {
+            for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
+                for (const row of batch) {
+                    const fieldVal = row[uniqueField];
+                    if (fieldVal) {
+                        uniqueFieldValues.add(fieldVal);
+                    }
+                    else {
+                        nulls += 1;
+                    }
+                }
+            }
+        } catch (e) {
+            throw new Error('Error parsing CSV');
+        }
+
+        return { uniqueValues: [...uniqueFieldValues], nulls };
+    }
+
+    async countOccurrences(collectionID: number, field: string, isIn: any[]): Promise<number> {
+        if (isIn.length === 0) {
+            return 0;
+        }
+
+        const result = await this.occurrenceRepo.createQueryBuilder('o')
+            .select([`COUNT(DISTINCT o.${field}) as cnt`])
+            .where(`o.collectionID = :collectionID`, { collectionID })
+            .andWhere(`o.${field} IS NOT NULL`)
+            .andWhere(`o.${field} IN (:...isIn)`, { isIn })
+            .getRawOne<{ cnt: number }>();
+
+        return result.cnt;
+    }
+
+    async startUpload(uid: number, collectionID: number, uploadID: number): Promise<void> {
+        await this.uploadQueue.add({ uid, collectionID, uploadID });
     }
 }

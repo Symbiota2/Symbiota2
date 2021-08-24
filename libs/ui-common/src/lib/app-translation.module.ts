@@ -30,8 +30,9 @@ export function HttpLoaderFactory(http: HttpClient) {
         { provide: TranslateStore, useClass: TranslateStore }
     ],
     exports: [
-        TranslateModule,
-    ]
+        TranslateModule
+    ],
+    declarations: []
 })
 export class AppTranslationModule {
     constructor(

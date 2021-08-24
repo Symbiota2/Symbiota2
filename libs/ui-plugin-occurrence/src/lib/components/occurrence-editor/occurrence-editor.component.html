@@ -1,186 +1,174 @@
-<div fxLayout='row'>
-    <symbiota2-expansion-panel label='Record-level' expanded>
-        <div fxLayout.gt-sm='row'>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.catalogNumber'
-                    helpLink=''
-                    [control]='formControlCatalogNumber'
-                >
-                </symbiota2-occurrence-field>
+<ng-container [formGroup]='form'>
+    <div fxLayout='row'>
+        <symbiota2-expansion-panel label='Record-level' expanded>
+            <div fxLayout.gt-sm='row'>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.catalogNumber'
+                        helpLink=''
+                        formControlName='catalogNumber'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.recordedByNames'
+                        helpLink=''
+                        formControlName='recordedBy'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.recordNumber'
+                        helpLink=''
+                        formControlName='recordNumber'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.eventDate'
+                        type='date'
+                        helpLink=''
+                        formControlName='eventDate'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
             </div>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.recordedByNames'
-                    helpLink=''
-                    [control]='formControlCollector'
-                >
-                </symbiota2-occurrence-field>
-            </div>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.recordNumber'
-                    helpLink=''
-                    [control]='formControlRecordNumber'
-                >
-                </symbiota2-occurrence-field>
-            </div>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.eventDate'
-                    type='date'
-                    helpLink=''
-                    [control]='formControlEventDate'
-                >
-                </symbiota2-occurrence-field>
-            </div>
-        </div>
-    </symbiota2-expansion-panel>
-</div>
+        </symbiota2-expansion-panel>
+    </div>
 
-<div fxLayout='row'>
-    <symbiota2-expansion-panel label='Latest Identification' expanded>
-        <div fxLayout.gt-sm='row'>
-            <div fxLayout.gt-sm='column' fxFlex='60'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.sciname'
-                    helpLink=''
-                    [control]='formControlScientificName'
-                >
-                </symbiota2-occurrence-field>
+    <div fxLayout='row'>
+        <symbiota2-expansion-panel label='Latest Identification' expanded>
+            <div fxLayout.gt-sm='row'>
+                <div fxLayout.gt-sm='column' fxFlex='60'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.scientificName'
+                        helpLink=''
+                        formControlName='scientificName'
+                        [autoCompleteItems]='autoCompleteTaxa'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.scientificNameAuthorship'
+                        helpLink=''
+                        formControlName='scientificNameAuthorship'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
             </div>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.scientificNameAuthorship'
-                    helpLink=''
-                    [control]='formControlAuthor'
-                >
-                </symbiota2-occurrence-field>
+            <div fxLayout.gt-sm='row'>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.family'
+                        helpLink=''
+                        formControlName='family'
+                        disabled='true'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.identifiedBy'
+                        helpLink=''
+                        formControlName='identifiedBy'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.dateIdentified'
+                        type='date'
+                        helpLink=''
+                        formControlName='dateIdentified'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
             </div>
-        </div>
-        <div fxLayout.gt-sm='row'>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.family'
-                    helpLink=''
-                    [control]='formControlFamily'
-                >
-                </symbiota2-occurrence-field>
+        </symbiota2-expansion-panel>
+    </div>
+    <div fxLayout='row'>
+        <symbiota2-expansion-panel label='Locality' expanded>
+            <div fxLayout.gt-sm='row'>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.country'
+                        helpLink=''
+                        formControlName='country'
+                        [autoCompleteItems]='autoCompleteCountries'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.stateProvince'
+                        helpLink=''
+                        formControlName='stateProvince'
+                        [autoCompleteItems]='autoCompleteStateProvinces'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.county'
+                        helpLink=''
+                        formControlName='county'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.municipality'
+                        helpLink=''
+                        formControlName='municipality'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
             </div>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.identifiedBy'
-                    helpLink=''
-                    [control]='formControlIdentifiedBy'
-                >
-                </symbiota2-occurrence-field>
+            <div fxLayout.gt-sm='row'>
+                <div fxLayout.gt-sm='column'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.locality'
+                        helpLink=''
+                        formControlName='locality'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
+                <div fxLayout.gt-sm='column' fxFlex='15'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.latitude'
+                        type='number'
+                        helpLink=''
+                        formControlName='latitude'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
+                <div fxLayout.gt-sm='column' fxFlex='15'>
+                    <symbiota2-occurrence-field
+                        label='plugins.occurrence.fields.longitude'
+                        type='number'
+                        helpLink=''
+                        formControlName='longitude'
+                    >
+                    </symbiota2-occurrence-field>
+                </div>
             </div>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.dateIdentified'
-                    type='date'
-                    helpLink=''
-                    [control]='formControlDateIdentified'
-                >
-                </symbiota2-occurrence-field>
-            </div>
-        </div>
-    </symbiota2-expansion-panel>
-</div>
-<div fxLayout='row'>
-    <symbiota2-expansion-panel label='Locality' expanded>
-        <div fxLayout.gt-sm='row'>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.country'
-                    helpLink=''
-                    [control]='formControlCountry'
-                >
-                </symbiota2-occurrence-field>
-            </div>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.stateProvince'
-                    helpLink=''
-                    [control]='formControlStateProvince'
-                >
-                </symbiota2-occurrence-field>
-            </div>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.county'
-                    helpLink=''
-                    [control]='formControlCounty'
-                >
-                </symbiota2-occurrence-field>
-            </div>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.municipality'
-                    helpLink=''
-                    [control]='formControlMunicipality'
-                >
-                </symbiota2-occurrence-field>
-            </div>
-        </div>
-        <div fxLayout.gt-sm='row'>
-            <div fxLayout.gt-sm='column'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.locality'
-                    helpLink=''
-                    [control]='formControlLocality'
-                >
-                </symbiota2-occurrence-field>
-            </div>
-            <div fxLayout.gt-sm='column' fxFlex='15'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.latitude'
-                    type='number'
-                    helpLink=''
-                    [control]='formControlLatitude'
-                >
-                </symbiota2-occurrence-field>
-            </div>
-            <div fxLayout.gt-sm='column' fxFlex='15'>
-                <symbiota2-occurrence-field
-                    label='plugins.occurrence.fields.longitude'
-                    type='number'
-                    helpLink=''
-                    [control]='formControlLongitude'
-                >
-                </symbiota2-occurrence-field>
-            </div>
-        </div>
-        <div id='localitySecurity' fxLayout='row' fxLayoutAlign='start center'>
+            <div id='localitySecurity' fxLayout='row' fxLayoutAlign='start center'>
             <span>
                 Redact locality data?
             </span>
-            <a href=''>
-                <mat-icon color='primary'>help</mat-icon>
-            </a>
-            <mat-checkbox
-                (change)='formControlLocalitySecurity.setValue($event.checked)'
-            >
-            </mat-checkbox>
-        </div>
-    </symbiota2-expansion-panel>
-</div>
-<div fxLayout='row'>
-    <symbiota2-expansion-panel label='Additional Fields' expanded>
-        <div fxLayout='row' *ngFor='let _ of counter(numExtraFields); last as last'>
-            <div fxLayout.gt-sm='column' fxFlex='60'>
-                <symbiota2-occurrence-extra-field
-                    [options]='ADDITIONAL_FIELDS'
-                    [disabledFields]='disabledAdditionalFields'
-                    (fieldChanged)='onExtraField($event)'
+                <a href=''>
+                    <mat-icon color='primary'>help</mat-icon>
+                </a>
+                <mat-checkbox
+                    (change)='form.setValue({ locality: $event.checked })'
                 >
-                </symbiota2-occurrence-extra-field>
+                </mat-checkbox>
             </div>
-            <div *ngIf='last' fxLayout.gt-sm='column' fxFlex='10'>
-                <button mat-icon-button (click)='numExtraFields = numExtraFields + 1'>
-                    <mat-icon>add</mat-icon>
-                </button>
-            </div>
-        </div>
-    </symbiota2-expansion-panel>
-</div>
+        </symbiota2-expansion-panel>
+    </div>
+
+</ng-container>

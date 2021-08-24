@@ -8,6 +8,8 @@ import { InstitutionModule } from './institution/institution.module';
 import { SymbiotaApiPlugin } from '@symbiota2/api-common';
 import { AuthModule } from '@symbiota2/api-auth';
 import { AppConfigModule } from '@symbiota2/api-config';
+import { CollectionStatsUpdateQueue } from './collection-stats-update/collection-stats-update.queue';
+import { CollectionStatsUpdateProcessor } from './collection-stats-update/collection-stats-update.processor';
 
 /**
  * Module for working with specimen collections
@@ -17,11 +19,13 @@ import { AppConfigModule } from '@symbiota2/api-config';
         AppConfigModule,
         AuthModule,
         InstitutionModule,
-        DatabaseModule
+        DatabaseModule,
+        CollectionStatsUpdateQueue
     ],
     providers: [
         CategoryService,
-        CollectionService
+        CollectionService,
+        CollectionStatsUpdateProcessor
     ],
     controllers: [
         CategoryController,
@@ -29,7 +33,8 @@ import { AppConfigModule } from '@symbiota2/api-config';
     ],
     exports: [
         CategoryService,
-        CollectionService
+        CollectionService,
+        CollectionStatsUpdateQueue,
     ]
 })
 export class CollectionModule extends SymbiotaApiPlugin {}

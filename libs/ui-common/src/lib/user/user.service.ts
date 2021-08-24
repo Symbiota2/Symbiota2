@@ -1,27 +1,37 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
-import { User, UserProfileData } from "./dto/user.class";
-import { ApiClientService } from "../api-client";
-import { plainToClass } from "class-transformer";
+import { Injectable, EventEmitter } from '@angular/core';
+import {
+    BehaviorSubject,
+    combineLatest,
+    Observable,
+    of,
+    Subscription, timer
+} from 'rxjs';
+import { User, UserProfileData } from './dto/user.class';
+import { ApiClientService } from '../api-client';
+import { plainToClass } from 'class-transformer';
 import {
     catchError,
-    delay, filter,
+    delay, filter, finalize,
     map,
     shareReplay,
-    skip,
+    skip, startWith,
     switchMap, take,
     tap
 } from 'rxjs/operators';
-import { ApiLoginResponse } from "@symbiota2/data-access";
-import { AlertService } from "../alert";
-import { HttpErrorResponse } from "@angular/common/http";
-import jwtDecode from "jwt-decode";
+import { ApiLoginResponse, ApiUserNotification } from '@symbiota2/data-access';
+import { AlertService, LoadingService } from '../alert';
+import { HttpErrorResponse } from '@angular/common/http';
+import jwtDecode from 'jwt-decode';
 import {
     ApiCreateUserData,
     ApiUser
 } from '@symbiota2/data-access';
 
 type AuthData = { username?: string, password?: string };
+interface NotificationResults {
+    count: number;
+    notifications: ApiUserNotification[];
+}
 
 /**
  * Service for retrieving users from the API
@@ -29,17 +39,66 @@ type AuthData = { username?: string, password?: string };
 @Injectable()
 export class UserService {
     private static readonly ONE_MINUTE = 60 * 1000;
+    private static readonly TEN_SECONDS = 10 * 1000;
 
     private readonly _currentUser = new BehaviorSubject<User>(null);
     private refreshSubscription: Subscription = null;
+    private notificationDeleted = new EventEmitter<void>();
 
     /**
      * The currently logged in user
      */
-    public readonly currentUser = this._currentUser.asObservable().pipe(
-        // Skip the first one, it's usually null on initial page load
+    public readonly currentUser: Observable<User> = this._currentUser.asObservable().pipe(
         skip(1),
         // After that, replay the last submitted value to all subscribers
+        shareReplay(1)
+    );
+
+    private readonly notificationResults: Observable<NotificationResults> = combineLatest([
+        this.currentUser,
+        this.notificationDeleted.pipe(startWith({})),
+    ]).pipe(
+        switchMap(([user, _]) => {
+            return timer(0, UserService.TEN_SECONDS).pipe(
+                map(() => user)
+            )
+        }),
+        switchMap((user) => {
+            if (!user) {
+                return of([]);
+            }
+
+            const url = this.notificationUrl(user.uid);
+            const query = this.api.queryBuilder(url)
+                .get()
+                .addJwtAuth(user.token)
+                .build();
+
+            return this.api.send(query, { skipLoading: true });
+        }),
+        map((response: NotificationResults) => {
+            // API returns a timestamp string, so we need to convert to a date
+            let notifications = [...response.notifications];
+            notifications = notifications.map((n) => {
+                return {
+                    ...n,
+                    createdAt: new Date(n.createdAt)
+                };
+            });
+            return {
+                count: response.count,
+                notifications: notifications
+            }
+        }),
+    );
+
+    public readonly notifications: Observable<ApiUserNotification[]> = this.notificationResults.pipe(
+        map((result) => result.notifications),
+        shareReplay(1)
+    );
+
+    public readonly notificationCount: Observable<number> = this.notificationResults.pipe(
+        map((result) => result.count),
         shareReplay(1)
     );
 
@@ -52,7 +111,7 @@ export class UserService {
                 return of(null);
             }
 
-            const dataReq = this.api.queryBuilder(`${this.api.apiRoot()}/users/${userData.uid}`)
+            const dataReq = this.api.queryBuilder(`${ this.api.apiRoot() }/users/${ userData.uid }`)
                 .get()
                 .addJwtAuth(userData.token)
                 .build();
@@ -84,7 +143,8 @@ export class UserService {
 
     constructor(
         private readonly alert: AlertService,
-        private readonly api: ApiClientService) { }
+        private readonly api: ApiClientService,
+        private readonly loading: LoadingService) { }
 
     /**
      * Creates a new user
@@ -100,7 +160,7 @@ export class UserService {
         return this.api.send(createReq).pipe(
             catchError((err: HttpErrorResponse) => {
                 if (err.error && err.error.message) {
-                    return of(`Account creation failed: ${err.error.message}`);
+                    return of(`Account creation failed: ${ err.error.message }`);
                 }
                 return of('Account creation failed');
             }),
@@ -111,7 +171,7 @@ export class UserService {
                 }
                 return of(null);
             })
-        )
+        );
     }
 
     /**
@@ -119,8 +179,10 @@ export class UserService {
      * @return Observable<User> The logged in user
      */
     login(username: string, password: string): Observable<User> {
+        this.loading.start();
         return this.authenticate(this.loginUrl, { username, password }).pipe(
-            tap((userData) => this._currentUser.next(userData))
+            tap((userData) => this._currentUser.next(userData)),
+            finalize(() => this.loading.end())
         );
     }
 
@@ -134,9 +196,15 @@ export class UserService {
             .addJwtAuth(currentUser.token)
             .build();
 
-        this.api.send(logoutReq).pipe(tap(() => {
-            this._currentUser.next(null);
-        })).subscribe();
+        this.loading.start();
+        this.api.send(logoutReq).pipe(
+            tap(() => {
+                this._currentUser.next(null);
+            }),
+            finalize(() => {
+                this.loading.end()
+            })
+        ).subscribe();
     }
 
     /**
@@ -161,7 +229,7 @@ export class UserService {
                     return null;
                 }
 
-                const dataReq = this.api.queryBuilder(`${this.api.apiRoot()}/users/${userData.uid}`)
+                const dataReq = this.api.queryBuilder(`${ this.api.apiRoot() }/users/${ userData.uid }`)
                     .patch()
                     .body(profileData)
                     .addJwtAuth(userData.token)
@@ -169,7 +237,7 @@ export class UserService {
 
                 return this.api.send(dataReq).pipe(
                     catchError((e: HttpErrorResponse) => {
-                        this.alert.showError(`An error occurred: ${e.error.message.join('\n')}`);
+                        this.alert.showError(`An error occurred: ${ e.error.message.join('\n') }`);
                         return of(null);
                     }),
                     map((profileData) => {
@@ -197,7 +265,7 @@ export class UserService {
             take(1),
             filter((user) => user !== null),
             switchMap((user) => {
-                const req = this.api.queryBuilder(`${this.api.apiRoot()}/users/${user.uid}/changePassword`)
+                const req = this.api.queryBuilder(`${ this.api.apiRoot() }/users/${ user.uid }/changePassword`)
                     .patch()
                     .addJwtAuth(user.token)
                     .body({
@@ -234,7 +302,7 @@ export class UserService {
             .addCookieAuth()
             .build();
 
-        return this.api.send<AuthData, User>(authReq).pipe(
+        return this.api.send<AuthData, User>(authReq, { skipLoading: true }).pipe(
             catchError((e) => {
                 console.error(e);
                 return of(null);
@@ -259,19 +327,90 @@ export class UserService {
         );
     }
 
+    deleteNotification(id: number) {
+        this.currentUser.pipe(
+            take(1),
+            map((user) => {
+                if (!user) {
+                    throw new Error('Please log in')
+                }
+                return user;
+            }),
+            switchMap((user) => {
+                const url = `${this.notificationUrl(user.uid)}/${id}`;
+                const query = this.api.queryBuilder(url)
+                    .delete()
+                    .addJwtAuth(user.token)
+                    .build();
+
+                return this.api.send(query, { skipLoading: true }).pipe(
+                    map(() => null)
+                );
+            }),
+            catchError((e) => {
+                return of(e);
+            })
+        ).subscribe((err) => {
+            if (err !== null) {
+                this.alert.showError(`Error deleting notification: ${err.message}`);
+            }
+            else {
+                this.notificationDeleted.emit();
+            }
+        });
+    }
+
+    deleteAllNotifications() {
+        this.currentUser.pipe(
+            take(1),
+            map((user) => {
+                if (!user) {
+                    throw new Error('Please log in')
+                }
+                return user;
+            }),
+            switchMap((user) => {
+                const url = this.notificationUrl(user.uid);
+                const query = this.api.queryBuilder(url)
+                    .delete()
+                    .addJwtAuth(user.token)
+                    .build();
+
+                return this.api.send<unknown, { deleted: number }>(query, { skipLoading: true }).pipe(
+                    map((result) => result.deleted)
+                );
+            }),
+            catchError((e) => {
+                return of(e);
+            })
+        ).subscribe((errOrDeletedCount) => {
+            if (errOrDeletedCount instanceof Error) {
+                this.alert.showError(`Error deleting notification: ${ errOrDeletedCount.message }`);
+            }
+            else {
+                this.notificationDeleted.emit();
+                this.alert.showMessage(`Cleared ${errOrDeletedCount} notifications`);
+            }
+        });
+    }
+
     private get loginUrl() {
-        return `${this.api.apiRoot()}/auth/login`;
+        return `${ this.api.apiRoot() }/auth/login`;
     }
 
     private get logoutUrl() {
-        return `${this.api.apiRoot()}/auth/logout`;
+        return `${ this.api.apiRoot() }/auth/logout`;
     }
 
     private get refreshUrl() {
-        return `${this.api.apiRoot()}/auth/refresh`;
+        return `${ this.api.apiRoot() }/auth/refresh`;
     }
 
     private get usersUrl() {
-        return `${this.api.apiRoot()}/users`;
+        return `${ this.api.apiRoot() }/users`;
+    }
+
+    private notificationUrl(uid: number) {
+        return `${ this.api.apiRoot() }/users/${ uid }/notifications`;
     }
 }

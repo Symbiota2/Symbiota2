@@ -3,7 +3,7 @@ import { ApiCollectionListItem } from './collection';
 
 export enum ApiTaxonSearchCriterion {
     familyOrSciName = 'familyOrSciName',
-    sciName = 'sciName',
+    scientificName = 'scientificName',
     family = 'family',
     higherTaxonomy = 'higherTaxonomy',
     commonName = 'commonName'
@@ -51,7 +51,7 @@ export interface ApiOccurrenceListItem {
     collection: ApiCollectionListItem;
     catalogNumber: string;
     taxonID: number | null;
-    sciname: string;
+    scientificName: string;
     latitude: number | null;
     longitude: number | null;
 }
@@ -64,7 +64,6 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     associatedTaxa: string;
     basisOfRecord: string;
     behavior: string;
-    collectionCode: string;
     collectionIDStr: string;
     coordinatePrecision: number;
     coordinateUncertaintyInMeters: number | null;
@@ -106,7 +105,6 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     informationWithheld: string;
     infraspecificEpithet: string;
     initialTimestamp: Date | null;
-    institutionCode: string;
     institutionID: string;
     labelProject: string;
     language: string;
@@ -141,7 +139,6 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     samplingEffort: string;
     samplingProtocol: string;
     scientificName: string;
-    scientificNameAuthorship: string;
     sex: string;
     specificEpithet: string;
     startDayOfYear: number | null;
@@ -159,4 +156,14 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     verbatimEventDate: string;
     waterBody: string;
     year: number | null;
+}
+
+export interface ApiOccurrenceUpload {
+    id: number;
+    fieldMap: Record<string, string>;
+}
+
+export interface ApiOccurrenceMapUploadFieldsBody {
+    uniqueIDField: string;
+    fieldMap: Record<string, string>;
 }

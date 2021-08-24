@@ -1,6 +1,9 @@
 import { createConnection } from 'typeorm';
+// @ts-ignore
 import glob from 'glob';
+// @ts-ignore
 import fs from 'fs';
+// @ts-ignore
 import path from 'path';
 import ormconfig from '../ormconfig';
 import { ConnectionOptions } from 'typeorm';
@@ -33,24 +36,24 @@ async function main(): Promise<void> {
 
     // Run files
     const conn = await createConnection({
-        ...ormconfig,
+        ...(await ormconfig),
         multipleStatements: true
     } as ConnectionOptions);
 
-    await conn.transaction(async (entityManager) => {
-        for (const sqlFile in sqlScripts) {
-            const fileData = sqlScripts[sqlFile];
-            console.log(`Running ${ sqlFile }...`);
-            try {
-                await entityManager.query(fileData);
-                console.log(`Finished processing ${ sqlFile }.`);
-            }
-            catch (e) {
-                console.error(`ERROR RUNNING ${sqlFile}: ${e.toString()}`);
-                process.exit(1);
-            }
-        }
-    });
+    for (const sqlFile in sqlScripts) {
+        const fileData = sqlScripts[sqlFile];
+        console.log(`Running ${ sqlFile }...`);
+            await conn.transaction(async (entityManager) => {
+                try {
+                    await entityManager.query(fileData);
+                }
+                catch (e) {
+                    console.error(`ERROR RUNNING ${sqlFile}: ${e.toString()}`);
+                    process.exit(1);
+                }
+            });
+            console.log(`Finished processing ${ sqlFile }.`);
+    }
 }
 
 main().then(() => {

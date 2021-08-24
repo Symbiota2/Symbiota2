@@ -7,7 +7,7 @@ export class OccurrenceListItem implements ApiOccurrenceListItem {
     @Expose() id: number;
     @Expose() catalogNumber: string;
     @Expose() taxonID: number;
-    @Expose() sciname: string;
+    @Expose() scientificName: string;
     @Expose() latitude: number;
     @Expose() longitude: number;
 

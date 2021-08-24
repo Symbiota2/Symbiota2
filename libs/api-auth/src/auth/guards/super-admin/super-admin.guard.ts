@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthenticatedRequest } from '../../dto/authenticated-request';
-import { TokenService } from '../../../user/services/token.service';
+import { TokenService } from '../../../user/services/token/token.service';
 import { AppConfigService } from '@symbiota2/api-config';
 
 /**

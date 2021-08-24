@@ -54,7 +54,7 @@ export interface ApiCollectionListItem {
 export interface ApiCollectionOutput extends ApiCollectionListItem {
     collectionCode: string;
     institution: ApiCollectionInstitutionOutput;
-    stats: ApiCollectionStatsOutput;
+    collectionStats: ApiCollectionStatsOutput;
     fullDescription: string;
     homePage: string;
     individualUrl: string;

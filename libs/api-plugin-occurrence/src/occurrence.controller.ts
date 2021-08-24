@@ -6,10 +6,10 @@ import {
     HttpCode,
     HttpStatus,
     Logger, NotFoundException,
-    Param, ParseArrayPipe,
+    Param, ParseArrayPipe, Patch,
     Post,
-    Query,
-    UploadedFile,
+    Query, Req,
+    UploadedFile, UseGuards,
     UseInterceptors
 } from '@nestjs/common';
 import {
@@ -26,17 +26,18 @@ import { OccurrenceInputDto } from './dto/occurrence-input.dto';
 import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import fs from 'fs';
-import JSONStream from 'JSONStream';
 import {
     ApiFileInput,
+    getCSVFields
 } from '@symbiota2/api-common';
-import { DeepPartial } from 'typeorm';
-import { Occurrence } from '@symbiota2/api-database';
-import { plainToClass } from 'class-transformer';
 import { OccurrenceOutputDto } from './dto/occurrence.output.dto';
 import { ProtectCollection } from '@symbiota2/api-plugin-collection';
 import { CollectionListItem } from '@symbiota2/ui-plugin-collection';
-import { DwCArchiveParser } from '@symbiota2/dwc';
+import { CollectionIDQueryParam } from './dto/collection-id-query-param';
+import { AuthenticatedRequest, JwtAuthGuard } from '@symbiota2/api-auth';
+import { OccurrenceHeaderMapBody } from './dto/occurrence-header-map.input.dto';
+import { Occurrence, OccurrenceUpload } from '@symbiota2/api-database';
+import * as path from 'path';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -44,27 +45,24 @@ const fsPromises = fs.promises;
 @ApiTags('Occurrences')
 @Controller('occurrences')
 export class OccurrenceController {
-    private static readonly CREATE_MANY_CHUNK_SZ = 1024;
-    private logger = new Logger(OccurrenceController.name);
-
     constructor(private readonly occurrenceService: OccurrenceService) { }
 
+    @Get()
     @ApiResponse({ status: HttpStatus.OK, type: OccurrenceList })
     @ApiOperation({
         summary: "Retrieve a list of occurrences"
     })
-    @Get()
     async findAll(@Query() findAllOpts: FindAllParams): Promise<OccurrenceList> {
         const occurrenceList = await this.occurrenceService.findAll(findAllOpts);
         return new OccurrenceList(occurrenceList.count, occurrenceList.data);
     }
 
+    @Get(':id')
     @ApiResponse({ status: HttpStatus.OK, type: OccurrenceOutputDto })
     @ApiOperation({
         summary: "Retrieve an occurrence by ID"
     })
     @ApiExtraModels(CollectionListItem)
-    @Get(':id')
     async findByID(@Param('id') id: number): Promise<OccurrenceOutputDto> {
         const occurrence = await this.occurrenceService.findByID(id);
         if (occurrence) {
@@ -73,117 +71,140 @@ export class OccurrenceController {
         throw new NotFoundException();
     }
 
-    @Post(':collectionID')
+    @Get('meta/fields')
+    @ApiOperation({
+        summary: 'Retrieve the list of fields for the occurrence entity'
+    })
+    async getOccurrenceFields(): Promise<string[]> {
+        return this.occurrenceService.getOccurrenceFields();
+    }
+
+    @Post()
     @ApiOperation({
         summary: "Create an occurrence within the given collection"
     })
-    @ProtectCollection('collectionID')
+    @ProtectCollection('collectionID', { isInQuery: true })
     @HttpCode(HttpStatus.OK)
     @ApiBody({ type: OccurrenceInputDto, isArray: true })
     async createOccurrence(
-        @Param('collectionID')
-        collectionID: number,
+        @Query() query: CollectionIDQueryParam,
         @Body(new ParseArrayPipe({ items: OccurrenceInputDto }))
         occurrenceData: OccurrenceInputDto[]): Promise<OccurrenceListItem> {
 
         // TODO: This returns nothing if input is array & something if it's a single occurrence
         if (occurrenceData.length > 1) {
-            await this.occurrenceService.createMany(collectionID, occurrenceData);
+            await this.occurrenceService.createMany(query.collectionID, occurrenceData);
         }
         else {
             const occurrence = await this.occurrenceService.create(
-                collectionID,
+                query.collectionID,
                 occurrenceData[0]
             );
             return new OccurrenceListItem(occurrence);
         }
     }
 
-    @Post(':collectionID/upload')
-    @ProtectCollection('collectionID')
+    @Post('upload')
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor('file'))
+    @UseGuards(JwtAuthGuard)
     @ApiOperation({
-        summary: "Upload a CSV or JSON file containing occurrences"
+        summary: "Upload a CSV or DwCA file containing occurrences"
     })
     @ApiFileInput('file')
-    async createOccurrencesFromCsv(
-        @Param('collectionID') collectionID: number,
-        @UploadedFile() file: File): Promise<void> {
+    async uploadOccurrenceFile(@UploadedFile() file: File): Promise<OccurrenceUpload> {
+        let upload: OccurrenceUpload;
 
-        if (!file.mimetype.startsWith('text/json')) {
-            await fsPromises.unlink(file.path);
-            throw new BadRequestException('Only JSON and CSV files are accepted');
+        if (!file) {
+            throw new BadRequestException('File not specified');
         }
 
-        const inputStream = fs.createReadStream(file.path);
+        if (file.mimetype.startsWith('text/csv')) {
+            const headers = await getCSVFields(file.path);
+            const headerMap = {};
+            headers.forEach((h) => headerMap[h] = '');
 
-        return new Promise(((resolve, reject) => {
-            let currentChunk: DeepPartial<Occurrence>[] = [];
-            const occurrencePromises = [];
-            const uploadStart = Date.now();
+            upload = await this.occurrenceService.createUpload(
+                path.resolve(file.path),
+                file.mimetype,
+                headerMap
+            );
+        }
+        else if (file.mimetype.startsWith('application/zip')) {
+            // TODO: DwCA uploads
+            await fsPromises.unlink(file.path);
+            throw new BadRequestException('DwCA uploads are not yet implemented');
+        }
+        else {
+            await fsPromises.unlink(file.path);
+            throw new BadRequestException('Unsupported file type: CSV and DwCA zip files are supported');
+        }
 
-            this.logger.debug('Upload started');
+        return upload;
+    }
 
-            inputStream.pipe(JSONStream.parse('*'))
-                .on('data', async (occurrence) => {
-                    if (currentChunk.length < OccurrenceController.CREATE_MANY_CHUNK_SZ) {
-                        try {
-                            currentChunk.push(
-                                plainToClass(
-                                    OccurrenceInputDto,
-                                    occurrence,
-                                    {
-                                        enableImplicitConversion: true,
-                                        excludeExtraneousValues: true
-                                    }
-                                )
-                            );
-                        }
-                        catch (e) {
-                            throw new BadRequestException(e.message);
-                        }
-                    }
-                    else {
-                        occurrencePromises.push(
-                            this.occurrenceService.createMany(
-                                collectionID,
-                                currentChunk
-                            )
-                        );
-                        currentChunk = [];
-                    }
-                })
-                .on('error', async (e) => {
-                    await fsPromises.unlink(file.path);
-                    reject(e);
-                })
-                .on('end', async () => {
-                    if (currentChunk.length > 0) {
-                        occurrencePromises.push(
-                            this.occurrenceService.createMany(
-                                collectionID,
-                                currentChunk
-                            )
-                        );
-                    }
+    @Get('upload/:id')
+    @ApiOperation({ summary: 'Retrieve an upload by its ID' })
+    async getUploadByID(@Param('id') id: number): Promise<OccurrenceUpload> {
+        return this.occurrenceService.findUploadByID(id);
+    }
 
-                    try {
-                        await Promise.all(occurrencePromises);
-                    }
-                    catch (e) {
-                        reject(e);
-                    }
-                    finally {
-                        const uploadTook = Math.round(
-                            (Date.now() - uploadStart) / 1000
-                        );
-                        this.logger.debug(`Upload took ${uploadTook}s`);
-                        await fsPromises.unlink(file.path);
-                    }
+    @Patch('upload/:id')
+    @HttpCode(HttpStatus.OK)
+    @ProtectCollection('collectionID', { isInQuery: true })
+    @ApiOperation({
+        summary: 'Map the fields of a CSV or DwCA to the occurrence table\'s fields'
+    })
+    async mapOccurrenceUpload(
+        @Query() query: CollectionIDQueryParam,
+        @Param('id') id: number,
+        @Body() body: OccurrenceHeaderMapBody): Promise<{ newRecords: number, updatedRecords: number, nullRecords: number }> {
 
-                    resolve();
-                });
-        }));
+        const upload = await this.occurrenceService.patchUploadFieldMap(
+            id,
+            body.uniqueIDField,
+            body.fieldMap as Record<string, keyof Occurrence>
+        );
+
+        if (!upload) {
+            throw new NotFoundException();
+        }
+
+        const csvOccurrenceUniqueIDs = await this.occurrenceService.countCSVNonNull(
+            upload.filePath,
+            body.uniqueIDField
+        );
+
+        const dbUniqueIDField = body.fieldMap[body.uniqueIDField];
+        const dbOccurrenceUniqueIDs = await this.occurrenceService.countOccurrences(
+            query.collectionID,
+            dbUniqueIDField,
+            csvOccurrenceUniqueIDs.uniqueValues
+        );
+
+        const newOccurrenceCount = csvOccurrenceUniqueIDs.uniqueValues.length - dbOccurrenceUniqueIDs;
+        return {
+            newRecords: newOccurrenceCount,
+            updatedRecords: dbOccurrenceUniqueIDs,
+            nullRecords: csvOccurrenceUniqueIDs.nulls
+        };
+    }
+
+    @Post('upload/:id/start')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ProtectCollection('collectionID', { isInQuery: true })
+    @ApiOperation({
+        summary: 'Starts a pre-configured upload of a CSV or DwCA'
+    })
+    async startUpload(
+        @Param('id') uploadID: number,
+        @Query() query: CollectionIDQueryParam,
+        @Req() request: AuthenticatedRequest) {
+
+        await this.occurrenceService.startUpload(
+            request.user.uid,
+            query.collectionID,
+            uploadID
+        );
     }
 }

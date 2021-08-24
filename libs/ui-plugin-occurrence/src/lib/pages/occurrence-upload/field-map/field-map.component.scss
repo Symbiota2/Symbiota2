@@ -1,0 +1,30 @@
+#table-container {
+    margin: 0 auto;
+    width: 75%;
+
+    table {
+        width: 100%;
+    }
+}
+
+.begin {
+    margin: 1rem 2rem;
+}
+
+#header {
+    h1 {
+        margin: 0;
+    }
+}
+
+#unique-id {
+    margin: 0 1rem;
+}
+
+.error {
+    color: darkred;
+}
+
+.mat-paginator {
+    font-weight: bold;
+}

@@ -1,6 +1,6 @@
 <!-- <h1 mat-dialog-title>Row Action :: <strong>{{action}}</strong></h1> -->
 <div mat-dialog-content>
-        <form *ngIf="action == 'Update'; else elseTemplate" class="name-autocomplete-form">
+        <form *ngIf="action == 'Update'; else elseTemplate">
             <mat-form-field appearance="fill">
                 <mat-label>{{'taxon.editor.common.name' | translate}}</mat-label>
                 <input matInput

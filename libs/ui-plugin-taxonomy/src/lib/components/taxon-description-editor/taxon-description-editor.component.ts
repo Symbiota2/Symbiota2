@@ -2,11 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonDescriptionBlockListItem, TaxonDescriptionBlockService,
-    TaxonListItem, TaxonomicAuthorityService,
+    TaxonDescriptionBlockListItem,
+    TaxonDescriptionBlockService,
+    TaxonListItem,
+    TaxonomicAuthorityService,
     TaxonomicStatusService,
-    TaxonService, TaxonVernacularListItem, TaxonVernacularService,
-    TaxonomicEnumTreeService
+    TaxonService,
+    TaxonVernacularListItem,
+    TaxonVernacularService,
+    TaxonomicEnumTreeService,
+    TaxonDescriptionDialogComponent,
+    TaxonDescriptionStatementListItem,
+    TaxonDescriptionStatementDialogComponent
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TranslateService } from '@ngx-translate/core'
 import { MatTableDataSource } from '@angular/material/table';
@@ -22,6 +29,13 @@ export interface BlockInfo {
     displayLevel: number
 }
 
+export interface StatementInfo {
+    heading: string
+    displayHeader: 1
+    statement: string
+    sortSequence: number
+}
+
 @Component({
     selector: 'taxon-description-editor',
     templateUrl: './taxon-description-editor.html',
@@ -29,7 +43,6 @@ export interface BlockInfo {
 })
 
 export class TaxonDescriptionEditorComponent implements OnInit {
-    displayedColumns = ['name', 'language', 'notes', 'sortSequence', 'source', 'action']
     blocks: TaxonDescriptionBlockListItem[] = []
     dataSource = this.blocks
     private taxonID: string
@@ -67,34 +80,34 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     Load the taxon description blocks
     */
     loadBlocks(taxonID: number) {
-
         this.taxonBlockService.findBlocksByTaxonID(taxonID)
             .subscribe((itemList) => {
-                this.blocks= itemList
+                this.blocks = itemList
                 this.dataSource = this.blocks
-                itemList.forEach((item) => {
-                })
             })
     }
 
-    /*
-     Add a row to the common names
-     */
-    onAddCommonName() {
-        const temp = new TaxonDescriptionBlockListItem()
-        temp.id = this.idCounter-- // Set the ID to a nonexistent value
+    onAddDescriptionBlock() {
         this.blocks.push(new TaxonDescriptionBlockListItem())
+        this.dataSource = this.blocks
+    }
+
+    onAddStatement(block: TaxonDescriptionBlockListItem) {
+        console.log(" here " + block.descriptionStatements.length)
+        // Initialize list if it does not exist
+        if (!block.descriptionStatements) block.descriptionStatements = []
+        block.descriptionStatements.unshift(new TaxonDescriptionStatementListItem())
         this.dataSource = this.blocks
     }
 
     openDialog(action, obj) {
         obj.action = action
         const dialogRef = (action == 'Delete') ?
-            this.dialog.open(TaxonEditorDialogComponent, {
+            this.dialog.open(TaxonDescriptionDialogComponent, {
                 width: '100',
                 data: obj
             })
-            : this.dialog.open(TaxonEditorDialogComponent, {
+            : this.dialog.open(TaxonDescriptionDialogComponent, {
                 width: '80%',
                 data: obj
             })
@@ -106,6 +119,56 @@ export class TaxonDescriptionEditorComponent implements OnInit {
                 this.deleteRowData(result.data)
             }
         })
+    }
+
+    openStatementDialog(action, obj) {
+        obj.action = action
+        const dialogRef = (action == 'Delete') ?
+            this.dialog.open(TaxonDescriptionStatementDialogComponent, {
+                width: '100',
+                data: obj
+            })
+            : this.dialog.open(TaxonDescriptionStatementDialogComponent, {
+                width: '80%',
+                data: obj
+            })
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result.event == 'Update') {
+                this.updateStatementRowData(result.data)
+            } else if (result.event == 'Delete') {
+                this.deleteStatementRowData(result.data)
+            }
+        })
+    }
+
+    updateStatementRowData(row_obj) {
+        this.blocks = this.blocks.filter((value,key) => {
+            if(value.id == row_obj.descriptionBlockID) {
+                value.descriptionStatements.filter((statement) => {
+                    if (statement.id == row_obj.id) {
+                        // copy temporary info to display info
+                        statement.sortSequence = row_obj.sortSequence
+                        statement.heading = row_obj.heading
+                        statement.statement = row_obj.statement
+                        statement.displayHeader = row_obj.displayHeader
+                    }
+                })
+            }
+            return true
+        })
+    }
+
+    deleteStatementRowData(row_obj) {
+        this.blocks = this.blocks.filter((value,key) => {
+            if(value.id == row_obj.descriptionBlockID) {
+                value.descriptionStatements = value.descriptionStatements.filter((statement) => {
+                    return statement.id != row_obj.id
+                })
+            }
+            return true
+        })
+        this.dataSource = this.blocks
     }
 
     updateRowData(row_obj) {
@@ -124,7 +187,6 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     }
 
     deleteRowData(row_obj) {
-        console.log("made it here")
         this.blocks = this.blocks.filter((value,key)=>{
             return value.id != row_obj.id
         })

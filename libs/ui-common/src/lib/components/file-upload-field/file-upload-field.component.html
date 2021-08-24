@@ -1,0 +1,8 @@
+<!-- TODO: i18n -->
+<div fxLayout='row' fxLayoutGap='1rem'>
+    <input type='text' readonly value='{{ file ? file.name : "" }}'>
+    <button mat-raised-button color='primary' (click)='onBrowseClicked()'>
+        Browse...
+    </button>
+    <input #fileInput hidden type='file' (change)='onFileChanged($event)'>
+</div>

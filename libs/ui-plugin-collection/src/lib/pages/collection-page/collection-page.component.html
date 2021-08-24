@@ -55,19 +55,20 @@
                 <symbiota2-collection-field label="Collection type" [value]="collection.type"></symbiota2-collection-field>
                 <symbiota2-collection-field label="Management" [value]="collection.managementType"></symbiota2-collection-field>
                 <symbiota2-collection-field label="Usage rights" [value]="collection.usageTerm"></symbiota2-collection-field>
-                <symbiota2-collection-field label="Last update" [value]="collection.stats?.lastModifiedTimestamp | date: 'medium'"></symbiota2-collection-field>
+                <symbiota2-collection-field label="Last update" [value]="collection.collectionStats?.lastModifiedTimestamp | date: 'medium'"></symbiota2-collection-field>
             </div>
         </div>
         <div fxFlex='30'>
-            <div id="collectionStats" *ngIf='collection.stats'>
+            <div id="collectionStats" *ngIf='collection.collectionStats'>
                 <b>Collection Stats</b>
                 <ul>
-                    <li>{{ collection.stats.recordCount }} occurrences</li>
-                    <li>{{ collection.stats.georeferencedCount }} ({{ geoReferencedPercent | async }}%) georeferenced</li>
-                    <li>{{ collection.stats.familyCount }} families</li>
-                    <li>{{ collection.stats.genusCount }} genera</li>
-                    <li>{{ collection.stats.speciesCount }} species</li>
+                    <li>{{ collection.collectionStats.recordCount | number }} occurrences</li>
+                    <li>{{ collection.collectionStats.georeferencedCount | number }} ({{ geoReferencedPercent | async }}%) georeferenced</li>
+                    <li>{{ collection.collectionStats.familyCount | number }} families</li>
+                    <li>{{ collection.collectionStats.genusCount | number }} genera</li>
+                    <li>{{ collection.collectionStats.speciesCount | number }} species</li>
                 </ul>
+                <small>Last updated {{ collection.collectionStats.lastModifiedTimestamp | date: 'medium' }}</small>
             </div>
         </div>
     </div>

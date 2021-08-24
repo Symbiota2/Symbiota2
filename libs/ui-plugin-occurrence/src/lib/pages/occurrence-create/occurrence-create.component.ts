@@ -58,6 +58,7 @@ export class OccurrenceCreateComponent {
         private readonly occurrences: OccurrenceService) { }
 
     onFormChanged(formData: Partial<ApiOccurrence>): void {
+        console.log(formData);
         this.formData = formData;
     }
 

@@ -2,7 +2,6 @@
     <div
         id="side-nav-toggle"
         fxFlex
-        fxLayout
         fxLayoutAlign="start center"
         fxHide.gt-sm
     >
@@ -20,102 +19,124 @@
         fxLayoutAlign="start center"
         fxHide.lt-md
     >
-        <ul fxLayout fxLayoutGap="40px" class="navigation-items">
-            <li>
-                <a [routerLink]="ROUTE_HOME">
-                    {{ 'core.layout.header.topnav.home_link' | translate }}
+        <div fxLayout fxLayoutGap="0.5rem">
+            <a mat-button [routerLink]="ROUTE_HOME">
+                {{ 'core.layout.header.topnav.home_link' | translate }}
+            </a>
+            <a mat-button *ngFor="let link of pluginLinks" routerLink="{{ link.url }}">
+                {{ link.name | translate }}
+            </a>
+            <button mat-button [matMenuTriggerFor]="symbiota">
+                {{ 'core.layout.header.topnav.symbiota_link' | translate }}
+            </button>
+            <mat-menu #symbiota="matMenu">
+                <a mat-menu-item href="http://symbiota.org/docs/" target="_blank">
+                    {{ 'core.layout.header.topnav.symbiota_docs_link' | translate }}
                 </a>
-            </li>
-            <ng-container>
-                <li *ngFor="let link of pluginLinks">
-                    <a routerLink="{{ link.url }}">
-                        {{ link.name | translate }}
-                    </a>
-                </li>
-            </ng-container>
-            <li>
-                <a [matMenuTriggerFor]="symbiota">
-                    {{ 'core.layout.header.topnav.symbiota_link' | translate }}
+                <a mat-menu-item href="http://symbiota.org/docs/symbiota-introduction/symbiota-help-pages/" target="_blank">
+                    {{ 'core.layout.header.topnav.symbiota_help_link' | translate }}
                 </a>
-            </li>
-        </ul>
+                <a mat-menu-item href="http://symbiota.org/docs/google-group/" target="_blank">
+                    {{ 'core.layout.header.topnav.symbiota_google_group_link' | translate }}
+                </a>
+            </mat-menu>
+        </div>
     </div>
     <div
-        id="right-links"
-        fxFlex
-        fxLayout
         fxLayoutAlign="end center"
         fxHide.xs
     >
-        <ul
-            class="navigation-items"
-            fxLayout
-            fxLayoutGap="15px"
-            fxLayoutAlign="space-around center"
-        >
-            <li *ngIf="user">
-                {{ 'core.layout.header.topnav.welcome_line' | translate:{ 'firstName': user.firstName } }}
-            </li>
-            <li *ngIf="user">
-                <a [routerLink]='ROUTE_PROFILE'>
-                    {{ 'core.layout.header.topnav.my_profile_link' | translate }}
-                </a>
-            </li>
-            <li *ngIf="user" (click)="onLogout()">
-                <a>{{ 'core.layout.header.topnav.logout_link' | translate }}</a>
-            </li>
-            <li *ngIf="!user" (click)="onLogin()">
-                <a>{{ 'core.layout.header.topnav.login_link' | translate }}</a>
-            </li>
-            <li *ngIf="!user">
-                <a [routerLink]='ROUTE_CREATE_PROFILE'>
+        <ng-container *ngIf='(currentUser | async) as user; else loginMenu'>
+            <div id='user-menu'>
+                <button mat-button [matMenuTriggerFor]='userMenu'>
+                    {{ 'core.layout.header.topnav.welcome_line' | translate: { 'firstName': user.firstName } }}
+                    <mat-icon>expand_more</mat-icon>
+                </button>
+                <mat-menu #userMenu='matMenu'>
+                    <a [routerLink]='ROUTE_PROFILE' mat-menu-item>
+                        {{ 'core.layout.header.topnav.my_profile_link' | translate }}
+                    </a>
+                    <button mat-menu-item (click)="onLogout()">
+                        {{ 'core.layout.header.topnav.logout_link' | translate }}
+                    </button>
+                </mat-menu>
+            </div>
+
+            <div *ngIf='{ notifications: notifications | async, count: notificationCount | async } as notificationData'>
+                <button
+                    mat-icon-button
+                    [matMenuTriggerFor]='notificationMenu'
+                    [disabled]='notificationData.count === 0'
+                >
+                    <mat-icon
+                        id='notification-icon'
+                        matBadgePosition='below after'
+                        matBadgeColor='accent'
+                        matBadgeSize='small'
+                        [matBadge]='notificationData.count'
+                        [matBadgeHidden]='notificationData.count === 0'
+                    >
+                        notifications
+                    </mat-icon>
+                </button>
+                <mat-menu #notificationMenu='matMenu'>
+                    <div
+                        mat-menu-item
+                        class='notification'
+                        *ngFor='let n of notificationData.notifications'
+                        (click)='onNotificationClicked(n)'
+                    >
+                        <p class='createdAt'>
+                            <ng-container *ngIf='isToday(n.createdAt); else notToday'>
+                                {{ n.createdAt | date: 'shortTime' }}
+                            </ng-container>
+                            <ng-template #notToday>
+                                {{ n.createdAt | date: 'longDate' }}
+                            </ng-template>
+                        </p>
+                        <p>{{ n.message }}</p>
+                        <mat-divider></mat-divider>
+                    </div>
+                    <div id='notification-actions'>
+                        <button mat-flat-button (click)='clearNotifications()'>Clear all</button>
+                    </div>
+                </mat-menu>
+            </div>
+        </ng-container>
+
+        <ng-template #loginMenu>
+            <div fxLayoutGap='0.5rem'>
+                <button mat-button (click)='onLogin()'>
+                    {{ 'core.layout.header.topnav.login_link' | translate }}
+                </button>
+                <a mat-button [routerLink]='ROUTE_CREATE_PROFILE'>
                     {{ 'core.layout.header.topnav.new_account_link' | translate }}
                 </a>
-            </li>
-            <li>
-                <a [routerLink]="ROUTE_SITEMAP">
-                    {{ 'core.layout.header.topnav.sitemap_link' | translate }}
-                </a>
-            </li>
-            <li>
-                <select
-                    [ngModel]="currentLang"
-                    (change)="useLanguage($event.target)"
-                >
-                    <option value="en">English</option>
-                    <option value="ar">Arabic</option>
-                    <option value="zh">Chinese</option>
-                    <option value="fa">Farsi</option>
-                    <option value="fr">French</option>
-                    <option value="de">German</option>
-                    <option value="hi">Hindi</option>
-                    <option value="it">Italian</option>
-                    <option value="ja">Japanese</option>
-                    <option value="pt">Portuguese</option>
-                    <option value="ru">Russian</option>
-                    <option value="es">Spanish</option>
-                    <option value="ur">Urdu</option>
-                </select>
-            </li>
-        </ul>
+            </div>
+        </ng-template>
+
+        <mat-divider vertical id='divider'></mat-divider>
+
+        <div fxLayoutGap='0.5rem'>
+            <!-- TODO: Do we really need a sitemap? -->
+<!--            <a [routerLink]="ROUTE_SITEMAP">-->
+<!--                {{ 'core.layout.header.topnav.sitemap_link' | translate }}-->
+<!--            </a>-->
+            <select id='lang-select' [ngModel]='currentLang' (ngModelChange)='useLanguage($event)'>
+                <option value="en">English</option>
+                <option value="ar">Arabic</option>
+                <option value="zh">Chinese</option>
+                <option value="fa">Farsi</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+                <option value="hi">Hindi</option>
+                <option value="it">Italian</option>
+                <option value="ja">Japanese</option>
+                <option value="pt">Portuguese</option>
+                <option value="ru">Russian</option>
+                <option value="es">Spanish</option>
+                <option value="ur">Urdu</option>
+            </select>
+        </div>
     </div>
-    <mat-menu #symbiota="matMenu">
-        <ul id="navigation-items-sub" fxLayout="column" fxLayoutGap="15px">
-            <li mat-menu-item>
-                <a href="http://symbiota.org/docs/" target="_blank">
-                    {{ 'core.layout.header.topnav.symbiota_docs_link' | translate }}
-                </a>
-            </li>
-            <li mat-menu-item>
-                <a href="http://symbiota.org/docs/symbiota-introduction/symbiota-help-pages/" target="_blank">
-                    {{ 'core.layout.header.topnav.symbiota_help_link' | translate }}
-                </a>
-            </li>
-            <li mat-menu-item>
-                <a href="http://symbiota.org/docs/google-group/" target="_blank">
-                    {{ 'core.layout.header.topnav.symbiota_google_group_link' | translate }}
-                </a>
-            </li>
-        </ul>
-    </mat-menu>
 </div>

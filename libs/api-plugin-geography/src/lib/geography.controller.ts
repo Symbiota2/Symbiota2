@@ -18,6 +18,7 @@ import { Geometry } from 'wkx';
 import { Province, ProvinceListItem } from './dto/Province.output.dto';
 import { StateProvinceService } from './state-province/state-province.service';
 import { ProvinceFindManyQuery } from './dto/ProvinceFindManyQuery.input.dto';
+import { CountryFindAllQuery } from './dto/country-find-all-query';
 
 type GeoJSON = Record<string, unknown>;
 
@@ -71,8 +72,11 @@ export class GeographyController {
         summary: "Retrieve a list of countries from the database"
     })
     @ApiResponse({ status: HttpStatus.OK, type: CountryListItem, isArray: true })
-    async countryList(): Promise<CountryListItem[]> {
-        const countries = await this.countries.findAll();
+    async countryList(@Query() params: CountryFindAllQuery): Promise<CountryListItem[]> {
+        const countries = await this.countries.findAll(
+            params.countryTerm,
+            params.limit ? params.limit : null
+        );
         return countries.map((country) => {
             return new CountryListItem(country);
         });

@@ -1,46 +1,42 @@
 <div>
     <h1>{{"taxon.profile.title" | translate}}</h1>
 </div>
-
-<!-- Configure name list -->
-<div *ngIf='block' class="expansion-panel">
-    <symbiota2-expansion-panel label='{{block.taxon.scientificName}}'>
-        <table >
-            <tr>
-                <td>
-                    <img *ngIf='image' src="http://openherbarium.org{{image.url}}"/>
-                    <span *ngIf='!image'>{{"taxon.profile.no.image" | translate}}</span>
-                    <br/>
-                    <span *ngIf='image' style='text-aligh:right'>{{image.photographerName}}</span>
-                </td>
-                <td>
-                    <div *ngIf='block.caption' style='text-align:right'>
-                        {{block.caption}}
-                        <br/><br/>
-                    </div>
-                    <span *ngIf="descriptions.length > 0">
-                        <span *ngFor="let d of descriptions">
-                            <b *ngIf='d.displayHeader == 1'>{{d.heading}}</b>&nbsp;<div [innerHTML]="d.statement"></div>
-                        </span>
-                    </span>
-                    <span *ngIf='descriptions.length == 0'>
+<button style='float:right' mat-icon-button>
+    <mat-icon color="primary" (click)="goToLink(taxonID)">edit</mat-icon>
+</button>
+<!-- <button appearance='fill' (click)="goToLink(taxonID)">{{"taxon.editor.link.label" | translate}}</button> -->
+<mat-tab-group *ngIf="blocks.length > 0" mat-align-tabs="start">
+    <mat-tab *ngFor='let block of blocks' label='{{block.caption}}'>
+        <symbiota2-expansion-panel label='{{block.taxon.scientificName}}'>
+            <table>
+                <tr>
+                    <td>
+                        <img *ngIf='block.images?.length > 0' src="http://openherbarium.org{{block.images[0].url}}"/>
+                        <span *ngIf='block.images?.length == 0'>{{"taxon.profile.no.image" | translate}}</span>
+                        <br/>
+                        <span *ngIf='block.images?.length > 0' style='text-aligh:right'>{{block.images[0].photographerName}}</span>
+                    </td>
+                    <td>
+                        <div *ngIf='block.source' style='text-align:right'>
+                            {{block.source}}
+                            <br/><br/>
+                        </div>
+                        <span *ngIf="block.descriptionStatements?.length > 0">
+                            <span *ngFor="let d of block.descriptionStatements">
+                                <b *ngIf='d.displayHeader == 1'>{{d.heading}}</b>&nbsp;
+                                <div [innerHTML]="d.statement"></div>
+                            </span>
+                            <span *ngIf='block.descriptionStatements?.length == 0'>
                         {{"taxon.profile.no.description" | translate}}
-                    </span>
-                </td>
-            </tr>
-        </table>
+                                                </span>
+                        </span>
+                    </td>
+                </tr>
+            </table>
 
-    </symbiota2-expansion-panel>
-</div>
-<div *ngIf='!block'>
+        </symbiota2-expansion-panel>
+    </mat-tab>
+</mat-tab-group>
+<div *ngIf="blocks.length == 0">
     {{"taxon.profile.no.description" | translate}}
 </div>
-
-<!--
-<div class="expansion-panel">
-    <symbiota2-expansion-panel label='Images'>
-    Images
-    </symbiota2-expansion-panel>
- </div>
- -->
-

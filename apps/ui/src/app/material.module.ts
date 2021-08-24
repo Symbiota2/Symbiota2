@@ -7,6 +7,9 @@ import { MatMenuModule } from "@angular/material/menu";
 import { MatIconModule } from "@angular/material/icon";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatButtonModule } from "@angular/material/button";
+import { MatSelectModule } from '@angular/material/select';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatBadgeModule } from '@angular/material/badge';
 
 /**
  * Imports the @angular/material modules used by the core of the UI
@@ -21,7 +24,10 @@ import { MatButtonModule } from "@angular/material/button";
         MatTabsModule,
         MatMenuModule,
         MatIconModule,
-        MatDialogModule
+        MatDialogModule,
+        MatSelectModule,
+        MatDividerModule,
+        MatBadgeModule
     ],
     exports: [
         MatButtonModule,
@@ -31,7 +37,10 @@ import { MatButtonModule } from "@angular/material/button";
         MatTabsModule,
         MatMenuModule,
         MatIconModule,
-        MatDialogModule
+        MatDialogModule,
+        MatSelectModule,
+        MatDividerModule,
+        MatBadgeModule
     ]
 })
 export class MaterialModule { }

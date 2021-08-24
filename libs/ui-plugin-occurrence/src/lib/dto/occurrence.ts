@@ -23,10 +23,11 @@ interface CollectorInfo extends Pick<Occurrence, CollectorInfoProps> { }
 type LatestIDInfoProps = (
     'dateIdentified' |
     'family' |
+    'genus' |
     'identificationQualifier' |
     'identifiedBy' |
     'scientificNameAuthorship' |
-    'sciname'
+    'scientificName'
 );
 interface LatestIDInfo extends Pick<Occurrence, LatestIDInfoProps> { }
 
@@ -161,8 +162,9 @@ export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurre
         return {
             identificationQualifier: this.identificationQualifier,
             scientificNameAuthorship: this.scientificNameAuthorship,
-            sciname: this.sciname,
+            scientificName: this.scientificName,
             family: this.family,
+            genus: this.genus,
             dateIdentified: this.dateIdentified,
             identifiedBy: this.identifiedBy
         };

@@ -1,12 +1,13 @@
 import {
+    BeforeInsert, BeforeUpdate,
     Column,
-    Entity,
+    Entity, getConnection,
     Index,
     JoinColumn,
     ManyToOne,
     OneToMany,
     OneToOne,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn, Repository
 } from 'typeorm';
 import { OccurrenceVerification } from './OccurrenceVerification.entity';
 import { OccurrenceLithostratigraphy } from './OccurrenceLithostratigraphy.entity';
@@ -36,9 +37,10 @@ import { Taxon } from '../taxonomy/Taxon.entity';
 import { User } from '../user/User.entity';
 import { OccurrenceDatasetLink } from './OccurrenceDatasetLink.entity';
 import { EntityProvider } from '../../entity-provider.class';
+import { TaxaEnumTreeEntry, TaxonomicUnit } from '../taxonomy';
 
 @Index('Index_collid', ['collectionID', 'dbpk'], { unique: true })
-@Index('Index_sciname', ['sciname'])
+@Index(['scientificName'])
 @Index('Index_family', ['family'])
 @Index('Index_country', ['country'])
 @Index('Index_state', ['stateProvince'])
@@ -149,21 +151,11 @@ export class Occurrence extends EntityProvider {
     @Column('varchar', { name: 'datasetID', nullable: true, length: 255 })
     datasetID: string;
 
-    @Column('varchar', { name: 'institutionCode', nullable: true, length: 64 })
-    institutionCode: string;
-
-    @Column('varchar', { name: 'collectionCode', nullable: true, length: 64 })
-    collectionCode: string;
-
     @Column('varchar', { name: 'family', nullable: true, length: 255 })
     family: string;
 
-    // TODO: How can we name these to better distinguish between the two?
     @Column('varchar', { name: 'scientificName', nullable: true, length: 255 })
     scientificName: string;
-
-    @Column('varchar', { name: 'sciname', nullable: true, length: 255 })
-    sciname: string;
 
     @Column('int', { name: 'tidinterpreted', nullable: true, unsigned: true })
     taxonID: number | null;
@@ -183,13 +175,6 @@ export class Occurrence extends EntityProvider {
         length: 255,
     })
     infraspecificEpithet: string;
-
-    @Column('varchar', {
-        name: 'scientificNameAuthorship',
-        nullable: true,
-        length: 255,
-    })
-    scientificNameAuthorship: string;
 
     @Column('text', { name: 'taxonRemarks', nullable: true })
     taxonRemarks: string;
@@ -301,7 +286,7 @@ export class Occurrence extends EntityProvider {
     @Column('varchar', {
         name: 'informationWithheld',
         nullable: true,
-        length: 250,
+        length: 500,
     })
     informationWithheld: string;
 
@@ -719,4 +704,68 @@ export class Occurrence extends EntityProvider {
         (omoccurdatasetlink) => omoccurdatasetlink.occurrence
     )
     datasetLinks: Promise<OccurrenceDatasetLink[]>;
+
+    @BeforeInsert()
+    async clearTaxonomy() {
+        // The only way these should be set is through populateTaxonomy()
+        this.taxonID = null;
+        this.family = null;
+        this.genus = null;
+    }
+
+    @BeforeUpdate()
+    async updateLastModified() {
+        this.lastModifiedTimestamp = new Date();
+    }
+
+    async populateTaxonomy(
+        taxonRepo: Repository<Taxon>,
+        familyRankID: number,
+        genusRankID: number) {
+
+        // It's already populated
+        if (this.taxonID && this.family && this.genus) {
+            return;
+        }
+
+        if (!this.scientificName) {
+            this.taxonID = null;
+            this.family = null;
+            this.genus = null;
+            return;
+        }
+
+        let taxon: Taxon;
+        if (!this.taxonID) {
+            taxon = await taxonRepo.findOne(
+                { scientificName: this.scientificName },
+                { select: ['id', 'author'] }
+            );
+
+            if (!taxon) {
+                this.family = null;
+                this.genus = null;
+                return;
+            }
+
+            this.taxonID = taxon.id;
+        }
+        else {
+            taxon = await this.taxon;
+        }
+
+        if (!(this.family || this.genus)) {
+            const family = await taxon.lookupAncestor(
+                taxonRepo,
+                familyRankID
+            );
+            const genus = await taxon.lookupAncestor(
+                taxonRepo,
+                genusRankID
+            );
+
+            this.genus = genus ? genus.scientificName : null;
+            this.family = family ? family.scientificName : null;
+        }
+    }
 }
