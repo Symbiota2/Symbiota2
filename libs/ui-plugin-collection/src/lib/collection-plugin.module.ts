@@ -28,10 +28,12 @@ import { CollectionLogoComponent } from './components/collection-logo/collection
 import { MatInputModule } from '@angular/material/input';
 import {MatDividerModule} from '@angular/material/divider'; 
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatPaginatorModule} from '@angular/material/paginator'; 
 import {
     ROUTE_COLLECTION_LIST,
     ROUTE_COLLECTION_PROFILE,
     ROUTE_COLLECTION_NEW,
+    ROUTE_COLLECTION_COMMENTS
 } from './routes';
 import { CollectionFieldComponent } from './components/collection-field/collection-field.component';
 import { CollectionListPage } from './pages/collection-list-page/collection-list-page.component';
@@ -43,6 +45,9 @@ import { CollectionNewCollectionComponent } from "./components/collection-new-co
 import { CollectionNewPage } from './pages/collection-new-page/collection-new-page.component';
 import { InstitutionNewComponent } from './components/institution-new/institution-new.component';
 import { InstitutionNewDialogComponent } from './components/institution-new-dialog/institution-new-dialog.component';
+import { CollectionCommentPage } from './pages/collection-comment-page/collection-comment-page.component';
+import { CollectionCommentComponent } from './components/collection-comment/collection-comment.component';
+
 
 @NgModule({
     declarations: [
@@ -58,7 +63,9 @@ import { InstitutionNewDialogComponent } from './components/institution-new-dial
         CollectionNewPage,
         CollectionNewCollectionComponent,
         InstitutionNewComponent,
-        InstitutionNewDialogComponent
+        InstitutionNewDialogComponent,
+        CollectionCommentPage,
+        CollectionCommentComponent,
     ],
   imports: [
     AppTranslationModule,
@@ -80,7 +87,8 @@ import { InstitutionNewDialogComponent } from './components/institution-new-dial
     MatDialogModule,
     MatSelectModule,
     MatDividerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatPaginatorModule
   ],
     providers: [
         CollectionService,
@@ -98,6 +106,7 @@ export class CollectionPlugin extends SymbiotaUiPlugin {
             { path: ROUTE_COLLECTION_LIST, component: CollectionListPage },
             { path: ROUTE_COLLECTION_PROFILE, component: CollectionPage },
             { path: ROUTE_COLLECTION_NEW, component: CollectionNewPage},
+            { path: ROUTE_COLLECTION_COMMENTS, component: CollectionCommentPage}
         ];
     }
 

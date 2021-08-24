@@ -6,21 +6,18 @@ import { CollectionService } from '../../services/collection.service';
 import { Collection } from '../../dto/Collection.output.dto';
 import {
     CollectionProfileLink,
-    CollectionProfileService
+    CollectionProfileService,
 } from '../../services/collection-profile.service';
 import { MatDialog } from '@angular/material/dialog';
-import {
-    AlertService,
-    UserService
-} from '@symbiota2/ui-common';
+import { AlertService, UserService } from '@symbiota2/ui-common';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ROUTE_COLLECTION_LIST } from '../../routes';
+import { ROUTE_COLLECTION_LIST, ROUTE_COLLECTION_COMMENTS } from '../../routes';
 import { CollectionEditorDialogComponent } from '../../components/collection-editor-dialog/collection-editor-dialog.component';
 
 @Component({
     selector: 'symbiota2-collection-page',
     templateUrl: './collection-page.component.html',
-    styleUrls: ['./collection-page.component.scss']
+    styleUrls: ['./collection-page.component.scss'],
 })
 export class CollectionPage {
     private static readonly ROUTE_PARAM_COLLID = 'collectionID';
@@ -30,16 +27,17 @@ export class CollectionPage {
         routerLink: `/${ROUTE_COLLECTION_LIST}`,
     };
 
+    private collectionID = -1;
+    
     public collection = this.currentRoute.paramMap.pipe(
         map((params) => {
-            return (
-                params.has(CollectionPage.ROUTE_PARAM_COLLID) ?
-                    parseInt(params.get(CollectionPage.ROUTE_PARAM_COLLID)) :
-                    -1
-            );
+            return params.has(CollectionPage.ROUTE_PARAM_COLLID)
+                ? parseInt(params.get(CollectionPage.ROUTE_PARAM_COLLID))
+                : -1;
         }),
         tap((collectionID) => {
             this.collections.setCollectionID(collectionID);
+            this.collectionID = collectionID;
         }),
         switchMap(() => {
             return this.collections.currentCollection;
@@ -52,6 +50,15 @@ export class CollectionPage {
         })
     );
 
+    private comments_link: CollectionProfileLink = {
+        text: 'view comments',
+        requiresLogin: false,
+        routerLink: `/${ROUTE_COLLECTION_COMMENTS.replace(
+            ':collectionID',
+            `1`
+        )}`,
+    };
+
     public links: Observable<CollectionProfileLink[]> = this.collection.pipe(
         switchMap((collection) => {
             return this.profileService.links(collection.id);
@@ -59,24 +66,29 @@ export class CollectionPage {
         map((links) => {
             return [
                 CollectionPage.USER_COLLECTIONS_LINK,
-                ...links
+                ...links,
+                this.comments_link,
             ];
         })
     );
 
     public userCanEdit = combineLatest([
         this.userService.currentUser,
-        this.collection
+        this.collection,
     ]).pipe(
         map(([user, collection]) => {
-            return !!user && !!collection && user.canEditCollection(collection.id);
+            return (
+                !!user && !!collection && user.canEditCollection(collection.id)
+            );
         })
     );
 
     public collectionHomePage = this.collection.pipe(
         map((collection) => {
             if (collection?.homePage) {
-                return this.sanitizer.bypassSecurityTrustUrl(collection.homePage);
+                return this.sanitizer.bypassSecurityTrustUrl(
+                    collection.homePage
+                );
             }
             return null;
         })
@@ -85,7 +97,11 @@ export class CollectionPage {
     public geoReferencedPercent = this.collection.pipe(
         map((collection) => {
             if (collection?.stats?.recordCount > 0) {
-                return Math.round(collection.stats.georeferencedCount / collection.stats.recordCount * 100);
+                return Math.round(
+                    (collection.stats.georeferencedCount /
+                        collection.stats.recordCount) *
+                        100
+                );
             }
             return 0;
         })
@@ -99,27 +115,32 @@ export class CollectionPage {
         private readonly currentRoute: ActivatedRoute,
         private readonly profileService: CollectionProfileService,
         private readonly dialog: MatDialog,
-        private readonly sanitizer: DomSanitizer) { }
+        private readonly sanitizer: DomSanitizer
+    ) {}
 
     onEdit() {
-        this.collection.pipe(
-            filter((collection) => collection !== null),
-            take(1),
-            switchMap((collection) => {
-                const dialog = this.dialog.open(
-                    CollectionEditorDialogComponent,
-                    { data: collection, disableClose: true }
-                );
+        this.collection
+            .pipe(
+                filter((collection) => collection !== null),
+                take(1),
+                switchMap((collection) => {
+                    const dialog = this.dialog.open(
+                        CollectionEditorDialogComponent,
+                        { data: collection, disableClose: true }
+                    );
 
-                return dialog.afterClosed().pipe(
-                    take(1),
-                    map((collectionData) => {
-                        if (collectionData !== null) {
-                            return this.collections.updateCurrentCollection(collectionData);
-                        }
-                    })
-                )
-            })
-        ).subscribe();
+                    return dialog.afterClosed().pipe(
+                        take(1),
+                        map((collectionData) => {
+                            if (collectionData !== null) {
+                                return this.collections.updateCurrentCollection(
+                                    collectionData
+                                );
+                            }
+                        })
+                    );
+                })
+            )
+            .subscribe();
     }
 }

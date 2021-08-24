@@ -1,0 +1,38 @@
+<div *ngIf="collection != null" fxLayout="column" fxLayoutGap="1rem">
+    <div fxLayout="row" fxLayoutGap="1rem" fxLayoutAlign="start end">
+        <symbiota2-collection-logo
+            [collectionID]="collection.id"
+            size="5rem"
+            src="{{ collection.icon }}"
+        >
+        </symbiota2-collection-logo>
+        <h1>
+            ({{ collection.collectionCode }}){{
+                collection.collectionName
+            }}
+            Comments
+        </h1>
+    </div>
+    <div fxLayoutGap="1rem">
+        <mat-paginator
+            [length]="comments.length"
+            [pageSize]="5"
+            [pageSizeOptions]="[5, 25, 50, 100]"
+            (page)="onPageChanged($event)"
+        ></mat-paginator>
+        <div class=comment fxLayout="column" fxLayoutGap="0.2rem" *ngFor="let comment of commentSlice"  >
+            <symbiota2-collection-comment></symbiota2-collection-comment>
+            <div *ngIf="isAdmin()" fxLayout="row" fxLayoutGap="1rem">
+                <button mat-raised-button color='primary' >
+                    Hide Comment from Public
+                </button>
+                <button mat-raised-button color='primary'>
+                    Mark As Reviewed
+                </button>
+                <button mat-raised-button color='accent'>
+                    Delete Comment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
