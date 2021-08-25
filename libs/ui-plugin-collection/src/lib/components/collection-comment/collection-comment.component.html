@@ -1,9 +1,24 @@
-<mat-card>
-    <div fxLayout=row fxLayoutGap=2rem>
-        <b>BBSL228328</b>
-        <p>S.Vanderwall</p>
-        <P>1977-10-09</P>
-    </div>
-    <p><b>Cobb, Neil</b> posted on 2020-11-09 15:04:19</p>
-    <p>This is misidentified, B. cockerelli is restricted to cockerelli is limited to Otero and Lincoln continues in New Mexico, at high elevation</p>
+<mat-card class="main" fxLayoutGap="0.8rem" fxLayout="column">
+    <mat-card-title
+        class="post"
+        fxLayout="row"
+        fxLayoutGap="1rem"
+        fxLayoutAlign="start center"
+    >
+        <b color="primary">Occurrence:</b>
+        <p>{{ comment.postID }}</p>
+        <p class="divider">|</p>
+        <p>{{ comment.postAuthor }}</p>
+        <p class="divider">|</p>
+        <P>{{ comment.postDate }}</P>
+    </mat-card-title>
+    <mat-card-subtitle class="commentInfo" fxLayout="row" fxLayoutGap="0.5rem" fxLayoutAlign="start center">
+        <p *ngIf="this.comment.status" id="reviewed"><mat-icon>check_circle</mat-icon>Reviewed</p>
+        <p *ngIf="!this.comment.public" id="private"><mat-icon>lock
+        </mat-icon>Private</p>
+        <p>
+            <b>{{ comment.commentAuthor }}</b> posted on {{ comment.timeStamp }}
+        </p>    
+    </mat-card-subtitle>
+    <mat-card-content class="comment">{{ comment.content }}</mat-card-content>
 </mat-card>

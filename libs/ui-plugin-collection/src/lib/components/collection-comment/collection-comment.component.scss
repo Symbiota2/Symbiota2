@@ -1,0 +1,64 @@
+
+.main{
+    box-shadow: none;
+    padding: 0rem;
+    border-radius: 00.5rem;
+    
+}
+
+.post {
+    padding-left: 0.5rem;
+    padding-right: 0.5;
+    background-color: #005285;
+    border-radius: 0.5rem;
+    border-bottom-left-radius: 0rem;
+    border-bottom-right-radius: 0rem;
+    color: white;
+    font-size: 14px;
+}
+
+.divider{
+    height: 100%;
+    color: #00000041;
+    font-size: 28px;
+    font-stretch: extra-expanded;
+    text-align: center !important;
+    vertical-align:auto !important;
+    display:table-column !important;
+}
+
+.commentInfo {
+    padding-left: 0.5rem;
+    padding-bottom: 0.4rem;
+    margin-bottom: 0rem !important;
+    border-bottom: rgba(0, 0, 0, 0.26) 1.5px solid;
+}
+
+#reviewed{
+    display: flex;
+    align-items:center;
+    vertical-align: auto;
+    color: #49cc90;
+    mat-icon{
+        transform: scale(.7);
+    }
+}
+
+#private{
+    display: flex;
+    align-items:center;
+    vertical-align: auto;
+    color: #f93e3e;
+    mat-icon{
+        transform: scale(.7);
+    }
+}
+
+.comment {
+    padding: 0.5rem;
+}
+
+p {
+    margin: 0rem;
+
+}

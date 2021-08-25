@@ -1,3 +1,35 @@
+
 .comment{
-    padding-top: 1rem;
+    padding: 0rem;
+    border-radius: 0.4rem;
+
+    mat-icon{
+        font-size: 28px !important;
+    
+    }
+}
+
+::ng-deep.accent{
+    background: #005285;
+}
+
+::ng-deep.primary{
+    background: #008575;
+}
+
+
+#title{
+    color:rgb(80, 80, 80);
+    font-size: xx-large;
+}
+
+.commentsSection{
+    background-color: white;
+    
+    padding : 0.4rem;
+    border-radius: 0rem;
+}
+
+.paginator{
+    border-radius: 0.5rem;
 }

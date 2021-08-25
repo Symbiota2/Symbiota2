@@ -24,6 +24,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CollectionService } from './services/collection.service';
 import { InstitutionService } from "./services/institution.service";
 import { CollectionProfileService } from './services/collection-profile.service';
+import { CommentService } from './services/comments.service';
 import { CollectionLogoComponent } from './components/collection-logo/collection-logo.component';
 import { MatInputModule } from '@angular/material/input';
 import {MatDividerModule} from '@angular/material/divider'; 
@@ -93,7 +94,8 @@ import { CollectionCommentComponent } from './components/collection-comment/coll
     providers: [
         CollectionService,
         CollectionProfileService,
-        InstitutionService
+        InstitutionService,
+        CommentService
     ],
     exports: [
         CollectionCheckboxSelectorComponent,

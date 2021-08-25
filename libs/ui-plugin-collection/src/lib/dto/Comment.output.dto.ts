@@ -1,4 +1,4 @@
-export class CommentOutputDto {
+export class Comment {
     constructor(data: Record<string, unknown>) {
         Object.assign(this, data);
     }
@@ -8,7 +8,7 @@ export class CommentOutputDto {
     postDate: string
     commentID: number
     commentAuthor: string
-    comment: string
+    content: string
     timeStamp: string
     status: number
     public: number
