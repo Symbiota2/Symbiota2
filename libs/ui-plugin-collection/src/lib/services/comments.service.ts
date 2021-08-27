@@ -57,6 +57,115 @@ export class CommentService {
             content:
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet nisl suscipit adipiscing bibendum est. Adipiscing diam donec adipiscing tristique risus. Augue mauris augue neque gravida in. Mattis vulputate enim nulla aliquet porttitor. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin. Sit amet tellus cras adipiscing enim.',
         },
+        {
+            postID: 'BBSL228328',
+            postAuthor: 'S.Vanderwall',
+            postDate: '1997-10-09',
+            commentID: 3,
+            commentAuthor: 'Cobb, Neil',
+            timeStamp: '2020-11-9 15:04:19',
+            status: 0,
+            public: 0,
+            content:
+                'This is misidentified, B. cockerelli is restricted to cockerelli is limited to Otero and Lincoln continues in New Mexico, at high elevation',
+        },
+        {
+            postID: 'BASL228729',
+            postAuthor: 'D.Houston',
+            postDate: '1999-11-01',
+            commentID: 4,
+            commentAuthor: 'James, Williams',
+            timeStamp: '2021-08-23 12:10:23',
+            status: 1,
+            public: 1,
+            content:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Eget nulla facilisi etiam dignissim diam quis. Feugiat nibh sed pulvinar proin. At tellus at urna condimentum mattis pellentesque id nibh. Ultrices tincidunt arcu non sodales neque. Venenatis tellus in metus vulputate.',
+        },
+        {
+            postID: 'CAAE1684682',
+            postAuthor: 'A.Nizbeth',
+            postDate: '2002-04-03',
+            commentID: 5,
+            commentAuthor: 'Larry, Sonders',
+            timeStamp: '2021-04-09 8:53:33',
+            status: 0,
+            public: 1,
+            content:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet nisl suscipit adipiscing bibendum est. Adipiscing diam donec adipiscing tristique risus. Augue mauris augue neque gravida in. Mattis vulputate enim nulla aliquet porttitor. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin. Sit amet tellus cras adipiscing enim.',
+        },
+        {
+            postID: 'BBSL228328',
+            postAuthor: 'S.Vanderwall',
+            postDate: '1997-10-09',
+            commentID: 6,
+            commentAuthor: 'Cobb, Neil',
+            timeStamp: '2020-11-9 15:04:19',
+            status: 0,
+            public: 0,
+            content:
+                'This is misidentified, B. cockerelli is restricted to cockerelli is limited to Otero and Lincoln continues in New Mexico, at high elevation',
+        },
+        {
+            postID: 'BASL228729',
+            postAuthor: 'D.Houston',
+            postDate: '1999-11-01',
+            commentID: 7,
+            commentAuthor: 'James, Williams',
+            timeStamp: '2021-08-23 12:10:23',
+            status: 1,
+            public: 1,
+            content:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Eget nulla facilisi etiam dignissim diam quis. Feugiat nibh sed pulvinar proin. At tellus at urna condimentum mattis pellentesque id nibh. Ultrices tincidunt arcu non sodales neque. Venenatis tellus in metus vulputate.',
+        },
+        {
+            postID: 'CAAE1684682',
+            postAuthor: 'A.Nizbeth',
+            postDate: '2002-04-03',
+            commentID: 8,
+            commentAuthor: 'Larry, Sonders',
+            timeStamp: '2021-04-09 8:53:33',
+            status: 0,
+            public: 1,
+            content:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet nisl suscipit adipiscing bibendum est. Adipiscing diam donec adipiscing tristique risus. Augue mauris augue neque gravida in. Mattis vulputate enim nulla aliquet porttitor. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin. Sit amet tellus cras adipiscing enim.',
+        },
+        {
+            postID: 'BBSL228328',
+            postAuthor: 'S.Vanderwall',
+            postDate: '1997-10-09',
+            commentID: 9,
+            commentAuthor: 'Cobb, Neil',
+            timeStamp: '2020-11-9 15:04:19',
+            status: 0,
+            public: 0,
+            content:
+                'This is misidentified, B. cockerelli is restricted to cockerelli is limited to Otero and Lincoln continues in New Mexico, at high elevation',
+        },
+        {
+            postID: 'BASL228729',
+            postAuthor: 'D.Houston',
+            postDate: '1999-11-01',
+            commentID: 10,
+            commentAuthor: 'James, Williams',
+            timeStamp: '2021-08-23 12:10:23',
+            status: 1,
+            public: 1,
+            content:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Eget nulla facilisi etiam dignissim diam quis. Feugiat nibh sed pulvinar proin. At tellus at urna condimentum mattis pellentesque id nibh. Ultrices tincidunt arcu non sodales neque. Venenatis tellus in metus vulputate.',
+        },
+        {
+            postID: 'CAAE1684682',
+            postAuthor: 'A.Nizbeth',
+            postDate: '2002-04-03',
+            commentID: 11,
+            commentAuthor: 'Larry, Sonders',
+            timeStamp: '2021-04-09 8:53:33',
+            status: 0,
+            public: 1,
+            content:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet nisl suscipit adipiscing bibendum est. Adipiscing diam donec adipiscing tristique risus. Augue mauris augue neque gravida in. Mattis vulputate enim nulla aliquet porttitor. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin. Sit amet tellus cras adipiscing enim.',
+        },
+        
     ];
 
     constructor(

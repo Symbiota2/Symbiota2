@@ -65,12 +65,21 @@ legend {
     color: grey;
 }
 
+::ng-deep.mat-simple-snackbar{
+    text-align: center !important;
+    justify-content: center !important;
+}
+
 .error-snackbar {
     background-color: $warnColor;
+    text-align: center !important;
+    font-weight: bold;
 }
 
 .message-snackbar {
-    background-color: $primaryColor;
+    background-color: #49cc90;
+    text-align: center !important;
+    font-weight: bold !important;
 }
 
 .dynamic-tab-content {

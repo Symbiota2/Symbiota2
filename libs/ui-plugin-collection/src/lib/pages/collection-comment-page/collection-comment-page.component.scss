@@ -5,7 +5,7 @@
     margin-left: .4rem;
     margin-right: .4rem;
     border-radius: 0.55rem;
-    outline: $primaryColor 1.5px solid;
+    outline: scale-color($primaryColor, $alpha: -80%) 1.5px solid;
 
     mat-icon{
         font-size: 28px !important;
@@ -28,7 +28,7 @@
 }
 
 .commentsSection{
-    background-color: $backgroundColor;
+    box-shadow: none !important;
     padding: 0px 0px 1rem 0px;
     border-radius: 0.5rem;
 }

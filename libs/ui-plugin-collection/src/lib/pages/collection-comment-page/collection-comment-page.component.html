@@ -1,4 +1,4 @@
-<div *ngIf="collection != null" fxLayout="column" fxLayoutGap="1rem">
+<mat-card *ngIf="collection != null" fxLayout="column" fxLayoutGap="1rem">
     <div fxLayout="row" fxLayoutGap="1rem" fxLayoutAlign="start center">
         <symbiota2-collection-logo
             [collectionID]="collection.id"
@@ -11,10 +11,10 @@
             Comments
         </h1>
     </div>
-    <mat-card class="commentsSection" fxLayout="column" fxLayoutGap="1rem">
+    <mat-card class="commentsSection" fxLayout="column" fxLayoutGap=".6rem">
         <mat-paginator
             class="paginator"
-            [length]="comments.length"
+            [length]="commentList.length"
             [pageSize]="5"
             [pageSizeOptions]="[5, 25, 50, 100]"
             (page)="onPageChanged($event)"
@@ -60,30 +60,30 @@
                 <button
                     *ngIf="!comment.status"
                     mat-icon-button
-                    color="accent"
+                    color="primary"
                     (click)="this.toggleStatus(comment)"
                     aria-label="Mark as Reviewed"
                     matTooltip="Mark as Reviewed"
                     matTooltipPosition="above"
-                    matTooltipClass="accent"
+                    matTooltipClass="primary"
                 >
                     <mat-icon>check_circle</mat-icon>
                 </button>
                 <button
                 *ngIf="comment.status"
                 mat-icon-button
-                color="accent"
+                color="primary"
                 (click)="this.toggleStatus(comment)"
                 aria-label="Mark for Review"
                 matTooltip="Mark for Review"
                 matTooltipPosition="above"
-                matTooltipClass="accent"
+                matTooltipClass="primary"
             >
                 <mat-icon>unpublished</mat-icon>
             </button>
                 <button
                     mat-icon-button
-                    color="primary"
+                    color="warn"
                     aria-label="Delete Comment"
                     matTooltip="Delete Comment"
                     matTooltipPosition="above"
@@ -94,4 +94,4 @@
             </div>
         </mat-card>
     </mat-card>
-</div>
+</mat-card>

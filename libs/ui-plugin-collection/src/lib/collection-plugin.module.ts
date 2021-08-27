@@ -48,6 +48,7 @@ import { InstitutionNewComponent } from './components/institution-new/institutio
 import { InstitutionNewDialogComponent } from './components/institution-new-dialog/institution-new-dialog.component';
 import { CollectionCommentPage } from './pages/collection-comment-page/collection-comment-page.component';
 import { CollectionCommentComponent } from './components/collection-comment/collection-comment.component';
+import { ImgFallbackDirective } from './components/collection-logo/img-fallback.directive';
 
 
 @NgModule({
@@ -67,6 +68,7 @@ import { CollectionCommentComponent } from './components/collection-comment/coll
         InstitutionNewDialogComponent,
         CollectionCommentPage,
         CollectionCommentComponent,
+        ImgFallbackDirective,
     ],
   imports: [
     AppTranslationModule,

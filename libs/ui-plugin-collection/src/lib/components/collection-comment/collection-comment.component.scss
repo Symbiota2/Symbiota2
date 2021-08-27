@@ -10,13 +10,15 @@
 .post {
     padding-left: 0.5rem;
     padding-right: 0.5;
-    background-color: $primaryColor;
+    background-color: scale-color($primaryColor, $alpha: -80%);
     border-radius: 0.5rem;
     border-bottom-left-radius: 0rem;
     border-bottom-right-radius: 0rem;
-    color: white;
+    color: $primaryColor;
     font-size: 14px;
 }
+
+
 
 .divider{
     height: 100%;

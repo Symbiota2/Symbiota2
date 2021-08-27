@@ -1,5 +1,6 @@
 <a *ngIf='url !== "#"; else noLink' [routerLink]='url'>
     <img
+        symbiota2ImgFallback
         [ngStyle]="{ width: size, height: size }"
         class="collection-logo"
         src="{{ src }}"
@@ -8,6 +9,7 @@
 </a>
 <ng-template #noLink>
     <img
+        symbiota2ImgFallback
         [ngStyle]="{ width: size, height: size }"
         class="collection-logo"
         src="{{ src }}"
