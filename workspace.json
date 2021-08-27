@@ -70,6 +70,11 @@
             "aot": true,
             "assets": ["apps/ui/src/favicon.ico", "apps/ui/src/assets"],
             "styles": ["apps/ui/src/styles.scss"],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "apps/ui/src/"
+              ]
+            },
             "scripts": []
           },
           "configurations": {
@@ -321,6 +326,12 @@
       "root": "libs/ui-plugin-collection",
       "sourceRoot": "libs/ui-plugin-collection/src",
       "prefix": "symbiota2",
+      "styles": ["apps/ui/src/styles.scss"],
+      "stylePreprocessorOptions": {
+        "includePaths": [
+          "apps/ui/src/"
+        ]
+      },
       "targets": {
         "build": {
           "executor": "@nrwl/angular:package",

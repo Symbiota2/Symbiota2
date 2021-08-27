@@ -1,7 +1,7 @@
 <mat-card class="main" fxLayoutGap="0.8rem" fxLayout="column">
     <mat-card-title
         class="post"
-        fxLayout="row"
+        fxLayout="row wrap"
         fxLayoutGap="1rem"
         fxLayoutAlign="start center"
     >
@@ -12,7 +12,7 @@
         <p class="divider">|</p>
         <P>{{ comment.postDate }}</P>
     </mat-card-title>
-    <mat-card-subtitle class="commentInfo" fxLayout="row" fxLayoutGap="0.5rem" fxLayoutAlign="start center">
+    <mat-card-subtitle class="commentInfo" fxLayout="row warp" fxLayoutGap="0.5rem" fxLayoutAlign="start center">
         <p *ngIf="this.comment.status" id="reviewed"><mat-icon>check_circle</mat-icon>Reviewed</p>
         <p *ngIf="!this.comment.public" id="private"><mat-icon>lock
         </mat-icon>Private</p>

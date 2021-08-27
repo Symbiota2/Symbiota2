@@ -1,8 +1,11 @@
+@import "apps/ui/src/styles.scss";
 
 .comment{
     padding: 0rem;
+    margin-left: .4rem;
+    margin-right: .4rem;
     border-radius: 0.55rem;
-    outline: #005285 1.5px solid;
+    outline: $primaryColor 1.5px solid;
 
     mat-icon{
         font-size: 28px !important;
@@ -11,11 +14,11 @@
 }
 
 ::ng-deep.accent{
-    background: #005285;
+    background: $accentColor;
 }
 
 ::ng-deep.primary{
-    background: #008575;
+    background: $primaryColor;
 }
 
 
@@ -25,12 +28,11 @@
 }
 
 .commentsSection{
-    background-color: white;
-    
-    padding : 0.4rem;
-    border-radius: 0rem;
+    background-color: $backgroundColor;
+    padding: 0px 0px 1rem 0px;
+    border-radius: 0.5rem;
 }
 
 .paginator{
-    border-radius: 0.5rem;
+    border-radius: 0.5rem, 0.5rem, 0px, 0px;
 }
