@@ -8,14 +8,14 @@ import {
 } from '@symbiota2/data-access';
 import { Geometry } from 'wkx';
 import { InjectQueue } from '@nestjs/bull';
-import { QUEUE_ID_OCCURRENCE_UPLOAD_CLEANUP } from './queues/occurrence-upload-cleanup.queue';
+import { QUEUE_ID_OCCURRENCE_UPLOAD_CLEANUP } from '../queues/occurrence-upload-cleanup.queue';
 import { Queue } from 'bull';
-import { OccurrenceUploadCleanupJob } from './queues/occurrence-upload-cleanup.processor';
-import { OccurrenceUpload } from '../../api-database/src/entities/upload/OccurrenceUpload.entity';
+import { OccurrenceUploadCleanupJob } from '../queues/occurrence-upload-cleanup.processor';
+import { OccurrenceUpload } from '../../../api-database/src/entities/upload/OccurrenceUpload.entity';
 import fs from 'fs';
 import csv from 'csv-parser';
-import { QUEUE_ID_OCCURRENCE_UPLOAD } from './queues/occurrence-upload.queue';
-import { OccurrenceUploadJob } from './queues/occurrence-upload.processor';
+import { QUEUE_ID_OCCURRENCE_UPLOAD } from '../queues/occurrence-upload.queue';
+import { OccurrenceUploadJob } from '../queues/occurrence-upload.processor';
 import { csvIterator } from '@symbiota2/api-common';
 
 type _OccurrenceFindAllItem = Pick<Occurrence, 'id' | 'catalogNumber' | 'taxonID' | 'scientificName' | 'latitude' | 'longitude'>;
