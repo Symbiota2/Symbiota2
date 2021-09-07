@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { OccurrenceService } from './occurrence.service';
-import { OccurrenceController } from './occurrence.controller';
+import { OccurrenceService } from './occurrence/occurrence.service';
+import { OccurrenceController } from './occurrence/occurrence.controller';
 import { DatabaseModule } from '@symbiota2/api-database';
 import { MulterModule } from '@nestjs/platform-express';
 import { AppConfigModule, AppConfigService } from '@symbiota2/api-config';
@@ -12,6 +12,8 @@ import { OccurrenceUploadCleanupProcessor } from './queues/occurrence-upload-cle
 import { OccurrenceUploadQueue } from './queues/occurrence-upload.queue';
 import { OccurrenceUploadProcessor } from './queues/occurrence-upload.processor';
 import { CollectionModule } from '@symbiota2/api-plugin-collection';
+import { OccurrenceCommentController } from './occurrence-comment/occurrence-comment.controller';
+import { OccurrenceCommentService } from './occurrence-comment/occurrence-comment.service';
 
 /**
  * Module for retrieving occurrence records from the database
@@ -54,7 +56,8 @@ import { CollectionModule } from '@symbiota2/api-plugin-collection';
         OccurrenceService,
         OccurrenceUploadCleanupProcessor,
         OccurrenceUploadProcessor,
+        OccurrenceCommentService,
     ],
-    controllers: [OccurrenceController]
+    controllers: [OccurrenceController, OccurrenceCommentController]
 })
 export class OccurrenceModule extends SymbiotaApiPlugin { }

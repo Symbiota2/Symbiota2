@@ -9,18 +9,26 @@ import {
 import { Occurrence } from './Occurrence.entity';
 import { User } from '../user/User.entity';
 import { EntityProvider } from '../../entity-provider.class';
+import { ApiProperty } from '@nestjs/swagger';
+import { Expose, Type } from 'class-transformer';
 
 @Index(['occurrenceID'])
 @Index(['uid'])
 @Entity('omoccurcomments')
 export class OccurrenceComment extends EntityProvider {
     @PrimaryGeneratedColumn({ type: 'int', name: 'comid' })
+    @ApiProperty()
+    @Expose()
     id: number;
 
     @Column('int', { name: 'occid', unsigned: true })
+    @ApiProperty()
+    @Expose()
     occurrenceID: number;
 
     @Column('text', { name: 'comment' })
+    @ApiProperty()
+    @Expose()
     comment: string;
 
     @Column('int', { name: 'uid', unsigned: true })
@@ -31,6 +39,8 @@ export class OccurrenceComment extends EntityProvider {
         unsigned: true,
         default: () => '\'0\''
     })
+    @ApiProperty()
+    @Expose()
     reviewStatus: number;
 
     @Column('int', { name: 'parentcomid', nullable: true, unsigned: true })
@@ -55,5 +65,26 @@ export class OccurrenceComment extends EntityProvider {
         onUpdate: 'CASCADE',
     })
     @JoinColumn([{ name: 'uid', referencedColumnName: 'uid' }])
-    commenter: Promise<User>;
+    @ApiProperty()
+    @Expose()
+    @Type(() => OccurrenceCommenter)
+    commenter: Promise<User> | User;
+}
+
+class OccurrenceCommenter {
+    @ApiProperty()
+    @Expose()
+    uid: number;
+
+    @ApiProperty()
+    @Expose()
+    username: string;
+
+    @ApiProperty()
+    @Expose()
+    firstName: string;
+
+    @ApiProperty()
+    @Expose()
+    lastName: string;
 }
