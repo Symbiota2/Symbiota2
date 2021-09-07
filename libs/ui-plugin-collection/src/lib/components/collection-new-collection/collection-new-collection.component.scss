@@ -1,4 +1,49 @@
+@import "apps/ui/src/styles.scss";
 
+.container {
+    
+    left: 0;
+    right: 0;
+    background-color: white;
+}
+
+::ng-deep.primary{
+    background: $primaryColor;
+}
+
+.sidenav{
+    display: flex;
+    align-items: flex-end;
+    justify-content: end;
+    width: 200px;
+
+    
+}
+
+.navList{
+    list-style: none;
+    padding-right: 1rem;
+    font-weight: lighter;
+    li{
+        
+        color: grey;
+        margin-top: 1rem;
+        justify-content: flex-end !important;
+        text-align: end !important;
+    }
+
+    li:hover{
+        color: $primaryColor;
+    }
+
+    li:active{
+        color: $primaryColor;
+    }
+}
+
+::ng-deep.mat-list-item.mat-list-item-content{
+    justify-content: end !important;
+}
 
 #content {
     margin-left: 13rem;
@@ -17,8 +62,12 @@
     font-family: 'Material Icons' !important;
 }
 
+.medium-input{
+    max-width: 248px;
+}
+
 .title{
-    font-size: 18px !important;
+    font-size: 28px !important;
     color:rgb(80, 80, 80);
 }
 
@@ -27,7 +76,6 @@
 }
 
 .content{
-   // background-color: papayawhip;
 }
 
 .coords{
@@ -39,5 +87,12 @@
 }
 
 .contact{
+    transition: none !important;
+    box-shadow: none !important;
    // background-color: palevioletred;
+}
+.submit-button{
+    margin-top: 2rem !important;
+    margin-left: 1rem !important;
+    height: 4rem;
 }

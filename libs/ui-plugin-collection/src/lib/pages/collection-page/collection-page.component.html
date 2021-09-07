@@ -1,4 +1,4 @@
-<div *ngIf="(collection | async) as collection">
+<div *ngIf="collection">
     <div fxLayout="row" fxLayoutAlign="start center">
         <symbiota2-collection-logo
             id="collectionLogo"
@@ -14,10 +14,10 @@
                     {{ collection.collectionName }}
                 </h1>
                 <button
-                    *ngIf="userCanEdit | async"
+                    *ngIf="userCanEdit"
                     id='editButton'
                     mat-icon-button
-                    (click)="onEdit()"
+                    (click)="openCollectionTools()"
                 >
                     <mat-icon>edit</mat-icon>
                 </button>
@@ -31,7 +31,7 @@
                 </small>
             </div>
             <div id="links">
-                <ng-container *ngFor="let link of (links | async)">
+                <ng-container *ngFor="let link of links">
                     <span>
                         <a
                             [routerLink]="link.routerLink"

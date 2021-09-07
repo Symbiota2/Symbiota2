@@ -1,3 +1,4 @@
+
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder, FormControl } from '@angular/forms';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
@@ -13,6 +14,7 @@ import { Router } from '@angular/router';
 import { ROUTE_COLLECTION_PROFILE } from '../../routes';
 import { CollectionAsyncValidators } from './validators';
 import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
+import { ViewportScroller } from '@angular/common';
 
 
 //TODO: add back end support for additional fields
@@ -70,7 +72,8 @@ export class CollectionNewCollectionComponent implements OnInit {
         private users: UserService,
         private institutions: InstitutionService,
         private dialog: MatDialog,
-        private rt: Router
+        private rt: Router,
+        private viewportScroller: ViewportScroller,
     ) {}
 
     ngOnInit(): void {
@@ -134,6 +137,10 @@ export class CollectionNewCollectionComponent implements OnInit {
                 })
             )
             .subscribe((user) => (this.user = user));
+    }
+
+    onClickScroll(elementId: string): void {
+        this.viewportScroller.scrollToAnchor(elementId);
     }
 
     populate(): void {

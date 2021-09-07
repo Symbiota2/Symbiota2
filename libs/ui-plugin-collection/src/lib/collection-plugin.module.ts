@@ -30,11 +30,14 @@ import { MatInputModule } from '@angular/material/input';
 import {MatDividerModule} from '@angular/material/divider'; 
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatPaginatorModule} from '@angular/material/paginator'; 
+import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatListModule} from '@angular/material/list';
 import {
     ROUTE_COLLECTION_LIST,
     ROUTE_COLLECTION_PROFILE,
     ROUTE_COLLECTION_NEW,
-    ROUTE_COLLECTION_COMMENTS
+    ROUTE_COLLECTION_COMMENTS,
+    ROUTE_COLLECTION_TOOLS
 } from './routes';
 import { CollectionFieldComponent } from './components/collection-field/collection-field.component';
 import { CollectionListPage } from './pages/collection-list-page/collection-list-page.component';
@@ -49,6 +52,7 @@ import { InstitutionNewDialogComponent } from './components/institution-new-dial
 import { CollectionCommentPage } from './pages/collection-comment-page/collection-comment-page.component';
 import { CollectionCommentComponent } from './components/collection-comment/collection-comment.component';
 import { ImgFallbackDirective } from './components/collection-logo/img-fallback.directive';
+import { CollectionToolsPage } from './pages/collection-tools-page/collection-tools-page.component';
 
 
 @NgModule({
@@ -69,6 +73,7 @@ import { ImgFallbackDirective } from './components/collection-logo/img-fallback.
         CollectionCommentPage,
         CollectionCommentComponent,
         ImgFallbackDirective,
+        CollectionToolsPage,
     ],
   imports: [
     AppTranslationModule,
@@ -91,7 +96,10 @@ import { ImgFallbackDirective } from './components/collection-logo/img-fallback.
     MatSelectModule,
     MatDividerModule,
     MatTooltipModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatSidenavModule,
+    MatListModule
+
   ],
     providers: [
         CollectionService,
@@ -110,7 +118,8 @@ export class CollectionPlugin extends SymbiotaUiPlugin {
             { path: ROUTE_COLLECTION_LIST, component: CollectionListPage },
             { path: ROUTE_COLLECTION_PROFILE, component: CollectionPage },
             { path: ROUTE_COLLECTION_NEW, component: CollectionNewPage},
-            { path: ROUTE_COLLECTION_COMMENTS, component: CollectionCommentPage}
+            { path: ROUTE_COLLECTION_COMMENTS, component: CollectionCommentPage},
+            { path: ROUTE_COLLECTION_TOOLS, component: CollectionToolsPage}
         ];
     }
 
