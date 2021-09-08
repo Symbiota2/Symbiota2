@@ -10,7 +10,11 @@ import {
 import { MatDialog } from '@angular/material/dialog';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ROUTE_COLLECTION_LIST, ROUTE_COLLECTION_COMMENTS, ROUTE_COLLECTION_TOOLS } from '../../routes';
+import {
+    ROUTE_COLLECTION_LIST,
+    ROUTE_COLLECTION_COMMENTS,
+    ROUTE_COLLECTION_TOOLS,
+} from '../../routes';
 import { CollectionEditorDialogComponent } from '../../components/collection-editor-dialog/collection-editor-dialog.component';
 import { Collection } from '@symbiota2/ui-plugin-collection';
 
@@ -53,40 +57,36 @@ export class CollectionPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.getCollection().then(data => {
-                this.collection = data;
-                this.collectionHomePage = data.homePage;
-                this.geoReferencedPercent =
-                    data.collectionStats.recordCount > 0
-                        ? Math.round(
-                              (data.collectionStats.georeferencedCount /
-                                  data.collectionStats.recordCount) *
-                                  100
-                          )
-                        : 0;
-                this.collectionID = data.id;
-                this.canUserEdit();
-                this.comments_link = {
-                    text: 'view comments',
-                    requiresLogin: false,
-                    routerLink: `/${ROUTE_COLLECTION_COMMENTS.replace(
-                        ':collectionID',
-                        this.collectionID.toString()
-                    )}`,
-                };
-                this.getLinks();
-                console.log("subscribe: " + data);
+        this.getCollection().then((data) => {
+            this.collection = data;
+            this.collectionHomePage = data.homePage;
+            this.geoReferencedPercent =
+                data.collectionStats.recordCount > 0
+                    ? Math.round(
+                          (data.collectionStats.georeferencedCount /
+                              data.collectionStats.recordCount) *
+                              100
+                      )
+                    : 0;
+            this.collectionID = data.id;
+            this.canUserEdit();
+            this.comments_link = {
+                text: 'view comments',
+                requiresLogin: false,
+                routerLink: `/${ROUTE_COLLECTION_COMMENTS.replace(
+                    ':collectionID',
+                    this.collectionID.toString()
+                )}`,
+            };
+            this.getLinks();
+            console.log('subscribe: ' + data);
         });
-
     }
 
     getCollection(): Promise<Collection> {
-
         return this.currentRoute.paramMap
             .pipe(
                 map((params) => {
-                    console.log(params)
-                    console.log(params.has(CollectionPage.ROUTE_PARAM_COLLID))
                     return params.has(CollectionPage.ROUTE_PARAM_COLLID)
                         ? parseInt(
                               params.get(CollectionPage.ROUTE_PARAM_COLLID)
@@ -94,9 +94,7 @@ export class CollectionPage implements OnInit {
                         : -1;
                 }),
                 switchMap((collectionID) => {
-                    console.log("param id : " + collectionID);
                     this.collections.setCollectionID(collectionID);
-                    console.log("setID : " + this.collections.currentCollection );
 
                     return this.collections.currentCollection;
                 }),
@@ -107,7 +105,8 @@ export class CollectionPage implements OnInit {
                     }
                 }),
                 take(1) //had to add this to get promise to resolve
-            ).toPromise();
+            )
+            .toPromise();
     }
 
     getLinks(): void {
@@ -145,25 +144,28 @@ export class CollectionPage implements OnInit {
     }
 
     isUserEditor(): Promise<boolean> {
-
-        return this.userService.currentUser.pipe(
-            map((user) => {
-                return user.canEditCollection(this.collectionID);
-            }),
-            take(1)
-        ).toPromise();
-
+        return this.userService.currentUser
+            .pipe(
+                map((user) => {
+                    return user.canEditCollection(this.collectionID);
+                }),
+                take(1)
+            )
+            .toPromise();
     }
 
-    openCollectionTools(): void{
-        var route: string = `/${ROUTE_COLLECTION_TOOLS.replace(':collectionID', this.collectionID.toString())}`
+    openCollectionTools(): void {
+        var route: string = `/${ROUTE_COLLECTION_TOOLS.replace(
+            ':collectionID',
+            this.collectionID.toString()
+        )}`;
 
         console.log(route);
-        this.isUserEditor().then(bool => {
-            if (bool){
+        this.isUserEditor().then((bool) => {
+            if (bool) {
                 this.router.navigate([route]);
             }
-        })
+        });
     }
 
     // onEdit() {

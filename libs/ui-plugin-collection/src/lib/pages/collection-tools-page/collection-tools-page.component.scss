@@ -1,0 +1,17 @@
+.container{
+    background-color: powderblue;
+}
+
+.sidenav{
+    display: flex;
+    align-items: flex-end;
+    justify-content: end;
+    width: 200px;
+    background-color: pink;
+}
+
+.content{
+    margin-left: 13rem;
+    width: 400px;
+    background-color: palegreen;
+}

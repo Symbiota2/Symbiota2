@@ -1,1 +1,13 @@
-<p>collection-tools-page works!</p>
+<mat-sidenav-container class='container'>
+    <mat-sidenav
+        #sidenav
+        mode="side"
+        opened
+        class="sidenav"
+        fixedInViewport="true"
+        fixedTopGap="338">
+    </mat-sidenav>
+    <mat-sidenav-content class="content" *ngComponentOutlet="activeComponent">
+
+    </mat-sidenav-content>
+</mat-sidenav-container>

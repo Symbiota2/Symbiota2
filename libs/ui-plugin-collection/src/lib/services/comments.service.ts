@@ -22,6 +22,8 @@ export class CommentService {
 
     static comments: Comment[] = [
         {
+            //primary key
+            //commenterUID
             postID: 'BBSL228328',
             postAuthor: 'S.Vanderwall',
             postDate: '1997-10-09',
