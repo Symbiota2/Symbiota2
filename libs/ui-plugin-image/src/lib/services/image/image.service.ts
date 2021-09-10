@@ -6,6 +6,7 @@ import { ImageQueryBuilder } from './image-query-builder'
 import { ImageListItem } from '../../dto/image-list-item'
 
 interface FindAllParams {
+    imageIDs: number[]
     taxonIDs: number[]
     limit?: number
 }
@@ -29,7 +30,22 @@ export class ImageService {
     findAll(params?: FindAllParams): Observable<ImageListItem[]> {
         const url = this.createQueryBuilder()
             .findAll()
-            .taxonIDs(params? params.taxonIDs : [])
+            .imageIDs(params? params.imageIDs : [])
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build();
+        return this.apiClient.send<any, Record<string, unknown>[]>(query)
+            .pipe(
+                map((descriptions) => descriptions.map((o) => {
+                    return ImageListItem.fromJSON(o);
+                }))
+            );
+    }
+
+    findByTaxonIDs(ids: number[]): Observable<ImageListItem[]> {
+        const url = this.createQueryBuilder()
+            .findByTaxonIDs()
+            .taxonIDs(ids)
             .build()
 
         const query = this.apiClient.queryBuilder(url).get().build();

@@ -116,6 +116,21 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
         return this
     }
 
+    familyRank(): FindAllScientificNamesBuilder {
+        this.url = new URL(`${this.baseUrl}/taxon/familyNames`)
+        return this
+    }
+
+    genusRank(): FindAllScientificNamesBuilder {
+        this.url = new URL(`${this.baseUrl}/taxon/genusNames`)
+        return this
+    }
+
+    speciesRank(): FindAllScientificNamesBuilder {
+        this.url = new URL(`${this.baseUrl}/taxon/speciesNames`)
+        return this
+    }
+
     build(): string {
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)

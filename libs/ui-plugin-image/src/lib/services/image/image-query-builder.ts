@@ -15,6 +15,10 @@ export class ImageQueryBuilder {
         return new FindAllBuilder(this.baseUrl)
     }
 
+    findByTaxonIDs(): FindByTaxonIDsBuilder {
+        return new FindByTaxonIDsBuilder(this.baseUrl)
+    }
+
     findDescriptions(): FindDescriptionsBuilder {
         return new FindDescriptionsBuilder(this.baseUrl)
     }
@@ -43,9 +47,32 @@ class FindOneBuilder extends ImageQueryBuilder {
 }
 
 class FindAllBuilder extends ImageQueryBuilder {
-    protected _taxonIDs: number[] = [];
+    protected _imageIDs: number[] = [];
 
-    taxonIDs(ids: number[]): FindAllBuilder {
+    imageIDs(ids: number[]): FindAllBuilder {
+        this._imageIDs = ids
+        return this
+    }
+
+    build(): string {
+        this._imageIDs.forEach((id) => {
+            this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString());
+        })
+
+        return super.build();
+    }
+}
+
+class FindByTaxonIDsBuilder extends ImageQueryBuilder {
+    protected _taxonIDs: number[] = []
+
+    constructor(apiBaseUrl: string) {
+        super(apiBaseUrl)
+        this.baseUrl = apiBaseUrl
+        this.url = new URL(`${apiBaseUrl}/image/taxonIDs`)
+    }
+
+    taxonIDs(ids: number[]): FindByTaxonIDsBuilder {
         this._taxonIDs = ids
         return this
     }

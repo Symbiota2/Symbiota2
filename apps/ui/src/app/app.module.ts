@@ -32,11 +32,13 @@ import { PasswordFormValidator } from './pages/user-profile/password-validator.d
 import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.component';
 import { ForgotUsernamePage } from './pages/forgot-username/forgot-username.component';
 import { NotificationDialog } from './components/navbar/notification-dialog/notification-dialog.component';
+import { ImagePlugin } from '@symbiota2/ui-plugin-image';
 
 const PLUGINS = [
     CollectionPlugin,
     OccurrencePlugin,
-    TaxonomyPlugin
+    TaxonomyPlugin,
+    ImagePlugin
 ];
 
 /**
