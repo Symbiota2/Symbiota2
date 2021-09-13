@@ -57,7 +57,7 @@ export class UserRole extends EntityProvider {
         onUpdate: 'CASCADE',
     })
     @JoinColumn([{ name: 'uid', referencedColumnName: 'uid' }])
-    user: Promise<User>;
+    user: Promise<User> | User;
 
     @ManyToOne(() => User, (users) => users.assignedRoles, {
         onDelete: 'SET NULL',

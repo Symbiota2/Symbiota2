@@ -1,11 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
     Collection,
-    CollectionCategoryLink, CollectionStat, Occurrence, TaxaEnumTreeEntry, Taxon
+    CollectionCategoryLink,
+    CollectionStat,
+    Occurrence,
+    TaxaEnumTreeEntry,
+    Taxon,
+    UserRole
 } from '@symbiota2/api-database';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, In, Repository } from 'typeorm';
 import { CollectionFindAllParams } from './dto/coll-find-all.input.dto';
 import { BaseService } from '@symbiota2/api-common';
+import { ApiUserRoleName } from '@symbiota2/data-access';
 
 /**
  * Service for manipulating specimen collections
@@ -20,7 +26,9 @@ export class CollectionService extends BaseService<Collection> {
         @Inject(CollectionStat.PROVIDER_ID)
         private readonly collectionStats: Repository<CollectionStat>,
         @Inject(Occurrence.PROVIDER_ID)
-        private readonly occurrenceRepo: Repository<Occurrence>) {
+        private readonly occurrenceRepo: Repository<Occurrence>,
+        @Inject(UserRole.PROVIDER_ID)
+        private readonly roleRepo: Repository<UserRole>) {
 
         super(collections);
     }
@@ -114,6 +122,18 @@ export class CollectionService extends BaseService<Collection> {
     async updateLastModified(id: number): Promise<void> {
         await this.collectionStats.update(id, {
             lastModifiedTimestamp: new Date()
+        });
+    }
+
+    async getRolesForCollection(collectionID: number): Promise<UserRole[]> {
+        const reqRoles = [
+            ApiUserRoleName.COLLECTION_ADMIN,
+            ApiUserRoleName.COLLECTION_EDITOR
+        ];
+        return await this.roleRepo.find({
+            select: ['id', 'name', 'user'],
+            where: { name: In(reqRoles), tablePrimaryKey: collectionID },
+            relations: ['user']
         });
     }
 }
