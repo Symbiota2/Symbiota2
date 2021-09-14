@@ -3,8 +3,9 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
     TaxonDescriptionBlockListItem,
-    TaxonDescriptionBlockService,
-} from '@symbiota2/ui-plugin-taxonomy'
+    TaxonDescriptionBlockService, TaxonListItem, TaxonomicStatusListItem, TaxonomicStatusService, TaxonService
+} from '@symbiota2/ui-plugin-taxonomy';
+import { ImageListItem, ImageService } from '@symbiota2/ui-plugin-image';
 
 @Component({
     selector: 'taxon-profile',
@@ -15,10 +16,16 @@ import {
 export class TaxonProfilePageComponent implements OnInit {
     blocks: TaxonDescriptionBlockListItem[] = []
     taxonID: string
+    image: ImageListItem
+    images: ImageListItem[] = []
+    taxon: TaxonListItem
+    taxonomicStatus: TaxonomicStatusListItem
 
     constructor(
         //private readonly userService: UserService,  // TODO: needed for species hiding
         private readonly taxonDescriptionBlockService: TaxonDescriptionBlockService,
+        private readonly imageService: ImageService,
+        private readonly taxonStatusService: TaxonomicStatusService,
         private router: Router,
         private formBuilder: FormBuilder,
         private currentRoute: ActivatedRoute
@@ -47,9 +54,32 @@ export class TaxonProfilePageComponent implements OnInit {
             })
             this.blocks = blocks
         })
+        this.imageService.findByTaxonIDs([taxonID]).subscribe((images) => {
+            this.image = images.shift()
+            this.images = images
+            //images.forEach((image) => {
+            //})
+        })
+        this.taxonStatusService.findAll({taxonIDs : [taxonID], taxonomicAuthorityID: 1}).subscribe((taxonomicStatuses) => {
+            let authoritySet = false
+            taxonomicStatuses.forEach((taxonomicStatus) => {
+                if (!authoritySet) {
+                    this.taxonomicStatus = taxonomicStatus
+                    this.taxon = taxonomicStatus.taxon
+                }
+                if (taxonomicStatus.taxonID == taxonomicStatus.taxonIDAccepted) {
+                    authoritySet = true
+                }
+            })
+
+        })
     }
 
     goToLink(url: string){
-        window.open("taxon/editor/" + url, "_blank");
+        window.open("taxon/editor/" + url, "_blank")
+    }
+
+    goToParent(url: string){
+        window.open("taxon/profile/" + url)
     }
 }

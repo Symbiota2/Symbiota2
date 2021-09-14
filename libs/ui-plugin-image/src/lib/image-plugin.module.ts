@@ -7,7 +7,6 @@ import {
   SymbiotaUiPlugin
 } from '@symbiota2/ui-common';
 
-//import { TaxaViewerPageComponent } from "./pages/taxa-viewer/taxa-viewer-page.component";
 import { Route, RouterModule } from "@angular/router";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatCardModule } from "@angular/material/card";
@@ -31,6 +30,8 @@ import {
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
+import { ImageLibraryPageComponent, ImageSearchPageComponent } from './pages';
+import { ImageDetailsPageComponent } from './pages/image-details/image-details-page.component';
 
 
 @NgModule({
@@ -63,16 +64,23 @@ import { MatRadioModule } from '@angular/material/radio';
   ],
     declarations: [
 //        TaxaSearchPage,
+        ImageSearchPageComponent,
+        ImageLibraryPageComponent,
+        ImageDetailsPageComponent
     ],
     providers: [
         ImageService,
     ],
     entryComponents: [
 //        TaxaSearchPage,
+        ImageSearchPageComponent,
+        ImageLibraryPageComponent,
+        ImageDetailsPageComponent
     ]
 })
 export class ImagePlugin extends SymbiotaUiPlugin {
-    //private static SEARCH_TAXA_ROUTE = "taxonomy/search"
+    private static IMAGE_LIBRARY_ROUTE = "images/library/:level"
+    private static IMAGE_DETAILS_ROUTE = "image/details/:imageID"
 
     constructor() {
         super();
@@ -80,24 +88,24 @@ export class ImagePlugin extends SymbiotaUiPlugin {
 
     static routes(): Route[] {
         return [
-            /*
             {
-                path: ImagePlugin.SEARCH_TAXA_ROUTE,
-                component: TaxaSearchPage
+                path: ImagePlugin.IMAGE_LIBRARY_ROUTE,
+                component: ImageLibraryPageComponent
             },
-             */
+            {
+                path: ImagePlugin.IMAGE_DETAILS_ROUTE,
+                component: ImageDetailsPageComponent
+            },
+
         ];
     }
 
     static navBarLinks(): NavBarLink[] {
         return [
-            /*
             {
-                url: `/${ImagePlugin.IMAGE_VIEWER_ROUTE}`,
-                //name: "core.layout.header.topnav.search_taxa_link"
-                name: "Taxa Viewer"
+                url: `/${ImagePlugin.IMAGE_LIBRARY_ROUTE}`,
+                name: "core.layout.header.topnav.image_library_link"
             }
-             */
         ]
     }
 

@@ -1,6 +1,19 @@
 <div>
     <h1>{{"taxon.profile.title" | translate}}</h1>
 </div>
+<div *ngIf='taxonomicStatus'>
+    <div>
+        <b *ngIf='taxon'>{{taxon.scientificName}}</b>
+        &nbsp;<span *ngIf='taxon.author'>{{taxon.author}}</span>
+        <a *ngIf='taxonomicStatus.parentTaxonID' href='taxon/profile/{{taxonomicStatus.parentTaxonID}}' style='text-decoration: none'>
+            <mat-icon>arrow_upward</mat-icon>
+        </a>
+    </div>
+    <div *ngIf='taxonomicStatus.family'>
+        <b>Family: </b>{{taxonomicStatus.family}}
+    </div>
+
+</div>
 <button style='float:right' mat-icon-button>
     <mat-icon color="primary" (click)="goToLink(taxonID)">edit</mat-icon>
 </button>
@@ -11,10 +24,12 @@
             <table>
                 <tr>
                     <td>
-                        <img *ngIf='block.images?.length > 0' src="http://openherbarium.org{{block.images[0].url}}"/>
-                        <span *ngIf='block.images?.length == 0'>{{"taxon.profile.no.image" | translate}}</span>
+                        <a *ngIf='image' href='image/details/{{image.id}}'>
+                            <img src="http://openherbarium.org{{image.thumbnailUrl}}"/>
+                        </a>
+                        <span *ngIf='!image'>{{"taxon.profile.no.image" | translate}}</span>
                         <br/>
-                        <span *ngIf='block.images?.length > 0' style='text-aligh:right'>{{block.images[0].photographerName}}</span>
+                        <span *ngIf='image' style='text-aligh:right'>{{image.photographerName}}</span>
                     </td>
                     <td>
                         <div *ngIf='block.source' style='text-align:right'>
@@ -27,16 +42,39 @@
                                 <div [innerHTML]="d.statement"></div>
                             </span>
                             <span *ngIf='block.descriptionStatements?.length == 0'>
-                        {{"taxon.profile.no.description" | translate}}
-                                                </span>
+                                {{"taxon.profile.no.description" | translate}}
+                            </span>
                         </span>
                     </td>
                 </tr>
             </table>
-
         </symbiota2-expansion-panel>
     </mat-tab>
 </mat-tab-group>
 <div *ngIf="blocks.length == 0">
-    {{"taxon.profile.no.description" | translate}}
+    <table>
+        <tr>
+            <td>
+                <a *ngIf='image' href='image/details/{{image.id}}'>
+                    <img src="http://openherbarium.org{{image.thumbnailUrl}}"/>
+                </a>
+                <span *ngIf='!image'>{{"taxon.profile.no.image" | translate}}</span>
+                <br/>
+                <span *ngIf='image' style='text-aligh:right'>{{image.photographerName}}</span>
+            </td>
+            <td>
+                {{"taxon.profile.no.description" | translate}}
+            </td>
+        </tr>
+    </table>
 </div>
+<mat-grid-list *ngIf='images.length > 0' cols='4' rowHeight='.9:1'>
+    <mat-grid-tile *ngFor='let image of images'>
+        <div class="img-with-text">
+            <a *ngIf='image' href='image/details/{{image.id}}'>
+                <img src="http://openherbarium.org{{image.thumbnailUrl}}"/>
+            </a>
+            <p>{{image.photographerName}}</p>
+        </div>
+    </mat-grid-tile>
+</mat-grid-list>

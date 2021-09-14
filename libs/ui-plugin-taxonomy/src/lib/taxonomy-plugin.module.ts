@@ -50,6 +50,7 @@ import {
     TaxonTaxonDialogComponent
 } from './components';
 import { TaxonEditorPageComponent } from './pages'
+import { MatGridListModule } from '@angular/material/grid-list';
 
 @NgModule({
   imports: [
@@ -80,7 +81,8 @@ import { TaxonEditorPageComponent } from './pages'
     SymbiotaComponentModule,
     ScrollingModule,
     MatTabsModule,
-    MatTableModule
+    MatTableModule,
+    MatGridListModule
   ],
     declarations: [
         TaxaSearchPage,

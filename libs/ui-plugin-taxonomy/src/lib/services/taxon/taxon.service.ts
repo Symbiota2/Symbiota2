@@ -4,6 +4,7 @@ import { catchError, map } from 'rxjs/operators'
 import { Injectable } from '@angular/core'
 import { Taxon, TaxonListItem } from '../../dto'
 import { TaxonQueryBuilder } from './taxon-query-builder'
+import { TaxonIDAndNameItem } from '../../dto/taxon-id-and-name-item';
 
 interface FindAllParams {
     taxonIDs: number[]
@@ -38,13 +39,37 @@ export class TaxonService {
     }
 
     findAllScientificNames(partialName, authorityID?): Observable<string[]> {
-        const url = this.createQueryBuilder()
+        const qb = this.createQueryBuilder()
             .findAllScientificNames()
             .authorityID(authorityID)
             .partialName(partialName)
-            .build()
+
+        const url = qb.build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)
+    }
+
+    findScientificNames(partialName, rank, authorityID?): Observable<TaxonIDAndNameItem[]> {
+        const qb = this.createQueryBuilder()
+            .findAllScientificNames()
+            .authorityID(authorityID)
+            .partialName(partialName)
+
+        if (rank) {
+            if (rank == "family") {
+                qb.familyRank()
+            } else if (rank == "species") {
+                qb.speciesRank()
+            } else if (rank == "genus") {
+                qb.genusRank()
+            }
+        } else {
+            qb.familyRank()  // Default to family rank
+        }
+
+        const url = qb.build()
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, TaxonIDAndNameItem[]>(query)
     }
 
     findAllScientificNamesPlusAuthors(partialName, authorityID?): Observable<string[]> {
@@ -73,7 +98,7 @@ export class TaxonService {
             )
     }
 
-    findByID(id: number, authorityID?): Observable<Taxon> {
+    findByID(id: number, authorityID?): Observable<TaxonListItem> {
         const url = this.createQueryBuilder()
             .findOne()
             .authorityID(authorityID)
@@ -82,7 +107,7 @@ export class TaxonService {
 
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, Record<string, unknown>>(query)
-            .pipe(map((o) => Taxon.fromJSON(o)))
+            .pipe(map((o) => TaxonListItem.fromJSON(o)))
 
     }
 

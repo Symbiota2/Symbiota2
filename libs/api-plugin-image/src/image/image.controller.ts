@@ -5,7 +5,7 @@ import { ImageDto } from './dto/ImageDto'
 import { ImageFindAllParams } from './dto/image-find-all.input.dto'
 
 @ApiTags('Image')
-@Controller('Image')
+@Controller('image')
 export class ImageController {
     constructor(private readonly myService: ImageService) { }
 
@@ -16,6 +16,20 @@ export class ImageController {
     })
     async findAll(@Query() findAllParams: ImageFindAllParams): Promise<ImageDto[]> {
         const images = await this.myService.findAll(findAllParams)
+        const taxonDtos = images.map(async (c) => {
+            const image = new ImageDto(c)
+            return image
+        });
+        return Promise.all(taxonDtos)
+    }
+
+    @Get('taxonIDs')
+    @ApiResponse({ status: HttpStatus.OK, type: ImageDto, isArray: true })
+    @ApiOperation({
+        summary: "Retrieve a list of image records using a list of taxonIDs."
+    })
+    async findByTaxonIDs(@Query() findAllParams: ImageFindAllParams): Promise<ImageDto[]> {
+        const images = await this.myService.findByTaxonIDs(findAllParams)
         const taxonDtos = images.map(async (c) => {
             const image = new ImageDto(c)
             return image

@@ -30,6 +30,8 @@ import {
     ProtectCollection
 } from './collection-edit-guard/protect-collection.decorator';
 import { Collection } from '@symbiota2/api-database';
+import { CollectionEditGuard } from '@symbiota2/api-plugin-collection';
+import { CollectionRole } from './dto/collection-role.output';
 
 /**
  * API routes for manipulating specimen collections
@@ -75,6 +77,15 @@ export class CollectionController {
         }
 
         return collection;
+    }
+
+    @Get(':id/roles')
+    @ApiOperation({ summary: 'Retrieve the roles for the given collection' })
+    @ProtectCollection('id')
+    @ApiResponse({ status: HttpStatus.OK, type: CollectionRole, isArray: true })
+    async findRolesForCollection(@Param('id') id: number): Promise<CollectionRole[]> {
+        const roles = await this.collections.getRolesForCollection(id);
+        return roles.map((role) => new CollectionRole(role));
     }
 
     @Post()
