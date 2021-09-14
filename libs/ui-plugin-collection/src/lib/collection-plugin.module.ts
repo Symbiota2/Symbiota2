@@ -32,6 +32,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatPaginatorModule} from '@angular/material/paginator'; 
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatListModule} from '@angular/material/list';
+import {MatRadioModule} from '@angular/material/radio';
 import {
     ROUTE_COLLECTION_LIST,
     ROUTE_COLLECTION_PROFILE,
@@ -53,6 +54,7 @@ import { CollectionCommentPage } from './pages/collection-comment-page/collectio
 import { CollectionCommentComponent } from './components/collection-comment/collection-comment.component';
 import { ImgFallbackDirective } from './components/collection-logo/img-fallback.directive';
 import { CollectionToolsPage } from './pages/collection-tools-page/collection-tools-page.component';
+import { CollectionPermissionsComponent } from './components/collection-permissions/collection-permissions.component';
 
 
 @NgModule({
@@ -74,6 +76,7 @@ import { CollectionToolsPage } from './pages/collection-tools-page/collection-to
         CollectionCommentComponent,
         ImgFallbackDirective,
         CollectionToolsPage,
+        CollectionPermissionsComponent,
     ],
   imports: [
     AppTranslationModule,
@@ -98,7 +101,8 @@ import { CollectionToolsPage } from './pages/collection-tools-page/collection-to
     MatTooltipModule,
     MatPaginatorModule,
     MatSidenavModule,
-    MatListModule
+    MatListModule,
+    MatRadioModule
 
   ],
     providers: [
