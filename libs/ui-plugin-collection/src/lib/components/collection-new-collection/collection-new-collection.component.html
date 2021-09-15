@@ -97,13 +97,13 @@
                                 <mat-label>Collection Code *</mat-label>
                                 <input
                                     matInput
-                                    formControlName="code"
+                                    formControlName="collectionCode"
                                     oninput="this.value = this.value.toUpperCase()"
                                 />
                                 <mat-error
                                     *ngIf="
                                         newCollectionForm
-                                            .get('code')
+                                            .get('collectionCode')
                                             .hasError('required')
                                     "
                                 >
@@ -112,7 +112,7 @@
                                 <mat-error
                                     *ngIf="
                                         newCollectionForm
-                                            .get('code')
+                                            .get('collectionCode')
                                             .hasError('codeTaken')
                                     "
                                 >
@@ -258,12 +258,12 @@
                             <input
                                 matInput
                                 type="url"
-                                formControlName="homepage"
+                                formControlName="homePage"
                             />
                             <mat-error
                                 *ngIf="
                                     newCollectionForm
-                                        .get('homepage')
+                                        .get('homePage')
                                         .hasError('required')
                                 "
                             >
@@ -278,12 +278,12 @@
                             <input
                                 matInput
                                 type="url"
-                                formControlName="license"
+                                formControlName="rights"
                             />
                             <mat-error
                                 *ngIf="
                                     newCollectionForm
-                                        .get('license')
+                                        .get('rights')
                                         .hasError('required')
                                 "
                             >
@@ -376,7 +376,7 @@
                         <mat-label>Description</mat-label>
                         <textarea
                             matInput
-                            formControlName="description"
+                            formControlName="fullDescription"
                             #description
                         ></textarea>
                     </mat-form-field>
