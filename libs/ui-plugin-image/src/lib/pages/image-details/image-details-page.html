@@ -1,0 +1,34 @@
+<div>
+    <h1>{{"image.details.title" | translate}}</h1>
+</div>
+<table>
+    <tr>
+        <td>
+            <a href='{{image.url}}'><img src='http://openherbarium.org{{image.thumbnailUrl}}'/></a>
+            <div style='text-align:center'> {{"image.details.clickon" | translate}} </div>
+        </td>
+        <td>
+            <div>
+                <b>{{"image.details.sciname" | translate}}</b>: {{taxon.scientificName}} {{taxon.author}}
+            </div>
+            <div>
+                <b>{{"image.details.caption" | translate}}</b>: {{image.caption}}
+            </div>
+            <div>
+                <b>{{"image.details.photographer" | translate}}r</b>: {{image.photographerName}}
+            </div>
+            <div>
+                <b>{{"image.details.manager" | translate}}</b>: {{image.owner}}
+            </div>
+            <div>
+                <b>{{"image.details.image.source" | translate}}</b>: <a href='{{image.originalUrl}}'>{{image.originalUrl}}</a>
+            </div>
+            <div>
+                <b>{{"image.details.image.locality" | translate}}</b>: {{image.locality}}
+            </div>
+            <div>
+                <b>{{"image.details.image.notes" | translate}}</b>: <span [innerHTML]="image.notes"></span>
+            </div>
+        </td>
+    </tr>
+</table>

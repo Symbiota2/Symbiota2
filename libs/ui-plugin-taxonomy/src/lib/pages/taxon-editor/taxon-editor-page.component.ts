@@ -48,7 +48,6 @@ export class TaxonEditorPageComponent implements OnInit {
         console.log("loading ")
         this.currentRoute.paramMap.subscribe(params => {
             this.taxonID = params.get('taxonID')
-            console.log("t " + this.taxonID)
             // Load the profile
             this.loadProfile(parseInt(this.taxonID))
         })

@@ -27,6 +27,19 @@ export class ImageService extends BaseService<Image>{
     }
 
     /*
+    Fetch all of the taxon links.
+    Can limit the list by a list of ids.
+    Can also limit the number fetched and use an offset.
+    */
+    async findByTaxonIDs(params?: ImageFindAllParams): Promise<Image[]> {
+        const { limit, offset, ...qParams } = params;
+
+        return await (qParams.id)?
+            this.myRepository.find({take: limit, skip: offset, where: { taxonID: In(params.id)}})
+            : []
+    }
+
+    /*
     TODO: Not sure if this is implemented correctly.
      */
     async create(data: Partial<Image>): Promise<Image> {

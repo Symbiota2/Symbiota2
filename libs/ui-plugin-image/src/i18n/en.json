@@ -1,2 +1,14 @@
 {
+  "image.library.title": "Species with Images",
+  "image.library.intro": "This page provides a complete list to taxa that have images. Use the controls below to browse and search for images by family, genus, or species.",
+  "image.library.names": "Names",
+  "image.details.title": "Image Details",
+  "image.details.clickon": "Click on the image to enlarge",
+  "image.details.sciname": "Scientific Name",
+  "image.details.caption": "Caption",
+  "image.details.photographer": "Photographer",
+  "image.details.manager": "Manager",
+  "image.details.image.source": "Image Source",
+  "image.details.image.notes": "Notes",
+  "image.details.image.locality": "Locality"
 }

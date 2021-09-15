@@ -6,6 +6,7 @@ import {
 } from './dto/TaxonDto';
 import { TaxonFindAllParams } from './dto/taxon-find-all.input.dto';
 import { TaxonFindNamesParams } from './dto/taxon-find-names.input.dto';
+import { TaxonIDandNameDto } from './dto/TaxonIDandNameDto';
 
 @ApiTags('Taxon')
 @Controller('taxon')
@@ -38,6 +39,48 @@ export class TaxonController {
         const taxons = await this.taxons.findAllScientificNames(findNamesParams)
         const names = taxons.map(async (c) => {
             return c.scientificName
+        });
+        return Promise.all(names)
+    }
+
+    // Get a list of all the family names
+    @Get('familyNames')
+    @ApiResponse({ status: HttpStatus.OK, type: String })
+    @ApiOperation({
+        summary: "Retrieve a list of family names.  The list can be narrowed by taxa authority and/or taxon IDs."
+    })
+    async findFamilyNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
+        const items = await this.taxons.findFamilyNames(findNamesParams)
+        const names = items.map(async (c) => {
+            return new TaxonIDandNameDto(c.scientificName, c.id)
+        });
+        return Promise.all(names)
+    }
+
+    // Get a list of all the genus names
+    @Get('genusNames')
+    @ApiResponse({ status: HttpStatus.OK, type: String })
+    @ApiOperation({
+        summary: "Retrieve a list of genus names.  The list can be narrowed by taxa authority and/or taxon IDs."
+    })
+    async findGenusNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
+        const items = await this.taxons.findGenusNames(findNamesParams)
+        const names = items.map(async (c) => {
+            return new TaxonIDandNameDto(c.scientificName, c.id)
+        });
+        return Promise.all(names)
+    }
+
+    // Get a list of all the species names
+    @Get('speciesNames')
+    @ApiResponse({ status: HttpStatus.OK, type: String })
+    @ApiOperation({
+        summary: "Retrieve a list of genus names.  The list can be narrowed by taxa authority and/or taxon IDs."
+    })
+    async findSpeciesNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
+        const items = await this.taxons.findSpeciesNames(findNamesParams)
+        const names = items.map(async (c) => {
+            return new TaxonIDandNameDto(c.scientificName, c.id)
         });
         return Promise.all(names)
     }

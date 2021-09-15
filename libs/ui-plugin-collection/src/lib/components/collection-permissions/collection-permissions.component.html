@@ -1,0 +1,48 @@
+<div class="main">
+    <mat-card class="listContainer">
+        <mat-card-title>Admins</mat-card-title>
+        <ng-container *ngIf="admins">
+            <mat-list>
+                <mat-list-items *ngFor="let admin of admins">
+                    {{ admin }}
+                </mat-list-items>
+            </mat-list>
+        </ng-container>
+    </mat-card>
+    <mat-card class="listContainer">
+        <mat-card-title>Editors</mat-card-title>
+        <ng-container *ngIf="editors">
+            <mat-list>
+                <mat-list-item *ngFor="let editor of editors">
+                    {{ editor }}
+                </mat-list-item>
+            </mat-list>
+        </ng-container>
+    </mat-card>
+    <mat-card class="listContainer">
+        <mat-card-title>Rare Species Readers</mat-card-title>
+        <ng-container *ngIf="rareSpeciesReaders">
+            <mat-list>
+                <mat-list-item *ngFor="let reader of rareSpeciesReaders">
+                    {{ editor }}
+                </mat-list-item>
+            </mat-list>
+        </ng-container>
+    </mat-card>
+    <mat-card class="formContainer">
+        <mat-card-title>Add User Permissions</mat-card-title>
+        <form fxLayout="column">
+            <mat-radio-group aria-label="Select a user permission" fxLayout="column">
+                <mat-radio-button value="admin">Administrator</mat-radio-button>
+                <mat-radio-button value="editor">Editor</mat-radio-button>
+                <mat-radio-button value="reader"
+                    >Rare Species Readers</mat-radio-button
+                >
+            </mat-radio-group>
+
+            <button mat-raised-button color="primary">
+                Apply Roles to User
+            </button>
+        </form>
+    </mat-card>
+</div>

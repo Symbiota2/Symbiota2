@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Taxon } from '@symbiota2/api-database'
-import { In, Repository } from 'typeorm'
+import { In, Like, Repository } from 'typeorm';
 import { TaxonFindAllParams } from './dto/taxon-find-all.input.dto'
 import { BaseService } from '@symbiota2/api-common'
 import { TaxonFindNamesParams } from './dto/taxon-find-names.input.dto';
@@ -86,8 +86,8 @@ export class TaxonService extends BaseService<Taxon>{
     }
 
     /*
-    Project the sciname from the taxa table using possibly a list of taxaIDs and an authority ID
-     */
+ Project the sciname from the taxa table using possibly a list of taxaIDs and an authority ID
+  */
     async findAllScientificNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         //console.log("Taxon service: finding scientific names")
         const { limit,...qParams } = params
@@ -118,6 +118,149 @@ export class TaxonService extends BaseService<Taxon>{
                     select: ["scientificName"],
                     take: TaxonFindAllParams.MAX_LIMIT
                 })
+        }
+    }
+
+    /*
+    Project the sciname from the taxa table for the rank of family using possibly a list of taxaIDs
+    and an authority ID
+     */
+    async findFamilyNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
+        //console.log("Taxon service: finding scientific names")
+        const { limit,...qParams } = params
+
+        if (qParams.taxonAuthorityID) {
+            const qb = this.myRepository.createQueryBuilder('o')
+                .select([
+                    'o.scientificName', 'o.id'
+                ])
+                //.limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
+                .innerJoin('o.taxonStatuses', 'c')
+                .where('c.taxonAuthorityID = :authorityID',
+                    { authorityID: params.taxonAuthorityID })
+                .andWhere('c.rankID = :rankID',
+                    { rankID: 140 })
+
+            if (qParams.partialName) {
+                qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
+            }
+            if (qParams.id) {
+                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
+            }
+            return await qb.getMany()
+        } else {
+            return (qParams.id)?
+                await this.myRepository.find({
+                    select: ["scientificName", "id"],
+                    where: { id: In(params.id), rankID: 140 }
+                    // take: TaxonFindAllParams.MAX_LIMIT
+                })
+                : await this.myRepository.find({
+                    select: ["scientificName","id"],
+                    where: { rankID: 140 }
+                   // take: TaxonFindAllParams.MAX_LIMIT
+                })
+        }
+    }
+
+    /*
+Project the sciname from the taxa table for the rank of genus using possibly a list of taxaIDs
+and an authority ID
+ */
+    async findGenusNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
+        //console.log("Taxon service: finding scientific names")
+        const { limit,...qParams } = params
+
+        if (qParams.taxonAuthorityID) {
+            const qb = this.myRepository.createQueryBuilder('o')
+                .select([
+                    'o.scientificName','o.id'
+                ])
+                //.limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
+                .innerJoin('o.taxonStatuses', 'c')
+                .where('c.taxonAuthorityID = :authorityID',
+                    { authorityID: params.taxonAuthorityID })
+                .andWhere('c.rankID = :rankID',
+                    { rankID: 180 })
+
+            if (qParams.partialName) {
+                qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
+            }
+            if (qParams.id) {
+                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
+            }
+            return await qb.getMany()
+        } else {
+            return (qParams.id)?
+                await this.myRepository.find({
+                    select: ["scientificName", "id"],
+                    where: { id: In(params.id), rankID: 180 }
+                    //take: TaxonFindAllParams.MAX_LIMIT
+                })
+                : await this.myRepository.find({
+                    select: ["scientificName","id"],
+                    where: { rankID: 180 }
+                    //take: TaxonFindAllParams.MAX_LIMIT
+                })
+        }
+    }
+
+    /*
+Project the sciname from the taxa table for the rank of species using possibly a list of taxaIDs
+and an authority ID
+ */
+    async findSpeciesNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
+        //console.log("Taxon service: finding scientific names")
+        const { limit,...qParams } = params
+
+        if (qParams.taxonAuthorityID) {
+            const qb = this.myRepository.createQueryBuilder('o')
+                .select([
+                    'o.scientificName', 'o.id'
+                ])
+                //.limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
+                .innerJoin('o.taxonStatuses', 'c')
+                .where('c.taxonAuthorityID = :authorityID',
+                    { authorityID: params.taxonAuthorityID })
+                .andWhere('c.rankID = :rankID',
+                    { rankID: 220 })
+
+            if (qParams.partialName) {
+                qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
+            }
+            if (qParams.id) {
+                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
+            }
+            return await qb.getMany()
+        } else {
+            return (qParams.id)?
+                (qParams.partialName)?
+                    await this.myRepository.find({
+                        select: ["scientificName", "id"],
+                        where: { id: In(params.id),
+                            rankID: 220,
+                            scientificName: Like(params.partialName + '%') }
+                        //take: TaxonFindAllParams.MAX_LIMIT
+                    })
+                    : await this.myRepository.find({
+                        select: ["scientificName", "id"],
+                        where: { id: In(params.id), rankID: 220 }
+                        //take: TaxonFindAllParams.MAX_LIMIT
+                    })
+                : (qParams.partialName)?
+                    await this.myRepository.find({
+                        select: ["scientificName","id"],
+                        where: {
+                            rankID: 220,
+                            scientificName: Like(params.partialName + '%')
+                        }
+                        //take: TaxonFindAllParams.MAX_LIMIT
+                    })
+                    : await this.myRepository.find({
+                        select: ["scientificName","id"],
+                        where: { rankID: 220 }
+                        //take: TaxonFindAllParams.MAX_LIMIT
+                    })
         }
     }
 
