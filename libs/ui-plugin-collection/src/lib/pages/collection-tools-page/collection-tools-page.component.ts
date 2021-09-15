@@ -4,6 +4,7 @@ import { AlertService, UserService } from '@symbiota2/ui-common';
 import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { Observable, of } from 'rxjs';
 import { map, switchMap, take, tap } from 'rxjs/operators';
+import { CollectionEditorComponent } from '../../components/collection-editor/collection-editor.component';
 
 @Component({
     selector: 'symbiota2-collection-tools-page',
@@ -13,7 +14,14 @@ import { map, switchMap, take, tap } from 'rxjs/operators';
 export class CollectionToolsPage implements OnInit {
     private static readonly ROUTE_PARAM_COLLID = 'collectionID';
 
-    collection: Observable<Collection>;
+    private collectionTools: Map<string, Component> = new Map()
+    .set("Edit Collection", CollectionEditorComponent);
+
+    readonly collectionToolsKeys: String[] = Array.from(this.collectionTools.keys());
+
+    selectedContent: Component;
+
+    collection: Collection;
 
     constructor(
         private readonly users: UserService,
@@ -26,13 +34,22 @@ export class CollectionToolsPage implements OnInit {
     ngOnInit(): void {
         this.validatePage().then((isValid) => {
           if(isValid){
-            this.collection = this.collections.currentCollection;
-            this.collection.pipe(map(col=> console.log(col))).subscribe();
+            this.getCollection();
+            console.log(this.collection);
+            this.collectionToolsKeys ;
+            console.log(this.collectionToolsKeys);
+            
+            this.selectedContent = this.collectionTools.get("Edit Collection");
+            
           }
         });
     }
 
-    validatePage(): Promise<Boolean> {
+    setContentView(key: string): void{
+        this.selectedContent = this.collectionTools.get(key);
+    }
+
+    private validatePage(): Promise<Boolean> {
         return this.currentRoute.paramMap
             .pipe(
                 map((params) => {
@@ -79,4 +96,9 @@ export class CollectionToolsPage implements OnInit {
             )
             .toPromise();
     }
+
+    private getCollection(): void {
+        this.collections.currentCollection.pipe().subscribe(col => this.collection = col);
+    }
+
 }

@@ -1,5 +1,8 @@
+@import "apps/ui/src/styles.scss";
+
+
 .container{
-    background-color: powderblue;
+     background-color: white;
 }
 
 .sidenav{
@@ -7,11 +10,32 @@
     align-items: flex-end;
     justify-content: end;
     width: 200px;
-    background-color: pink;
+    // background-color: pink;
 }
 
 .content{
     margin-left: 13rem;
-    width: 400px;
-    background-color: palegreen;
+    width: 50rem;
+    // background-color: palegreen;
+}
+
+.navList{
+    list-style: none;
+    padding-right: 1rem;
+    font-weight: lighter;
+    li{
+        
+        color: grey;
+        margin-top: 1rem;
+        justify-content: flex-end !important;
+        text-align: end !important;
+    }
+
+    li:hover{
+        color: $primaryColor;
+    }
+
+    li:active{
+        color: $primaryColor;
+    }
 }
