@@ -51,7 +51,7 @@
                 <!-- TODO: i18n -->
                 <symbiota2-collection-field label="Contact" [value]="collection.contact"></symbiota2-collection-field>
                 <symbiota2-collection-field label="Contact email" [value]="collection.email"></symbiota2-collection-field>
-                <symbiota2-collection-field label="Home page" [href]="collectionHomePage | async" [value]="collection.homePage"></symbiota2-collection-field>
+                <symbiota2-collection-field label="Home page" [href]="collectionHomePage" [value]="collection.homePage"></symbiota2-collection-field>
                 <symbiota2-collection-field label="Collection type" [value]="collection.type"></symbiota2-collection-field>
                 <symbiota2-collection-field label="Management" [value]="collection.managementType"></symbiota2-collection-field>
                 <symbiota2-collection-field label="Usage rights" [value]="collection.usageTerm"></symbiota2-collection-field>
@@ -63,7 +63,7 @@
                 <b>Collection Stats</b>
                 <ul>
                     <li>{{ collection.collectionStats.recordCount | number }} occurrences</li>
-                    <li>{{ collection.collectionStats.georeferencedCount | number }} ({{ geoReferencedPercent | async }}%) georeferenced</li>
+                    <li>{{ collection.collectionStats.georeferencedCount | number }} ({{ geoReferencedPercent }}%) georeferenced</li>
                     <li>{{ collection.collectionStats.familyCount | number }} families</li>
                     <li>{{ collection.collectionStats.genusCount | number }} genera</li>
                     <li>{{ collection.collectionStats.speciesCount | number }} species</li>

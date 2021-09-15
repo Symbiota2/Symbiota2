@@ -100,7 +100,7 @@ import { CollectionToolsPage } from './pages/collection-tools-page/collection-to
     MatSidenavModule,
     MatListModule
 
-  ],
+  ],entryComponents:[CollectionEditorComponent],
     providers: [
         CollectionService,
         CollectionProfileService,

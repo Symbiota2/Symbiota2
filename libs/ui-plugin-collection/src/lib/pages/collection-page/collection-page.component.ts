@@ -61,7 +61,7 @@ export class CollectionPage implements OnInit {
             this.collection = data;
             this.collectionHomePage = data.homePage;
             this.geoReferencedPercent =
-                data.collectionStats.recordCount > 0
+                data.collectionStats != null && data.collectionStats.recordCount > 0
                     ? Math.round(
                           (data.collectionStats.georeferencedCount /
                               data.collectionStats.recordCount) *
