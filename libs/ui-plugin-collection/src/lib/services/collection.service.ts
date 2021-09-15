@@ -12,6 +12,7 @@ import {
     AlertService,
     ApiClientService,
     formToQueryParams,
+    UserRole,
     UserService,
 } from '@symbiota2/ui-common';
 import {
@@ -33,6 +34,7 @@ import {
     ApiCollectionCategoryOutput,
     ApiCollectionListItem,
     ApiCollectionOutput,
+    ApiUserRole,
 } from '@symbiota2/data-access';
 
 interface FindAllParams {
@@ -206,6 +208,28 @@ export class CollectionService {
             .subscribe();
 
         return result;
+    }
+
+    getCurrentRoles(userToken: string): Observable<UserRole[]> {
+        return this.currentCollection.pipe(
+            map((collection) => {
+                const url = `${this.COLLECTION_BASE_URL}/${collection.id}/roles`;
+                const req = this.api
+                    .queryBuilder(url)
+                    .get()
+                    .addJwtAuth(userToken)
+                    .build();
+
+                return req;
+            }),
+            switchMap((req) => {
+                return this.api.send(req).pipe(
+                    map((response: UserRole[]) => {
+                        return response;
+                    })
+                );
+            })
+        );
     }
 
     private fetchCollectionList(

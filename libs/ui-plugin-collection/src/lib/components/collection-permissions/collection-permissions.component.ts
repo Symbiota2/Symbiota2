@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertService, UserService } from '@symbiota2/ui-common';
+import { AlertService, UserRole, UserService } from '@symbiota2/ui-common';
 import { Observable, of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import {
     Collection,
     CollectionListItem,
 } from '../../dto/Collection.output.dto';
 import { CollectionService } from '../../services/collection.service';
+import { ApiUserRoleName } from '@symbiota2/data-access';
 
 @Component({
     selector: 'symbiota2-collection-permissions',
@@ -14,31 +15,51 @@ import { CollectionService } from '../../services/collection.service';
     styleUrls: ['./collection-permissions.component.scss'],
 })
 export class CollectionPermissionsComponent implements OnInit {
-    admins: string[];
-    editors: string[];
-    rareSpeciesReaders: string[];
+    admins: UserRole[];
+    editors: UserRole[];
+    rareSpeciesReaders: UserRole[];
 
     collection: Collection;
 
     constructor(
         readonly collections: CollectionService,
         readonly users: UserService,
-        readonly alerts: AlertService
+        readonly alerts: AlertService,
     ) {}
 
     ngOnInit(): void {
-        this.getCollection().subscribe((col) => {
-            this.collection = col;
-            this.admins = ["bob", "dave", "mary"];
-            this.editors = ["edward"];
+      this.getCollectionRoles().subscribe(roles => {
+        roles.forEach(role => {
+          switch (role.name) {
+            case ApiUserRoleName.COLLECTION_ADMIN:
+              this.admins.push(role)              
+              break;
+          
+            default:
+              break;
+          }
         });
+      })
     }
 
     getCollection(): Observable<Collection> {
         return this.collections.currentCollection.pipe(
             map((collection) => {
                 return collection;
-            }),
+            })
         );
     }
+
+    getCollectionRoles(): Observable<UserRole[]> {
+        return this.users.currentUser.pipe(
+            map((user) => {
+                return user.token;
+            }),
+            switchMap((token) => {
+                return this.collections.getCurrentRoles(token);
+            })
+        );
+    }
+
+    onApplyRoles(uid: number, role: string): void {}
 }
