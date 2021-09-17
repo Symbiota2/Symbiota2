@@ -1,0 +1,24 @@
+@import "apps/ui/src/styles.scss";
+
+.listContainer{
+    margin-top: 1rem;
+
+    mat-card-title {
+        color:rgb(80, 80, 80);
+
+        mat-icon{
+            color: $primaryColor;
+            padding-right: 1rem;
+            font-family: 'Material Icons' !important;
+        }
+    }
+
+    mat-card-content{
+        margin-left: 2rem;
+    }
+}
+
+.formContainer{
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}

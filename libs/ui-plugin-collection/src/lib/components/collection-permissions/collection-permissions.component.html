@@ -1,48 +1,62 @@
 <div class="main">
+    <h1>User Permissions</h1>
     <mat-card class="listContainer">
-        <mat-card-title>Admins</mat-card-title>
-        <ng-container *ngIf="admins">
+        <mat-card-title fxLayoutAlign="start center"><mat-icon>local_police</mat-icon>Administrators</mat-card-title>
+        <mat-card-content *ngIf="admins.length > 0">
             <mat-list>
-                <mat-list-items *ngFor="let admin of admins">
+                <mat-list-item *ngFor="let admin of admins;else noListedUsers">
                     {{ admin }}
-                </mat-list-items>
+                </mat-list-item>
             </mat-list>
-        </ng-container>
+        </mat-card-content>
     </mat-card>
     <mat-card class="listContainer">
-        <mat-card-title>Editors</mat-card-title>
-        <ng-container *ngIf="editors">
+        <mat-card-title fxLayoutAlign="start center"><mat-icon>edit</mat-icon>Editors</mat-card-title>
+        <mat-card-content *ngIf="editors.length > 0;else noListedUsers">
             <mat-list>
                 <mat-list-item *ngFor="let editor of editors">
                     {{ editor }}
                 </mat-list-item>
             </mat-list>
-        </ng-container>
+        </mat-card-content>
     </mat-card>
     <mat-card class="listContainer">
-        <mat-card-title>Rare Species Readers</mat-card-title>
-        <ng-container *ngIf="rareSpeciesReaders">
+        <mat-card-title fxLayoutAlign="start center"><mat-icon>local_library</mat-icon>Rare Species Readers</mat-card-title>
+        <mat-card-content *ngIf="rareSpeciesReaders.length > 0;else noListedUsers">
             <mat-list>
                 <mat-list-item *ngFor="let reader of rareSpeciesReaders">
-                    {{ editor }}
+                    {{ reader }}
                 </mat-list-item>
             </mat-list>
-        </ng-container>
+        </mat-card-content>
+        
     </mat-card>
-    <mat-card class="formContainer">
-        <mat-card-title>Add User Permissions</mat-card-title>
-        <form fxLayout="column">
-            <mat-radio-group aria-label="Select a user permission" fxLayout="column">
-                <mat-radio-button value="admin">Administrator</mat-radio-button>
-                <mat-radio-button value="editor">Editor</mat-radio-button>
-                <mat-radio-button value="reader"
-                    >Rare Species Readers</mat-radio-button
-                >
-            </mat-radio-group>
+    <mat-card class="formContainer" fxLayout="column">
+        <mat-card-title fxLayoutAlign="start center" >Add User Permissions</mat-card-title>
+        <form fxLayout="column" [formGroup]="newPermissionForm" fxLayoutGap="1rem" fxLayoutAlign="start start">
+            <mat-form-field appearance="outline">
+                <mat-label>User</mat-label>
+                <mat-select formControlName="user" >
+                  <mat-option *ngFor="let user of (userList | async)" value="{{user.username}}">{{user.username}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div fxLayout="column" fxLayoutGap=".5rem">
+                <mat-label>Roles</mat-label>
+                <mat-radio-group formControlName="role" aria-label="Select a user permission" fxLayout="column" fxLayoutGap="1rem">
+                    <mat-radio-button value=0>Administrator</mat-radio-button>
+                    <mat-radio-button value=1>Editor</mat-radio-button>
+                    <mat-radio-button value=2
+                        >Rare Species Readers</mat-radio-button
+                    >
+                </mat-radio-group>
+            </div>  
 
-            <button mat-raised-button color="primary">
+
+            <button mat-raised-button color="primary" [disabled]="!newPermissionForm.valid" (click)="onApplyRoles()" fxFlex="25">
                 Apply Roles to User
             </button>
         </form>
     </mat-card>
 </div>
+
+<ng-template #noListedUsers> No listed users for this role</ng-template>
