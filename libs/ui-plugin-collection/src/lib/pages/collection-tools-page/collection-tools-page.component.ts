@@ -5,6 +5,7 @@ import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { Observable, of } from 'rxjs';
 import { map, switchMap, take, tap } from 'rxjs/operators';
 import { CollectionEditorComponent } from '../../components/collection-editor/collection-editor.component';
+import { CollectionPermissionsComponent } from '../../components/collection-permissions/collection-permissions.component';
 
 @Component({
     selector: 'symbiota2-collection-tools-page',
@@ -14,10 +15,11 @@ import { CollectionEditorComponent } from '../../components/collection-editor/co
 export class CollectionToolsPage implements OnInit {
     private static readonly ROUTE_PARAM_COLLID = 'collectionID';
 
-    private collectionTools: Map<string, Component> = new Map()
-    .set("Edit Collection", CollectionEditorComponent);
+    static collectionTools: Map<string, Component> = new Map()
+    .set("Edit Collection", CollectionEditorComponent)
+    .set("User Permissions", CollectionPermissionsComponent);
 
-    readonly collectionToolsKeys: String[] = Array.from(this.collectionTools.keys());
+    readonly collectionToolsKeys: String[] = Array.from(CollectionToolsPage.collectionTools.keys());
 
     selectedContent: Component;
 
@@ -39,14 +41,14 @@ export class CollectionToolsPage implements OnInit {
             this.collectionToolsKeys ;
             console.log(this.collectionToolsKeys);
             
-            this.selectedContent = this.collectionTools.get("Edit Collection");
+            this.selectedContent = CollectionToolsPage.collectionTools.get("User Permissions");
             
           }
         });
     }
 
     setContentView(key: string): void{
-        this.selectedContent = this.collectionTools.get(key);
+        this.selectedContent = CollectionToolsPage.collectionTools.get(key);
     }
 
     private validatePage(): Promise<Boolean> {
