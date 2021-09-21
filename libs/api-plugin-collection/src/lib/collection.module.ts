@@ -10,6 +10,7 @@ import { AuthModule } from '@symbiota2/api-auth';
 import { AppConfigModule } from '@symbiota2/api-config';
 import { CollectionStatsUpdateQueue } from './collection-stats-update/collection-stats-update.queue';
 import { CollectionStatsUpdateProcessor } from './collection-stats-update/collection-stats-update.processor';
+import { CollectionRolesController } from './collection-roles/collection-roles.controller';
 
 /**
  * Module for working with specimen collections
@@ -29,7 +30,8 @@ import { CollectionStatsUpdateProcessor } from './collection-stats-update/collec
     ],
     controllers: [
         CategoryController,
-        CollectionController
+        CollectionController,
+        CollectionRolesController
     ],
     exports: [
         CategoryService,
