@@ -1,6 +1,11 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Occurrence, OccurrenceUploadFieldMap } from '@symbiota2/api-database';
-import { DeepPartial, Repository } from 'typeorm';
+import {
+    DeepPartial,
+    FindConditions,
+    FindManyOptions,
+    Repository
+} from 'typeorm';
 import { FindAllParams } from './dto/find-all-input.dto';
 import {
     ApiCollectionListItem, ApiOccurrence,
@@ -11,12 +16,13 @@ import { InjectQueue } from '@nestjs/bull';
 import { QUEUE_ID_OCCURRENCE_UPLOAD_CLEANUP } from '../queues/occurrence-upload-cleanup.queue';
 import { Queue } from 'bull';
 import { OccurrenceUploadCleanupJob } from '../queues/occurrence-upload-cleanup.processor';
-import { OccurrenceUpload } from '../../../api-database/src/entities/upload/OccurrenceUpload.entity';
-import fs from 'fs';
-import csv from 'csv-parser';
+import { OccurrenceUpload } from '@symbiota2/api-database';
 import { QUEUE_ID_OCCURRENCE_UPLOAD } from '../queues/occurrence-upload.queue';
 import { OccurrenceUploadJob } from '../queues/occurrence-upload.processor';
 import { csvIterator } from '@symbiota2/api-common';
+import { DwcArchiveBuilder } from '@symbiota2/dwc';
+import { v4 as uuid4 } from 'uuid';
+import { join as pathJoin } from 'path';
 
 type _OccurrenceFindAllItem = Pick<Occurrence, 'id' | 'catalogNumber' | 'taxonID' | 'scientificName' | 'latitude' | 'longitude'>;
 type OccurrenceFindAllItem = _OccurrenceFindAllItem & { collection: ApiCollectionListItem };
@@ -391,5 +397,29 @@ export class OccurrenceService {
 
     async startUpload(uid: number, collectionID: number, uploadID: number): Promise<void> {
         await this.uploadQueue.add({ uid, collectionID, uploadID });
+    }
+
+    async createDwCArchive(tmpDir: string, findOpts: FindConditions<Occurrence>): Promise<string> {
+        const dwcBuilder = new DwcArchiveBuilder(tmpDir, 'Occurrence');
+        const archiveName = `${uuid4()}.zip`
+
+        let offset = 0;
+        let occurrences = await this.occurrenceRepo.find({
+            where: findOpts,
+            take: 1024,
+            skip: offset
+        });
+        while (occurrences.length > 0) {
+            occurrences.forEach((occurrence) => dwcBuilder.addCoreRecord(occurrence));
+            offset += occurrences.length;
+            occurrences = await this.occurrenceRepo.find({
+                where: findOpts,
+                take: 1024,
+                skip: offset
+            });
+        }
+
+        await dwcBuilder.build(archiveName);
+        return pathJoin(tmpDir, archiveName);
     }
 }

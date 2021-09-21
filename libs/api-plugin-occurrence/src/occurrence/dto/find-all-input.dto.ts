@@ -108,23 +108,23 @@ export class FindAllParams implements Partial<ApiOccurrenceFindAllParams> {
     @ApiProperty({ required: false })
     @IsString()
     @IsOptional()
-    collectorLastName: string;
+    collectorLastName?: string;
 
     @ApiProperty({ required: false })
     @IsDate()
     @IsOptional()
-    minEventDate: Date;
+    minEventDate?: Date;
 
     @ApiProperty({ required: false })
     @IsDate()
     @IsOptional()
-    maxEventDate: Date;
+    maxEventDate?: Date;
 
     // Specimen criteria
     @ApiProperty({ required: false })
     @IsString()
     @IsOptional()
-    catalogNumber: string;
+    catalogNumber?: string;
 
     // Filters
     @ApiProperty({ type: Boolean, required: false })
@@ -132,19 +132,19 @@ export class FindAllParams implements Partial<ApiOccurrenceFindAllParams> {
     @Transform((data) => data === 'true')
     @IsBoolean()
     @IsOptional()
-    limitToSpecimens = false;
+    limitToSpecimens? = false;
 
     @ApiProperty({ type: Boolean, required: false })
     @Transform((data) => data === 'true')
     @IsBoolean()
     @IsOptional()
-    limitToImages = false;
+    limitToImages? = false;
 
     @ApiProperty({ type: Boolean, required: false })
     @Transform((data) => data === 'true')
     @IsBoolean()
     @IsOptional()
-    limitToGenetic = false;
+    limitToGenetic? = false;
 
     @ApiProperty({
         description: 'A base64-encoded GeoJSON feature. All occurrences that fall within this polygon will be included' ,
@@ -153,5 +153,5 @@ export class FindAllParams implements Partial<ApiOccurrenceFindAllParams> {
     @IsNotEmpty()
     @IsOptional()
     @IsBase64()
-    geoJSON: string;
+    geoJSON?: string;
 }

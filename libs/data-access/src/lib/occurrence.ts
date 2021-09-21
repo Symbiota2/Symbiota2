@@ -73,7 +73,6 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     dataGeneralizations: string;
     datasetID: string;
     dateIdentified: Date | null;
-    day: number | null;
     dbpk: string;
     disposition: string;
     duplicateQuantity: number | null;
@@ -121,7 +120,6 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     minimumDepthInMeters: number | null;
     minimumElevationInMeters: number | null;
     modified: Date | null;
-    month: number | null;
     municipality: string;
     observerUID: number | null;
     occurrenceGUID: string;
@@ -155,7 +153,6 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     verbatimElevation: string;
     verbatimEventDate: string;
     waterBody: string;
-    year: number | null;
 }
 
 export interface ApiOccurrenceUpload {

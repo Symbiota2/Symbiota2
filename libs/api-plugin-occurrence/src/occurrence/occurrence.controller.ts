@@ -8,7 +8,7 @@ import {
     Logger, NotFoundException,
     Param, ParseArrayPipe, Patch,
     Post,
-    Query, Req,
+    Query, Req, Res,
     UploadedFile, UseGuards,
     UseInterceptors
 } from '@nestjs/common';
@@ -23,12 +23,12 @@ import { OccurrenceList, OccurrenceListItem } from './dto/occurrence-list';
 import { OccurrenceService } from './occurrence.service';
 import { FindAllParams } from './dto/find-all-input.dto';
 import { OccurrenceInputDto } from './dto/occurrence-input.dto';
-import { Express } from 'express';
+import { Express, Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import fs from 'fs';
+import fs, { createReadStream } from 'fs';
 import {
     ApiFileInput,
-    getCSVFields
+    getCSVFields, withTempDir
 } from '@symbiota2/api-common';
 import { OccurrenceOutputDto } from './dto/occurrence.output.dto';
 import { ProtectCollection } from '@symbiota2/api-plugin-collection';
@@ -38,6 +38,9 @@ import { AuthenticatedRequest, JwtAuthGuard } from '@symbiota2/api-auth';
 import { OccurrenceHeaderMapBody } from './dto/occurrence-header-map.input.dto';
 import { Occurrence, OccurrenceUpload } from '@symbiota2/api-database';
 import * as path from 'path';
+import { tmpdir } from 'os';
+import { DwcArchiveBuilder } from '@symbiota2/dwc';
+import { AppConfigService } from '@symbiota2/api-config';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -45,7 +48,9 @@ const fsPromises = fs.promises;
 @ApiTags('Occurrences')
 @Controller('occurrences')
 export class OccurrenceController {
-    constructor(private readonly occurrenceService: OccurrenceService) { }
+    constructor(
+        private readonly config: AppConfigService,
+        private readonly occurrenceService: OccurrenceService) { }
 
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: OccurrenceList })
@@ -206,5 +211,27 @@ export class OccurrenceController {
             query.collectionID,
             uploadID
         );
+    }
+
+    @Get('download/dwca')
+    @ApiOperation({
+        summary: 'Retrieve this collection as a Darwin Core Archive'
+    })
+    @ApiResponse({
+        content: {
+            'application/zip': {
+                schema: {
+                    type: 'string',
+                    format: 'binary'
+                }
+            }
+        }
+    })
+    async getCollectionAsArchive(@Query() query: CollectionIDQueryParam, @Res() response: Response): Promise<void> {
+        withTempDir(await this.config.dataDir(), async (tmpDir) => {
+            const archive = await this.occurrenceService.createDwCArchive(tmpDir, { collectionID: query.collectionID });
+            const readStream = createReadStream(archive);
+            readStream.pipe(response);
+        });
     }
 }
