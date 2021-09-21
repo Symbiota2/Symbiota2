@@ -1,4 +1,3 @@
-export type InsideTempDirCallback<T> = (string) => Promise<T>;
 export type DwCAParseCallback<T> = (tmpdir: string, archive: DwCAMeta) => Promise<T>;
 
 /*

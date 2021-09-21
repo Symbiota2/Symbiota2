@@ -1,8 +1,10 @@
 import csvParser from 'csv-parser';
-import fs from 'fs';
+import fs, { promises as fsPromises } from 'fs';
 import csv from 'csv-parser';
+import xml2js from 'xml2js';
 
 const DEFAULT_ITER_ROWS = 1024;
+export type InsideTempDirCallback<T> = (string) => Promise<T>;
 
 export async function getCSVFields(csvFile: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
@@ -44,4 +46,26 @@ export async function* csvIterator<RowType>(filePath: string, bufSize = DEFAULT_
         }
     }
     yield rowBuffer;
+}
+
+export function withTempDir<T>(dirPrefix: string, cb: InsideTempDirCallback<T>) {
+    fsPromises.mkdtemp(dirPrefix).then((tmpDir) => {
+        return cb(tmpDir).finally(async () => {
+            await fsPromises.rm(tmpDir, { recursive: true });
+        });
+    });
+}
+
+export async function readXmlFile<T>(filePath: string): Promise<T> {
+    const fileContents = await fsPromises.readFile(filePath);
+    return new Promise((resolve, reject) => {
+        xml2js.parseString(fileContents, (err, result) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(result);
+            }
+        });
+    });
 }
