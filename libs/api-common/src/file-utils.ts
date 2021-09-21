@@ -1,7 +1,13 @@
 import csvParser from 'csv-parser';
-import fs, { promises as fsPromises } from 'fs';
+import fs, {
+    createReadStream,
+    createWriteStream,
+    promises as fsPromises
+} from 'fs';
 import csv from 'csv-parser';
 import xml2js from 'xml2js';
+import archiver from 'archiver';
+import { basename } from 'path';
 
 const DEFAULT_ITER_ROWS = 1024;
 export type InsideTempDirCallback<T> = (string) => Promise<T>;
@@ -67,5 +73,22 @@ export async function readXmlFile<T>(filePath: string): Promise<T> {
                 resolve(result);
             }
         });
+    });
+}
+
+export async function zipFiles(archiveName: string, files: string[]): Promise<void> {
+    const archiveStream = createWriteStream(archiveName);
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    archive.pipe(archiveStream);
+
+    for (const file of files) {
+        const archiveFile = basename(file);
+        archive.append(createReadStream(file), { name: archiveFile });
+    }
+
+    return new Promise((resolve, reject) => {
+        archiveStream.on('close', () => resolve());
+        archiveStream.on('error', (e) => reject(e));
+        return archive.finalize();
     });
 }

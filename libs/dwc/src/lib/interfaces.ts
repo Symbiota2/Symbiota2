@@ -1,10 +1,17 @@
+export const DWC_SCHEMA_LOCATION = 'http://rs.tdwg.org/dwc/text/tdwg_dwc_text.xsd';
+export const DWC_XML_NS = 'http://rs.tdwg.org/dwc/text/';
 export type DwCAParseCallback<T> = (tmpdir: string, archive: DwCAMeta) => Promise<T>;
 
 /*
 All interfaces prefixed by DwCAMeta come from the archive schema defined at
-https://dwc.tdwg.org/text/tdwg_dwc_text.xsd
+https://dwc.tdwg.org/text/
 Helpful: http://tools.gbif.org/dwca-assistant/gbif_dwc-a_asst_en_v1.1.pdf
  */
+
+export interface DwCASerializable {
+    asDwCRecord(): Record<any, any>;
+    loadDwCRecord(record: Record<any, any>);
+}
 
 /*
 The full meta.xml for a dwc archive
@@ -17,7 +24,7 @@ export interface DwCAMeta {
             "xmlns:xsi": string;
             "xsi:schemaLocation": string;
         }
-        core: DwCAMetaCoreFileType[];
+        core: DwCAMetaCoreFileType;
         extension?: DwCAMetaExtensionFileType[];
     }
 }
@@ -27,8 +34,6 @@ A core file within the archive
  */
 export interface DwCAMetaCoreFileType extends DwCAMetaFileType {
     id?: DwCAMetaIDFieldType;
-    files: DwCAMetaFileType[];
-    field: DwCAMetaFieldType[];
 }
 
 /*
@@ -36,7 +41,13 @@ An extension file within the archive
  */
 export interface DwCAMetaExtensionFileType extends DwCAMetaFileType {
     coreid: DwCAMetaIDFieldType[];
-    field: DwCAMetaFieldType[];
+}
+
+/*
+List of data files within the archive
+ */
+export interface DwCAMetaFileLocationType {
+    location: string[];
 }
 
 /*
@@ -44,14 +55,16 @@ Attributes shared across all file types, core or extensions
  */
 export interface DwCAMetaFileType {
     $: {
-        rowType: 'Occurrence' | 'Taxon';
-        dateFormat?: string;
-        encoding?: string;
+        rowType: 'http://rs.tdwg.org/dwc/terms/Occurrence' | 'http://rs.tdwg.org/dwc/terms/Taxon';
         fieldsTerminatedBy?: string;
         linesTerminatedBy?: string;
         fieldsEnclosedBy?: string;
+        encoding?: string;
         ignoreHeaderLines?: number;
-    }
+        dateFormat?: string;
+    },
+    files: DwCAMetaFileLocationType[];
+    field: DwCAMetaFieldType[];
 }
 
 /*
@@ -59,11 +72,10 @@ A field within one of the archive data files
  */
 export interface DwCAMetaFieldType {
     $: {
-        term: string;
         index?: number;
+        term: string;
         default?: string;
         vocabulary?: string;
-        delimitedBy?: string;
     }
 }
 
@@ -74,13 +86,6 @@ export interface DwCAMetaIDFieldType {
     $: {
         index?: number;
     }
-}
-
-/*
-List of data files within the archive
- */
-export interface DwCAMetaFileType {
-    location: string[];
 }
 
 // https://dwc.tdwg.org/terms

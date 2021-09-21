@@ -1,6 +1,6 @@
 import {
     BeforeInsert, BeforeUpdate,
-    Column,
+    Column, DeepPartial,
     Entity, getConnection,
     Index,
     JoinColumn,
@@ -38,6 +38,7 @@ import { User } from '../user/User.entity';
 import { OccurrenceDatasetLink } from './OccurrenceDatasetLink.entity';
 import { EntityProvider } from '../../entity-provider.class';
 import {
+    DwCASerializable,
     DwCEvent, DwCIdentification,
     DwCLocation,
     DwCOccurrence,
@@ -76,7 +77,7 @@ type DwCKey = keyof DwCRecord | keyof DwCEvent | keyof DwCIdentification | keyof
 @Index('Index_otherCatalogNumbers', ['otherCatalogNumbers'])
 @Index('Index_latestDateCollected', ['latestDateCollected'])
 @Entity('omoccurrences')
-export class Occurrence extends EntityProvider {
+export class Occurrence extends EntityProvider implements DwCASerializable {
     // https://dwc.tdwg.org/terms/#occurrence
     static readonly DWCA_FIELD_MAP = new Map<DwCKey, keyof Occurrence>([
         // Record level
@@ -830,7 +831,7 @@ export class Occurrence extends EntityProvider {
         }
     }
 
-    asDwCOccurrence(): Record<DwCKey, any> {
+    asDwCRecord(): Record<DwCKey, any> {
         const dwcRecord = {};
         for (const [dwcKey, databaseKey] of Occurrence.DWCA_FIELD_MAP.entries()) {
             if (this[databaseKey]) {
@@ -840,27 +841,24 @@ export class Occurrence extends EntityProvider {
         return dwcRecord as Record<DwCKey, any>;
     }
 
-    static fromDwCOccurrence(occurrenceRepo: Repository<Occurrence>, dwc: Record<DwCKey, any>): Occurrence {
-        const occurrence = occurrenceRepo.create();
+    loadDwCRecord(dwc: Record<DwCKey, any>) {
         for (const [dwcKey, databaseKey] of Occurrence.DWCA_FIELD_MAP.entries()) {
             if (!['day', 'month', 'year'].includes(dwcKey)) {
                 // @ts-ignore
-                occurrence[databaseKey] = dwc[dwcKey];
+                this[databaseKey] = dwc[dwcKey];
             }
         }
         if (!dwc.eventDate && (dwc.day || dwc.month || dwc.year)) {
-            occurrence.eventDate = new Date();
+            this.eventDate = new Date();
             if (dwc.year) {
-                occurrence.eventDate.setFullYear(dwc.year);
+                this.eventDate.setFullYear(dwc.year);
             }
             if (dwc.month) {
-                occurrence.eventDate.setMonth(dwc.month);
+                this.eventDate.setMonth(dwc.month);
             }
             if (dwc.day) {
-                occurrence.eventDate.setDate(dwc.day);
+                this.eventDate.setDate(dwc.day);
             }
         }
-
-        return occurrence;
     }
 }
