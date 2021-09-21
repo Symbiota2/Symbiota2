@@ -39,6 +39,7 @@ export class CollectionPermissionsComponent implements OnInit {
 
     ngOnInit(): void {
       this.getCollectionRoles().subscribe(roles => {
+          console.log(roles);
         roles.forEach(role => {
           switch (role.name) {
             case ApiUserRoleName.COLLECTION_ADMIN:
@@ -90,6 +91,12 @@ export class CollectionPermissionsComponent implements OnInit {
         );
     }
 
+    onUserSelect(user: UserOutputDto) {
+        this.newPermissionForm.get("user").setValue(user.uid)
+
+        console.log(this.newPermissionForm.get("user").value)
+    }
+
     onApplyRoles(): void {
         var user: string = this.newPermissionForm.get('user').value
         var role: string = this.newPermissionForm.get('role').value
@@ -114,5 +121,9 @@ export class CollectionPermissionsComponent implements OnInit {
                     this.alerts.showError("Error creating role")
               break;
           }
+    }
+
+    onRemoveRole(user: string): void {
+        //TODO: remove user api
     }
 }

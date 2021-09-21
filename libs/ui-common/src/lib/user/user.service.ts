@@ -28,7 +28,7 @@ import { AlertService, LoadingService } from '../alert';
 import { HttpErrorResponse } from '@angular/common/http';
 import jwtDecode from 'jwt-decode';
 import { ApiCreateUserData, ApiUser } from '@symbiota2/data-access';
-import { UserOutputDto } from '@symbiota2/api-auth'
+import { UserOutputDto } from '@symbiota2/api-auth';
 
 type AuthData = { username?: string; password?: string };
 interface NotificationResults {
@@ -438,11 +438,11 @@ export class UserService {
             });
     }
 
-    getUsers(): Observable<UserOutputDto[]> {
+    getUsers(searchTerm?: string): Observable<UserOutputDto[]> {
         return this.currentUser.pipe(
             switchMap((currentUser) => {
                 const url = `${this.usersUrl}`;
-                console.log(url)
+                console.log(url);
                 const req = this.api
                     .queryBuilder(url)
                     .get()
@@ -451,12 +451,23 @@ export class UserService {
 
                 return this.api.send(req).pipe(
                     map((users: UserOutputDto[]) => {
-                        console.log(users);
                         return users;
                     })
                 );
+            }),
+            map((users) => { //TODO: move search param to api
+                if (!!searchTerm) {
+                    return users.filter(
+                        (user) =>
+                            user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            user.username.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                }
+
+                return users;
             })
-        )
+        );
     }
 
     getUserById(uid: number): Observable<UserOutputDto> {
@@ -466,7 +477,7 @@ export class UserService {
             }),
             switchMap((token) => {
                 const url = `${this.usersUrl}/${uid}`;
-                console.log(url)
+                console.log(url);
                 const req = this.api
                     .queryBuilder(url)
                     .get()
@@ -475,7 +486,6 @@ export class UserService {
 
                 return this.api.send(req).pipe(
                     map((user: UserOutputDto) => {
-                        console.log(user.username);
                         return user;
                     })
                 );

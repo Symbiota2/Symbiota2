@@ -4,8 +4,9 @@
         <mat-card-title fxLayoutAlign="start center"><mat-icon>local_police</mat-icon>Administrators</mat-card-title>
         <mat-card-content *ngIf="admins.length > 0">
             <mat-list>
-                <mat-list-item *ngFor="let admin of admins;else noListedUsers">
+                <mat-list-item *ngFor="let admin of admins;else noListedUsers" fxLayout="row" fxLayoutGap="1rem">
                     {{ admin }}
+                    <button (click)="onRemoveRole(admin)" mat-icon-button><mat-icon color="warn">highlight_off</mat-icon></button>
                 </mat-list-item>
             </mat-list>
         </mat-card-content>
@@ -14,18 +15,20 @@
         <mat-card-title fxLayoutAlign="start center"><mat-icon>edit</mat-icon>Editors</mat-card-title>
         <mat-card-content *ngIf="editors.length > 0;else noListedUsers">
             <mat-list>
-                <mat-list-item *ngFor="let editor of editors">
-                    {{ editor }}
+                <mat-list-item *ngFor="let editor of editors" fxLayout="row" fxLayoutGap="1rem">
+                    {{editor}}
+                    <button (click)="onRemoveRole(editor)" mat-icon-button><mat-icon color="warn">highlight_off</mat-icon></button>
                 </mat-list-item>
             </mat-list>
         </mat-card-content>
     </mat-card>
     <mat-card class="listContainer">
         <mat-card-title fxLayoutAlign="start center"><mat-icon>local_library</mat-icon>Rare Species Readers</mat-card-title>
-        <mat-card-content *ngIf="rareSpeciesReaders.length > 0;else noListedUsers">
+        <mat-card-content *ngIf="rareSpeciesReaders.length > 0;else noListedUsers" fxLayout="row" fxLayoutGap="1rem">
             <mat-list>
                 <mat-list-item *ngFor="let reader of rareSpeciesReaders">
                     {{ reader }}
+                    <button (click)="onRemoveRole(reader)" mat-icon-button><mat-icon color="warn">highlight_off</mat-icon></button>
                 </mat-list-item>
             </mat-list>
         </mat-card-content>
@@ -33,13 +36,8 @@
     </mat-card>
     <mat-card class="formContainer" fxLayout="column">
         <mat-card-title fxLayoutAlign="start center" >Add User Permissions</mat-card-title>
-        <form fxLayout="column" [formGroup]="newPermissionForm" fxLayoutGap="1rem" fxLayoutAlign="start start">
-            <mat-form-field appearance="outline">
-                <mat-label>User</mat-label>
-                <mat-select formControlName="user" >
-                  <mat-option *ngFor="let user of (userList | async)" value="{{user.username}}">{{user.username}}</mat-option>
-                </mat-select>
-            </mat-form-field>
+        <form fxLayout="column" [formGroup]="newPermissionForm" fxLayoutGap="0.5rem" fxLayoutAlign="start start">
+            <symbiota2-user-searchable-select (selectUser)="onUserSelect($event)" ></symbiota2-user-searchable-select>
             <div fxLayout="column" fxLayoutGap=".5rem">
                 <mat-label>Roles</mat-label>
                 <mat-radio-group formControlName="role" aria-label="Select a user permission" fxLayout="column" fxLayoutGap="1rem">

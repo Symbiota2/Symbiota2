@@ -33,6 +33,7 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatListModule} from '@angular/material/list';
 import {MatRadioModule} from '@angular/material/radio';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {
     ROUTE_COLLECTION_LIST,
     ROUTE_COLLECTION_PROFILE,
@@ -55,6 +56,7 @@ import { CollectionCommentComponent } from './components/collection-comment/coll
 import { ImgFallbackDirective } from './components/collection-logo/img-fallback.directive';
 import { CollectionToolsPage } from './pages/collection-tools-page/collection-tools-page.component';
 import { CollectionPermissionsComponent } from './components/collection-permissions/collection-permissions.component';
+import { UserSearchableSelectComponent } from './components/user-searchable-select/user-searchable-select.component';
 
 
 @NgModule({
@@ -77,6 +79,7 @@ import { CollectionPermissionsComponent } from './components/collection-permissi
         ImgFallbackDirective,
         CollectionToolsPage,
         CollectionPermissionsComponent,
+        UserSearchableSelectComponent,
     ],
   imports: [
     AppTranslationModule,
@@ -102,7 +105,8 @@ import { CollectionPermissionsComponent } from './components/collection-permissi
     MatPaginatorModule,
     MatSidenavModule,
     MatListModule,
-    MatRadioModule
+    MatRadioModule,
+    MatAutocompleteModule
 
   ],entryComponents:[CollectionEditorComponent],
     providers: [
