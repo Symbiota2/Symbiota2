@@ -37,7 +37,15 @@ import { Taxon } from '../taxonomy/Taxon.entity';
 import { User } from '../user/User.entity';
 import { OccurrenceDatasetLink } from './OccurrenceDatasetLink.entity';
 import { EntityProvider } from '../../entity-provider.class';
-import { TaxaEnumTreeEntry, TaxonomicUnit } from '../taxonomy';
+import {
+    DwCEvent, DwCIdentification,
+    DwCLocation,
+    DwCOccurrence,
+    DwCRecord
+} from '@symbiota2/dwc';
+import { v4 as uuid4 } from 'uuid';
+
+type DwCKey = keyof DwCRecord | keyof DwCEvent | keyof DwCIdentification | keyof DwCOccurrence | keyof DwCLocation;
 
 @Index('Index_collid', ['collectionID', 'dbpk'], { unique: true })
 @Index(['scientificName'])
@@ -70,31 +78,73 @@ import { TaxaEnumTreeEntry, TaxonomicUnit } from '../taxonomy';
 @Entity('omoccurrences')
 export class Occurrence extends EntityProvider {
     // https://dwc.tdwg.org/terms/#occurrence
-    static readonly DWCA_FIELD_MAP = new Map<string, keyof Occurrence>([
+    static readonly DWCA_FIELD_MAP = new Map<DwCKey, keyof Occurrence>([
         // Record level
-        ['modified', 'lastModifiedTimestamp'],
+        ['basisOfRecord', 'basisOfRecord'],
         ['collectionID', 'collectionID'],
         ['datasetID', 'datasetID'],
-        ['ownerInstitutionCode', 'ownerInstitutionCode'],
-        ['basisOfRecord', 'basisOfRecord'],
         ['dynamicProperties', 'dynamicProperties'],
+        ['modified', 'lastModifiedTimestamp'],
+        ['ownerInstitutionCode', 'ownerInstitutionCode'],
+
+        // Event level
+        ['fieldNumber', 'fieldNumber'],
+        ['eventDate', 'eventDate'],
+        ['startDayOfYear', 'startDayOfYear'],
+        ['endDayOfYear', 'endDayOfYear'],
+        ['verbatimEventDate', 'verbatimEventDate'],
+        ['habitat', 'habitat'],
+        ['samplingProtocol', 'samplingProtocol'],
+        ['fieldNotes', 'fieldNotes'],
+
+        // Identification level
+        ['typeStatus', 'typeStatus'],
+        ['identifiedBy', 'identifiedBy'],
+        ['dateIdentified', 'dateIdentified'],
+        ['identificationReferences', 'identificationReferences'],
+        ['identificationRemarks', 'identificationRemarks'],
+
+        // Location level
+        ['coordinatePrecision', 'coordinatePrecision'],
+        ['coordinateUncertaintyInMeters', 'coordinateUncertaintyInMeters'],
+        ['country', 'country'],
+        ['county', 'county'],
+        ['decimalLatitude', 'latitude'],
+        ['decimalLongitude', 'longitude'],
+        ['footprintWKT', 'footprintWKT'],
+        ['geodeticDatum', 'geodeticDatum'],
+        ['georeferencedBy', 'georeferencedBy'],
+        ['georeferenceProtocol', 'georeferenceProtocol'],
+        ['georeferenceRemarks', 'georeferenceRemarks'],
+        ['locality', 'locality'],
+        ['locationRemarks', 'locationRemarks'],
+        ['maximumDepthInMeters', 'maximumDepthInMeters'],
+        ['maximumElevationInMeters', 'maximumElevationInMeters'],
+        ['minimumDepthInMeters', 'minimumDepthInMeters'],
+        ['minimumElevationInMeters', 'minimumElevationInMeters'],
+        ['municipality', 'municipality'],
+        ['stateProvince', 'stateProvince'],
+        ['verbatimCoordinates', 'verbatimCoordinates'],
+        ['verbatimCoordinateSystem', 'verbatimCoordinateSystem'],
+        ['verbatimDepth', 'verbatimDepth'],
+        ['verbatimElevation', 'verbatimElevation'],
 
         // Occurrence level
-        ['occurrenceID', 'occurrenceGUID'],
-        ['catalogNumber', 'catalogNumber'],
-        ['recordNumber', 'recordNumber'],
-        ['recordedBy', 'recordedBy'],
-        ['individualCount', 'individualCount'],
-        ['sex', 'sex'],
-        ['lifeStage', 'lifeStage'],
-        ['reproductiveCondition', 'reproductiveCondition'],
-        ['behavior', 'behavior'],
-        ['establishmentMeans', 'establishmentMeans'],
-        ['preparations', 'preparations'],
-        ['disposition', 'disposition'],
         ['associatedTaxa', 'associatedTaxa'],
+        ['behavior', 'behavior'],
+        ['catalogNumber', 'catalogNumber'],
+        ['disposition', 'disposition'],
+        ['establishmentMeans', 'establishmentMeans'],
+        ['individualCount', 'individualCount'],
+        ['lifeStage', 'lifeStage'],
+        ['occurrenceID', 'occurrenceGUID'],
+        ['occurrenceRemarks', 'occurrenceRemarks'],
         ['otherCatalogNumbers', 'otherCatalogNumbers'],
-        ['occurrenceRemarks', 'occurrenceRemarks']
+        ['preparations', 'preparations'],
+        ['recordedBy', 'recordedBy'],
+        ['recordNumber', 'recordNumber'],
+        ['reproductiveCondition', 'reproductiveCondition'],
+        ['sex', 'sex'],
     ]);
 
     @PrimaryGeneratedColumn({ type: 'int', name: 'occid', unsigned: true })
@@ -123,6 +173,14 @@ export class Occurrence extends EntityProvider {
         length: 255,
     })
     occurrenceGUID: string;
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    private setGUIDIfNotExists() {
+        if (!this.occurrenceGUID) {
+            this.occurrenceGUID = uuid4();
+        }
+    }
 
     @Column('varchar', { name: 'catalogNumber', nullable: true, length: 32 })
     catalogNumber: string;
@@ -235,14 +293,17 @@ export class Occurrence extends EntityProvider {
     @Column('date', { name: 'latestDateCollected', nullable: true })
     latestDateCollected: string;
 
-    @Column('int', { name: 'year', nullable: true })
-    year: number | null;
+    get year(): number {
+        return this.eventDate.getUTCFullYear();
+    }
 
-    @Column('int', { name: 'month', nullable: true })
-    month: number | null;
+    get month(): number {
+        return this.eventDate.getUTCMonth();
+    }
 
-    @Column('int', { name: 'day', nullable: true })
-    day: number | null;
+    get day(): number {
+        return this.eventDate.getUTCDate();
+    }
 
     @Column('int', { name: 'startDayOfYear', nullable: true })
     startDayOfYear: number | null;
@@ -767,5 +828,39 @@ export class Occurrence extends EntityProvider {
             this.genus = genus ? genus.scientificName : null;
             this.family = family ? family.scientificName : null;
         }
+    }
+
+    asDwCOccurrence(): Record<DwCKey, any> {
+        const dwcRecord = {};
+        for (const [dwcKey, databaseKey] of Occurrence.DWCA_FIELD_MAP.entries()) {
+            if (this[databaseKey]) {
+                dwcRecord[dwcKey] = this[databaseKey];
+            }
+        }
+        return dwcRecord as Record<DwCKey, any>;
+    }
+
+    static fromDwCOccurrence(occurrenceRepo: Repository<Occurrence>, dwc: Record<DwCKey, any>): Occurrence {
+        const occurrence = occurrenceRepo.create();
+        for (const [dwcKey, databaseKey] of Occurrence.DWCA_FIELD_MAP.entries()) {
+            if (!['day', 'month', 'year'].includes(dwcKey)) {
+                // @ts-ignore
+                occurrence[databaseKey] = dwc[dwcKey];
+            }
+        }
+        if (!dwc.eventDate && (dwc.day || dwc.month || dwc.year)) {
+            occurrence.eventDate = new Date();
+            if (dwc.year) {
+                occurrence.eventDate.setFullYear(dwc.year);
+            }
+            if (dwc.month) {
+                occurrence.eventDate.setMonth(dwc.month);
+            }
+            if (dwc.day) {
+                occurrence.eventDate.setDate(dwc.day);
+            }
+        }
+
+        return occurrence;
     }
 }

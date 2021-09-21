@@ -24,6 +24,8 @@ export class DwCArchiveParser {
                 throw new Error(`Invalid DwC Archive. The schema supported is ${DwCArchiveParser.SCHEMA_VERSION}`);
             }
 
+            const coreFile =
+
             await cb(extractDir, archiveMeta);
         });
     }
