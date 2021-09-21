@@ -9,11 +9,9 @@ import {
     DwCASerializable
 } from '../interfaces';
 import * as xml2js from 'xml2js';
-import { createWriteStream, WriteStream } from 'fs';
-import { writeFile } from 'fs/promises';
+import { createWriteStream, WriteStream, promises as fsPromises } from 'fs';
 import { join as pathJoin } from 'path';
 import { v4 as uuid4 } from 'uuid';
-import * as archiver from 'archiver';
 import { zipFiles } from '@symbiota2/api-common';
 import { basename } from '@angular/compiler-cli/src/ngtsc/file_system';
 
@@ -115,7 +113,7 @@ export class DwcArchiveBuilder {
         const xmlBuilder = new xml2js.Builder();
         const meta = xmlBuilder.buildObject(this.meta);
 
-        await writeFile(metaPath, meta);
+        await fsPromises.writeFile(metaPath, meta);
         await zipFiles(archivePath, [metaPath, this.csvCoreFile.path.toString()]);
     }
 }
