@@ -136,4 +136,19 @@ export class CollectionService extends BaseService<Collection> {
             relations: ['user']
         });
     }
+
+    async addRoleForCollection(collectionID: number, uid: number, role: ApiUserRoleName): Promise<UserRole[]> {
+        const newRole = this.roleRepo.create({
+            name: role,
+            uid: uid,
+            tablePrimaryKey: collectionID
+        });
+        await this.roleRepo.save(newRole);
+        return await this.getRolesForCollection(collectionID);
+    }
+
+    async deleteRoleForCollection(collectionID: number, uid: number, role: ApiUserRoleName): Promise<UserRole[]> {
+        await this.roleRepo.delete({ name: role, uid: uid, tablePrimaryKey: collectionID });
+        return await this.getRolesForCollection(collectionID);
+    }
 }

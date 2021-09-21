@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
+import { IsEnum, IsIn, IsInt, IsString } from 'class-validator';
+import { ApiUserRoleName } from '@symbiota2/data-access';
 
 class CollectionRoleUser {
     @ApiProperty()
@@ -36,4 +38,15 @@ export class CollectionRole {
     @Expose()
     @Type(() => CollectionRoleUser)
     user: CollectionRoleUser;
+}
+
+export class CreateCollectionRoleBody {
+    @ApiProperty()
+    @IsInt()
+    uid: number;
+
+    @ApiProperty()
+    @IsString()
+    @IsEnum(ApiUserRoleName)
+    role: ApiUserRoleName;
 }
