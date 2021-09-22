@@ -88,7 +88,9 @@ export class AppConfigService {
      * The path to the directory where Symbiota2 will store data
      */
     async dataDir(): Promise<string> {
-        const dataDir = this.configService.get<string>(ENV_APP_DATA_DIR);
+        const dataDir = path.resolve(
+            this.configService.get<string>(ENV_APP_DATA_DIR)
+        );
         const dirExists = await AppConfigService.fsExists(dataDir);
 
         if (!dirExists) {

@@ -1,4 +1,3 @@
-import csvParser from 'csv-parser';
 import fs, {
     createReadStream,
     createWriteStream,
@@ -7,7 +6,7 @@ import fs, {
 import csv from 'csv-parser';
 import xml2js from 'xml2js';
 import archiver from 'archiver';
-import { basename } from 'path';
+import { join as pathJoin, basename } from 'path';
 
 const DEFAULT_ITER_ROWS = 1024;
 export type InsideTempDirCallback<T> = (string) => Promise<T>;
@@ -15,7 +14,7 @@ export type InsideTempDirCallback<T> = (string) => Promise<T>;
 export async function getCSVFields(csvFile: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
         const stream = fs.createReadStream(csvFile);
-        stream.pipe(csvParser())
+        stream.pipe(csv())
             .on('headers', (headers) => {
                 stream.pause();
                 stream.destroy();
@@ -54,10 +53,10 @@ export async function* csvIterator<RowType>(filePath: string, bufSize = DEFAULT_
     yield rowBuffer;
 }
 
-export function withTempDir<T>(dirPrefix: string, cb: InsideTempDirCallback<T>) {
-    fsPromises.mkdtemp(dirPrefix).then((tmpDir) => {
-        return cb(tmpDir).finally(async () => {
-            await fsPromises.rm(tmpDir, { recursive: true });
+export function withTempDir<T>(baseDir: string, cb: InsideTempDirCallback<T>) {
+    fsPromises.mkdtemp(pathJoin(baseDir, 'tmp-')).then((tmpDir) => {
+        return cb(tmpDir).finally(() => {
+            return fsPromises.rm(tmpDir, { recursive: true });
         });
     });
 }

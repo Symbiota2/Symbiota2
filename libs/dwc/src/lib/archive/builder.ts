@@ -5,21 +5,22 @@ import {
     DwCAMetaExtensionFileType,
     DwCAMetaFieldType,
     DwCAMetaFileLocationType,
-    DwCAMetaFileType,
     DwCASerializable
 } from '../interfaces';
 import * as xml2js from 'xml2js';
 import { createWriteStream, WriteStream, promises as fsPromises } from 'fs';
-import { join as pathJoin } from 'path';
+import { basename, join as pathJoin } from 'path';
 import { v4 as uuid4 } from 'uuid';
 import { zipFiles } from '@symbiota2/api-common';
-import { basename } from '@angular/compiler-cli/src/ngtsc/file_system';
 
 export class DwcArchiveBuilder {
     private static readonly DWC_FIELD_PREFIX = 'http://rs.tdwg.org/dwc/terms';
     private static readonly DWC_FIELD_SEP = ',';
     private static readonly DWC_LINE_SEP = '\n';
     private static readonly DWC_FIELD_ENCLOSE = '"';
+    private static readonly DWC_FIELD_ENCLOSE_REPLACE_REGEXP = new RegExp(
+        DwcArchiveBuilder.DWC_FIELD_ENCLOSE
+    );
 
     private csvCoreFile: WriteStream;
 
@@ -70,26 +71,44 @@ export class DwcArchiveBuilder {
     }
 
     private recordToCSVLine(dwcRecord: Record<any, any>): string {
-        let line = DwcArchiveBuilder.DWC_FIELD_SEP;
+        let line = '';
         for (const field of this.coreFields) {
-            const val = dwcRecord[field];
-            line += val.toString().replace(DwcArchiveBuilder.DWC_FIELD_SEP, `\\${DwcArchiveBuilder.DWC_FIELD_SEP}`);
+            line += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            if (Object.keys(dwcRecord).includes(field)) {
+                const val = dwcRecord[field];
+                if (val) {
+                    line += val.toString().replace(
+                        DwcArchiveBuilder.DWC_FIELD_ENCLOSE_REPLACE_REGEXP,
+                        `\\${ DwcArchiveBuilder.DWC_FIELD_ENCLOSE }`
+                    )
+                }
+            }
+            line += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
             line += DwcArchiveBuilder.DWC_FIELD_SEP;
-            line += DwcArchiveBuilder.DWC_LINE_SEP;
         }
+        line += DwcArchiveBuilder.DWC_LINE_SEP;
         return line;
     }
 
     addCoreRecord(serializable: DwCASerializable): DwcArchiveBuilder {
         const asRecord = serializable.asDwCRecord();
 
-        if (this.coreFiles.length === 0) {
+        if (this.coreFields.length === 0) {
             const fields = Object.keys(asRecord);
 
             for (let i = 0; i < fields.length; i++) {
+                let term = fields[i];
+
+                // This is lame
+                if (term === 'modified') {
+                    term = 'http://purl.org/dc/terms/modified';
+                }
+                else {
+                    term = `${DwcArchiveBuilder.DWC_FIELD_PREFIX}/${fields[i]}`;
+                }
                 const fieldDesc: DwCAMetaFieldType = {
                     $: {
-                        term: `${DwcArchiveBuilder.DWC_FIELD_PREFIX}/${fields[i]}`,
+                        term: term,
                         index: i
                     }
                 };
@@ -102,12 +121,26 @@ export class DwcArchiveBuilder {
         return this;
     }
 
+    setCoreID(idFieldName: string): DwcArchiveBuilder {
+        if (this.coreFields.includes(idFieldName)) {
+            this.meta.archive.core.id = {
+                $: {
+                    index: this.coreFields.indexOf(idFieldName)
+                }
+            };
+        }
+        else {
+            throw new Error(`Unknown core id field '${idFieldName}'`)
+        }
+        return this;
+    }
+
     async build(archivePath: string) {
         const metaPath = pathJoin(this.tmpDir, 'meta.xml');
 
         this.csvCoreFile.end();
         this.meta.archive.core.files.push({
-            location: [`./${basename(this.csvCoreFile.path.toString())}`]
+            location: [basename(this.csvCoreFile.path.toString())]
         });
 
         const xmlBuilder = new xml2js.Builder();

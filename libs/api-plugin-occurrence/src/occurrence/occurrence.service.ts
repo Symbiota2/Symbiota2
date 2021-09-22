@@ -3,7 +3,7 @@ import { Occurrence, OccurrenceUploadFieldMap } from '@symbiota2/api-database';
 import {
     DeepPartial,
     FindConditions,
-    FindManyOptions,
+    FindManyOptions, IsNull,
     Repository
 } from 'typeorm';
 import { FindAllParams } from './dto/find-all-input.dto';
@@ -37,6 +37,8 @@ type OccurrenceFindAllList = {
  */
 @Injectable()
 export class OccurrenceService {
+    private static readonly DWCA_CREATE_LIMIT = 1024;
+
     constructor(
         @Inject(Occurrence.PROVIDER_ID)
         private readonly occurrenceRepo: Repository<Occurrence>,
@@ -401,25 +403,34 @@ export class OccurrenceService {
 
     async createDwCArchive(tmpDir: string, findOpts: FindConditions<Occurrence>): Promise<string> {
         const dwcBuilder = new DwcArchiveBuilder(tmpDir, 'Occurrence');
-        const archiveName = `${uuid4()}.zip`
+        const archivePath = pathJoin(tmpDir, `${uuid4()}.zip`);
+
+        // Make sure all of the occurrences have a guid
+        await this.occurrenceRepo.createQueryBuilder('o')
+            .update({ occurrenceGUID: () => 'UUID()' })
+            .where({ ...findOpts, occurrenceGUID: IsNull() })
+            .execute();
 
         let offset = 0;
         let occurrences = await this.occurrenceRepo.find({
             where: findOpts,
-            take: 1024,
+            take: OccurrenceService.DWCA_CREATE_LIMIT,
             skip: offset
         });
+
         while (occurrences.length > 0) {
-            occurrences.forEach((occurrence) => dwcBuilder.addCoreRecord(occurrence));
+            occurrences.forEach((occurrence) => {
+                dwcBuilder.addCoreRecord(occurrence);
+            });
             offset += occurrences.length;
             occurrences = await this.occurrenceRepo.find({
                 where: findOpts,
-                take: 1024,
-                skip: offset
+                take: OccurrenceService.DWCA_CREATE_LIMIT,
+                skip: offset,
             });
         }
 
-        await dwcBuilder.build(archiveName);
-        return pathJoin(tmpDir, archiveName);
+        await dwcBuilder.setCoreID('occurrenceID').build(archivePath);
+        return archivePath;
     }
 }
