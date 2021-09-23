@@ -1,3 +1,5 @@
+import { ApiUserRoleName } from "..";
+
 export interface ApiCollectionInstitutionOutput {
     id: number;
     code: string;
@@ -33,6 +35,24 @@ export interface ApiInstitutionInput{
     email: string;
     url: string;
     notes: string;
+}
+
+export interface ApiCollectionRoleUser {
+    uid: number;
+    username: string;
+    firstName: string;
+    lastName: string;
+}
+
+export interface ApiCollectionRoleOutput {
+    id: number;
+    name: string;
+    user: ApiCollectionRoleUser;
+}
+
+export interface ApiCollectionRoleInput {
+    uid: number
+    role: ApiUserRoleName
 }
 
 export interface ApiCollectionStatsOutput {

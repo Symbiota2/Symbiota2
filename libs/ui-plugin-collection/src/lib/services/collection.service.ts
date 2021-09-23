@@ -36,6 +36,7 @@ import {
     ApiCollectionOutput,
     ApiUserRole,
 } from '@symbiota2/data-access';
+import { CollectionRoleInput, CollectionRoleOutput } from '../dto/CollectionRole.output.dto';
 
 interface FindAllParams {
     id?: number | number[];
@@ -210,7 +211,7 @@ export class CollectionService {
         return result;
     }
 
-    getCurrentRoles(userToken: string): Observable<UserRole[]> {
+    getCurrentRoles(userToken: string): Observable<CollectionRoleOutput[]> {
         return this.currentCollection.pipe(
             map((collection) => {
                 const url = `${this.COLLECTION_BASE_URL}/${collection.id}/roles`;
@@ -224,10 +225,39 @@ export class CollectionService {
             }),
             switchMap((req) => {
                 return this.api.send(req).pipe(
-                    map((response: UserRole[]) => {
+                    map((response: CollectionRoleOutput[]) => {
                         return response;
                     })
                 );
+            })
+        );
+    }
+
+    postCollectionRole(role: CollectionRoleInput): Observable<boolean> {
+        return this.users.currentUser.pipe(
+            switchMap(user => {
+                if (!!user) {
+                    return this.currentCollection.pipe(
+                        map((collection) => {
+                            const url = `${this.COLLECTION_BASE_URL}/${collection.id}/roles`;
+                            const req = this.api
+                                .queryBuilder(url)
+                                .post()
+                                .body(role)
+                                .addJwtAuth(user.token)
+                                .build();
+
+                            return req;
+                        }),
+                        switchMap((req) => {
+                            return this.api.send(req).pipe(
+                                map(response => {
+                                    return !!response ? true : false;
+                                })
+                            )
+                        }) 
+                    );
+                } else {return of(false) }
             })
         );
     }

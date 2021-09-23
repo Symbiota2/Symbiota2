@@ -2,33 +2,33 @@
     <h1>User Permissions</h1>
     <mat-card class="listContainer">
         <mat-card-title fxLayoutAlign="start center"><mat-icon>local_police</mat-icon>Administrators</mat-card-title>
-        <mat-card-content *ngIf="admins.length > 0">
+        <mat-card-content *ngIf="true;else noListedUsers">
             <mat-list>
-                <mat-list-item *ngFor="let admin of admins;else noListedUsers" fxLayout="row" fxLayoutGap="1rem">
-                    {{ admin }}
-                    <button (click)="onRemoveRole(admin)" mat-icon-button><mat-icon color="warn">highlight_off</mat-icon></button>
+                <mat-list-item *ngFor="let role of admins | async;" fxLayout="row" fxLayoutGap="1rem">
+                    {{ role.user.username }}
+                    <button (click)="onRemoveRole(role)" mat-icon-button><mat-icon color="warn">highlight_off</mat-icon></button>
                 </mat-list-item>
             </mat-list>
         </mat-card-content>
     </mat-card>
     <mat-card class="listContainer">
         <mat-card-title fxLayoutAlign="start center"><mat-icon>edit</mat-icon>Editors</mat-card-title>
-        <mat-card-content *ngIf="editors.length > 0;else noListedUsers">
+        <mat-card-content *ngIf="true;else noListedUsers">
             <mat-list>
-                <mat-list-item *ngFor="let editor of editors" fxLayout="row" fxLayoutGap="1rem">
-                    {{editor}}
-                    <button (click)="onRemoveRole(editor)" mat-icon-button><mat-icon color="warn">highlight_off</mat-icon></button>
+                <mat-list-item *ngFor="let role of  (editors | async )" fxLayout="row" fxLayoutGap="1rem">
+                    {{role.user.username}}
+                    <button (click)="onRemoveRole(role)" mat-icon-button><mat-icon color="warn">highlight_off</mat-icon></button>
                 </mat-list-item>
             </mat-list>
         </mat-card-content>
     </mat-card>
     <mat-card class="listContainer">
         <mat-card-title fxLayoutAlign="start center"><mat-icon>local_library</mat-icon>Rare Species Readers</mat-card-title>
-        <mat-card-content *ngIf="rareSpeciesReaders.length > 0;else noListedUsers" fxLayout="row" fxLayoutGap="1rem">
+        <mat-card-content *ngIf="true;else noListedUsers" fxLayout="row" fxLayoutGap="1rem">
             <mat-list>
-                <mat-list-item *ngFor="let reader of rareSpeciesReaders">
-                    {{ reader }}
-                    <button (click)="onRemoveRole(reader)" mat-icon-button><mat-icon color="warn">highlight_off</mat-icon></button>
+                <mat-list-item *ngFor="let role of ( rareSpeciesReaders | async )">
+                    {{ role.user.username }}
+                    <button (click)="onRemoveRole(role)" mat-icon-button><mat-icon color="warn">highlight_off</mat-icon></button>
                 </mat-list-item>
             </mat-list>
         </mat-card-content>
@@ -41,11 +41,9 @@
             <div fxLayout="column" fxLayoutGap=".5rem">
                 <mat-label>Roles</mat-label>
                 <mat-radio-group formControlName="role" aria-label="Select a user permission" fxLayout="column" fxLayoutGap="1rem">
-                    <mat-radio-button value=0>Administrator</mat-radio-button>
-                    <mat-radio-button value=1>Editor</mat-radio-button>
-                    <mat-radio-button value=2
-                        >Rare Species Readers</mat-radio-button
-                    >
+                    <mat-radio-button value={{apiUserRoleName.COLLECTION_ADMIN}}>Administrator</mat-radio-button>
+                    <mat-radio-button value={{apiUserRoleName.COLLECTION_EDITOR}}>Editor</mat-radio-button>
+                    <mat-radio-button value={{apiUserRoleName.RARE_SPECIES_READER}}>Rare Species Readers</mat-radio-button>
                 </mat-radio-group>
             </div>  
 

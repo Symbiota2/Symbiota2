@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertService, UserRole, UserService } from '@symbiota2/ui-common';
 import { Observable, of } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { filter, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import {
     Collection,
     CollectionListItem,
@@ -10,6 +10,7 @@ import { CollectionService } from '../../services/collection.service';
 import { ApiUserRoleName } from '@symbiota2/data-access';
 import { UserOutputDto } from '@symbiota2/api-auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CollectionRoleInput, CollectionRoleOutput } from '../../dto/CollectionRole.output.dto';
 
 @Component({
     selector: 'symbiota2-collection-permissions',  
@@ -17,9 +18,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
     styleUrls: ['./collection-permissions.component.scss'],
 })
 export class CollectionPermissionsComponent implements OnInit {
-    admins: string[] = [];
-    editors: string[] = [];
-    rareSpeciesReaders: string[] = [];
+    admins: Observable<CollectionRoleOutput[]>;
+    editors: Observable<CollectionRoleOutput[]>;
+    rareSpeciesReaders: Observable<CollectionRoleOutput[]>;
 
     collection: Collection;
 
@@ -38,49 +39,39 @@ export class CollectionPermissionsComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-      this.getCollectionRoles().subscribe(roles => {
-          console.log(roles);
-        roles.forEach(role => {
-          switch (role.name) {
-            case ApiUserRoleName.COLLECTION_ADMIN:
-                this.users.getUserById(role.id).subscribe(user => {
-                    //this.admins.push(user.username);
-                });
-              break;
+        this.updateRoles();
 
-            case ApiUserRoleName.COLLECTION_EDITOR:
-                this.users.getUserById(role.id).subscribe(user => {
-                    //this.editors.push(user.username);
-                });
+    }
 
-            case ApiUserRoleName.RARE_SPECIES_READER:
-                this.users.getUserById(role.id).subscribe(user => {
-                    //this.rareSpeciesReaders.push(user.username);
-                });
-          
-            default:
-              break;
-          }
-
-        });
-
-        this.admins = ['evindunn', 'neilcobb'];
-        this.editors = ['ccarter'];
-        this.rareSpeciesReaders = [];
-
-        this.userList = this.users.getUsers();
-      })
+    private updateRoles(): void {
+        this.admins = this.getCollectionRoles().pipe(
+            map(roles => {
+                return roles.filter(role => role.name.includes(ApiUserRoleName.COLLECTION_ADMIN));
+            })
+        )
+        
+        this.editors = this.getCollectionRoles().pipe(
+            map(roles => {
+                return roles.filter(role => role.name.includes(ApiUserRoleName.COLLECTION_EDITOR));
+            })
+        )
+        
+        this.rareSpeciesReaders = this.getCollectionRoles().pipe(
+            map(roles => {
+                return roles.filter(role => role.name.includes(ApiUserRoleName.RARE_SPECIES_READER));
+            })
+        )
     }
 
     getCollection(): Observable<Collection> {
         return this.collections.currentCollection.pipe(
             map((collection) => {
                 return collection;
-            })
+            }),
         );
     }
 
-    getCollectionRoles(): Observable<UserRole[]> {
+    private getCollectionRoles(): Observable<CollectionRoleOutput[]> {
         return this.users.currentUser.pipe(
             map((user) => {
                 return user.token;
@@ -98,32 +89,26 @@ export class CollectionPermissionsComponent implements OnInit {
     }
 
     onApplyRoles(): void {
-        var user: string = this.newPermissionForm.get('user').value
-        var role: string = this.newPermissionForm.get('role').value
 
-        //TODO POST
-        console.log(user)
+        const uid: number = this.newPermissionForm.get('user').value;
+        console.log(uid);
+        
+        const role: ApiUserRoleName = this.newPermissionForm.get('role').value;
+        console.log(role);
+        
+        const collectionRoleInput = new CollectionRoleInput(uid, role);
 
-        switch (role) {
-            case '0':
-                    this.admins.push(user);
-              break;
+        //TODO: POST
+        this.collections.postCollectionRole(collectionRoleInput).subscribe();
+        this.updateRoles();
 
-            case "1":
-                    this.editors.push(user);
-                break;
-
-            case "2":
-                    this.rareSpeciesReaders.push(user);
-                break;
-          
-            default:
-                    this.alerts.showError("Error creating role")
-              break;
-          }
     }
 
     onRemoveRole(user: string): void {
         //TODO: remove user api
     }
+
+    public get apiUserRoleName(): typeof ApiUserRoleName {
+        return ApiUserRoleName; 
+      }
 }
