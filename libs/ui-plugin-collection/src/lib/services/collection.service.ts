@@ -36,7 +36,10 @@ import {
     ApiCollectionOutput,
     ApiUserRole,
 } from '@symbiota2/data-access';
-import { CollectionRoleInput, CollectionRoleOutput } from '../dto/CollectionRole.output.dto';
+import {
+    CollectionRoleInput,
+    CollectionRoleOutput,
+} from '../dto/CollectionRole.dto';
 
 interface FindAllParams {
     id?: number | number[];
@@ -200,7 +203,6 @@ export class CollectionService {
                             collection[index].collectionCode.toLowerCase() ===
                                 code.toLowerCase()
                         ) {
-                            console.log(collection[index].collectionCode);
                             result = of(true);
                         }
                     }
@@ -211,31 +213,38 @@ export class CollectionService {
         return result;
     }
 
-    getCurrentRoles(userToken: string): Observable<CollectionRoleOutput[]> {
-        return this.currentCollection.pipe(
-            map((collection) => {
-                const url = `${this.COLLECTION_BASE_URL}/${collection.id}/roles`;
-                const req = this.api
-                    .queryBuilder(url)
-                    .get()
-                    .addJwtAuth(userToken)
-                    .build();
-
-                return req;
-            }),
-            switchMap((req) => {
-                return this.api.send(req).pipe(
-                    map((response: CollectionRoleOutput[]) => {
-                        return response;
-                    })
-                );
+    getCurrentRoles(): Observable<CollectionRoleOutput[]> {
+        return this.users.currentUser.pipe(
+            switchMap((user) => {
+                if(!!user) {
+                    return this.currentCollection.pipe(
+                        map((collection) => {
+                            const url = `${this.COLLECTION_BASE_URL}/${collection.id}/roles`;
+                            const req = this.api
+                                .queryBuilder(url)
+                                .get()
+                                .addJwtAuth(user.token)
+                                .build();
+            
+                            return req;
+                        }),
+                        switchMap((req) => {
+                            return this.api.send(req).pipe(
+                                map((response: CollectionRoleOutput[]) => {
+                                    return response;
+                                })
+                            );
+                        })
+                    );
+                } else { return null };
             })
-        );
+        )
+        
     }
 
     postCollectionRole(role: CollectionRoleInput): Observable<boolean> {
         return this.users.currentUser.pipe(
-            switchMap(user => {
+            switchMap((user) => {
                 if (!!user) {
                     return this.currentCollection.pipe(
                         map((collection) => {
@@ -251,15 +260,59 @@ export class CollectionService {
                         }),
                         switchMap((req) => {
                             return this.api.send(req).pipe(
-                                map(response => {
+                                map((response) => {
+                                    return !!response ? true : false;
+                                })
+                            );
+                        })
+                    );
+                } else {
+                    return of(false);
+                }
+            })
+        );
+    }
+
+    deleteCollectionRole(body: CollectionRoleInput): Observable<boolean> {
+        return this.users.currentUser.pipe(
+            switchMap((user) => {
+                if(!!user) {
+                    return this.currentCollection.pipe(
+                        map((collection) => {
+                            const url = `${this.COLLECTION_BASE_URL}/${collection.id}/roles`;
+                            const req = this.api
+                                .queryBuilder(url)
+                                .delete()
+                                .body(body)
+                                .addJwtAuth(user.token)
+                                .build();
+
+                            return req;
+                        }),
+                        switchMap((req) => {
+                            return this.api.send(req).pipe(
+                                map((response) => {
                                     return !!response ? true : false;
                                 })
                             )
-                        }) 
-                    );
-                } else {return of(false) }
+                        })
+                    )
+                }
             })
-        );
+        )
+    }
+
+    doesRoleExist(roleInput: CollectionRoleInput): Observable<boolean>{
+         return this.getCurrentRoles().pipe(
+             map((roles) => {
+                 for(var index = 0; index < roles.forEach.length; index += 1){
+                    if(roles[index].user.uid === roleInput.uid && roles[index].name === roleInput.role ){
+                        return true;
+                    }
+                 }
+                 return false;
+             })
+         );
     }
 
     private fetchCollectionList(

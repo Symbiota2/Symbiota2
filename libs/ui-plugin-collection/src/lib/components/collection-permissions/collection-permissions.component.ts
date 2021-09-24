@@ -10,7 +10,9 @@ import { CollectionService } from '../../services/collection.service';
 import { ApiUserRoleName } from '@symbiota2/data-access';
 import { UserOutputDto } from '@symbiota2/api-auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CollectionRoleInput, CollectionRoleOutput } from '../../dto/CollectionRole.output.dto';
+import { CollectionRoleInput, CollectionRoleOutput } from '../../dto/CollectionRole.dto';
+import { CollectionRoleAsyncValidators } from './validators';
+import { textChangeRangeIsUnchanged } from 'typescript';
 
 @Component({
     selector: 'symbiota2-collection-permissions',  
@@ -29,7 +31,7 @@ export class CollectionPermissionsComponent implements OnInit {
     newPermissionForm: FormGroup = this.fb.group({
         user: [-1, Validators.required],
         role: ['',Validators.required]
-    });
+    }, CollectionRoleAsyncValidators.userHasRole(this.collections));
 
     constructor(
         readonly collections: CollectionService,
@@ -72,40 +74,36 @@ export class CollectionPermissionsComponent implements OnInit {
     }
 
     private getCollectionRoles(): Observable<CollectionRoleOutput[]> {
-        return this.users.currentUser.pipe(
-            map((user) => {
-                return user.token;
-            }),
-            switchMap((token) => {
-                return this.collections.getCurrentRoles(token);
-            })
-        );
+        return this.collections.getCurrentRoles();
     }
 
     onUserSelect(user: UserOutputDto) {
         this.newPermissionForm.get("user").setValue(user.uid)
 
-        console.log(this.newPermissionForm.get("user").value)
+        console.log("onUserSelect uid: ", this.newPermissionForm.get("user").value)
     }
 
     onApplyRoles(): void {
-
+        //TODO: add pop up to confirm role
+        //TODO: check if user has role in collection and add pop up to confirm role change
         const uid: number = this.newPermissionForm.get('user').value;
-        console.log(uid);
+        console.log("onApplyRoles uid: ", uid);
         
         const role: ApiUserRoleName = this.newPermissionForm.get('role').value;
-        console.log(role);
+        console.log("onApplyRoles role: ", role);
         
         const collectionRoleInput = new CollectionRoleInput(uid, role);
 
-        //TODO: POST
         this.collections.postCollectionRole(collectionRoleInput).subscribe();
         this.updateRoles();
 
     }
 
-    onRemoveRole(user: string): void {
-        //TODO: remove user api
+    onRemoveRole(role: CollectionRoleOutput): void {
+        //TODO: add popup dialog 
+        const collectionRoleInput = new CollectionRoleInput(role.user.uid, role.name)
+        this.collections.deleteCollectionRole(collectionRoleInput).subscribe();
+        this.updateRoles();
     }
 
     public get apiUserRoleName(): typeof ApiUserRoleName {

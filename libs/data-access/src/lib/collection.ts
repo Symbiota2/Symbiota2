@@ -46,7 +46,7 @@ export interface ApiCollectionRoleUser {
 
 export interface ApiCollectionRoleOutput {
     id: number;
-    name: string;
+    name: ApiUserRoleName;
     user: ApiCollectionRoleUser;
 }
 

@@ -3,7 +3,7 @@ import { ApiCollectionRoleInput, ApiCollectionRoleOutput, ApiCollectionRoleUser,
 
 export class CollectionRoleOutput implements ApiCollectionRoleOutput {
     id: number;
-    name: string;
+    name: ApiUserRoleName;
     user: ApiCollectionRoleUser;
 
     constructor(collectionRole: ApiCollectionRoleOutput) {
