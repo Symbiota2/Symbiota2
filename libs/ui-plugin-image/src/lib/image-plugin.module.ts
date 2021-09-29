@@ -32,6 +32,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
 import { ImageLibraryPageComponent, ImageSearchPageComponent } from './pages';
 import { ImageDetailsPageComponent } from './pages/image-details/image-details-page.component';
+import { FilterPipe } from './pages/image-search/filter.pipe';
 
 
 @NgModule({
@@ -66,7 +67,8 @@ import { ImageDetailsPageComponent } from './pages/image-details/image-details-p
 //        TaxaSearchPage,
         ImageSearchPageComponent,
         ImageLibraryPageComponent,
-        ImageDetailsPageComponent
+        ImageDetailsPageComponent,
+        FilterPipe
     ],
     providers: [
         ImageService,
@@ -81,6 +83,7 @@ import { ImageDetailsPageComponent } from './pages/image-details/image-details-p
 export class ImagePlugin extends SymbiotaUiPlugin {
     private static IMAGE_LIBRARY_ROUTE = "images/library/:level"
     private static IMAGE_DETAILS_ROUTE = "image/details/:imageID"
+    private static IMAGE_SEARCH_ROUTE = "image/search"
 
     constructor() {
         super();
@@ -95,6 +98,10 @@ export class ImagePlugin extends SymbiotaUiPlugin {
             {
                 path: ImagePlugin.IMAGE_DETAILS_ROUTE,
                 component: ImageDetailsPageComponent
+            },
+            {
+                path: ImagePlugin.IMAGE_SEARCH_ROUTE,
+                component: ImageSearchPageComponent
             },
 
         ];

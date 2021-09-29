@@ -23,6 +23,19 @@ export class ImageController {
         return Promise.all(taxonDtos)
     }
 
+    @Get('photographerNames')
+    @ApiResponse({ status: HttpStatus.OK, type: String, isArray: true })
+    @ApiOperation({
+        summary: "Retrieve a list of distinct photographer names."
+    })
+    async findPhotographerNames(): Promise<String[]> {
+        const images = await this.myService.findPhotographerNames()
+        const s = images.map(async (c) => {
+            return c.o_photographer
+        });
+        return Promise.all(s)
+    }
+
     @Get('taxonIDs')
     @ApiResponse({ status: HttpStatus.OK, type: ImageDto, isArray: true })
     @ApiOperation({

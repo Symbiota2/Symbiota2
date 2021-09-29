@@ -3,13 +3,13 @@
 </div>
 {{"image.library.intro" | translate}}
 <div>
-    <a href="images/library/family">Browse by family</a>
+    <a href="images/library/family">{{"image.library.browse.family" | translate}}</a>
 </div>
 <div>
-    <a href="images/library/genus">Browse by genus</a>
+    <a href="images/library/genus">{{"image.library.browse.genus" | translate}}</a>
 </div>
 <div>
-    <a href="images/library/species">Browse by species</a>
+    {{"image.library.browse.species" | translate}}
     <ul>
         <a href="images/library/A">A</a> | <a href="images/library/B">B</a> | <a href="images/library/C">C</a> |
         <a href="images/library/D">D</a> | <a href="images/library/E">E</a> | <a href="images/library/F">F</a> |
@@ -29,12 +29,15 @@
 <symbiota2-expansion-panel label='{{"image.library.names" | translate}}'>
     <mat-list *ngFor='let name of names'>
         <mat-list-item *ngIf="level == 'family'" role="listitem">
-            <a href='images/library/{{name.id}}' target='_blank' style='color:inherit;text-decoration:none'>{{name.name.toUpperCase()}}</a>
-        </mat-list-item>
-        <mat-list-item *ngIf="level == 'species'" role="listitem">
-            <a href='images/library/{{name.id}}' target='_blank' style='color:inherit;text-decoration:none'><i>{{name.name}}</i></a>
+            <!--
+            <a href="javascript: void(0);" style='color:inherit;text-decoration:none' (click)="loadDescendants(name.id)">{{name.name.toUpperCase()}}</a>
+            -->
+            <a href='images/library/{{name.id}}'  (click)="loadDescendants(name.id)" style='color:inherit;text-decoration:none'>{{name.name.toUpperCase()}}</a>
         </mat-list-item>
         <mat-list-item *ngIf="level == 'genus'" role="listitem">
+            <a href='images/library/{{name.id}}'  (click)="loadDescendants(name.id)" style='color:inherit;text-decoration:none'><i>{{name.name}}</i></a>
+        </mat-list-item>
+        <mat-list-item *ngIf="level == 'species'" role="listitem">
             <a href='taxon/profile/{{name.id}}' target='_blank' style='color:inherit;text-decoration:none'>{{name.name}}</a>
         </mat-list-item>
     </mat-list>

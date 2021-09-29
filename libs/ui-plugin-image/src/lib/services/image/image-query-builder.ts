@@ -15,6 +15,10 @@ export class ImageQueryBuilder {
         return new FindAllBuilder(this.baseUrl)
     }
 
+    findPhotographerNames(): FindPhotographerNamesBuilder {
+        return new FindPhotographerNamesBuilder(this.baseUrl)
+    }
+
     findByTaxonIDs(): FindByTaxonIDsBuilder {
         return new FindByTaxonIDsBuilder(this.baseUrl)
     }
@@ -61,6 +65,20 @@ class FindAllBuilder extends ImageQueryBuilder {
 
         return super.build();
     }
+}
+
+class FindPhotographerNamesBuilder extends ImageQueryBuilder {
+
+    constructor(apiBaseUrl: string) {
+        super(apiBaseUrl)
+        this.baseUrl = apiBaseUrl
+        this.url = new URL(`${apiBaseUrl}/image/photographerNames`)
+    }
+
+    build(): string {
+        return super.build();
+    }
+
 }
 
 class FindByTaxonIDsBuilder extends ImageQueryBuilder {

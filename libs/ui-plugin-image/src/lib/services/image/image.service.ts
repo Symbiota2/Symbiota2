@@ -39,7 +39,21 @@ export class ImageService {
                 map((descriptions) => descriptions.map((o) => {
                     return ImageListItem.fromJSON(o);
                 }))
-            );
+            )
+    }
+
+    findPhotographerNames(): Observable<string[]> {
+        const url = this.createQueryBuilder()
+            .findPhotographerNames()
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, string[]>(query)
+            .pipe(
+                map((descriptions) => descriptions.map((o) => {
+                    return o;
+                }))
+            )
     }
 
     findByTaxonIDs(ids: number[]): Observable<ImageListItem[]> {

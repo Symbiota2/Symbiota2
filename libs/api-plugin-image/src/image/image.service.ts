@@ -14,7 +14,7 @@ export class ImageService extends BaseService<Image>{
     }
 
     /*
-    Fetch all of the taxon links.
+    Fetch all of the images.
     Can limit the list by a list of ids.
     Can also limit the number fetched and use an offset.
      */
@@ -25,6 +25,25 @@ export class ImageService extends BaseService<Image>{
             this.myRepository.find({take: limit, skip: offset, where: { id: In(params.id)}})
             : this.myRepository.find({take: limit, skip: offset})
     }
+
+    /*
+    Fetch distinct photographer names.
+    */
+    async findPhotographerNames(): Promise<any[]> {
+        //return this.myRepository.find({select: ['photographerName']})
+
+        const qb = this.myRepository.createQueryBuilder('o')
+            .select(
+                'o.photographerName'
+            )
+            .distinct(true)
+            //.limit(100)
+            .where('o.photographerName IS NOT NULL')
+            .orderBy('o.photographerName')
+
+        return await qb.getRawMany()
+    }
+
 
     /*
     Fetch all of the taxon links.
