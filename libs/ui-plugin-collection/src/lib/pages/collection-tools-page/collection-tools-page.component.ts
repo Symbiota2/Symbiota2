@@ -41,7 +41,7 @@ export class CollectionToolsPage implements OnInit {
             this.collectionToolsKeys ;
             console.log(this.collectionToolsKeys);
             
-            this.selectedContent = CollectionToolsPage.collectionTools.get("User Permissions");
+            this.selectedContent = CollectionToolsPage.collectionTools.get("Edit Collection");
             
           }
         });

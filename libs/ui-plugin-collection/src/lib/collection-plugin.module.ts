@@ -57,7 +57,7 @@ import { ImgFallbackDirective } from './components/collection-logo/img-fallback.
 import { CollectionToolsPage } from './pages/collection-tools-page/collection-tools-page.component';
 import { CollectionPermissionsComponent } from './components/collection-permissions/collection-permissions.component';
 import { UserSearchableSelectComponent } from './components/user-searchable-select/user-searchable-select.component';
-
+import { CollectionPermissionsConfirmDialogComponent } from './components/collection-permissions-confirm-dialog/collection-permissions-confirm-dialog.component';
 
 @NgModule({
     declarations: [
@@ -80,6 +80,7 @@ import { UserSearchableSelectComponent } from './components/user-searchable-sele
         CollectionToolsPage,
         CollectionPermissionsComponent,
         UserSearchableSelectComponent,
+        CollectionPermissionsConfirmDialogComponent,
     ],
   imports: [
     AppTranslationModule,

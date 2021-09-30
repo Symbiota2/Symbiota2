@@ -7,31 +7,41 @@ import {
 } from '@angular/forms';
 import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { of, Observable } from 'rxjs';
-import { map, first, debounce, take } from 'rxjs/operators';
+import { map, first, debounce, take, switchMap } from 'rxjs/operators';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
 
 export class CollectionAsyncValidators {
     static nameTaken(collections: CollectionService): AsyncValidatorFn {
         return (control: AbstractControl): Observable<ValidationErrors> => {
-            return collections
-                .isNameTaken(control.value)
-                .pipe(
-                    map((result: boolean) =>
-                        result ? { nameTaken: result } : null
-                    )
-                );
+            return collections.currentCollection.pipe(
+                switchMap((collection) => {
+                    return collections
+                        .isNameTaken(control.value, collection.collectionName)
+                        .pipe(
+                            map((result: boolean) =>
+                                result ? { nameTaken: true } : null
+                            )
+                        );
+                }),
+                take(1)
+            );
         };
     }
 
     static codeTaken(collections: CollectionService): AsyncValidatorFn {
         return (control: AbstractControl): Observable<ValidationErrors> => {
-            return collections
-                .isCodeTaken(control.value)
-                .pipe(
-                    map((result: boolean) =>
-                        result ? { codeTaken: result } : null
-                    )
-                );
+            return collections.currentCollection.pipe(
+                switchMap((collection) => {
+                    return collections
+                        .isCodeTaken(control.value, collection.collectionCode)
+                        .pipe(
+                            map((result: boolean) =>
+                                result ? { codeTaken: result } : null
+                            )
+                        );
+                }),
+                take(1)
+            );
         };
     }
 

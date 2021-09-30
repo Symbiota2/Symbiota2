@@ -20,6 +20,7 @@ import {
     debounceTime,
     distinctUntilChanged,
     filter,
+    first,
     map,
     shareReplay,
     startWith,
@@ -35,11 +36,14 @@ import {
     ApiCollectionListItem,
     ApiCollectionOutput,
     ApiUserRole,
+    ApiUserRoleName,
 } from '@symbiota2/data-access';
 import {
     CollectionRoleInput,
     CollectionRoleOutput,
 } from '../dto/CollectionRole.dto';
+import * as e from 'express';
+import { ConstraintMetadata } from 'class-validator/types/metadata/ConstraintMetadata';
 
 interface FindAllParams {
     id?: number | number[];
@@ -173,50 +177,63 @@ export class CollectionService {
             });
     }
 
-    isNameTaken(name: string): Observable<boolean> {
-        var result = of(false);
-
-        this.collectionList
-            .pipe(
-                map((collections) => {
-                    collections.forEach((collection) => {
-                        if (collection.collectionName === name) {
-                            result = of(true);
+    isNameTaken(name: string, exempt?: string | string[]): Observable<boolean> {
+        return this.collectionList.pipe(
+            map((collections) => {
+                for (var index = 0; index < collections.length; index += 1) {
+                    if (collections[index].collectionName === name) {
+                        if (!!exempt) {
+                            if (
+                                Array.isArray(exempt) &&
+                                exempt.includes(name)
+                            ) {
+                                return false;
+                            } else if (exempt === name) {
+                                return false;
+                            }
                         }
-                    });
-                })
-            )
-            .subscribe();
-
-        return result;
+                        return true;
+                    }
+                }
+                return false;
+            })
+        );
     }
 
-    isCodeTaken(code: string): Observable<boolean> {
-        var result = of(false);
-
-        this.collectionList
-            .pipe(
-                map((collection) => {
-                    for (var index = 0; index < collection.length; index++) {
-                        if (
-                            collection[index].collectionCode !== null &&
-                            collection[index].collectionCode.toLowerCase() ===
+    isCodeTaken(code: string, exempt?: string | string[]): Observable<boolean> {
+        return this.collectionList.pipe(
+            map((collections) => {
+                for (var index = 0; index < collections.length; index += 1) {
+                    if (
+                        !!collections[index].collectionCode &&
+                        collections[index].collectionCode.toLowerCase() ===
+                            code.toLowerCase()
+                    ) {
+                        if (!!exempt) {
+                            if (
+                                Array.isArray(exempt) &&
+                                exempt.includes(code)
+                            ) {
+                                return false;
+                            } else if (
+                                String(exempt).toLowerCase() ===
                                 code.toLowerCase()
-                        ) {
-                            result = of(true);
+                            ) {
+                                return false;
+                            }
                         }
+                        return true;
                     }
-                })
-            )
-            .subscribe();
-
-        return result;
+                }
+                return false;
+            })
+        );
     }
 
     getCurrentRoles(): Observable<CollectionRoleOutput[]> {
         return this.users.currentUser.pipe(
             switchMap((user) => {
-                if(!!user) {
+                if (!!user) {
                     return this.currentCollection.pipe(
                         map((collection) => {
                             const url = `${this.COLLECTION_BASE_URL}/${collection.id}/roles`;
@@ -225,7 +242,7 @@ export class CollectionService {
                                 .get()
                                 .addJwtAuth(user.token)
                                 .build();
-            
+
                             return req;
                         }),
                         switchMap((req) => {
@@ -236,13 +253,19 @@ export class CollectionService {
                             );
                         })
                     );
-                } else { return null };
+                } else {
+                    return null;
+                }
             })
-        )
-        
+        );
     }
 
-    postCollectionRole(role: CollectionRoleInput): Observable<boolean> {
+    postCollectionRole(
+        uid: number,
+        role: ApiUserRoleName
+    ): Observable<boolean> {
+        const newRole = new CollectionRoleInput(uid, role);
+
         return this.users.currentUser.pipe(
             switchMap((user) => {
                 if (!!user) {
@@ -252,7 +275,7 @@ export class CollectionService {
                             const req = this.api
                                 .queryBuilder(url)
                                 .post()
-                                .body(role)
+                                .body(newRole)
                                 .addJwtAuth(user.token)
                                 .build();
 
@@ -273,10 +296,15 @@ export class CollectionService {
         );
     }
 
-    deleteCollectionRole(body: CollectionRoleInput): Observable<boolean> {
+    deleteCollectionRole(
+        uid: number,
+        role: ApiUserRoleName
+    ): Observable<boolean> {
+        const body = new CollectionRoleInput(uid, role);
+
         return this.users.currentUser.pipe(
             switchMap((user) => {
-                if(!!user) {
+                if (!!user) {
                     return this.currentCollection.pipe(
                         map((collection) => {
                             const url = `${this.COLLECTION_BASE_URL}/${collection.id}/roles`;
@@ -294,25 +322,42 @@ export class CollectionService {
                                 map((response) => {
                                     return !!response ? true : false;
                                 })
-                            )
+                            );
                         })
-                    )
+                    );
                 }
             })
-        )
+        );
     }
 
-    doesRoleExist(roleInput: CollectionRoleInput): Observable<boolean>{
-         return this.getCurrentRoles().pipe(
-             map((roles) => {
-                 for(var index = 0; index < roles.forEach.length; index += 1){
-                    if(roles[index].user.uid === roleInput.uid && roles[index].name === roleInput.role ){
+    doesRoleExist(uid: number, role: ApiUserRoleName): Observable<boolean> {
+        return this.getCurrentRoles().pipe(
+            map((roles) => {
+                for (var index = 0; index < roles.length; index += 1) {
+                    if (
+                        roles[index].user.uid == uid &&
+                        roles[index].name == role
+                    ) {
                         return true;
                     }
-                 }
-                 return false;
-             })
-         );
+                }
+                return false;
+            }),
+            take(1)
+        );
+    }
+
+    getUserRole(uid: number): Observable<CollectionRoleOutput> {
+        return this.getCurrentRoles().pipe(
+            map((roles) => {
+                for (var index = 0; index < roles.length; index += 1) {
+                    if (roles[index].user.uid == uid) {
+                        return roles[index];
+                    }
+                }
+                return null;
+            })
+        );
     }
 
     private fetchCollectionList(

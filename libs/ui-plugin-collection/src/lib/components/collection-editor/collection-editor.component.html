@@ -60,7 +60,7 @@
                         matTooltipClass="primary">
                         <mat-label>Institution *</mat-label>
                         <mat-select formControlName="institutionID">
-                            <mat-option *ngFor="let i of inst" value="{{ i.id }}">({{ i.code }}) {{ i.name }}</mat-option>
+                            <mat-option *ngFor="let i of inst$ | async" [value]="i.id">({{ i.code }}) {{ i.name }}</mat-option>
                         </mat-select>
                         <mat-error *ngIf="
                                             editCollectionForm
@@ -221,7 +221,7 @@
                 Contact Information
             </mat-card-title>
             <mat-card-content fxLayout="column" fxLayoutAlign="start">
-                <h2 mat-h2>Role: Admin</h2>
+                <h3>*Contact with administration permissions recommended</h3>
                 <mat-form-field class="medium-input">
                     <mat-label>Name *</mat-label>
                     <input matInput type="url" formControlName="contact" />
@@ -283,7 +283,10 @@
     <div fxLayoutAlign="start">
         <button id="submit" class="submit-button" mat-raised-button color="primary" type="submit" (click)="onApplyChanges()"
             [disabled]="!editCollectionForm.valid" style="font-size: large">
-            Create New Collection
+            Update Collection
         </button>
     </div>
+    <p><b>Form Status:</b> {{ editCollectionForm.status }}</p>
+    <pre> <b>Form Values:</b> {{editCollectionForm.value | json}}</pre> 
+    <pre> <b>Form Errors:</b> {{editCollectionForm.errors | json}}</pre> 
 </form>

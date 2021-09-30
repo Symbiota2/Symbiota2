@@ -41,7 +41,6 @@ export class UserSearchableSelectComponent implements OnInit {
 
   onSelectUser(user: UserOutputDto): void{
     this.selectUser.emit(user);
-    console.log(user.username)
   }
 
 }

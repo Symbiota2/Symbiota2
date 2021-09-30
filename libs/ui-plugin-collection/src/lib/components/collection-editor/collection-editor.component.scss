@@ -11,15 +11,6 @@
     background: $primaryColor;
 }
 
-.sidenav{
-    display: flex;
-    align-items: flex-end;
-    justify-content: end;
-    width: 200px;
-
-    
-}
-
 .navList{
     list-style: none;
     padding-right: 1rem;
@@ -46,7 +37,6 @@
 }
 
 #content {
-    margin-left: 13rem;
 }
 
 #description{

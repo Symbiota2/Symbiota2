@@ -1,5 +1,5 @@
-<div class="main">
-    <h1>User Permissions</h1>
+<mat-card class="main">
+    <mat-card-title class="title" fxLayoutAlign="start center"><mat-icon color="primary">badge</mat-icon>User Permissions</mat-card-title>
     <mat-card class="listContainer">
         <mat-card-title fxLayoutAlign="start center"
             ><mat-icon>local_police</mat-icon>Administrators</mat-card-title
@@ -98,7 +98,7 @@
                     newPermissionForm.hasError('userHasRole')
                 "
             >
-                User Already has Role
+                <b>User already has role</b>
             </mat-error>
 
             <button
@@ -110,10 +110,8 @@
             >
                 Apply Roles to User
             </button>
-            <p><b>Form Status:</b> {{ newPermissionForm.status }}</p>
-            <pre> <b>Form Values:</b> {{newPermissionForm.value | json}}</pre> 
         </form>
     </mat-card>
-</div>
+</mat-card>
 
 <ng-template #noListedUsers> No listed users for this role</ng-template>

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Inject } from '@nestjs/common';
+import { MatDialogRef } from '@angular/material/dialog';
 import { Institution } from '@symbiota2/api-database';
 
 @Component({
