@@ -31,7 +31,7 @@
                 </small>
             </div>
             <div id="links">
-                <ng-container *ngFor="let link of links">
+                <ng-container *ngFor="let link of links$ | async">
                     <span>
                         <a
                             [routerLink]="link.routerLink"

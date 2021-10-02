@@ -36,3 +36,14 @@
 .paginator{
     border-radius: 0.5rem, 0.5rem, 0px, 0px;
 }
+
+.warning{
+    background-color: #ffe082;
+    color: #ffa000;
+    margin-bottom: .5rem;
+
+    mat-icon{
+        font-size: 36px;
+        padding-right: 1rem;
+    }
+}

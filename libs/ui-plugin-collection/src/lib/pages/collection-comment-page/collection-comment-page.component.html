@@ -1,4 +1,12 @@
-<mat-card *ngIf="collection != null" fxLayout="column" fxLayoutGap="1rem">
+<mat-card class="warning">
+    <mat-card-title fxLayoutAlign="start start">
+        <mat-icon>warning</mat-icon> Message from Developers
+    </mat-card-title>
+    <mat-card-content>
+        This page is still underdevelopment and may not function as desired. :(
+    </mat-card-content>
+</mat-card>
+<mat-card *ngIf="collection$ | async; let collection" fxLayout="column" fxLayoutGap="1rem">
     <div fxLayout="row" fxLayoutGap="1rem" fxLayoutAlign="start center">
         <symbiota2-collection-logo
             [collectionID]="collection.id"

@@ -10,6 +10,7 @@ import { filter } from 'rxjs/operators';
 import { Comment } from '../../dto/Comment.output.dto';
 import { CommentService } from '../../services/comments.service';
 import { Observable } from 'rxjs';
+import { once } from 'node:events';
 
 @Component({
     selector: 'symbiota2-collection-comment-page',
@@ -17,7 +18,8 @@ import { Observable } from 'rxjs';
     styleUrls: ['./collection-comment-page.component.scss'],
 })
 export class CollectionCommentPage implements OnInit {
-    public collection: Collection;
+
+    public collection$: Observable<Collection>;
 
     public commentList: Comment[];
     public commentSlice: Comment[];
@@ -32,13 +34,24 @@ export class CollectionCommentPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.getCollection();
-        this.getCollectionComments();
-        //this.getCollectionComments(this.collection.id);
+        //setting collection variable for html access
+        this.collection$ = this.getCollection();
+
+        //once collection is pulled from api pull said collections comments/set data reliant on collection
+        this.collection$.pipe(
+            map(collection => {
+
+                //TODO: change to a function that pulls list of comments from api
+                this.getCollectionComments().subscribe(comments => {
+                    this.commentList = comments;
+                    this.commentSlice = this.commentList.slice(0, 5);
+                });
+            })
+        ).subscribe();
     }
 
-    private getCollection() {
-        this.activeRoute.paramMap
+    private getCollection(): Observable<Collection> {
+        return this.activeRoute.paramMap
             .pipe(
                 map((params) => parseInt(params.get('collectionID'))),
                 tap((collectionID) => {
@@ -47,21 +60,18 @@ export class CollectionCommentPage implements OnInit {
                 switchMap(() => {
                     return this.collections.currentCollection;
                 })
-            )
-            .subscribe((collection) => (this.collection = collection));
+            );
     }
 
-    private getCollectionComments() {
-        this.comments
+    //TODO: convert from mock data function into api call through a service
+    private getCollectionComments( ): Observable<Comment[]> {
+        return this.comments
             .getComments()
             .pipe(
                 map((comments) => {
                     return comments;
                 })
-            )
-            .subscribe((comments) => (this.commentList = comments));
-
-        this.commentSlice = this.commentList.slice(0, 5);
+            );
     }
 
     isAdmin(): boolean {

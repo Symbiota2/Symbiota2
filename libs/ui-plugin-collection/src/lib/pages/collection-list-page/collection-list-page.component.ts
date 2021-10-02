@@ -3,7 +3,7 @@ import { CollectionService } from '../../services/collection.service';
 import { ROUTE_COLLECTION_NEW } from '../../routes';
 import { UserService } from '@symbiota2/ui-common';
 import { filter } from 'rxjs/operators';
-import { AdminLanguage } from '@symbiota2/api-database';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'symbiota2-collection-list-page',
@@ -25,14 +25,14 @@ export class CollectionListPage implements OnInit {
         this.collectionService.refreshCategories();
     }
 
-    isAdmin(): boolean {
+    //TODO: this function is made a lot and should just be built into user service
+    //TODO: clean function
+    isAdmin(): Observable<boolean> {
         var result;
 
-        this.user.currentUser
-            .pipe(filter((user) => user !== null))
-            .subscribe((user) => {
-                result = user.isSuperAdmin();
-            });
+        this.user.currentUser.subscribe(user => {
+            result = user !== null && user.isSuperAdmin();
+        })
             
         return result;
     }

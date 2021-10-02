@@ -37,8 +37,9 @@ export class CollectionPage implements OnInit {
 
     private comments_link: CollectionProfileLink;
 
-    public links: CollectionProfileLink[];
+    public links$: Observable<CollectionProfileLink[]>;
 
+    //TODO: make observable
     public userCanEdit: boolean;
 
     public collectionHomePage: string;
@@ -52,23 +53,23 @@ export class CollectionPage implements OnInit {
         private readonly alerts: AlertService,
         private readonly currentRoute: ActivatedRoute,
         private readonly profileService: CollectionProfileService,
-        private readonly dialog: MatDialog,
-        private readonly sanitizer: DomSanitizer
     ) {}
 
     ngOnInit(): void {
-        this.getCollection().then((data) => {
-            this.collection = data;
-            this.collectionHomePage = data.homePage;
+
+        //TODO: rework this into html (let collection from async for variables)
+        this.getCollection().subscribe((collection) => {
+            this.collection = collection;
+            this.collectionHomePage = collection.homePage;
             this.geoReferencedPercent =
-                data.collectionStats != null && data.collectionStats.recordCount > 0
+                collection.collectionStats != null && collection.collectionStats.recordCount > 0
                     ? Math.round(
-                          (data.collectionStats.georeferencedCount /
-                              data.collectionStats.recordCount) *
+                          (collection.collectionStats.georeferencedCount /
+                              collection.collectionStats.recordCount) *
                               100
                       )
                     : 0;
-            this.collectionID = data.id;
+            this.collectionID = collection.id;
             this.canUserEdit();
             this.comments_link = {
                 text: 'view comments',
@@ -78,12 +79,11 @@ export class CollectionPage implements OnInit {
                     this.collectionID.toString()
                 )}`,
             };
-            this.getLinks();
-            console.log('subscribe: ' + data);
+            this.links$ = this.getLinks();
         });
     }
 
-    getCollection(): Promise<Collection> {
+    getCollection(): Observable<Collection> {
         return this.currentRoute.paramMap
             .pipe(
                 map((params) => {
@@ -104,13 +104,11 @@ export class CollectionPage implements OnInit {
                         this.alerts.showError('Collection not found');
                     }
                 }),
-                take(1) //had to add this to get promise to resolve
-            )
-            .toPromise();
+            );
     }
 
-    getLinks(): void {
-        this.collections.currentCollection
+    getLinks(): Observable<CollectionProfileLink[]> {
+        return this.collections.currentCollection
             .pipe(
                 switchMap((collection) => {
                     return this.profileService.links(collection.id);
@@ -122,8 +120,7 @@ export class CollectionPage implements OnInit {
                         this.comments_link,
                     ];
                 })
-            )
-            .subscribe((links) => (this.links = links));
+            );
     }
 
     canUserEdit() {
@@ -167,30 +164,4 @@ export class CollectionPage implements OnInit {
             }
         });
     }
-
-    // onEdit() {
-    //     this.collection
-    //         .pipe(
-    //             filter((collection) => collection !== null),
-    //             take(1),
-    //             switchMap((collection) => {
-    //                 const dialog = this.dialog.open(
-    //                     CollectionEditorDialogComponent,
-    //                     { data: collection, disableClose: true }
-    //                 );
-
-    //                 return dialog.afterClosed().pipe(
-    //                     take(1),
-    //                     map((collectionData) => {
-    //                         if (collectionData !== null) {
-    //                             return this.collections.updateCurrentCollection(
-    //                                 collectionData
-    //                             );
-    //                         }
-    //                     })
-    //                 );
-    //             })
-    //         )
-    //         .subscribe();
-    // }
 }

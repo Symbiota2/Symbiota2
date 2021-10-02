@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, switchMap, take, tap } from 'rxjs/operators';
 import { CollectionEditorComponent } from '../../components/collection-editor/collection-editor.component';
 import { CollectionPermissionsComponent } from '../../components/collection-permissions/collection-permissions.component';
@@ -21,9 +21,10 @@ export class CollectionToolsPage implements OnInit {
 
     readonly collectionToolsKeys: String[] = Array.from(CollectionToolsPage.collectionTools.keys());
 
+    //TODO: rework into observable
     selectedContent: Component;
 
-    collection: Collection;
+    collection$: Observable<Collection>;
 
     constructor(
         private readonly users: UserService,
@@ -34,15 +35,10 @@ export class CollectionToolsPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.validatePage().then((isValid) => {
+        this.validatePage().subscribe((isValid) => {
           if(isValid){
-            this.getCollection();
-            console.log(this.collection);
-            this.collectionToolsKeys ;
-            console.log(this.collectionToolsKeys);
-            
+            this.collection$ = this.collections.currentCollection;
             this.selectedContent = CollectionToolsPage.collectionTools.get("Edit Collection");
-            
           }
         });
     }
@@ -51,7 +47,7 @@ export class CollectionToolsPage implements OnInit {
         this.selectedContent = CollectionToolsPage.collectionTools.get(key);
     }
 
-    private validatePage(): Promise<Boolean> {
+    private validatePage(): Observable<Boolean> {
         return this.currentRoute.paramMap
             .pipe(
                 map((params) => {
@@ -94,13 +90,7 @@ export class CollectionToolsPage implements OnInit {
                         this.alerts.showError('Permission Denied');
                     }
                 }),
-                take(1)
-            )
-            .toPromise();
-    }
-
-    private getCollection(): void {
-        this.collections.currentCollection.pipe().subscribe(col => this.collection = col);
+            );
     }
 
 }
