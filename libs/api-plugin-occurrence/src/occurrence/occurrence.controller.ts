@@ -218,6 +218,7 @@ export class OccurrenceController {
         summary: 'Retrieve this collection as a Darwin Core Archive'
     })
     @ApiResponse({
+        status: HttpStatus.OK,
         content: {
             'application/zip': {
                 schema: {
@@ -228,10 +229,20 @@ export class OccurrenceController {
         }
     })
     async getCollectionAsArchive(@Query() query: CollectionIDQueryParam, @Res() response: Response): Promise<void> {
-        withTempDir(await this.config.dataDir(), async (tmpDir) => {
-            const archive = await this.occurrenceService.createDwCArchive(tmpDir, { collectionID: query.collectionID });
+        const dataDir = await this.config.dataDir();
+
+        withTempDir(dataDir, async (tmpDir) => {
+            const archive = await this.occurrenceService.createDwCArchive(
+                tmpDir,
+                { collectionID: query.collectionID }
+            );
             const readStream = createReadStream(archive);
             readStream.pipe(response);
+
+            return new Promise<void>((resolve, reject) => {
+                readStream.on('error', (e) => reject(e));
+                readStream.on('close', () => resolve());
+            });
         });
     }
 }

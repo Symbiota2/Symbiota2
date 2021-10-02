@@ -58,11 +58,39 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
         // Fetch the descendants
         return (qParams.taxonAuthorityID) ?
             await this.taxonomicEnumTrees.find({
-                relations: ["parentTaxon", "taxon"],
+                relations: ["taxon"],
                 where: { taxonAuthorityID: params.taxonAuthorityID, parentTaxonID: taxonid}})
             : await this.taxonomicEnumTrees.find({
-                relations: ["parentTaxon", "taxon"],
+                relations: ["taxon"],
                 where: { parentTaxonID: taxonid}})
+    }
+
+    /*
+ Find the descendants for a given taxon id, rank id, and taxon authority (which is optional, in which case all are returned)
+  */
+    async findDescendantsByRank(taxonid: number, rankID: number, params?: TaxonomicEnumTreeFindAllParams): Promise<TaxaEnumTreeEntry[]> {
+        const { ...qParams } = params
+        const qb = this.taxonomicEnumTrees.createQueryBuilder('o')
+            //.select(['o.*', 'c.*'])
+            .select([
+                'c.scientificName', 'o.taxonID'
+            ])
+            //.limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
+            .innerJoin('o.taxon', 'c')
+            .where('c.rankID = :rankID AND o.parentTaxonID = :parentTaxonID',
+                { rankID: 220, parentTaxonID: taxonid })
+
+        /*
+        if (qParams.taxonAuthorityID) {
+            qb.innerJoin('c.taxonStatuses', 'd')
+               .andWhere('d.taxonAuthorityID = :authorityID',
+                { authorityID: params.taxonAuthorityID })
+        }
+
+         */
+
+        return await qb.getMany()
+
     }
 
     /*

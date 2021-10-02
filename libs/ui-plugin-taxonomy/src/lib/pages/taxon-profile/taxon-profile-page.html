@@ -68,7 +68,7 @@
         </tr>
     </table>
 </div>
-<mat-grid-list *ngIf='images.length > 0' cols='4' rowHeight='.9:1'>
+<mat-grid-list *ngIf='images.length > 0' cols='4' rowHeight='.8:1'>
     <mat-grid-tile *ngFor='let image of images'>
         <div class="img-with-text">
             <a *ngIf='image' href='image/details/{{image.id}}'>

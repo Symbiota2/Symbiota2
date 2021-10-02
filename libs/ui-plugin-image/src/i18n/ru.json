@@ -1,0 +1,17 @@
+{
+  "image.library.title": "Виды с изображениями",
+  "image.library.intro": "На этой странице представлен полный список таксонов, у которых есть изображения. Используйте элементы управления ниже для просмотра и поиска изображений по семействам, родам или видам.",
+  "image.library.names": "Имена",
+  "image.library.browse.family": "Поиск по семье",
+  "image.library.browse.genus": "Искать по родам",
+  "image.library.browse.species": "Просмотр по видам",
+  "image.details.title": "Детали изображения",
+  "image.details.clickon": "Щелкните изображение, чтобы увеличить",
+  "image.details.sciname": "Научное название",
+  "image.details.caption": "Подпись",
+  "image.details.photographer": "Фотограф",
+  "image.details.manager": "Менеджер",
+  "image.details.image.source": "Источник изображения",
+  "image.details.image.notes": "Заметки",
+  "image.details.image.locality": "Местность"
+}

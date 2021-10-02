@@ -19,6 +19,10 @@ export class TaxonomicEnumTreeQueryBuilder {
         return new FindDescendantsBuilder(this.baseUrl)
     }
 
+    findDescendantsByRank() : FindDescendantsByRankBuilder {
+        return new FindDescendantsByRankBuilder(this.baseUrl)
+    }
+
     findAncestorTaxons() : FindAncestorTaxonsBuilder {
         return new FindAncestorTaxonsBuilder(this.baseUrl)
     }
@@ -115,6 +119,42 @@ class FindDescendantsBuilder extends TaxonomicEnumTreeQueryBuilder {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
         }
 
+        return super.build();
+    }
+}
+
+class FindDescendantsByRankBuilder extends TaxonomicEnumTreeQueryBuilder {
+    protected _taxonID: number = null
+    protected _authorityID: number
+    protected _rankID: number = null
+
+    constructor(apiBaseUrl: string) {
+        super(apiBaseUrl)
+        this.baseUrl = apiBaseUrl
+        this.url = new URL(`${apiBaseUrl}/taxonomicEnumTree/descendantsByRank`)
+    }
+
+    authorityID(authorityID: number): FindDescendantsByRankBuilder {
+        this._authorityID = authorityID
+        return this
+    }
+
+    taxonID(id: number): FindDescendantsByRankBuilder {
+        this._taxonID = id
+        this.url = new URL(`${this.baseUrl}/taxonomicEnumTree/descendantsByRank/${this._taxonID}/${this._rankID}`)
+        return this
+    }
+
+    rankID(id: number): FindDescendantsByRankBuilder {
+        this._rankID = id
+        this.url = new URL(`${this.baseUrl}/taxonomicEnumTree/descendantsByRank/${this._taxonID}/${this._rankID}`)
+        return this
+    }
+
+    build(): string {
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
         return super.build();
     }
 }

@@ -23,7 +23,7 @@ export class TaxonomicEnumTreeDto {
 
     @ApiProperty()
     @Expose()
-    taxon: Promise<Taxon>
+    taxon: TaxonDto
 
     @ApiProperty()
     @Expose()

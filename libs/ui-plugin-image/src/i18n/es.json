@@ -1,0 +1,17 @@
+{
+  "image.library.title": "Especies con imágenes",
+  "image.library.intro": "Esta página proporciona una lista completa de taxones que tienen imágenes. Utilice los controles a continuación para navegar y buscar imágenes por familia, género o especie.",
+  "image.library.names": "Nombres",
+  "image.library.browse.family": "Buscar por familia",
+  "image.library.browse.genus": "Buscar por género",
+  "image.library.browse.species": "Buscar por especie",
+  "image.details.title": "Detalles de la imagen",
+  "image.details.clickon": "Haga clic en la imagen para ampliar",
+  "image.details.sciname": "Nombre científico",
+  "image.details.caption": "Título",
+  "image.details.photographer": "Fotógrafo",
+  "image.details.manager": "Administrador",
+  "image.details.image.source": "Fuente de la imagen",
+  "image.details.image.notes": "Notas",
+  "image.details.image.locality": "Localidad"
+}
