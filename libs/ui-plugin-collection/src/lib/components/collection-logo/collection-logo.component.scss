@@ -1,6 +1,4 @@
-// TODO: This is just copy/pasted from the global theme: How can we export the site theme to plugins?
-$primaryColor: #0e6b88;
-$accentColor: #882a0e;
+@import "apps/ui/src/styles.scss";
 
 a {
     &:active, &:focus {

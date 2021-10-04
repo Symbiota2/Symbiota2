@@ -1,0 +1,105 @@
+<mat-card class="warning">
+    <mat-card-title fxLayoutAlign="start start">
+        <mat-icon>warning</mat-icon> Message from Developers
+    </mat-card-title>
+    <mat-card-content>
+        This page is still underdevelopment and may not function as desired. :(
+    </mat-card-content>
+</mat-card>
+<mat-card *ngIf="collection$ | async; let collection" fxLayout="column" fxLayoutGap="1rem">
+    <div fxLayout="row" fxLayoutGap="1rem" fxLayoutAlign="start center">
+        <symbiota2-collection-logo
+            [collectionID]="collection.id"
+            size="5rem"
+            src="{{ collection.icon }}"
+        >
+        </symbiota2-collection-logo>
+        <h1 id="title">
+            ({{ collection.collectionCode }}) {{ collection.collectionName }}
+            Comments
+        </h1>
+    </div>
+    <mat-card class="commentsSection" fxLayout="column" fxLayoutGap=".6rem">
+        <mat-paginator
+            class="paginator"
+            [length]="commentList.length"
+            [pageSize]="5"
+            [pageSizeOptions]="[5, 25, 50, 100]"
+            (page)="onPageChanged($event)"
+        ></mat-paginator>
+        <mat-card
+            class="comment"
+            fxLayout="column"
+            fxLayoutGap="0.2rem"
+            *ngFor="let comment of commentSlice"
+        >
+            <symbiota2-collection-comment [comment]="comment">
+            </symbiota2-collection-comment>
+            <div
+                *ngIf="isAdmin()"
+                fxLayout="row"
+                fxLayoutGap="0rem"
+                fxLayoutAlign="end start"
+            >
+                <button
+                    *ngIf="comment.public"
+                    mat-icon-button
+                    color="accent"
+                    aria-label="unlist comment"
+                    (click)="this.togglePublic(comment)"
+                    matTooltip="Set to Private"
+                    matTooltipPosition="above"
+                    matTooltipClass="accent"
+                >
+                    <mat-icon>visibility_off</mat-icon>
+                </button>
+                <button
+                    *ngIf="!comment.public"
+                    mat-icon-button
+                    color="accent"
+                    aria-label="relist comment"
+                    (click)="this.togglePublic(comment)"
+                    matTooltip="Set to Public"
+                    matTooltipPosition="above"
+                    matTooltipClass="accent"
+                >
+                    <mat-icon>visibility</mat-icon>
+                </button>
+                <button
+                    *ngIf="!comment.status"
+                    mat-icon-button
+                    color="primary"
+                    (click)="this.toggleStatus(comment)"
+                    aria-label="Mark as Reviewed"
+                    matTooltip="Mark as Reviewed"
+                    matTooltipPosition="above"
+                    matTooltipClass="primary"
+                >
+                    <mat-icon>check_circle</mat-icon>
+                </button>
+                <button
+                *ngIf="comment.status"
+                mat-icon-button
+                color="primary"
+                (click)="this.toggleStatus(comment)"
+                aria-label="Mark for Review"
+                matTooltip="Mark for Review"
+                matTooltipPosition="above"
+                matTooltipClass="primary"
+            >
+                <mat-icon>unpublished</mat-icon>
+            </button>
+                <button
+                    mat-icon-button
+                    color="warn"
+                    aria-label="Delete Comment"
+                    matTooltip="Delete Comment"
+                    matTooltipPosition="above"
+                    matTooltipClass="primary"
+                >
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+        </mat-card>
+    </mat-card>
+</mat-card>

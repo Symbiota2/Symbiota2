@@ -32,7 +32,8 @@ const defaultRoutes: Route[] = [
             defaultRoutes,
             {
                 relativeLinkResolution: 'legacy',
-                onSameUrlNavigation: 'reload'
+                onSameUrlNavigation: 'reload',
+                anchorScrolling: 'enabled'
             }
         )
     ],

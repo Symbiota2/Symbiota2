@@ -1,0 +1,15 @@
+<div mat-dialog-content id='window'>
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+        <mat-icon color="primary" id=logo>business</mat-icon>
+        <h2>New Institution</h2>
+        <button mat-icon-button id='closeBtn' (click)="onClose()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div fxLayout='row' id='form' fxLayoutAlign="start">
+        <symbiota2-institution-new
+        (submitClicked)='onSubmit($event)'
+        fxFlex="90">
+        </symbiota2-institution-new>
+    </div>
+</div>

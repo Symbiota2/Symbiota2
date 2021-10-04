@@ -1,0 +1,50 @@
+@import "apps/ui/src/styles.scss";
+
+.main{
+    transition: none !important;
+    box-shadow: none !important;
+}
+
+.title{
+    font-size: 28px !important;
+    color:rgb(80, 80, 80) !important;
+    padding-bottom: 1.2rem;
+
+    .mat-icon{
+        color: $primaryColor;
+        padding-right: 1rem;
+        height:36px !important;
+        width:36px !important;
+        font-size:36px !important;
+        font-family: 'Material Icons' !important;
+    }
+}
+
+
+
+.listContainer{
+    
+    margin-top: 1rem;
+
+    mat-card-title {
+        color:rgb(80, 80, 80);
+
+        mat-icon{
+            color: $primaryColor;
+            padding-right: 1rem;
+            height:36px !important;
+            width:36px !important;
+            font-size:36px !important;
+            font-family: 'Material Icons' !important;
+        }
+    }
+
+    mat-card-content{
+        margin-left: 2rem;
+    }
+}
+
+.formContainer{
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}

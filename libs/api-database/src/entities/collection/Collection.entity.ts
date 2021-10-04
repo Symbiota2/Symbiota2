@@ -39,7 +39,7 @@ export class Collection extends EntityProvider implements ApiCollectionOutput {
     id: number;
 
     @Column('varchar', { name: 'InstitutionCode', length: 45 })
-    institutionCode: string;
+    institutionCode: string = ""
 
     @ApiProperty()
     @Expose()

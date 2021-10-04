@@ -13,8 +13,9 @@ export class AlertService {
     showMessage(message: string) {
         this.snackbar.open(
             message,
-            "",
-            { duration: AlertService.MSG_DURATION }
+            '',
+            { duration: AlertService.MSG_DURATION, 
+                panelClass: ["message-snackbar"]}
         );
     }
 

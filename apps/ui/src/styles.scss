@@ -1,5 +1,6 @@
-@import "~@angular/material/theming";
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import "~@angular/material/theming";
 
 @import "./styles/_palette-gen.import";
 @import "./styles/theme.import";
@@ -28,10 +29,15 @@ $app-theme: mat-light-theme((
     font-family: $font;
 }
 
+.mat-icon{
+    font-family: 'Material Icons' !important;
+  }
+
 html, body {
     margin: 0;
     padding: 0;
     width: 100%;
+    scroll-behavior: smooth !important;
 }
 
 body {
@@ -60,8 +66,21 @@ legend {
     color: grey;
 }
 
+::ng-deep.mat-simple-snackbar{
+    text-align: center !important;
+    justify-content: center !important;
+}
+
 .error-snackbar {
     background-color: $warnColor;
+    text-align: center !important;
+    font-weight: bold;
+}
+
+.message-snackbar {
+    background-color: #49cc90;
+    text-align: center !important;
+    font-weight: bold !important;
 }
 
 .dynamic-tab-content {

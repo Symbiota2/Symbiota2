@@ -1,0 +1,125 @@
+<form [formGroup]="newInstForm" (ngSubmit)="onSubmit()" fxLayout="column">
+    <div fxLayout="row wrap" fxLayoutGap="2em grid">
+        <mat-form-field fxFlex="70">
+            <mat-label>Institution Name</mat-label>
+            <input formControlName="name" matInput />
+            <mat-error *ngIf="newInstForm.get('name').hasError('required')">
+                Institution Name is <strong>required</strong>
+            </mat-error>
+            <mat-error *ngIf="newInstForm.get('name').hasError('nameTaken')">
+                Name already in use
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field fxFlex="30">
+            <mat-label>Institution Code</mat-label>
+            <input
+                formControlName="code"
+                matInput
+                oninput="this.value = this.value.toUpperCase()"
+            />
+            <mat-error *ngIf="newInstForm.get('code').hasError('required')">
+                Code is <strong>required</strong>
+            </mat-error>
+            <mat-error *ngIf="newInstForm.get('code').hasError('codeTaken')">
+                Code already in use
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <div fxLayout="column wrap" fxLayoutGap="grid">
+        <mat-form-field>
+            <mat-label>Primary Address</mat-label>
+            <input formControlName="address1" matInput />
+            <mat-error *ngIf="newInstForm.get('address1').hasError('required')">
+                Primary Address is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Secondary Address</mat-label>
+            <input formControlName="address2" matInput />
+        </mat-form-field>
+    </div>
+    <div fxLayout="row wrap" fxLayoutGap="1em grid">
+        <mat-form-field>
+            <mat-label>City</mat-label>
+            <input formControlName="city" matInput />
+            <mat-error *ngIf="newInstForm.get('city').hasError('required')">
+                City is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>State/Province</mat-label>
+            <input formControlName="stateProvince" matInput />
+            <mat-error
+                *ngIf="newInstForm.get('stateProvince').hasError('required')"
+            >
+                State/Province is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <div fxLayout="row wrap" fxLayoutGap="2em grid">
+        <mat-form-field>
+            <mat-label>Postal Code</mat-label>
+            <input formControlName="postalCode" matInput />
+            <mat-error
+                *ngIf="newInstForm.get('postalCode').hasError('required')"
+            >
+                postalCode is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Country</mat-label>
+            <input formControlName="country" matInput />
+            <mat-error *ngIf="newInstForm.get('country').hasError('required')">
+                Country is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <div fxLayout="row wrap" fxLayoutGap="2em grid">
+        <mat-form-field>
+            <mat-label>Phone Number</mat-label>
+            <input formControlName="phone" type="number" matInput />
+            <mat-error *ngIf="newInstForm.get('phone').hasError('required')">
+                Phone Number is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Contact</mat-label>
+            <input formControlName="contact" matInput />
+            <mat-error *ngIf="newInstForm.get('contact').hasError('required')">
+                Contact is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <div fxLayout="row wrap" fxLayoutGap="2em grid">
+        <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input formControlName="email" matInput />
+            <mat-error *ngIf="newInstForm.get('email').hasError('required')">
+                Email is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>URL</mat-label>
+            <input formControlName="url" matInput />
+            <mat-error *ngIf="newInstForm.get('url').hasError('required')">
+                is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <mat-form-field fxFlex="30" appearance="fill">
+        <mat-label>Notes</mat-label>
+        <textarea matInput formControlName="notes"></textarea>
+    </mat-form-field>
+</form>
+<div id="buttons" fxLayout="row wrap">
+    <button
+        mat-raised-button
+        color="primary"
+        (click)="onSubmit()"
+        [disabled]="!newInstForm.valid"
+    >
+        Create Institution
+    </button>
+</div>
+<!-- <p><b>Form Status:</b> {{ newInstForm.status }}</p>
+<pre> <b>Form Values:</b> {{newInstForm.value | json}}</pre> -->

@@ -1,0 +1,117 @@
+<mat-card class="main">
+    <mat-card-title class="title" fxLayoutAlign="start center"><mat-icon color="primary">badge</mat-icon>User Permissions</mat-card-title>
+    <mat-card class="listContainer">
+        <mat-card-title fxLayoutAlign="start center"
+            ><mat-icon>local_police</mat-icon>Administrators</mat-card-title
+        >
+        <mat-card-content *ngIf="true; else noListedUsers">
+            <mat-list>
+                <mat-list-item
+                    *ngFor="let role of admins | async"
+                    fxLayout="row"
+                    fxLayoutGap="1rem"
+                >
+                    {{ role.user.username }}
+                    <button (click)="onRemoveRole(role)" mat-icon-button>
+                        <mat-icon color="warn">highlight_off</mat-icon>
+                    </button>
+                </mat-list-item>
+            </mat-list>
+        </mat-card-content>
+    </mat-card>
+    <mat-card class="listContainer">
+        <mat-card-title fxLayoutAlign="start center"
+            ><mat-icon>edit</mat-icon>Editors</mat-card-title
+        >
+        <mat-card-content *ngIf="true; else noListedUsers">
+            <mat-list>
+                <mat-list-item
+                    *ngFor="let role of editors | async"
+                    fxLayout="row"
+                    fxLayoutGap="1rem"
+                >
+                    {{ role.user.username }}
+                    <button (click)="onRemoveRole(role)" mat-icon-button>
+                        <mat-icon color="warn">highlight_off</mat-icon>
+                    </button>
+                </mat-list-item>
+            </mat-list>
+        </mat-card-content>
+    </mat-card>
+    <mat-card class="listContainer">
+        <mat-card-title fxLayoutAlign="start center"
+            ><mat-icon>local_library</mat-icon>Rare Species
+            Readers</mat-card-title
+        >
+        <mat-card-content
+            *ngIf="true; else noListedUsers"
+            fxLayout="row"
+            fxLayoutGap="1rem"
+        >
+            <mat-list>
+                <mat-list-item *ngFor="let role of rareSpeciesReaders | async">
+                    {{ role.user.username }}
+                    <button (click)="onRemoveRole(role)" mat-icon-button>
+                        <mat-icon color="warn">highlight_off</mat-icon>
+                    </button>
+                </mat-list-item>
+            </mat-list>
+        </mat-card-content>
+    </mat-card>
+    <mat-card class="formContainer" fxLayout="column">
+        <mat-card-title fxLayoutAlign="start center"
+            >Add User Permissions</mat-card-title
+        >
+        <form
+            fxLayout="column"
+            [formGroup]="newPermissionForm"
+            fxLayoutGap="0.5rem"
+            fxLayoutAlign="start start"
+        >
+            <symbiota2-user-searchable-select
+                (selectUser)="onUserSelect($event)"
+            ></symbiota2-user-searchable-select>
+            <div fxLayout="column" fxLayoutGap=".5rem">
+                <mat-label>Roles</mat-label>
+                <mat-radio-group
+                    formControlName="role"
+                    aria-label="Select a user permission"
+                    fxLayout="column"
+                    fxLayoutGap="1rem"
+                >
+                    <mat-radio-button
+                        value="{{ apiUserRoleName.COLLECTION_ADMIN }}"
+                        >Administrator</mat-radio-button
+                    >
+                    <mat-radio-button
+                        value="{{ apiUserRoleName.COLLECTION_EDITOR }}"
+                        >Editor</mat-radio-button
+                    >
+                    <mat-radio-button
+                        value="{{ apiUserRoleName.RARE_SPECIES_READER }}"
+                        >Rare Species Readers</mat-radio-button
+                    >
+                </mat-radio-group>
+            </div>
+            <mat-error
+                *ngIf="
+                    newPermissionForm.hasError('userHasRole')
+                "
+            >
+                <b>User already has role</b>
+            </mat-error>
+
+            <button
+                mat-raised-button
+                color="primary"
+                [disabled]="!newPermissionForm.valid"
+                (click)="onApplyRoles()"
+                fxFlex="25"
+            >
+                Apply Roles to User
+            </button>
+        </form>
+    </mat-card>
+</mat-card>
+
+<ng-template #noListedUsers> No listed users for this role</ng-template>

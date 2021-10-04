@@ -1,65 +1,129 @@
-import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Collection } from '../../dto/Collection.output.dto';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { map } from 'rxjs/operators';
-import { formToQueryParams } from '@symbiota2/ui-common';
+import {
+    FormGroup,
+    Validators,
+    FormBuilder,
+} from '@angular/forms';
+import { AlertService, formToQueryParams, User, UserService } from '@symbiota2/ui-common';
 import { Observable } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { CollectionService } from '@symbiota2/ui-plugin-collection';
+import { InstitutionService } from '../../services/institution.service';
+import { CollectionAsyncValidators } from './validators';
+import { Institution } from '@symbiota2/api-database';
+import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
+import { InstitutionNewDialogComponent } from '../institution-new-dialog/institution-new-dialog.component';
+import { CollectionInputDto } from '../../dto/Collection.input.dto';
 
 @Component({
     selector: 'symbiota2-collection-editor',
     templateUrl: './collection-editor.component.html',
-    styleUrls: ['./collection-editor.component.scss']
+    styleUrls: ['./collection-editor.component.scss'],
 })
 export class CollectionEditorComponent implements OnInit {
-    @Input()
-    collection!: Partial<Collection>;
 
-    @Output()
-    submitClicked = new EventEmitter<void>();
+    inst$: Observable<Institution[]>;
+    categories$: Observable<ApiCollectionCategoryOutput[]>;
 
-    @Output()
-    resetClicked = new EventEmitter<void>();
-
-    constructor() { }
-
-    controlName = new FormControl('');
-    controlCode = new FormControl('');
-    controlDesc = new FormControl('');
-    controlHomePage = new FormControl('');
-    controlUrl = new FormControl('');
-    controlContact = new FormControl('');
-    controlEmail = new FormControl('');
-    controlLat = new FormControl(null, [Validators.min(-90), Validators.max(90)]);
-    controlLng = new FormControl(null, [Validators.min(-180), Validators.max(180)]);
-    controlType = new FormControl('');
-    controlMgmtType = new FormControl('');
-    controlRightsHolder = new FormControl('');
-    controlRights = new FormControl('');
-    controlUsage = new FormControl('');
-    controlAccessRights = new FormControl('');
-
-    form = new FormGroup({
-        'collectionName': this.controlName,
-        'collectionCode': this.controlCode,
-        'fullDescription': this.controlDesc,
-        'homePage': this.controlHomePage,
-        'individualUrl': this.controlUrl,
-        'contact': this.controlContact,
-        'email': this.controlEmail,
-        'latitude': this.controlLat,
-        'longitude': this.controlLng,
-        'rightsHolder': this.controlRightsHolder,
-        'rights': this.controlRights,
-        'usageTerm': this.controlUsage,
-        'accessRights': this.controlAccessRights,
-    });
-
-    @Output()
-    collectionChange: Observable<Partial<Collection>> = this.form.valueChanges.pipe(
-        map(() => this.form.value)
+    editCollectionForm: FormGroup = this.fb.group({
+        collectionName: [
+            '',
+            Validators.required,
+            CollectionAsyncValidators.nameTaken(this.collections),
+        ],
+        collectionCode: [
+            '',
+            Validators.required,
+            CollectionAsyncValidators.codeTaken(this.collections),
+        ],
+        institutionID: ['0', Validators.required],
+        fullDescription: [''],
+        homePage: ['', Validators.required],
+        contact: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        // contact2: [''],
+        // email2: ['', Validators.email],
+        latitude: [
+            '0',
+            [Validators.required, Validators.min(-90), Validators.max(90)],
+        ],
+        longitude: [
+            '0',
+            [Validators.required, Validators.min(-180), Validators.max(180)],
+        ],
+        // category: [''],
+        rights: ['', Validators.required],
+        //aggregators: [false],
+        icon: [''],
+        type: ['', Validators.required],
+        managementType: ['', Validators.required],
+    }, {asyncValidators: CollectionAsyncValidators.valuesChanged(this.collections.currentCollection)}
     );
+    
+
+    constructor(
+        private fb: FormBuilder,
+        private readonly collections: CollectionService,
+        private readonly institutions: InstitutionService,
+        private readonly dialog: MatDialog,
+        private readonly alerts: AlertService
+    ) {}
 
     ngOnInit() {
-        this.form.patchValue(this.collection);
+        this.collections.currentCollection.subscribe((collection) => {
+            this.categories$ = this.collections.categories;
+            this.inst$ = this.institutions.getInstitutions();
+            this.patchForm(collection);
+        })
+    }
+
+    onApplyChanges(): void {
+        var updatedCollection: Partial<CollectionInputDto> = new CollectionInputDto(this.editCollectionForm.value);
+        this.collections.updateCurrentCollection(updatedCollection);
+    }
+
+    patchForm(collection: Collection): void {
+        this.editCollectionForm
+            .get('collectionName')
+            .setValue(collection.collectionName);
+        this.editCollectionForm.get('collectionCode').setValue(collection.collectionCode);
+        this.editCollectionForm.get('institutionID').setValue(collection.institution.id);
+        this.editCollectionForm
+            .get('fullDescription')
+            .setValue(collection.fullDescription);
+        this.editCollectionForm
+            .get('homePage')
+            .setValue(collection.homePage);
+        this.editCollectionForm.get('contact').setValue(collection.contact);
+        this.editCollectionForm.get('email').setValue(collection.email);
+        this.editCollectionForm.get('latitude').setValue(collection.latitude.toString());
+        this.editCollectionForm.get('longitude').setValue(collection.longitude.toString());
+        this.editCollectionForm
+            .get('rights')
+            .setValue(collection.rights);
+        this.editCollectionForm
+            .get('icon')
+            .setValue(
+                collection.icon
+            );
+        this.editCollectionForm.get('type').setValue(collection.type);
+        this.editCollectionForm.get('managementType').setValue(collection.managementType);
+        
+    }
+
+    onAddNewInst(): void {
+        const dialog = this.dialog.open(InstitutionNewDialogComponent, {
+            width: '100vw',
+            disableClose: true,
+        });
+        dialog.afterClosed().subscribe((inst: Institution) => {
+            if (inst !== null) {
+                this.inst$ = this.institutions.getInstitutions();
+                this.editCollectionForm
+                    .get('institutionID')
+                    .setValue(String(inst.id));
+            }
+        });
     }
 }

@@ -1,0 +1,49 @@
+@import "apps/ui/src/styles.scss";
+
+.comment{
+    padding: 0rem;
+    margin-left: .4rem;
+    margin-right: .4rem;
+    border-radius: 0.55rem;
+    outline: scale-color($primaryColor, $alpha: -80%) 1.5px solid;
+
+    mat-icon{
+        font-size: 28px !important;
+    
+    }
+}
+
+::ng-deep.accent{
+    background: $accentColor;
+}
+
+::ng-deep.primary{
+    background: $primaryColor;
+}
+
+
+#title{
+    color:rgb(80, 80, 80);
+    font-size: xx-large;
+}
+
+.commentsSection{
+    box-shadow: none !important;
+    padding: 0px 0px 1rem 0px;
+    border-radius: 0.5rem;
+}
+
+.paginator{
+    border-radius: 0.5rem, 0.5rem, 0px, 0px;
+}
+
+.warning{
+    background-color: #ffe082;
+    color: #ffa000;
+    margin-bottom: .5rem;
+
+    mat-icon{
+        font-size: 36px;
+        padding-right: 1rem;
+    }
+}
