@@ -73,7 +73,7 @@ export class UserController {
     @ApiBearerAuth()
     @ApiResponse({ status: HttpStatus.OK, type: UserOutputDto, isArray: true })
     @SerializeOptions({ groups: [UserOutputDto.GROUP_LIST] })
-    @UseGuards(JwtAuthGuard, SuperAdminGuard)
+    @UseGuards(JwtAuthGuard)
     async findAll(@Query() query?: FindAllQuery): Promise<UserOutputDto[]> {
         if (query && query.username) {
             const user = await this.userService.findByLogin(query.username);

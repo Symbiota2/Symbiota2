@@ -7,7 +7,12 @@ import {
     Param, Post,
     SerializeOptions, UseGuards
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiOperation,
+    ApiResponse,
+    ApiTags
+} from '@nestjs/swagger';
 import {
     CategoryOutputDto
 } from './dto/category.output.dto';
@@ -69,6 +74,7 @@ export class CategoryController {
 
     @Post(':id/collections')
     @ApiOperation({ summary: 'Add a collection to a category' })
+    @ApiBearerAuth()
     @UseGuards(JwtAuthGuard, SuperAdminGuard)
     async addCollectionToCategory(@Param('id') id: number, @Body() body: CollectionIDBody): Promise<CategoryOutputDto> {
         const category = await this.categories.addCollectionToCategory(id, body.collectionID);
@@ -80,6 +86,7 @@ export class CategoryController {
 
     @Delete(':id/collections')
     @ApiOperation({ summary: 'Remove a collection from a category' })
+    @ApiBearerAuth()
     @UseGuards(JwtAuthGuard, SuperAdminGuard)
     async removeCollectionFromCategory(@Param('id') id: number, @Body() body: CollectionIDBody): Promise<CategoryOutputDto> {
         const category = await this.categories.removeCollectionFromCategory(id, body.collectionID);

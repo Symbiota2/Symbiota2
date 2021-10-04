@@ -85,10 +85,10 @@ export class UserOutputDto implements ApiUser {
     isPublic: boolean;
 
     @ApiProperty()
-    @Expose({ groups: [UserOutputDto.GROUP_SINGLE, UserOutputDto.GROUP_LIST] })
+    @Expose({ groups: [UserOutputDto.GROUP_SINGLE] })
     initialTimestamp: Date;
 
     @ApiProperty()
-    @Expose({ groups: [UserOutputDto.GROUP_SINGLE, UserOutputDto.GROUP_LIST] })
+    @Expose({ groups: [UserOutputDto.GROUP_SINGLE] })
     lastLogin: Date;
 }

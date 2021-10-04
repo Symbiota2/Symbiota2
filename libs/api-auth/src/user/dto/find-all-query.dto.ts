@@ -30,14 +30,6 @@ export class FindAllQuery implements ApiQueryFindUsers {
     @IsOptional()
     lastName?: string;
 
-    @ApiProperty({ required: false })
-    @IsString()
-    @IsOptional()
-    email?: string;
-
-    @ApiProperty({ required: false, type: String, isArray: true })
-    'email[]'?: string[];
-
     @ApiProperty({ type: 'number', required: false, default: 10 })
     @Type(() => Number)
     @IsInt()
