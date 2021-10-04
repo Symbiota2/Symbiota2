@@ -1,10 +1,11 @@
 import {
-    Controller,
+    Body,
+    Controller, Delete,
     Get,
     HttpStatus,
     NotFoundException,
-    Param,
-    SerializeOptions
+    Param, Post,
+    SerializeOptions, UseGuards
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -12,9 +13,11 @@ import {
 } from './dto/category.output.dto';
 import { CategoryService } from './category.service';
 import { CollectionService } from '../collection.service';
+import { CollectionIDBody } from './dto/collection-id-body.dto';
+import { JwtAuthGuard, SuperAdminGuard } from '@symbiota2/api-auth';
 
-@ApiTags('Collections')
-@Controller('collections/categories')
+@ApiTags('Collection Categories')
+@Controller('collection-categories')
 export class CategoryController {
     constructor(
         private readonly collections: CollectionService,
@@ -59,6 +62,32 @@ export class CategoryController {
             throw new NotFoundException();
         }
 
+        const dto = new CategoryOutputDto(category);
+        dto.collections = collections;
+        return dto;
+    }
+
+    @Post(':id/collections')
+    @ApiOperation({ summary: 'Add a collection to a category' })
+    @UseGuards(JwtAuthGuard, SuperAdminGuard)
+    async addCollectionToCategory(@Param('id') id: number, @Body() body: CollectionIDBody): Promise<CategoryOutputDto> {
+        const category = await this.categories.addCollectionToCategory(id, body.collectionID);
+        const collections = await this.collections.findByCategory(id);
+        const dto = new CategoryOutputDto(category);
+        dto.collections = collections;
+        return dto;
+    }
+
+    @Delete(':id/collections')
+    @ApiOperation({ summary: 'Remove a collection from a category' })
+    @UseGuards(JwtAuthGuard, SuperAdminGuard)
+    async removeCollectionFromCategory(@Param('id') id: number, @Body() body: CollectionIDBody): Promise<CategoryOutputDto> {
+        const category = await this.categories.removeCollectionFromCategory(id, body.collectionID);
+        if (!category) {
+            throw new NotFoundException();
+        }
+
+        const collections = await this.collections.findByCategory(id);
         const dto = new CategoryOutputDto(category);
         dto.collections = collections;
         return dto;

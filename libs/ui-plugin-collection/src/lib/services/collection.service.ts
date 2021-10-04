@@ -33,7 +33,7 @@ interface FindAllParams {
 @Injectable()
 export class CollectionService {
     private readonly COLLECTION_BASE_URL = `${this.api.apiRoot()}/collections`;
-    private readonly CATEGORY_BASE_URL = `${this.COLLECTION_BASE_URL}/categories`;
+    private readonly CATEGORY_BASE_URL = `${this.api.apiRoot()}/collection-categories`;
 
     private readonly currentCategories = new BehaviorSubject<ApiCollectionCategoryOutput[]>([]);
     private readonly collectionQueryParams = new BehaviorSubject<FindAllParams>(null);
