@@ -64,7 +64,6 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     associatedTaxa: string;
     basisOfRecord: string;
     behavior: string;
-    collectionIDStr: string;
     coordinatePrecision: number;
     coordinateUncertaintyInMeters: number | null;
     country: string;
@@ -104,7 +103,6 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     informationWithheld: string;
     infraspecificEpithet: string;
     initialTimestamp: Date | null;
-    institutionID: string;
     labelProject: string;
     language: string;
     lastModifiedTimestamp: Date;

@@ -20,7 +20,7 @@ import { OccurrenceUpload } from '@symbiota2/api-database';
 import { QUEUE_ID_OCCURRENCE_UPLOAD } from '../queues/occurrence-upload.queue';
 import { OccurrenceUploadJob } from '../queues/occurrence-upload.processor';
 import { csvIterator } from '@symbiota2/api-common';
-import { DwcArchiveBuilder } from '@symbiota2/dwc';
+import { DwcArchiveBuilder, dwcRecordType } from '@symbiota2/dwc';
 import { v4 as uuid4 } from 'uuid';
 import { join as pathJoin } from 'path';
 

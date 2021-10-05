@@ -1,11 +1,11 @@
 import {
     DWC_SCHEMA_LOCATION,
     DWC_XML_NS,
-    DwCAMeta,
-    DwCAMetaExtensionFileType,
-    DwCAMetaFieldType,
-    DwCAMetaFileLocationType,
-    DwCASerializable
+    IDwCAMeta,
+    IDwCAMetaExtensionFileType,
+    IDwCAMetaFieldType,
+    IDwCAMetaFileLocationType,
+    IDwCASerializable
 } from '../interfaces';
 import * as xml2js from 'xml2js';
 import { createWriteStream, WriteStream, promises as fsPromises } from 'fs';
@@ -25,7 +25,7 @@ export class DwcArchiveBuilder {
     private csvCoreFile: WriteStream;
 
     tmpDir: string;
-    meta: DwCAMeta;
+    meta: IDwCAMeta;
 
     constructor(tmpDir: string, coreRowType: 'Occurrence' | 'Taxon') {
         this.tmpDir = tmpDir;
@@ -44,10 +44,10 @@ export class DwcArchiveBuilder {
                         fieldsEnclosedBy: DwcArchiveBuilder.DWC_FIELD_ENCLOSE,
                         encoding: "UTF-8"
                     },
-                    files: new Array<DwCAMetaFileLocationType>(),
-                    field: new Array<DwCAMetaFieldType>()
+                    files: new Array<IDwCAMetaFileLocationType>(),
+                    field: new Array<IDwCAMetaFieldType>()
                 },
-                extension: new Array<DwCAMetaExtensionFileType>()
+                extension: new Array<IDwCAMetaExtensionFileType>()
             }
         }
 
@@ -90,7 +90,7 @@ export class DwcArchiveBuilder {
         return line;
     }
 
-    addCoreRecord(serializable: DwCASerializable): DwcArchiveBuilder {
+    addCoreRecord(serializable: IDwCASerializable): DwcArchiveBuilder {
         const asRecord = serializable.asDwCRecord();
 
         if (this.coreFields.length === 0) {
@@ -106,7 +106,7 @@ export class DwcArchiveBuilder {
                 else {
                     term = `${DwcArchiveBuilder.DWC_FIELD_PREFIX}/${fields[i]}`;
                 }
-                const fieldDesc: DwCAMetaFieldType = {
+                const fieldDesc: IDwCAMetaFieldType = {
                     $: {
                         term: term,
                         index: i
