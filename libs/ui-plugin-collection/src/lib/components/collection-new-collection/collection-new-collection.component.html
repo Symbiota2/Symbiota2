@@ -12,11 +12,11 @@
             <ul class="navList">
                 <li><a (click)="onClickScroll('collection')">Collection</a></li>
                 <li><a (click)="onClickScroll('contact1')">Contact</a></li>
-                <li>
+                <!-- <li>
                     <a (click)="onClickScroll('contact2')"
                         >Additional Contact</a
                     >
-                </li>
+                </li> -->
                 <li>
                     <a (click)="onClickScroll('submit')"
                         >Submit</a
@@ -135,7 +135,7 @@
                                 <mat-label>Institution *</mat-label>
                                 <mat-select formControlName="institutionID">
                                     <mat-option
-                                        *ngFor="let i of inst"
+                                        *ngFor="let i of inst$ | async"
                                         value="{{ i.id }}"
                                         >({{ i.code }}) {{ i.name }}</mat-option
                                     >
@@ -168,17 +168,17 @@
                     <div fxLayout="column" fxFlex="30">
                         <mat-form-field appearance="outline">
                             <mat-label>Category *</mat-label>
-                            <mat-select formControlName="category">
+                            <mat-select formControlName="categoryID">
                                 <mat-option
-                                    *ngFor="let cat of categories"
-                                    value="{{ cat.id }}"
+                                    *ngFor="let cat of categories$ | async"
+                                    [value]="cat.id"
                                     >{{ cat.category }}</mat-option
                                 >
                             </mat-select>
                             <mat-error
                                 *ngIf="
                                     newCollectionForm
-                                        .get('category')
+                                        .get('categoryID')
                                         .hasError('required')
                                 "
                             >
@@ -440,7 +440,7 @@
                         </mat-form-field>
                     </mat-card-content>
                 </mat-card>
-                <mat-card id="contact2" class="contact">
+                <!-- <mat-card id="contact2" class="contact">
                     <mat-card-title class="title" fxLayoutAlign="start center">
                         <mat-icon color="primary" class="instIcon"
                             >account_circle</mat-icon
@@ -479,7 +479,7 @@
                             />
                         </mat-form-field>
                     </mat-card-content>
-                </mat-card>
+                </mat-card> -->
             </div>
             <div fxLayoutAlign="start">
                 <button
@@ -495,19 +495,8 @@
                     Create New Collection
                 </button>
             </div>
+            <!-- <p><b>Form Status:</b> {{ newCollectionForm.status }}</p>
+            <pre> <b>Form Values:</b> {{newCollectionForm.value | json}}</pre> -->
         </mat-sidenav-content>
     </mat-sidenav-container>
-
-    <!-- <div>
-        <button
-            mat-raised-button
-            color="primary"
-            (click)="populate()"
-            type="button"
-        >
-            Magic Button
-        </button>
-    </div>
-    <p><b>Form Status:</b> {{ newCollectionForm.status }}</p>
-    <pre> <b>Form Values:</b> {{newCollectionForm.value | json}}</pre> -->
 </form>

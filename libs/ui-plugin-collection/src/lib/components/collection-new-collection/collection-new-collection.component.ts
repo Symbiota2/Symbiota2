@@ -1,11 +1,10 @@
-
 import { Component, OnInit } from '@angular/core';
-import { Validators, FormBuilder, FormControl } from '@angular/forms';
+import { Validators, FormBuilder} from '@angular/forms';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
 import { CollectionService } from '../../services/collection.service';
-import { User, UserService } from '@symbiota2/ui-common';
-import { map } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { AlertService } from '@symbiota2/ui-common';
+import { map, tap } from 'rxjs/operators';
+import { Observable} from 'rxjs';
 import { Institution } from '@symbiota2/api-database';
 import { InstitutionService } from '../../services/institution.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,9 +15,7 @@ import { CollectionAsyncValidators } from './validators';
 import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 import { ViewportScroller } from '@angular/common';
 
-
-//TODO: add back end support for additional fields
-//TODO: add category functionality
+//TODO: add back end and db support for additional fields
 
 @Component({
     selector: 'symbiota2-collection-new-collection',
@@ -26,20 +23,19 @@ import { ViewportScroller } from '@angular/common';
     styleUrls: ['./collection-new-collection.component.scss'],
 })
 export class CollectionNewCollectionComponent implements OnInit {
-    user: User;
-    inst: Institution[];
-    categories: ApiCollectionCategoryOutput[];
+    inst$: Observable<Institution[]>;
+    categories$: Observable<ApiCollectionCategoryOutput[]>;
 
     newCollectionForm = this.fb.group({
         collectionName: [
             '',
             Validators.required,
-            CollectionAsyncValidators.nameTaken(this.collections),
+            CollectionAsyncValidators.nameTaken(this.collectionService),
         ],
         collectionCode: [
             '',
             Validators.required,
-            CollectionAsyncValidators.codeTaken(this.collections),
+            CollectionAsyncValidators.codeTaken(this.collectionService),
         ],
         institutionID: ['0', Validators.required],
         fullDescription: [''],
@@ -48,8 +44,8 @@ export class CollectionNewCollectionComponent implements OnInit {
         contact: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
         role2: [''],
-        contact2:[''],
-        email2:['', Validators.email],
+        contact2: [''],
+        email2: ['', Validators.email],
         latitude: [
             '0',
             [Validators.required, Validators.min(-90), Validators.max(90)],
@@ -58,7 +54,7 @@ export class CollectionNewCollectionComponent implements OnInit {
             '0',
             [Validators.required, Validators.min(-180), Validators.max(180)],
         ],
-        category: ['', Validators.required],
+        categoryID: ['', Validators.required],
         rights: ['', Validators.required],
         aggregators: [false],
         icon: [''],
@@ -68,38 +64,41 @@ export class CollectionNewCollectionComponent implements OnInit {
 
     constructor(
         private fb: FormBuilder,
-        private collections: CollectionService,
-        private users: UserService,
-        private institutions: InstitutionService,
+        private collectionService: CollectionService,
+        private institutionService: InstitutionService,
         private dialog: MatDialog,
+        private alertService: AlertService,
         private rt: Router,
-        private viewportScroller: ViewportScroller,
+        private viewportScroller: ViewportScroller
     ) {}
 
     ngOnInit(): void {
-        this.getUser();
-        this.getCategories();
-        this.getInstitutions();
+        this.categories$ = this.collectionService.categories;
+        this.inst$ = this.institutionService.getInstitutions();
     }
 
     onSubmit(): void {
         var newCollection = new CollectionInputDto(
             this.newCollectionForm.value
         );
-        if (this.user.isSuperAdmin()) {
-            //NOTE: requires user to be super admin to create new collections
-            this.collections
-                .createNewCollection(newCollection, this.user.token)
-                .subscribe((collection) =>
+        this.collectionService
+            .createNewCollection(newCollection)
+            .subscribe((collection) => {
+                if (!!collection) {
+
+                    this.alertService.showMessage("New Collection Created");
+
                     this.rt.navigate([
                         '/' +
                             ROUTE_COLLECTION_PROFILE.replace(
                                 ':collectionID',
                                 collection.id.toString()
                             ),
-                    ])
-                );
-        }
+                    ]);
+                } else {
+                    this.alertService.showError("Error: something went wrong creating new collection")
+                }
+            });
     }
 
     onAddNewInst(): void {
@@ -109,34 +108,15 @@ export class CollectionNewCollectionComponent implements OnInit {
         });
         dialog.afterClosed().subscribe((inst: Institution) => {
             if (inst !== null) {
-                this.inst.push(inst);
-                this.newCollectionForm
-                    .get('institutionID')
-                    .setValue(String(inst.id));
+                this.inst$ = this.institutionService.getInstitutions().pipe(
+                    tap((_) => {
+                        this.newCollectionForm
+                            .get('institutionID')
+                            .setValue(String(inst.id));
+                    })
+                );
             }
         });
-    }
-
-    getCategories(): void {
-        this.collections.categories.subscribe(
-            (categories) => (this.categories = categories)
-        );
-    }
-
-    getInstitutions(): void {
-        this.institutions
-            .getInstitutions()
-            .subscribe((institutions) => (this.inst = institutions));
-    }
-
-    getUser(): void {
-        this.users.currentUser
-            .pipe(
-                map((user) => {
-                    return user;
-                })
-            )
-            .subscribe((user) => (this.user = user));
     }
 
     onClickScroll(elementId: string): void {

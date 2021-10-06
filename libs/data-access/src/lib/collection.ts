@@ -109,4 +109,5 @@ export interface ApiCollectionInput {
     rights: string;
     usageTerm: string;
     accessRights: string;
+    categoryID: number;
 }

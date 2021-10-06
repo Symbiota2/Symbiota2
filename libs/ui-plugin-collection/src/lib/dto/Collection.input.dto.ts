@@ -23,4 +23,5 @@ export class CollectionInputDto implements ApiCollectionInput {
     usageTerm: string;
     accessRights: string;
     initialTimestamp: string;
+    categoryID: number;
 }

@@ -7,7 +7,10 @@ import {
     ReplaySubject,
     throwError,
 } from 'rxjs';
-import { CollectionCategory } from '../dto/Category.output.dto';
+import {
+    CollectionCategory,
+    CollectionIDBody,
+} from '../dto/Category.output.dto';
 import {
     AlertService,
     ApiClientService,
@@ -42,8 +45,6 @@ import {
     CollectionRoleInput,
     CollectionRoleOutput,
 } from '../dto/CollectionRole.dto';
-import * as e from 'express';
-import { ConstraintMetadata } from 'class-validator/types/metadata/ConstraintMetadata';
 
 interface FindAllParams {
     id?: number | number[];
@@ -124,22 +125,75 @@ export class CollectionService {
     }
 
     createNewCollection(
-        collectionData: Partial<CollectionInputDto>,
-        userToken: string
+        collectionData: Partial<CollectionInputDto>
     ): Observable<Collection> {
-        const req = this.api
-            .queryBuilder(this.COLLECTION_BASE_URL)
-            .post()
-            .body(collectionData)
-            .addJwtAuth(userToken)
-            .build();
+        return this.users.currentUser.pipe(
+            //verify user can create new collection
+            switchMap((user) => {
+                if (!!user && user.isSuperAdmin()) {
+                    //create request for api
+                    const req = this.api
+                        .queryBuilder(this.COLLECTION_BASE_URL)
+                        .post()
+                        .body(collectionData)
+                        .addJwtAuth(user.token)
+                        .build();
 
-        return this.api.send(req).pipe(
-            map((collection: ApiCollectionOutput) => {
-                if (collection === null) {
+                    //send request to api
+                    return this.api.send(req).pipe(
+                        map((collection: ApiCollectionOutput) => {
+                            if (!!collection) {
+                                //add collection to Category if it exists
+                                this.addCollectionToCategory(
+                                    collectionData.categoryID,
+                                    collection.id
+                                ).subscribe();
+                            }
+
+                            return new Collection(collection);
+                        })
+                    );
+                } else {
+                    this.alerts.showError(
+                        'Create new collection: Permission Denied'
+                    );
                     return null;
                 }
-                return new Collection(collection);
+            })
+        );
+    }
+
+    addCollectionToCategory(
+        categoryID: number,
+        collectionID: number
+    ): Observable<CollectionCategory> {
+        var collectionIDBody = new CollectionIDBody(collectionID);
+
+        return this.users.currentUser.pipe(
+            switchMap((user) => {
+                if (!!user && user.isSuperAdmin()) {
+                    //create request for api
+                    const req = this.api
+                        .queryBuilder(
+                            `${this.CATEGORY_BASE_URL}/${categoryID}/collections`
+                        )
+                        .post()
+                        .body(collectionIDBody)
+                        .addJwtAuth(user.token)
+                        .build();
+
+                    return this.api.send(req).pipe(
+                        map((res: CollectionCategory) => {
+                            if (!res) {
+                                console.log(
+                                    'Error adding collection to category'
+                                );
+                            }
+
+                            return res;
+                        })
+                    );
+                }
             })
         );
     }
@@ -196,7 +250,8 @@ export class CollectionService {
                     }
                 }
                 return false;
-            })
+            }),
+            take(1)
         );
     }
 
@@ -226,12 +281,16 @@ export class CollectionService {
                     }
                 }
                 return false;
-            })
+            }),
+            take(1)
         );
     }
 
+    //TODO: move role services to separate CollectionRolesService
+
     getCurrentRoles(): Observable<CollectionRoleOutput[]> {
         return this.users.currentUser.pipe(
+            //TODO: create function out of checking user permissions
             switchMap((user) => {
                 if (!!user) {
                     return this.currentCollection.pipe(

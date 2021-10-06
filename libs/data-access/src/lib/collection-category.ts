@@ -6,3 +6,7 @@ export interface ApiCollectionCategoryOutput {
     icon: string;
     collections: ApiCollectionListItem[];
 }
+
+export interface ApiCollectionIDBody {
+    collectionID: number;
+}
