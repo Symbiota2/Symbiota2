@@ -39,7 +39,7 @@ import { CharacteristicTaxonLink } from '../characteristic';
 import { EntityProvider } from '../../entity-provider.class';
 import { DwCField, DwCID, DwCRecord } from '@symbiota2/dwc';
 
-@DwCRecord('https://rs.tdwg.org/dwc/terms/Taxon')
+@DwCRecord('http://rs.tdwg.org/dwc/terms/Taxon')
 @Index('sciname_unique', ['scientificName', 'rankID', 'author'], { unique: true })
 @Index('rankid_index', ['rankID'])
 @Index('unitname1_index', ['unitName1', 'unitName2'])
@@ -49,7 +49,7 @@ import { DwCField, DwCID, DwCRecord } from '@symbiota2/dwc';
 @Entity('taxa')
 export class Taxon extends EntityProvider {
     @DwCID()
-    @DwCField('https://rs.tdwg.org/dwc/terms/taxonID')
+    @DwCField('http://rs.tdwg.org/dwc/terms/taxonID')
     @PrimaryGeneratedColumn({ type: 'int', name: 'TID', unsigned: true })
     id: number;
 
@@ -59,7 +59,7 @@ export class Taxon extends EntityProvider {
     @Column('smallint', { name: 'RankId', nullable: true, unsigned: true })
     rankID: number | null;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/scientificName')
+    @DwCField('http://rs.tdwg.org/dwc/terms/scientificName')
     @Column('varchar', { name: 'SciName', length: 250 })
     scientificName: string;
 
@@ -81,7 +81,7 @@ export class Taxon extends EntityProvider {
     @Column('varchar', { name: 'UnitName3', nullable: true, length: 35 })
     unitName3: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/scientificNameAuthorship')
+    @DwCField('http://rs.tdwg.org/dwc/terms/scientificNameAuthorship')
     @Column('varchar', { name: 'Author', nullable: true, length: 100 })
     author: string;
 
@@ -92,14 +92,14 @@ export class Taxon extends EntityProvider {
     })
     phyloSortSequence: number | null;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/taxonomicStatus')
+    @DwCField('http://rs.tdwg.org/dwc/terms/taxonomicStatus')
     @Column('varchar', { name: 'Status', nullable: true, length: 50 })
     status: string;
 
     @Column('varchar', { name: 'Source', nullable: true, length: 250 })
     source: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/taxonRemarks')
+    @DwCField('http://rs.tdwg.org/dwc/terms/taxonRemarks')
     @Column('varchar', { name: 'Notes', nullable: true, length: 250 })
     notes: string;
 

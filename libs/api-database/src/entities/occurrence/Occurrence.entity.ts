@@ -45,9 +45,9 @@ import {
     DwCRecord
 } from '@symbiota2/dwc';
 
-// https://dwc.tdwg.org/terms/#occurrence
+// http://dwc.tdwg.org/terms/#occurrence
 
-@DwCRecord('https://rs.tdwg.org/dwc/terms/Occurrence')
+@DwCRecord('http://rs.tdwg.org/dwc/terms/Occurrence')
 @Index('Index_collid', ['collectionID', 'dbpk'], { unique: true })
 @Index(['scientificName'])
 @Index('Index_family', ['family'])
@@ -88,7 +88,7 @@ export class Occurrence extends EntityProvider {
     @Column('varchar', { name: 'dbpk', nullable: true, length: 150 })
     dbpk: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/basisOfRecord')
+    @DwCField('http://rs.tdwg.org/dwc/terms/basisOfRecord')
     @Column('varchar', {
         name: 'basisOfRecord',
         nullable: true,
@@ -99,7 +99,7 @@ export class Occurrence extends EntityProvider {
     basisOfRecord: string;
 
     @DwCID()
-    @DwCField('https://rs.tdwg.org/dwc/terms/occurrenceID')
+    @DwCField('http://rs.tdwg.org/dwc/terms/occurrenceID')
     @Column('varchar', {
         name: 'occurrenceID',
         nullable: true,
@@ -116,11 +116,11 @@ export class Occurrence extends EntityProvider {
         }
     }
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/catalogNumber')
+    @DwCField('http://rs.tdwg.org/dwc/terms/catalogNumber')
     @Column('varchar', { name: 'catalogNumber', nullable: true, length: 32 })
     catalogNumber: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/otherCatalogNumbers')
+    @DwCField('http://rs.tdwg.org/dwc/terms/otherCatalogNumbers')
     @Column('varchar', {
         name: 'otherCatalogNumbers',
         nullable: true,
@@ -128,7 +128,7 @@ export class Occurrence extends EntityProvider {
     })
     otherCatalogNumbers: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/ownerInstitutionCode')
+    @DwCField('http://rs.tdwg.org/dwc/terms/ownerInstitutionCode')
     @Column('varchar', {
         name: 'ownerInstitutionCode',
         nullable: true,
@@ -136,7 +136,7 @@ export class Occurrence extends EntityProvider {
     })
     ownerInstitutionCode: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/datasetID')
+    @DwCField('http://rs.tdwg.org/dwc/terms/datasetID')
     @Column('varchar', { name: 'datasetID', nullable: true, length: 255 })
     datasetID: string;
 
@@ -146,7 +146,7 @@ export class Occurrence extends EntityProvider {
     @Column('varchar', { name: 'scientificName', nullable: true, length: 255 })
     scientificName: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/taxonID')
+    @DwCField('http://rs.tdwg.org/dwc/terms/taxonID')
     @Column('int', { name: 'tidinterpreted', nullable: true, unsigned: true })
     taxonID: number | null;
 
@@ -192,7 +192,7 @@ export class Occurrence extends EntityProvider {
     @Column('varchar', { name: 'typeStatus', nullable: true, length: 255 })
     typeStatus: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/recordedBy')
+    @DwCField('http://rs.tdwg.org/dwc/terms/recordedBy')
     @Column('varchar', {
         name: 'recordedBy',
         nullable: true,
@@ -201,7 +201,7 @@ export class Occurrence extends EntityProvider {
     })
     recordedByNames: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/recordNumber')
+    @DwCField('http://rs.tdwg.org/dwc/terms/recordNumber')
     @Column('varchar', {
         name: 'recordNumber',
         nullable: true,
@@ -278,7 +278,7 @@ export class Occurrence extends EntityProvider {
     })
     occurrenceRemarks: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/informationWithheld')
+    @DwCField('http://rs.tdwg.org/dwc/terms/informationWithheld')
     @Column('varchar', {
         name: 'informationWithheld',
         nullable: true,
@@ -286,7 +286,7 @@ export class Occurrence extends EntityProvider {
     })
     informationWithheld: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/dataGeneralizations')
+    @DwCField('http://rs.tdwg.org/dwc/terms/dataGeneralizations')
     @Column('varchar', {
         name: 'dataGeneralizations',
         nullable: true,
@@ -294,11 +294,11 @@ export class Occurrence extends EntityProvider {
     })
     dataGeneralizations: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/associatedOccurrences')
+    @DwCField('http://rs.tdwg.org/dwc/terms/associatedOccurrences')
     @Column('text', { name: 'associatedOccurrences', nullable: true })
     associatedOccurrences: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/associatedTaxa')
+    @DwCField('http://rs.tdwg.org/dwc/terms/associatedTaxa')
     @Column('text', {
         name: 'associatedTaxa',
         nullable: true,
@@ -306,18 +306,18 @@ export class Occurrence extends EntityProvider {
     })
     associatedTaxa: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/dynamicProperties')
+    @DwCField('http://rs.tdwg.org/dwc/terms/dynamicProperties')
     @Column('text', { name: 'dynamicProperties', nullable: true })
     dynamicProperties: string;
 
     @Column('text', { name: 'verbatimAttributes', nullable: true })
     verbatimAttributes: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/behavior')
+    @DwCField('http://rs.tdwg.org/dwc/terms/behavior')
     @Column('varchar', { name: 'behavior', nullable: true, length: 500 })
     behavior: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/reproductiveCondition')
+    @DwCField('http://rs.tdwg.org/dwc/terms/reproductiveCondition')
     @Column('varchar', {
         name: 'reproductiveCondition',
         nullable: true,
@@ -333,7 +333,7 @@ export class Occurrence extends EntityProvider {
     })
     cultivationStatus: number | null;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/establishmentMeans')
+    @DwCField('http://rs.tdwg.org/dwc/terms/establishmentMeans')
     @Column('varchar', {
         name: 'establishmentMeans',
         nullable: true,
@@ -341,15 +341,15 @@ export class Occurrence extends EntityProvider {
     })
     establishmentMeans: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/lifeStage')
+    @DwCField('http://rs.tdwg.org/dwc/terms/lifeStage')
     @Column('varchar', { name: 'lifeStage', nullable: true, length: 45 })
     lifeStage: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/sex')
+    @DwCField('http://rs.tdwg.org/dwc/terms/sex')
     @Column('varchar', { name: 'sex', nullable: true, length: 45 })
     sex: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/individualCount')
+    @DwCField('http://rs.tdwg.org/dwc/terms/individualCount')
     @Column('varchar', { name: 'individualCount', nullable: true, length: 45 })
     individualCount: string;
 
@@ -363,7 +363,7 @@ export class Occurrence extends EntityProvider {
     @Column('varchar', { name: 'samplingEffort', nullable: true, length: 200 })
     samplingEffort: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/preparations')
+    @DwCField('http://rs.tdwg.org/dwc/terms/preparations')
     @Column('varchar', { name: 'preparations', nullable: true, length: 100 })
     preparations: string;
 
@@ -472,7 +472,7 @@ export class Occurrence extends EntityProvider {
     })
     georeferenceSources: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus')
+    @DwCField('http://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus')
     @Column('varchar', {
         name: 'georeferenceVerificationStatus',
         nullable: true,
@@ -512,7 +512,7 @@ export class Occurrence extends EntityProvider {
     @Column('text', { name: 'previousIdentifications', nullable: true })
     previousIdentifications: string;
 
-    @DwCField('https://rs.tdwg.org/dwc/terms/disposition')
+    @DwCField('http://rs.tdwg.org/dwc/terms/disposition')
     @Column('varchar', { name: 'disposition', nullable: true, length: 250 })
     disposition: string;
 
@@ -533,7 +533,7 @@ export class Occurrence extends EntityProvider {
     })
     modified: Date | null;
 
-    @DwCField('https://purl.org/dc/elements/1.1/language')
+    @DwCField('http://purl.org/dc/elements/1.1/language')
     @Column('varchar', { name: 'language', nullable: true, length: 20 })
     language: string;
 
@@ -562,7 +562,7 @@ export class Occurrence extends EntityProvider {
     @Column('datetime', { name: 'dateEntered', nullable: true })
     initialTimestamp: Date | null;
 
-    @DwCField('https://purl.org/dc/terms/modified')
+    @DwCField('http://purl.org/dc/terms/modified')
     @Column('timestamp', {
         name: 'dateLastModified',
         default: () => 'CURRENT_TIMESTAMP()',

@@ -22,6 +22,9 @@ export class DwcArchiveBuilder {
     private static readonly DWC_FIELD_ENCLOSE_REPLACE_REGEXP = new RegExp(
         DwcArchiveBuilder.DWC_FIELD_ENCLOSE
     );
+    private static readonly DWC_LINE_SEP_REGEXP = new RegExp(
+        DwcArchiveBuilder.DWC_LINE_SEP
+    );
 
     private readonly logger = new Logger(DwcArchiveBuilder.name);
     private readonly tmpDir: string;
@@ -55,36 +58,43 @@ export class DwcArchiveBuilder {
     }
 
     private recordToCSVLine(recordType: string, record: Record<any, any>): string {
-        let line = '';
+        const fields = [];
         for (const field of this.orderedRecordFields(recordType)) {
-            line += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            let csvField = DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
             if (Object.keys(record).includes(field)) {
                 const val = record[field];
                 if (val) {
-                    line += val.toString().replace(
-                        DwcArchiveBuilder.DWC_FIELD_ENCLOSE_REPLACE_REGEXP,
-                        `\\${ DwcArchiveBuilder.DWC_FIELD_ENCLOSE }`
-                    )
+                    csvField += val.toString()
+                        .replace(
+                            DwcArchiveBuilder.DWC_FIELD_ENCLOSE_REPLACE_REGEXP,
+                            `\\${ DwcArchiveBuilder.DWC_FIELD_ENCLOSE }`
+                        )
+                        .replace(
+                            DwcArchiveBuilder.DWC_LINE_SEP_REGEXP,
+                            `\\${ DwcArchiveBuilder.DWC_LINE_SEP }`
+                        )
                 }
             }
-            line += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
-            line += DwcArchiveBuilder.DWC_FIELD_SEP;
+            csvField += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            fields.push(csvField);
         }
+        let line = fields.join(DwcArchiveBuilder.DWC_FIELD_SEP);
         line += DwcArchiveBuilder.DWC_LINE_SEP;
         return line;
     }
 
     private csvHeaderLine(recordType: string): string {
-        let line = '';
+        const fields = [];
         for (const field of this.orderedRecordFields(recordType)) {
-            line += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
-            line += field.replace(
+            let csvField = DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            csvField += field.replace(
                 DwcArchiveBuilder.DWC_FIELD_ENCLOSE_REPLACE_REGEXP,
                 `\\${ DwcArchiveBuilder.DWC_FIELD_ENCLOSE }`
             );
-            line += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
-            line += DwcArchiveBuilder.DWC_FIELD_SEP
+            csvField += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            fields.push(csvField);
         }
+        let line = fields.join(DwcArchiveBuilder.DWC_FIELD_SEP);
         line += DwcArchiveBuilder.DWC_LINE_SEP;
         return line;
     }
@@ -167,6 +177,7 @@ export class DwcArchiveBuilder {
                 $: {
                     xmlns: DWC_XML_NS,
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                    "xmlns:xs": "http://www.w3.org/2001/XMLSchema",
                     "xsi:schemaLocation": DWC_SCHEMA_LOCATION
                 },
                 core: {
@@ -174,9 +185,9 @@ export class DwcArchiveBuilder {
                         rowType: this.coreFileType as any,
                         ...commonOpts
                     },
-                    id: { $: { index: -1 } },
                     files: [],
-                    field: []
+                    id: { $: { index: -1 } },
+                    field: [],
                 },
                 extension: []
             }
@@ -201,8 +212,8 @@ export class DwcArchiveBuilder {
                         rowType: recordType as any,
                         ...commonOpts
                     },
-                    coreid: { $: { index: -1 } },
                     files: [],
+                    coreid: { $: { index: -1 } },
                     field: [],
                 }
 
