@@ -1,5 +1,5 @@
-export const DWC_SCHEMA_LOCATION = 'http://rs.tdwg.org/dwc/text/tdwg_dwc_text.xsd';
-export const DWC_XML_NS = 'http://rs.tdwg.org/dwc/text/';
+export const DWC_SCHEMA_LOCATION = 'https://dwc.tdwg.org/text/tdwg_dwc_text.xsd';
+export const DWC_XML_NS = 'https://rs.tdwg.org/dwc/text/';
 export type DwCAParseCallback<T> = (tmpdir: string, archive: IDwCAMeta) => Promise<T>;
 
 /*
@@ -7,11 +7,6 @@ All interfaces prefixed by DwCAMeta come from the archive schema defined at
 https://dwc.tdwg.org/text/
 Helpful: http://tools.gbif.org/dwca-assistant/gbif_dwc-a_asst_en_v1.1.pdf
  */
-
-export interface IDwCASerializable {
-    asDwCRecord(): Record<any, any>;
-    loadDwCRecord(record: Record<any, any>);
-}
 
 /*
 The full meta.xml for a dwc archive
@@ -40,7 +35,7 @@ export interface IDwCAMetaCoreFileType extends IDwCAMetaFileType {
 An extension file within the archive
  */
 export interface IDwCAMetaExtensionFileType extends IDwCAMetaFileType {
-    coreid: IDwCAMetaIDFieldType[];
+    coreid: IDwCAMetaIDFieldType;
 }
 
 /*

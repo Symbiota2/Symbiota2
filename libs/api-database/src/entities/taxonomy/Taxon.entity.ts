@@ -37,7 +37,9 @@ import { TaxonDescriptionBlock } from './TaxonDescriptionBlock.entity';
 import { User } from '../user/User.entity';
 import { CharacteristicTaxonLink } from '../characteristic';
 import { EntityProvider } from '../../entity-provider.class';
+import { DwCField, DwCID, DwCRecord } from '@symbiota2/dwc';
 
+@DwCRecord('https://rs.tdwg.org/dwc/terms/Taxon')
 @Index('sciname_unique', ['scientificName', 'rankID', 'author'], { unique: true })
 @Index('rankid_index', ['rankID'])
 @Index('unitname1_index', ['unitName1', 'unitName2'])
@@ -46,6 +48,8 @@ import { EntityProvider } from '../../entity-provider.class';
 @Index('sciname_index', ['scientificName'])
 @Entity('taxa')
 export class Taxon extends EntityProvider {
+    @DwCID()
+    @DwCField('https://rs.tdwg.org/dwc/terms/taxonID')
     @PrimaryGeneratedColumn({ type: 'int', name: 'TID', unsigned: true })
     id: number;
 
@@ -55,6 +59,7 @@ export class Taxon extends EntityProvider {
     @Column('smallint', { name: 'RankId', nullable: true, unsigned: true })
     rankID: number | null;
 
+    @DwCField('https://rs.tdwg.org/dwc/terms/scientificName')
     @Column('varchar', { name: 'SciName', length: 250 })
     scientificName: string;
 
@@ -76,6 +81,7 @@ export class Taxon extends EntityProvider {
     @Column('varchar', { name: 'UnitName3', nullable: true, length: 35 })
     unitName3: string;
 
+    @DwCField('https://rs.tdwg.org/dwc/terms/scientificNameAuthorship')
     @Column('varchar', { name: 'Author', nullable: true, length: 100 })
     author: string;
 
@@ -86,12 +92,14 @@ export class Taxon extends EntityProvider {
     })
     phyloSortSequence: number | null;
 
+    @DwCField('https://rs.tdwg.org/dwc/terms/taxonomicStatus')
     @Column('varchar', { name: 'Status', nullable: true, length: 50 })
     status: string;
 
     @Column('varchar', { name: 'Source', nullable: true, length: 250 })
     source: string;
 
+    @DwCField('https://rs.tdwg.org/dwc/terms/taxonRemarks')
     @Column('varchar', { name: 'Notes', nullable: true, length: 250 })
     notes: string;
 
@@ -232,6 +240,32 @@ export class Taxon extends EntityProvider {
 
     @OneToMany(() => CharacteristicTaxonLink, (kmchartaxalink) => kmchartaxalink.taxon)
     characteristicLinks: Promise<CharacteristicTaxonLink[]>;
+
+    get scientificNameAccepted(): Promise<string> {
+        return this.acceptedTaxonStatuses.then((acceptedStatuses) => {
+            if (acceptedStatuses.length === 0) {
+                return null;
+            }
+
+            const acceptedStatusesSorted = acceptedStatuses.sort((a, b) => {
+                if (a.sortSequence > b.sortSequence) {
+                    return 1;
+                }
+                else if (a.sortSequence < b.sortSequence) {
+                    return 0;
+                }
+                return 0;
+            });
+            const acceptedStatus = acceptedStatusesSorted[0];
+            return acceptedStatus.acceptedTaxon;
+
+        }).then((acceptedTaxon) => {
+            if (acceptedTaxon === null) {
+                return this.scientificName;
+            }
+            return acceptedTaxon.scientificName;
+        });
+    }
 
     async lookupAncestor(taxonRepo: Repository<Taxon>, rankID: number): Promise<Taxon> {
         return await taxonRepo.createQueryBuilder('t')

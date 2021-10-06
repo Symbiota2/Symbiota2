@@ -1,9 +1,13 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { Occurrence, OccurrenceUploadFieldMap } from '@symbiota2/api-database';
+import {
+    Occurrence,
+    OccurrenceUploadFieldMap,
+    Taxon
+} from '@symbiota2/api-database';
 import {
     DeepPartial,
     FindConditions,
-    FindManyOptions, IsNull,
+    FindManyOptions, IsNull, Not,
     Repository
 } from 'typeorm';
 import { FindAllParams } from './dto/find-all-input.dto';
@@ -402,8 +406,7 @@ export class OccurrenceService {
     }
 
     async createDwCArchive(tmpDir: string, findOpts: FindConditions<Occurrence>): Promise<string> {
-        const dwcBuilder = new DwcArchiveBuilder(tmpDir, 'Occurrence');
-        const archivePath = pathJoin(tmpDir, `${uuid4()}.zip`);
+        const dwcBuilder = new DwcArchiveBuilder(Taxon, tmpDir);
 
         // Make sure all of the occurrences have a guid
         await this.occurrenceRepo.createQueryBuilder('o')
@@ -415,13 +418,21 @@ export class OccurrenceService {
         let occurrences = await this.occurrenceRepo.find({
             where: findOpts,
             take: OccurrenceService.DWCA_CREATE_LIMIT,
-            skip: offset
+            skip: offset,
+            relations: ['taxon']
         });
 
+
         while (occurrences.length > 0) {
-            occurrences.forEach((occurrence) => {
-                dwcBuilder.addCoreRecord(occurrence);
-            });
+            await Promise.all(
+                occurrences.map((o) => {
+                    return o.taxon.then((t) => dwcBuilder.addRecord(t));
+                })
+            );
+
+            for (const occurrence of occurrences) {
+                dwcBuilder.addRecord(occurrence);
+            }
             offset += occurrences.length;
             occurrences = await this.occurrenceRepo.find({
                 where: findOpts,
@@ -430,7 +441,9 @@ export class OccurrenceService {
             });
         }
 
-        await dwcBuilder.setCoreID('occurrenceID').build(archivePath);
+        const archivePath = pathJoin(tmpDir, `${uuid4()}.zip`);
+        await dwcBuilder.build(archivePath);
+
         return archivePath;
     }
 }

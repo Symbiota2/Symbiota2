@@ -39,7 +39,7 @@ import { OccurrenceDatasetLink } from './OccurrenceDatasetLink.entity';
 import { EntityProvider } from '../../entity-provider.class';
 import { v4 as uuid4 } from 'uuid';
 import {
-    IDwCASerializable,
+    DwCID,
     dwcField,
     DwCField,
     DwCRecord
@@ -77,7 +77,7 @@ import {
 @Index('Index_otherCatalogNumbers', ['otherCatalogNumbers'])
 @Index('Index_latestDateCollected', ['latestDateCollected'])
 @Entity('omoccurrences')
-export class Occurrence extends EntityProvider implements IDwCASerializable {
+export class Occurrence extends EntityProvider {
     @PrimaryGeneratedColumn({ type: 'int', name: 'occid', unsigned: true })
     id: number;
 
@@ -88,7 +88,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     @Column('varchar', { name: 'dbpk', nullable: true, length: 150 })
     dbpk: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/basisOfRecord')
+    @DwCField('https://rs.tdwg.org/dwc/terms/basisOfRecord')
     @Column('varchar', {
         name: 'basisOfRecord',
         nullable: true,
@@ -98,6 +98,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     })
     basisOfRecord: string;
 
+    @DwCID()
     @DwCField('https://rs.tdwg.org/dwc/terms/occurrenceID')
     @Column('varchar', {
         name: 'occurrenceID',
@@ -119,7 +120,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     @Column('varchar', { name: 'catalogNumber', nullable: true, length: 32 })
     catalogNumber: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/otherCatalogNumbers')
+    @DwCField('https://rs.tdwg.org/dwc/terms/otherCatalogNumbers')
     @Column('varchar', {
         name: 'otherCatalogNumbers',
         nullable: true,
@@ -127,7 +128,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     })
     otherCatalogNumbers: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/ownerInstitutionCode')
+    @DwCField('https://rs.tdwg.org/dwc/terms/ownerInstitutionCode')
     @Column('varchar', {
         name: 'ownerInstitutionCode',
         nullable: true,
@@ -135,7 +136,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     })
     ownerInstitutionCode: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/datasetID')
+    @DwCField('https://rs.tdwg.org/dwc/terms/datasetID')
     @Column('varchar', { name: 'datasetID', nullable: true, length: 255 })
     datasetID: string;
 
@@ -145,6 +146,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     @Column('varchar', { name: 'scientificName', nullable: true, length: 255 })
     scientificName: string;
 
+    @DwCField('https://rs.tdwg.org/dwc/terms/taxonID')
     @Column('int', { name: 'tidinterpreted', nullable: true, unsigned: true })
     taxonID: number | null;
 
@@ -276,7 +278,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     })
     occurrenceRemarks: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/informationWithheld')
+    @DwCField('https://rs.tdwg.org/dwc/terms/informationWithheld')
     @Column('varchar', {
         name: 'informationWithheld',
         nullable: true,
@@ -284,7 +286,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     })
     informationWithheld: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/dataGeneralizations')
+    @DwCField('https://rs.tdwg.org/dwc/terms/dataGeneralizations')
     @Column('varchar', {
         name: 'dataGeneralizations',
         nullable: true,
@@ -292,11 +294,11 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     })
     dataGeneralizations: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/associatedOccurrences')
+    @DwCField('https://rs.tdwg.org/dwc/terms/associatedOccurrences')
     @Column('text', { name: 'associatedOccurrences', nullable: true })
     associatedOccurrences: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/associatedTaxa')
+    @DwCField('https://rs.tdwg.org/dwc/terms/associatedTaxa')
     @Column('text', {
         name: 'associatedTaxa',
         nullable: true,
@@ -304,18 +306,18 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     })
     associatedTaxa: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/dynamicProperties')
+    @DwCField('https://rs.tdwg.org/dwc/terms/dynamicProperties')
     @Column('text', { name: 'dynamicProperties', nullable: true })
     dynamicProperties: string;
 
     @Column('text', { name: 'verbatimAttributes', nullable: true })
     verbatimAttributes: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/behavior')
+    @DwCField('https://rs.tdwg.org/dwc/terms/behavior')
     @Column('varchar', { name: 'behavior', nullable: true, length: 500 })
     behavior: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/reproductiveCondition')
+    @DwCField('https://rs.tdwg.org/dwc/terms/reproductiveCondition')
     @Column('varchar', {
         name: 'reproductiveCondition',
         nullable: true,
@@ -331,7 +333,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     })
     cultivationStatus: number | null;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/establishmentMeans')
+    @DwCField('https://rs.tdwg.org/dwc/terms/establishmentMeans')
     @Column('varchar', {
         name: 'establishmentMeans',
         nullable: true,
@@ -339,15 +341,15 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     })
     establishmentMeans: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/lifeStage')
+    @DwCField('https://rs.tdwg.org/dwc/terms/lifeStage')
     @Column('varchar', { name: 'lifeStage', nullable: true, length: 45 })
     lifeStage: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/sex')
+    @DwCField('https://rs.tdwg.org/dwc/terms/sex')
     @Column('varchar', { name: 'sex', nullable: true, length: 45 })
     sex: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/individualCount')
+    @DwCField('https://rs.tdwg.org/dwc/terms/individualCount')
     @Column('varchar', { name: 'individualCount', nullable: true, length: 45 })
     individualCount: string;
 
@@ -361,7 +363,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     @Column('varchar', { name: 'samplingEffort', nullable: true, length: 200 })
     samplingEffort: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/preparations')
+    @DwCField('https://rs.tdwg.org/dwc/terms/preparations')
     @Column('varchar', { name: 'preparations', nullable: true, length: 100 })
     preparations: string;
 
@@ -470,7 +472,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     })
     georeferenceSources: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus')
+    @DwCField('https://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus')
     @Column('varchar', {
         name: 'georeferenceVerificationStatus',
         nullable: true,
@@ -510,7 +512,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     @Column('text', { name: 'previousIdentifications', nullable: true })
     previousIdentifications: string;
 
-    @DwCField('http://rs.tdwg.org/dwc/terms/disposition')
+    @DwCField('https://rs.tdwg.org/dwc/terms/disposition')
     @Column('varchar', { name: 'disposition', nullable: true, length: 250 })
     disposition: string;
 
@@ -531,7 +533,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     })
     modified: Date | null;
 
-    @DwCField('http://purl.org/dc/elements/1.1/language')
+    @DwCField('https://purl.org/dc/elements/1.1/language')
     @Column('varchar', { name: 'language', nullable: true, length: 20 })
     language: string;
 
@@ -560,7 +562,7 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
     @Column('datetime', { name: 'dateEntered', nullable: true })
     initialTimestamp: Date | null;
 
-    @DwCField('http://purl.org/dc/terms/modified')
+    @DwCField('https://purl.org/dc/terms/modified')
     @Column('timestamp', {
         name: 'dateLastModified',
         default: () => 'CURRENT_TIMESTAMP()',
@@ -776,38 +778,5 @@ export class Occurrence extends EntityProvider implements IDwCASerializable {
             this.genus = genus ? genus.scientificName : null;
             this.family = family ? family.scientificName : null;
         }
-    }
-
-    asDwCRecord(): Record<string, any> {
-        // TODO: What to do about collectionCode, institutionCode?
-        const dwcRecord = {};
-        for (const [k, v] of Object.entries(this)) {
-            const dwcFieldUrl = dwcField(this, k);
-            if (dwcFieldUrl) {
-                dwcRecord[dwcFieldUrl] = v;
-            }
-        }
-        return dwcRecord;
-    }
-
-    loadDwCRecord(dwc: Record<string, any>) {
-        // for (const [dwcKey, databaseKey] of Occurrence.DWCA_FIELD_MAP.entries()) {
-        //     if (!['day', 'month', 'year'].includes(dwcKey)) {
-        //         // @ts-ignore
-        //         this[databaseKey] = dwc[dwcKey];
-        //     }
-        // }
-        // if (!dwc.eventDate && (dwc.day || dwc.month || dwc.year)) {
-        //     this.eventDate = new Date();
-        //     if (dwc.year) {
-        //         this.eventDate.setFullYear(dwc.year);
-        //     }
-        //     if (dwc.month) {
-        //         this.eventDate.setMonth(dwc.month);
-        //     }
-        //     if (dwc.day) {
-        //         this.eventDate.setDate(dwc.day);
-        //     }
-        // }
     }
 }

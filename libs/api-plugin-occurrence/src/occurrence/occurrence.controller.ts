@@ -41,6 +41,7 @@ import * as path from 'path';
 import { tmpdir } from 'os';
 import { DwcArchiveBuilder } from '@symbiota2/dwc';
 import { AppConfigService } from '@symbiota2/api-config';
+import { IsNull, Not } from 'typeorm';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -231,10 +232,12 @@ export class OccurrenceController {
     async getCollectionAsArchive(@Query() query: CollectionIDQueryParam, @Res() response: Response): Promise<void> {
         const dataDir = await this.config.dataDir();
 
+        // TODO: Do we export records without an associated taxon?
+
         withTempDir(dataDir, async (tmpDir) => {
             const archive = await this.occurrenceService.createDwCArchive(
                 tmpDir,
-                { collectionID: query.collectionID }
+                { collectionID: query.collectionID, taxonID: Not(IsNull()) }
             );
             const readStream = createReadStream(archive);
             readStream.pipe(response);
