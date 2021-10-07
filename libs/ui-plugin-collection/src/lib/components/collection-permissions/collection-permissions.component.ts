@@ -10,7 +10,7 @@ import {
     CollectionRoleInput,
     CollectionRoleOutput,
 } from '../../dto/CollectionRole.dto';
-import { CollectionRoleAsyncValidators } from './validators';
+import { CollectionRoleAsyncValidators } from '../../validators/CollectionRoleValidators';
 import { MatDialog } from '@angular/material/dialog';
 import { CollectionPermissionsConfirmDialogComponent } from '../collection-permissions-confirm-dialog/collection-permissions-confirm-dialog.component';
 

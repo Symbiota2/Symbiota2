@@ -11,7 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { InstitutionNewDialogComponent } from '../institution-new-dialog/institution-new-dialog.component';
 import { Router } from '@angular/router';
 import { ROUTE_COLLECTION_PROFILE } from '../../routes';
-import { CollectionAsyncValidators } from './validators';
+import { CollectionAsyncValidators } from '../../validators/CollectionValidators';
 import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 import { ViewportScroller } from '@angular/common';
 

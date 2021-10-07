@@ -5,7 +5,7 @@ import {
 } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { InstitutionService } from '../../services/institution.service';
+import { InstitutionService } from '../services/institution.service';
 
 export class InstitutionAsyncValidators {
     static nameTaken(inst: InstitutionService): AsyncValidatorFn {

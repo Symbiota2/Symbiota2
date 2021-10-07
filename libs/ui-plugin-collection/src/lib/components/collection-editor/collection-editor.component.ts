@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { CollectionService } from '@symbiota2/ui-plugin-collection';
 import { InstitutionService } from '../../services/institution.service';
-import { CollectionAsyncValidators } from './validators';
+import { CollectionAsyncValidators } from '../../validators/CollectionValidators';
 import { Institution } from '@symbiota2/api-database';
 import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 import { InstitutionNewDialogComponent } from '../institution-new-dialog/institution-new-dialog.component';
@@ -30,12 +30,12 @@ export class CollectionEditorComponent implements OnInit {
         collectionName: [
             '',
             Validators.required,
-            CollectionAsyncValidators.nameTaken(this.collections),
+            CollectionAsyncValidators.nameTaken(this.collections, true),
         ],
         collectionCode: [
             '',
             Validators.required,
-            CollectionAsyncValidators.codeTaken(this.collections),
+            CollectionAsyncValidators.codeTaken(this.collections, true),
         ],
         institutionID: ['0', Validators.required],
         fullDescription: [''],

@@ -1,4 +1,3 @@
-import { ɵCompiler_compileModuleSync__POST_R3__ } from '@angular/core';
 import {
     FormControl,
     AbstractControl,
@@ -8,40 +7,72 @@ import {
 import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { of, Observable } from 'rxjs';
 import { map, first, debounce, take, switchMap } from 'rxjs/operators';
-import { CollectionInputDto } from '../../dto/Collection.input.dto';
+import { CollectionInputDto } from '../dto/Collection.input.dto';
 
 export class CollectionAsyncValidators {
-    static nameTaken(collections: CollectionService): AsyncValidatorFn {
+    static nameTaken(
+        collections: CollectionService,
+        isEditing?: boolean
+    ): AsyncValidatorFn {
         return (control: AbstractControl): Observable<ValidationErrors> => {
-            return collections.currentCollection.pipe(
-                switchMap((collection) => {
-                    return collections
-                        .isNameTaken(control.value, collection.collectionName)
-                        .pipe(
-                            map((result: boolean) =>
-                                result ? { nameTaken: true } : null
+            if (isEditing) {
+                return collections.currentCollection.pipe(
+                    switchMap((collection) => {
+                        return collections
+                            .isNameTaken(
+                                control.value,
+                                collection.collectionName
                             )
-                        );
-                }),
-                take(1)
-            );
+                            .pipe(
+                                map((result: boolean) =>
+                                    result ? { nameTaken: true } : null
+                                )
+                            );
+                    }),
+                    take(1)
+                );
+            } else {
+                return collections
+                    .isNameTaken(control.value)
+                    .pipe(
+                        map((result: boolean) =>
+                            result ? { nameTaken: true } : null
+                        )
+                    );
+            }
         };
     }
 
-    static codeTaken(collections: CollectionService): AsyncValidatorFn {
+    static codeTaken(
+        collections: CollectionService,
+        isEditing?: boolean
+    ): AsyncValidatorFn {
         return (control: AbstractControl): Observable<ValidationErrors> => {
-            return collections.currentCollection.pipe(
-                switchMap((collection) => {
-                    return collections
-                        .isCodeTaken(control.value, collection.collectionCode)
-                        .pipe(
-                            map((result: boolean) =>
-                                result ? { codeTaken: result } : null
+            if (isEditing) {
+                return collections.currentCollection.pipe(
+                    switchMap((collection) => {
+                        return collections
+                            .isCodeTaken(
+                                control.value,
+                                collection.collectionCode
                             )
-                        );
-                }),
-                take(1)
-            );
+                            .pipe(
+                                map((result: boolean) =>
+                                    result ? { codeTaken: result } : null
+                                )
+                            );
+                    }),
+                    take(1)
+                );
+            } else {
+                return collections
+                    .isCodeTaken(control.value)
+                    .pipe(
+                        map((result: boolean) =>
+                            result ? { codeTaken: result } : null
+                        )
+                    );
+            }
         };
     }
 
