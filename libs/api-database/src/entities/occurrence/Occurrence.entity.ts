@@ -44,6 +44,7 @@ import {
     DwCField,
     DwCRecord
 } from '@symbiota2/dwc';
+import { TaxaEnumTreeEntry, TaxonomicStatus, TaxonomicUnit } from '../taxonomy';
 
 // http://dwc.tdwg.org/terms/#occurrence
 
@@ -140,6 +141,7 @@ export class Occurrence extends EntityProvider {
     @Column('varchar', { name: 'datasetID', nullable: true, length: 255 })
     datasetID: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/family')
     @Column('varchar', { name: 'family', nullable: true, length: 255 })
     family: string;
 
@@ -150,6 +152,7 @@ export class Occurrence extends EntityProvider {
     @Column('int', { name: 'tidinterpreted', nullable: true, unsigned: true })
     taxonID: number | null;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/genus')
     @Column('varchar', { name: 'genus', nullable: true, length: 255 })
     genus: string;
 
@@ -778,5 +781,50 @@ export class Occurrence extends EntityProvider {
             this.genus = genus ? genus.scientificName : null;
             this.family = family ? family.scientificName : null;
         }
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/acceptedNameUsage')
+    async scientificNameAccepted(): Promise<string> {
+        const taxon = await this.taxon;
+        if (taxon) {
+            return await taxon.scientificNameAccepted();
+        }
+        return null;
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/kingdom')
+    async kingdom(): Promise<string> {
+        const taxon = await this.taxon;
+        if (taxon) {
+            return await taxon.kingdom();
+        }
+        return null;
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/phylum')
+    async phylum(): Promise<string> {
+        const taxon = await this.taxon;
+        if (taxon) {
+            return await taxon.phylum();
+        }
+        return null;
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/class')
+    async class(): Promise<string> {
+        const taxon = await this.taxon;
+        if (taxon) {
+            return await taxon.class();
+        }
+        return null;
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/order')
+    async order(): Promise<string> {
+        const taxon = await this.taxon;
+        if (taxon) {
+            return await taxon.order();
+        }
+        return null;
     }
 }

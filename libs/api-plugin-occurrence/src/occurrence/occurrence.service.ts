@@ -406,11 +406,11 @@ export class OccurrenceService {
     }
 
     async createDwCArchive(tmpDir: string, findOpts: FindConditions<Occurrence>): Promise<string> {
-        const dwcBuilder = new DwcArchiveBuilder(Taxon, tmpDir);
+        const dwcBuilder = new DwcArchiveBuilder(Occurrence, tmpDir);
 
         // Make sure all of the occurrences have a guid
         await this.occurrenceRepo.createQueryBuilder('o')
-            .update({ occurrenceGUID: () => 'UUID()' })
+            .update({ occurrenceGUID: () => "CONCAT('urn:uuid:', UUID())" })
             .where({ ...findOpts, occurrenceGUID: IsNull() })
             .execute();
 
@@ -424,15 +424,7 @@ export class OccurrenceService {
 
 
         while (occurrences.length > 0) {
-            await Promise.all(
-                occurrences.map((o) => {
-                    return o.taxon.then((t) => dwcBuilder.addRecord(t));
-                })
-            );
-
-            for (const occurrence of occurrences) {
-                dwcBuilder.addRecord(occurrence);
-            }
+            await Promise.all(occurrences.map((o) => dwcBuilder.addRecord(o)));
             offset += occurrences.length;
             occurrences = await this.occurrenceRepo.find({
                 where: findOpts,

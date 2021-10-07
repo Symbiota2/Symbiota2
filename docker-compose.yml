@@ -20,6 +20,16 @@ services:
     volumes: ["redis:/data"]
     ports: ["6379:6379"]
 
+  s3:
+    image: "quay.io/minio/minio:RELEASE.2021-09-24T00-24-24Z"
+    container_name: s2-storage
+    environment:
+      MINIO_ROOT_USER: symbiota2
+      MINIO_ROOT_PASSWORD: password
+    volumes: ["s3:/data"]
+    ports: ["127.0.0.1:9000:9000"]
+
 volumes:
   s2-db: { name: s2-db }
   redis: { name: s2-redis }
+  s3: { name: s2-storage }

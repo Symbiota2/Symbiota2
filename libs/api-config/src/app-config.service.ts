@@ -18,7 +18,7 @@ import {
     ENV_REDIS_PORT,
     ENV_SMTP_HOST, ENV_SMTP_PASSWORD,
     ENV_SMTP_PORT, ENV_SMTP_SENDER,
-    ENV_SMTP_USER
+    ENV_SMTP_USER, ENV_STORAGE_PASSWORD, ENV_STORAGE_SERVER, ENV_STORAGE_USER
 } from './configuration';
 
 import * as path from 'path';
@@ -215,7 +215,8 @@ export class AppConfigService {
             type: dbProto as any,
             synchronize: false,
             migrate: false,
-            logging: this.isDevelopment()
+            logging: this.isDevelopment(),
+            cache: true
         };
 
         if (dbProto === DatabaseProtocol.SQLITE) {
@@ -288,5 +289,17 @@ export class AppConfigService {
      */
     smtpSender(): string {
         return this.configService.get<string>(ENV_SMTP_SENDER);
+    }
+
+    storageServer(): string {
+        return this.configService.get<string>(ENV_STORAGE_SERVER);
+    }
+
+    storageUser(): string {
+        return this.configService.get<string>(ENV_STORAGE_USER);
+    }
+
+    storagePassword(): string {
+        return this.configService.get<string>(ENV_STORAGE_PASSWORD);
     }
 }

@@ -22,6 +22,13 @@ export const ENV_SMTP_PORT = 'SMTP_PORT';
 export const ENV_SMTP_USER = 'SMTP_USER';
 export const ENV_SMTP_PASSWORD = 'SMTP_PASSWORD';
 export const ENV_SMTP_SENDER = 'SMTP_SENDER';
+
+export const ENV_ENABLE_AUTH = 'ENABLE_AUTH';
+
+export const ENV_STORAGE_SERVER = 'STORAGE_SERVER';
+export const ENV_STORAGE_USER = 'STORAGE_USER';
+export const ENV_STORAGE_PASSWORD = 'STORAGE_PASSWORD';
+
 // ======================================
 
 // ===== Configuration defaults =====
@@ -46,8 +53,11 @@ export const DEFAULT_SMTP_USER = '';
 export const DEFAULT_SMTP_PASSWORD = '';
 export const DEFAULT_SMTP_SENDER = 'noreply@symbiota2.org';
 
-export const ENV_ENABLE_AUTH = 'ENABLE_AUTH';
 export const DEFAULT_ENABLE_AUTH = '1';
+
+export const DEFAULT_STORAGE_SERVER = 'http://127.0.0.1:9000';
+export const DEFAULT_STORAGE_USER = 'symbiota2';
+export const DEFAULT_STORAGE_PASSWORD = 'password';
 // ==================================
 
 /**
@@ -86,6 +96,11 @@ export default function configBuilder(): Record<string, string> {
         [ENV_SMTP_PORT]: process.env[ENV_SMTP_PORT] || DEFAULT_SMTP_PORT,
         [ENV_SMTP_USER]: process.env[ENV_SMTP_USER] || DEFAULT_SMTP_USER,
         [ENV_SMTP_PASSWORD]: process.env[ENV_SMTP_PASSWORD] || DEFAULT_SMTP_PASSWORD,
-        [ENV_SMTP_SENDER]: process.env[ENV_SMTP_SENDER] || DEFAULT_SMTP_SENDER
+        [ENV_SMTP_SENDER]: process.env[ENV_SMTP_SENDER] || DEFAULT_SMTP_SENDER,
+
+        // S3 Storage
+        [ENV_STORAGE_SERVER]: process.env[ENV_STORAGE_SERVER] || DEFAULT_STORAGE_SERVER,
+        [ENV_STORAGE_USER]: process.env[ENV_STORAGE_USER] || DEFAULT_STORAGE_USER,
+        [ENV_STORAGE_PASSWORD]: process.env[ENV_STORAGE_PASSWORD] || DEFAULT_STORAGE_PASSWORD
     };
 }

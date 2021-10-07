@@ -1,6 +1,6 @@
 import {
     Column,
-    Entity,
+    Entity, getConnection,
     Index,
     JoinColumn,
     ManyToOne,
@@ -38,6 +38,7 @@ import { User } from '../user/User.entity';
 import { CharacteristicTaxonLink } from '../characteristic';
 import { EntityProvider } from '../../entity-provider.class';
 import { DwCField, DwCID, DwCRecord } from '@symbiota2/dwc';
+import { TaxonomicUnit } from './TaxonomicUnit.entity';
 
 @DwCRecord('http://rs.tdwg.org/dwc/terms/Taxon')
 @Index('sciname_unique', ['scientificName', 'rankID', 'author'], { unique: true })
@@ -241,32 +242,6 @@ export class Taxon extends EntityProvider {
     @OneToMany(() => CharacteristicTaxonLink, (kmchartaxalink) => kmchartaxalink.taxon)
     characteristicLinks: Promise<CharacteristicTaxonLink[]>;
 
-    get scientificNameAccepted(): Promise<string> {
-        return this.acceptedTaxonStatuses.then((acceptedStatuses) => {
-            if (acceptedStatuses.length === 0) {
-                return null;
-            }
-
-            const acceptedStatusesSorted = acceptedStatuses.sort((a, b) => {
-                if (a.sortSequence > b.sortSequence) {
-                    return 1;
-                }
-                else if (a.sortSequence < b.sortSequence) {
-                    return 0;
-                }
-                return 0;
-            });
-            const acceptedStatus = acceptedStatusesSorted[0];
-            return acceptedStatus.acceptedTaxon;
-
-        }).then((acceptedTaxon) => {
-            if (acceptedTaxon === null) {
-                return this.scientificName;
-            }
-            return acceptedTaxon.scientificName;
-        });
-    }
-
     async lookupAncestor(taxonRepo: Repository<Taxon>, rankID: number): Promise<Taxon> {
         return await taxonRepo.createQueryBuilder('t')
             .select()
@@ -275,5 +250,79 @@ export class Taxon extends EntityProvider {
             .andWhere('t.rankID = :rankID', { rankID })
             .take(1)
             .getOne();
+    }
+
+    private async ancestorSciName(ancestorRankName: string): Promise<string> {
+        const db = getConnection();
+        const taxonRepo = db.getRepository(Taxon);
+
+        const ancestor = await taxonRepo.createQueryBuilder('pt')
+            .select(['pt.scientificName'])
+            .innerJoin(TaxaEnumTreeEntry, 'te', 'pt.id = te.parentTaxonID')
+            .innerJoin(Taxon, 't', 'te.taxonID = t.id')
+            .innerJoin(TaxonomicUnit, 'parentRank', 'pt.rankID = parentRank.rankID')
+            .where('t.id = :taxonID', { taxonID: this.id })
+            .andWhere(
+                'LOWER(parentRank.rankName) = :rankName',
+                { rankName: ancestorRankName.toLocaleLowerCase() }
+            )
+            .cache(30000)
+            .groupBy('pt.scientificName')
+            .getOne();
+
+        if (!ancestor) {
+            return null;
+        }
+
+        return ancestor.scientificName;
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/kingdom')
+    async kingdom(): Promise<string> {
+        return await this.ancestorSciName('Kingdom');
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/phylum')
+    async phylum(): Promise<string> {
+        return await this.ancestorSciName('Phylum');
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/class')
+    async class(): Promise<string> {
+        return await this.ancestorSciName('Class');
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/order')
+    async order(): Promise<string> {
+        return await this.ancestorSciName('Order');
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/family')
+    async family(): Promise<string> {
+        return await this.ancestorSciName('Family');
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/genus')
+    async genus(): Promise<string> {
+        return await this.ancestorSciName('Genus');
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/acceptedNameUsage')
+    async scientificNameAccepted(): Promise<string> {
+        const db = getConnection();
+        const taxonRepo = db.getRepository(Taxon);
+
+        const acceptedTaxon = await taxonRepo.createQueryBuilder('t')
+            .select(['acceptedTaxon.scientificName'])
+            .innerJoin(TaxonomicStatus, 's', 's.taxonID = t.id')
+            .innerJoin(Taxon, 'acceptedTaxon', 's.taxonIDAccepted = acceptedTaxon.id')
+            .where('t.id = :taxonID', { taxonID: this.id })
+            .orderBy('s.sortSequence')
+            .getOne();
+
+        if (acceptedTaxon) {
+            return acceptedTaxon.scientificName;
+        }
+        return null;
     }
 }

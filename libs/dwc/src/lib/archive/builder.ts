@@ -13,7 +13,9 @@ import { v4 as uuid4 } from 'uuid';
 import { zipFiles } from '@symbiota2/api-common';
 import { dwcField, dwcRecordType, isDwCID } from '../decorators';
 import { Logger } from '@nestjs/common';
-import { core } from '@angular/compiler';
+import { PassThrough } from 'stream';
+
+
 
 export class DwcArchiveBuilder {
     private static readonly DWC_FIELD_SEP = ',';
@@ -57,23 +59,26 @@ export class DwcArchiveBuilder {
         });
     }
 
-    private recordToCSVLine(recordType: string, record: Record<any, any>): string {
+    private async recordToCSVLine(recordType: string, record: Record<any, any>): Promise<string> {
         const fields = [];
         for (const field of this.orderedRecordFields(recordType)) {
             let csvField = DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
-            if (Object.keys(record).includes(field)) {
-                const val = record[field];
-                if (val) {
-                    csvField += val.toString()
-                        .replace(
-                            DwcArchiveBuilder.DWC_FIELD_ENCLOSE_REPLACE_REGEXP,
-                            `\\${ DwcArchiveBuilder.DWC_FIELD_ENCLOSE }`
-                        )
-                        .replace(
-                            DwcArchiveBuilder.DWC_LINE_SEP_REGEXP,
-                            `\\${ DwcArchiveBuilder.DWC_LINE_SEP }`
-                        )
-                }
+            let val = record[field];
+
+            if (typeof val === 'function') {
+                val = await val.bind(record)();
+            }
+
+            if (val) {
+                csvField += val.toString()
+                    .replace(
+                        DwcArchiveBuilder.DWC_FIELD_ENCLOSE_REPLACE_REGEXP,
+                        `\\${ DwcArchiveBuilder.DWC_FIELD_ENCLOSE }`
+                    )
+                    .replace(
+                        DwcArchiveBuilder.DWC_LINE_SEP_REGEXP,
+                        `\\${ DwcArchiveBuilder.DWC_LINE_SEP }`
+                    )
             }
             csvField += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
             fields.push(csvField);
@@ -99,24 +104,34 @@ export class DwcArchiveBuilder {
         return line;
     }
 
-    addRecord(record: any): DwcArchiveBuilder {
+    async addRecord(record: any): Promise<void> {
         const recordType = dwcRecordType(record.constructor);
         let recordID;
 
         if (!recordType) {
             this.logger.warn(`Invalid DwC record type for class ${record.constructor.name}`);
-            return this;
+            return;
         }
 
         // Map dwcUrl --> recordField
         if (!this.fieldMap.has(recordType)) {
             const recordFieldMap = new Map<string, string>();
-            for (const recordField of Object.keys(record)) {
-                const dwcUrl = dwcField(record, recordField);
-                if (dwcUrl) {
-                    recordFieldMap.set(dwcUrl, recordField);
+            const allRecordFields = [
+                // This gets the properties
+                ...Object.getOwnPropertyNames(record),
+                // This gets the methods
+                ...Object.getOwnPropertyNames(record.constructor.prototype)
+            ];
+
+            for (const recordFieldName of allRecordFields) {
+                const dwcUrl = dwcField(record, recordFieldName);
+                if (!dwcUrl) {
+                    continue;
                 }
-                if (isDwCID(record, recordField) && recordType === this.coreFileType) {
+
+                recordFieldMap.set(dwcUrl, recordFieldName);
+
+                if (isDwCID(record, recordFieldName) && recordType === this.coreFileType) {
                     this.coreIDField = dwcUrl;
                 }
             }
@@ -138,29 +153,37 @@ export class DwcArchiveBuilder {
 
         if (!recordID) {
             this.logger.warn(`Invalid DwC ID for class ${record.constructor.name}`);
-            return this;
+            return;
         }
 
         if (this.uniqueRecordMap.get(recordType).has(recordID)) {
             // this.logger.warn(`Duplicate ${record.constructor.name} detected: '${recordID}'`);
-            return this;
+            return;
         }
 
         this.uniqueRecordMap.get(recordType).add(recordID);
 
         // Map dwcRecordType --> writeStream
         if (!this.fileMap.has(recordType)) {
-            const filePath = pathJoin(this.tmpDir, `${ uuid4() }.csv`);
+            const filePath = pathJoin(this.tmpDir, `${ encodeURIComponent(record.constructor.name) }.csv`);
             const csvStream = createWriteStream(filePath);
             csvStream.write(this.csvHeaderLine(recordType));
             this.fileMap.set(recordType, csvStream);
         }
 
         const fileStream = this.fileMap.get(recordType);
-        const csvLine = this.recordToCSVLine(recordType, record);
-        fileStream.write(csvLine);
+        const csvLine = await this.recordToCSVLine(recordType, record);
+        await new Promise<void>((resolve) => {
+            const keepWriting = fileStream.write(csvLine);
+            if (keepWriting) {
+                resolve();
+            }
+            else {
+                fileStream.once('drain', () => resolve());
+            }
+        })
 
-        return this;
+        return;
     }
 
     async build(archivePath: string) {
@@ -234,14 +257,19 @@ export class DwcArchiveBuilder {
 
         const csvFiles = [];
         for (const [recordType, fileStream] of this.fileMap.entries()) {
-            fileStream.end();
+            await new Promise<void>((resolve) => {
+                fileStream.on('finish', () => resolve());
+                fileStream.end();
+            });
 
             let fileArr: IDwCAMetaFileLocationType[];
             if (recordType === this.coreFileType) {
                 fileArr = meta.archive.core.files;
             }
             else {
-                const extensionIdx = meta.archive.extension.findIndex((e) => e.$.rowType === recordType);
+                const extensionIdx = meta.archive.extension.findIndex((e) => {
+                    return e.$.rowType === recordType
+                });
                 fileArr = meta.archive.extension[extensionIdx].files;
             }
 
