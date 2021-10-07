@@ -106,6 +106,11 @@ export class CollectionInputDto implements ApiCollectionInput {
     @MaxLength(1000)
     @IsOptional()
     accessRights: string;
+
+    @ApiProperty({required: false})
+    @IsNumber()
+    @IsOptional()
+    categoryID: number;
 }
 
 export class UpdateCollectionInputDto extends PartialType(CollectionInputDto) {}
