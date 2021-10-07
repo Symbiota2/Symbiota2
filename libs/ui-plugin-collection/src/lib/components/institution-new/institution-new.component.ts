@@ -2,10 +2,8 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { InstitutionInputDto } from '../../dto/Institution.input.dto';
 import { InstitutionService } from '../../services/institution.service';
-import { User, UserService } from '@symbiota2/ui-common';
-import { map } from 'rxjs/operators';
 import { Institution } from '@symbiota2/api-database';
-import { InstitutionAsyncValidators } from './validators';
+import { InstitutionAsyncValidators } from './InstitutionValidators';
 
 @Component({
     selector: 'symbiota2-institution-new',
@@ -16,12 +14,9 @@ export class InstitutionNewComponent implements OnInit {
     @Output()
     submitClicked = new EventEmitter<Institution>();
 
-    private user: User;
-
     constructor(
         private fb: FormBuilder,
-        private institutions: InstitutionService,
-        private users: UserService
+        private institutions: InstitutionService
     ) {}
 
     newInstForm = this.fb.group({
@@ -48,29 +43,13 @@ export class InstitutionNewComponent implements OnInit {
         notes: [''],
     });
 
-    ngOnInit(): void {
-        this.getUser();
-    }
+    ngOnInit(): void {}
 
     onSubmit(): void {
-        if (this.user.isSuperAdmin()) {
-            //NOTE: user is required to be superAdmin to create new institution
-            var newInst = new InstitutionInputDto(this.newInstForm.value);
-            this.institutions
-                .createInstitution(newInst, this.user.token)
-                .subscribe((inst) => {
-                    this.submitClicked.emit(inst);
-                });
-        }
-    }
+        var newInst = new InstitutionInputDto(this.newInstForm.value);
 
-    getUser(): void {
-        this.users.currentUser
-            .pipe(
-                map((user) => {
-                    return user;
-                })
-            )
-            .subscribe((user) => (this.user = user));
+        this.institutions.createInstitution(newInst).subscribe((inst) => {
+            this.submitClicked.emit(inst); //send institution to parent
+        });
     }
 }

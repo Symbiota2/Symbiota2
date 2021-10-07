@@ -1,13 +1,11 @@
-import { ɵCompiler_compileModuleSync__POST_R3__ } from '@angular/core';
 import {
-    FormControl,
     AbstractControl,
     AsyncValidatorFn,
     ValidationErrors,
 } from '@angular/forms';
 import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
-import { of, Observable } from 'rxjs';
-import { map, first, debounce, take } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
 
 export class CollectionAsyncValidators {
