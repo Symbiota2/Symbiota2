@@ -16,9 +16,15 @@ import {
     ENV_NODE_ENV,
     ENV_REDIS_HOST,
     ENV_REDIS_PORT,
-    ENV_SMTP_HOST, ENV_SMTP_PASSWORD,
-    ENV_SMTP_PORT, ENV_SMTP_SENDER,
-    ENV_SMTP_USER, ENV_STORAGE_PASSWORD, ENV_STORAGE_SERVER, ENV_STORAGE_USER
+    ENV_SMTP_HOST,
+    ENV_SMTP_PASSWORD,
+    ENV_SMTP_PORT,
+    ENV_SMTP_SENDER,
+    ENV_SMTP_USER,
+    ENV_STORAGE_BUCKET,
+    ENV_STORAGE_PASSWORD,
+    ENV_STORAGE_SERVER,
+    ENV_STORAGE_USER
 } from './configuration';
 
 import * as path from 'path';
@@ -301,5 +307,9 @@ export class AppConfigService {
 
     storagePassword(): string {
         return this.configService.get<string>(ENV_STORAGE_PASSWORD);
+    }
+
+    storageBucket(): string {
+        return this.configService.get<string>(ENV_STORAGE_BUCKET);
     }
 }

@@ -42,6 +42,7 @@ import { tmpdir } from 'os';
 import { DwcArchiveBuilder } from '@symbiota2/dwc';
 import { AppConfigService } from '@symbiota2/api-config';
 import { IsNull, Not } from 'typeorm';
+import { StorageService } from '../../../api-storage/src/lib/storage.service';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -51,7 +52,8 @@ const fsPromises = fs.promises;
 export class OccurrenceController {
     constructor(
         private readonly config: AppConfigService,
-        private readonly occurrenceService: OccurrenceService) { }
+        private readonly occurrenceService: OccurrenceService,
+        private readonly storageService: StorageService) { }
 
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: OccurrenceList })
@@ -230,22 +232,33 @@ export class OccurrenceController {
         }
     })
     async getCollectionAsArchive(@Query() query: CollectionIDQueryParam, @Res() response: Response): Promise<void> {
+        const s3Key = `dwc/${query.collectionID}/dwc.zip`;
         const dataDir = await this.config.dataDir();
 
         // TODO: Do we export records without an associated taxon?
+        const archiveExists = await this.storageService.hasObject(s3Key);
 
-        withTempDir(dataDir, async (tmpDir) => {
-            const archive = await this.occurrenceService.createDwCArchive(
-                tmpDir,
-                { collectionID: query.collectionID, taxonID: Not(IsNull()) }
-            );
-            const readStream = createReadStream(archive);
-            readStream.pipe(response);
+        if (!archiveExists) {
+            await new Promise<void>((resolve) => {
+                withTempDir(dataDir, async (tmpDir) => {
+                    const archive = await this.occurrenceService.createDwCArchive(
+                        tmpDir,
+                        { collectionID: query.collectionID, taxonID: Not(IsNull()) }
+                    );
 
-            return new Promise<void>((resolve, reject) => {
-                readStream.on('error', (e) => reject(e));
-                readStream.on('close', () => resolve());
+                    const readStream = createReadStream(archive);
+                    await this.storageService.putObject(s3Key, readStream);
+                    resolve();
+                });
             });
+        }
+
+        const archive = this.storageService.getObject(s3Key);
+        archive.pipe(response);
+
+        return new Promise<void>((resolve, reject) => {
+            archive.on('error', (e) => reject(e));
+            archive.on('close', () => resolve());
         });
     }
 }

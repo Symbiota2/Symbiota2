@@ -26,8 +26,11 @@ services:
     environment:
       MINIO_ROOT_USER: symbiota2
       MINIO_ROOT_PASSWORD: password
+    command: "server /data --console-address ':9001'"
     volumes: ["s3:/data"]
-    ports: ["127.0.0.1:9000:9000"]
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
 
 volumes:
   s2-db: { name: s2-db }

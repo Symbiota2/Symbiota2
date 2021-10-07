@@ -14,6 +14,8 @@ import { OccurrenceUploadProcessor } from './queues/occurrence-upload.processor'
 import { CollectionModule } from '@symbiota2/api-plugin-collection';
 import { OccurrenceCommentController } from './occurrence-comment/occurrence-comment.controller';
 import { OccurrenceCommentService } from './occurrence-comment/occurrence-comment.service';
+import { StorageService } from '../../api-storage/src/lib/storage.service';
+import { ApiStorageModule } from '@symbiota2/api-storage';
 
 /**
  * Module for retrieving occurrence records from the database
@@ -50,7 +52,8 @@ import { OccurrenceCommentService } from './occurrence-comment/occurrence-commen
         }),
         CollectionModule,
         OccurrenceUploadCleanupQueue,
-        OccurrenceUploadQueue
+        OccurrenceUploadQueue,
+        ApiStorageModule
     ],
     providers: [
         OccurrenceService,
