@@ -1,10 +1,20 @@
-import { Controller, Get, Param, Patch, Put, Query } from '@nestjs/common';
+import {
+    Controller,
+    Get, HttpStatus,
+    NotFoundException,
+    Param,
+    Patch,
+    Put,
+    Query, Res
+} from '@nestjs/common';
 import { PublishedCollection } from './dto/published-collection';
 import { DwCService } from './dwc.service';
 import { CollectionIDParam } from './dto/collection-id-param';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateArchiveQuery } from './dto/update-archive-query';
 import { basename } from 'path';
+import { Response } from 'express';
+import { strict } from 'assert';
 
 @ApiTags('Darwin Core')
 @Controller('dwc')
@@ -18,6 +28,40 @@ export class DwCController {
             return new PublishedCollection({
                 collectionID: a.collectionID,
                 archive: basename(a.objectKey)
+            });
+        });
+    }
+
+    @Get('collections/:collectionID')
+    @ApiResponse({
+        status: HttpStatus.OK,
+        content: {
+            'application/zip': {
+                schema: {
+                    type: 'string',
+                    format: 'binary'
+                }
+            }
+        }
+    })
+    async getArchiveByID(@Param() params: CollectionIDParam, @Res() res: Response): Promise<void> {
+        const archiveStream = await this.dwc.getCollectionArchive(params.collectionID);
+        if (!archiveStream) {
+            throw new NotFoundException();
+        }
+
+        archiveStream.pipe(res);
+
+        return new Promise((resolve, reject) => {
+            let error = null;
+            archiveStream.on('error', (e) => {
+                error = e;
+                reject(e)
+            });
+            archiveStream.on('end', () => {
+                if (!error) {
+                    resolve();
+                }
             });
         });
     }

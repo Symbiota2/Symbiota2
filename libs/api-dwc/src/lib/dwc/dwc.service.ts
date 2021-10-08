@@ -142,7 +142,17 @@ export class DwCService {
         await this.updateCollectionTags(collectionID, { public: 'false' });
     }
 
-    retrieveArchive(archiveName: string): ReadableStream {
+    async getCollectionArchive(collectionID: number): Promise<ReadableStream> {
+        const archiveName = await this.collectionArchiveName(collectionID);
+        const objectKey = DwCService.s3Key(archiveName);
+
+        if (await this.storage.hasObject(objectKey)) {
+            return this.storage.getObject(objectKey);
+        }
+        return null;
+    }
+
+    private retrieveArchive(archiveName: string): ReadableStream {
         return this.storage.getObject(archiveName);
     }
 
