@@ -780,6 +780,27 @@
           }
         }
       }
+    },
+    "api-dwc": {
+      "root": "libs/api-dwc",
+      "sourceRoot": "libs/api-dwc/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/api-dwc/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/api-dwc"],
+          "options": {
+            "jestConfig": "libs/api-dwc/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {

@@ -24,7 +24,7 @@ import { OccurrenceUpload } from '@symbiota2/api-database';
 import { QUEUE_ID_OCCURRENCE_UPLOAD } from '../queues/occurrence-upload.queue';
 import { OccurrenceUploadJob } from '../queues/occurrence-upload.processor';
 import { csvIterator } from '@symbiota2/api-common';
-import { DwcArchiveBuilder, dwcRecordType } from '@symbiota2/dwc';
+import { DwcArchiveBuilder } from '@symbiota2/dwc';
 import { v4 as uuid4 } from 'uuid';
 import { join as pathJoin } from 'path';
 
@@ -403,39 +403,5 @@ export class OccurrenceService {
 
     async startUpload(uid: number, collectionID: number, uploadID: number): Promise<void> {
         await this.uploadQueue.add({ uid, collectionID, uploadID });
-    }
-
-    async createDwCArchive(tmpDir: string, findOpts: FindConditions<Occurrence>): Promise<string> {
-        const dwcBuilder = new DwcArchiveBuilder(Occurrence, tmpDir);
-
-        // Make sure all of the occurrences have a guid
-        await this.occurrenceRepo.createQueryBuilder('o')
-            .update({ occurrenceGUID: () => "CONCAT('urn:uuid:', UUID())" })
-            .where({ ...findOpts, occurrenceGUID: IsNull() })
-            .execute();
-
-        let offset = 0;
-        let occurrences = await this.occurrenceRepo.find({
-            where: findOpts,
-            take: OccurrenceService.DWCA_CREATE_LIMIT,
-            skip: offset,
-            relations: ['taxon']
-        });
-
-
-        while (occurrences.length > 0) {
-            await Promise.all(occurrences.map((o) => dwcBuilder.addRecord(o)));
-            offset += occurrences.length;
-            occurrences = await this.occurrenceRepo.find({
-                where: findOpts,
-                take: OccurrenceService.DWCA_CREATE_LIMIT,
-                skip: offset,
-            });
-        }
-
-        const archivePath = pathJoin(tmpDir, `${uuid4()}.zip`);
-        await dwcBuilder.build(archivePath);
-
-        return archivePath;
     }
 }

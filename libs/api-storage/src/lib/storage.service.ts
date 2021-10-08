@@ -6,11 +6,10 @@ import { PassThrough } from 'stream';
 import { S3 } from 'aws-sdk';
 import {
     DeleteObjectRequest,
-    GetObjectRequest,
-    HeadObjectRequest,
-    PutObjectRequest
+    GetObjectRequest, GetObjectTaggingRequest,
+    HeadObjectRequest, ListObjectsRequest,
+    PutObjectRequest, PutObjectTaggingRequest, Tag
 } from 'aws-sdk/clients/s3';
-import WritableStream = NodeJS.WritableStream;
 
 @Injectable()
 export class StorageService {
@@ -24,13 +23,17 @@ export class StorageService {
         return this.appConfig.storageBucket();
     }
 
-    async putObject(objectKey: string, objectValue: ReadableStream) {
+    async putObject(objectKey: string, objectValue: ReadableStream, tags?: Record<string, string>) {
         this.logger.debug(`Uploading object to s3://${this.bucket}/${objectKey}`);
         const req: PutObjectRequest = {
             Bucket: this.bucket,
             Key: objectKey,
             Body: objectValue
         };
+        if (tags) {
+            req.Tagging = StorageService.encodeObjectTags(tags);
+        }
+
         await this.s3Client.upload(req).promise();
         this.logger.debug(`Upload to s3://${this.bucket}/${objectKey} complete`);
     }
@@ -75,5 +78,59 @@ export class StorageService {
             Key: objectKey
         };
         await this.s3Client.deleteObject(req).promise();
+    }
+
+    async patchTags(objectKey: string, tags: Record<string, string>): Promise<void> {
+        this.logger.debug(`Tagging object at s3://${this.bucket}/${objectKey}`);
+
+        const currentTags = await this.getTags(objectKey);
+        tags = { ...currentTags, ...tags };
+
+        const newTags: Tag[] = [];
+        for (const [k, v] of Object.entries(tags)) {
+            newTags.push({ Key: k, Value: v });
+        }
+
+        const putReq: PutObjectTaggingRequest = {
+            Bucket: this.bucket,
+            Key: objectKey,
+            Tagging: {
+                TagSet: newTags
+            }
+        };
+
+        await this.s3Client.putObjectTagging(putReq).promise();
+    }
+
+    async getTags(objectKey: string): Promise<Record<string, string>> {
+        const getReq: GetObjectTaggingRequest = {
+            Bucket: this.bucket,
+            Key: objectKey
+        };
+        const tagResponse = await this.s3Client.getObjectTagging(getReq).promise();
+        const currentTags = {};
+
+        for (const tag of tagResponse.TagSet) {
+            currentTags[tag.Key] = tag.Value;
+        }
+
+        return currentTags;
+    }
+
+    async listObjects(pathPrefix: string): Promise<string[]> {
+        const req: ListObjectsRequest = {
+            Bucket: this.bucket,
+            Prefix: pathPrefix
+        };
+        const objs = await this.s3Client.listObjectsV2(req).promise();
+        return objs.Contents.map((o) => o.Key);
+    }
+
+    private static encodeObjectTags(tags: Record<string, string>): string {
+        const tagsUri = new URLSearchParams();
+        for (const [k, v] of Object.entries(tags)) {
+            tagsUri.set(k, v);
+        }
+        return tagsUri.toString();
     }
 }

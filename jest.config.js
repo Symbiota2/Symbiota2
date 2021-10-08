@@ -21,5 +21,6 @@ module.exports = {
     '<rootDir>/libs/dwc',
     '<rootDir>/libs/api-email',
     '<rootDir>/libs/api-storage',
+    '<rootDir>/libs/api-dwc',
   ],
 };

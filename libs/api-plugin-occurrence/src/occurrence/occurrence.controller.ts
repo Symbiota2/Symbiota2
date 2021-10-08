@@ -31,18 +31,20 @@ import {
     getCSVFields, withTempDir
 } from '@symbiota2/api-common';
 import { OccurrenceOutputDto } from './dto/occurrence.output.dto';
-import { ProtectCollection } from '@symbiota2/api-plugin-collection';
+import {
+    CollectionService,
+    ProtectCollection
+} from '@symbiota2/api-plugin-collection';
 import { CollectionListItem } from '@symbiota2/ui-plugin-collection';
 import { CollectionIDQueryParam } from './dto/collection-id-query-param';
 import { AuthenticatedRequest, JwtAuthGuard } from '@symbiota2/api-auth';
 import { OccurrenceHeaderMapBody } from './dto/occurrence-header-map.input.dto';
 import { Occurrence, OccurrenceUpload } from '@symbiota2/api-database';
 import * as path from 'path';
-import { tmpdir } from 'os';
-import { DwcArchiveBuilder } from '@symbiota2/dwc';
 import { AppConfigService } from '@symbiota2/api-config';
 import { IsNull, Not } from 'typeorm';
-import { StorageService } from '../../../api-storage/src/lib/storage.service';
+import { StorageService } from '@symbiota2/api-storage';
+import { DwCService } from '@symbiota2/api-dwc';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -53,7 +55,9 @@ export class OccurrenceController {
     constructor(
         private readonly config: AppConfigService,
         private readonly occurrenceService: OccurrenceService,
-        private readonly storageService: StorageService) { }
+        private readonly collectionService: CollectionService,
+        private readonly storageService: StorageService,
+        private readonly dwcService: DwCService) { }
 
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: OccurrenceList })
@@ -214,51 +218,5 @@ export class OccurrenceController {
             query.collectionID,
             uploadID
         );
-    }
-
-    @Get('download/dwca')
-    @ApiOperation({
-        summary: 'Retrieve this collection as a Darwin Core Archive'
-    })
-    @ApiResponse({
-        status: HttpStatus.OK,
-        content: {
-            'application/zip': {
-                schema: {
-                    type: 'string',
-                    format: 'binary'
-                }
-            }
-        }
-    })
-    async getCollectionAsArchive(@Query() query: CollectionIDQueryParam, @Res() response: Response): Promise<void> {
-        const s3Key = `dwc/${query.collectionID}/dwc.zip`;
-        const dataDir = await this.config.dataDir();
-
-        // TODO: Do we export records without an associated taxon?
-        const archiveExists = await this.storageService.hasObject(s3Key);
-
-        if (!archiveExists) {
-            await new Promise<void>((resolve) => {
-                withTempDir(dataDir, async (tmpDir) => {
-                    const archive = await this.occurrenceService.createDwCArchive(
-                        tmpDir,
-                        { collectionID: query.collectionID, taxonID: Not(IsNull()) }
-                    );
-
-                    const readStream = createReadStream(archive);
-                    await this.storageService.putObject(s3Key, readStream);
-                    resolve();
-                });
-            });
-        }
-
-        const archive = this.storageService.getObject(s3Key);
-        archive.pipe(response);
-
-        return new Promise<void>((resolve, reject) => {
-            archive.on('error', (e) => reject(e));
-            archive.on('close', () => resolve());
-        });
     }
 }
