@@ -17,6 +17,8 @@ export class AlertService {
             { duration: AlertService.MSG_DURATION, 
                 panelClass: ["message-snackbar"]}
         );
+
+        console.log(message);
     }
 
     showError(message: string) {
@@ -28,5 +30,7 @@ export class AlertService {
                 panelClass: ["error-snackbar"]
             }
         );
+
+        console.error(message);
     }
 }
