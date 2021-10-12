@@ -1,11 +1,28 @@
-import { Controller, Get, Param, Query, Post, Body, HttpStatus, HttpCode, Delete, NotFoundException, Patch } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Param,
+    Query,
+    Post,
+    Body,
+    HttpStatus,
+    HttpCode,
+    Delete,
+    NotFoundException,
+    Patch,
+    UseGuards, SerializeOptions
+} from '@nestjs/common';
 import { TaxonDescriptionBlockService } from './taxonDescriptionBlock.service'
-import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger'
+import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { TaxonDescriptionBlockDto } from './dto/TaxonDescriptionBlockDto'
 import { TaxonDescriptionBlockFindAllParams } from './dto/taxonDescriptionBlock-find-all.input.dto'
 import { TaxonDescriptionStatementDto } from '../taxonDescriptionStatement/dto/TaxonDescriptionStatementDto';
 import { TaxonDto } from '../taxon/dto/TaxonDto';
 import { ImageDto } from '../../../api-plugin-image/src/image/dto/ImageDto';
+import { JwtAuthGuard } from '@symbiota2/api-auth';
+import { Collection, TaxonDescriptionBlock } from '@symbiota2/api-database';
+import { CollectionInputDto, ProtectCollection, UpdateCollectionInputDto } from '@symbiota2/api-plugin-collection';
+import { TaxonDescriptionBlockInputDto } from './dto/TaxonDescriptionBlockInputDto';
 
 @ApiTags('TaxonDescriptionBlock')
 @Controller('taxonDescriptionBlock')
@@ -73,4 +90,50 @@ export class TaxonDescriptionBlockController {
         return dto
     }
 
+    @Post()
+    @ApiOperation({
+        summary: "Create a new description block"
+    })
+    @HttpCode(HttpStatus.OK)
+    //@UseGuards(JwtAuthGuard)
+    //@ApiBearerAuth()
+    @ApiResponse({ status: HttpStatus.OK, type: Collection })
+    //@SerializeOptions({ groups: ['single'] })
+    async create(@Body() data: TaxonDescriptionBlockInputDto): Promise<TaxonDescriptionBlockDto> {
+        if (data.taxonID == null) data.taxonID = 2
+        if (data.creatorUID == null) data.creatorUID = 1
+        const block = await this.myService.create(data)
+        const dto = new TaxonDescriptionBlockDto(block)
+        return dto
+    }
+
+    @Delete(':id')
+    @ApiOperation({
+        summary: "Delete a taxon description block by ID"
+    })
+    @ProtectCollection('id')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiResponse({ status: HttpStatus.NO_CONTENT })
+    async deleteByID(@Param('id') id: number): Promise<void> {
+        const block = await this.myService.deleteByID(id);
+        if (!block) {
+            throw new NotFoundException();
+        }
+    }
+
+    @Patch(':id')
+    @ApiOperation({
+        summary: "Update a specimen collection by ID"
+    })
+    @ProtectCollection('id')
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonDescriptionBlock })
+    @SerializeOptions({ groups: ['single'] })
+    async updateByID(@Param('id') id: number, @Body() data: TaxonDescriptionBlock): Promise<TaxonDescriptionBlock> {
+        const block = await this.myService.updateByID(id, data)
+        if (!block) {
+            throw new NotFoundException()
+        }
+
+        return block
+    }
 }

@@ -88,8 +88,13 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     }
 
     onAddDescriptionBlock() {
-        this.blocks.push(new TaxonDescriptionBlockListItem())
-        this.dataSource = this.blocks
+        // Construct a new blcok
+        const newBlock = new TaxonDescriptionBlockListItem()
+        this.taxonBlockService.create(newBlock).subscribe((block)=> {
+            // It has been added to the database, now make it part of the list of blocks
+            this.blocks.push(block)
+            this.dataSource = this.blocks
+        })
     }
 
     onAddStatement(block: TaxonDescriptionBlockListItem) {
