@@ -92,6 +92,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
         const newBlock = new TaxonDescriptionBlockListItem()
         this.taxonBlockService.create(newBlock).subscribe((block)=> {
             // It has been added to the database, now make it part of the list of blocks
+            console.log(" My block id is " + block.id)
             this.blocks.push(block)
             this.dataSource = this.blocks
         })
@@ -186,6 +187,11 @@ export class TaxonDescriptionEditorComponent implements OnInit {
                 value.sourceUrl = row_obj.sourceUrl
                 value.notes = row_obj.notes
                 value.displayLevel = row_obj.displayLevel
+                this.taxonBlockService.update(value).subscribe((block)=> {
+                    // It has been updated in the database
+                    //this.blocks.push(block)
+                    //this.dataSource = this.blocks
+                })
             }
             return true
         })

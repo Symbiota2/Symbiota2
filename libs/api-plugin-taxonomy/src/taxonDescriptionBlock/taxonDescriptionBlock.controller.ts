@@ -125,10 +125,11 @@ export class TaxonDescriptionBlockController {
     @ApiOperation({
         summary: "Update a specimen collection by ID"
     })
-    @ProtectCollection('id')
+    //@ProtectCollection('id')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDescriptionBlock })
     @SerializeOptions({ groups: ['single'] })
     async updateByID(@Param('id') id: number, @Body() data: TaxonDescriptionBlock): Promise<TaxonDescriptionBlock> {
+        console.log("data is " + data.caption)
         const block = await this.myService.updateByID(id, data)
         if (!block) {
             throw new NotFoundException()

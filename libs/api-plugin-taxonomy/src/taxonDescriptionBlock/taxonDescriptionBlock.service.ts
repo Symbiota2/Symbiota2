@@ -49,6 +49,7 @@ Fetch the block data for a given taxon id.
      */
     async create(data: Partial<TaxonDescriptionBlock>): Promise<TaxonDescriptionBlock> {
         const block = this.myRepository.create(data)
+        //console.log(" service " + block.id + block.taxonID)
         return this.myRepository.save(block)
     }
 
@@ -56,6 +57,9 @@ Fetch the block data for a given taxon id.
     TODO: Implement error handling
      */
     async updateByID(id: number, data: Partial<TaxonDescriptionBlock>): Promise<TaxonDescriptionBlock> {
+        console.log("id is " + id)
+        console.log("data is " + data.id )
+        console.log("data is " + data.caption )
         const updateResult = await this.myRepository.update({ id }, data)
         if (updateResult.affected > 0) {
             return this.findByID(id)
