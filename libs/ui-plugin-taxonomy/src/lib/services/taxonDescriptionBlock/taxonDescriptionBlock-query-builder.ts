@@ -1,4 +1,5 @@
 import { Q_PARAM_TAXAIDS } from '../../../constants';
+import { OccurrenceQueryBuilder } from '../../../../../ui-plugin-occurrence/src/lib/services/occurrence-query-builder';
 
 export class TaxonDescriptionBlockQueryBuilder {
     protected baseUrl: string
@@ -23,8 +24,47 @@ export class TaxonDescriptionBlockQueryBuilder {
         return new FindOneBuilder(this.baseUrl)
     }
 
+    create(): CreateOneBuilder {
+        return new CreateOneBuilder(this.baseUrl);
+    }
+
+    upload(): UploadBuilder {
+        return new UploadBuilder(this.baseUrl);
+    }
+
     build(): string {
         return this.url.toString()
+    }
+}
+
+class CreateOneBuilder extends TaxonDescriptionBlockQueryBuilder {
+    protected _myID: number;
+
+    myID(id: number): CreateOneBuilder {
+        this._myID = id;
+        return this;
+    }
+
+    build(): string {
+        //this.url.searchParams.set('collectionID', this._myID.toString());
+        return super.build();
+    }
+}
+
+class UploadBuilder extends TaxonDescriptionBlockQueryBuilder {
+    private _id: number = null;
+
+    id(id: number): UploadBuilder {
+        this._id = id;
+        return this;
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/upload`;
+        if (this._id) {
+            this.url.pathname += `/${this._id}`;
+        }
+        return super.build();
     }
 }
 
