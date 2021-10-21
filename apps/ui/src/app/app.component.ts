@@ -18,7 +18,7 @@ export class AppComponent implements OnInit {
 
     constructor(
         private readonly loadingService: LoadingService,
-        private readonly userService: UserService) { }
+        private readonly userService: UserService ) { }
 
     ngOnInit() {
         // Show loading screen when loading

@@ -1,15 +1,14 @@
 @import "../styles/mixins.import";
 
 #app {
-    $margin-y: 3rem;
-    @include mx(4ex);
-    @include my($margin-y);
+
+    border-radius: 0%;
 
     padding: 0;
 
     &, .mat-card-content {
         overflow: auto;
-        min-height: calc(100vh - #{$margin-y} * 2);
+        min-height: calc(100vh);
     }
 
     @media only screen and (max-width: 600px) {
@@ -28,7 +27,7 @@
     top: 0;
 }
 
-#site-banner { }
+#site-banner{ }
 
 #router-outlet {
     @include px(2rem);

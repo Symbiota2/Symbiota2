@@ -7,10 +7,15 @@
     >
         <button mat-icon-button>
             <mat-icon>menu</mat-icon>
-            <span>
-                {{ 'core.layout.header.topnav.menu_button' | translate }}
-            </span>
         </button>
+        <a routerLink="/" class="invisible-btn">
+            <img 
+                id="logo-btn"
+                src="./assets/images/layout/logo_white.png"
+                alt="{{ 'core.layout.header.banner.symbiota_logo_alt_text' | translate }}"
+            >
+        </a>
+        
     </div>
     <div
         id="left-links"
@@ -19,9 +24,13 @@
         fxLayoutAlign="start center"
         fxHide.lt-md
     >
-        <div fxLayout fxLayoutGap="0.5rem">
-            <a mat-button [routerLink]="ROUTE_HOME">
-                {{ 'core.layout.header.topnav.home_link' | translate }}
+        <div fxLayout fxLayoutGap="0.5rem" fxLayoutAlign="center center">
+            <a routerLink="/" class="invisible-btn">
+                <img 
+                    id="logo-btn"
+                    src="./assets/images/layout/logo_white.png"
+                    alt="{{ 'core.layout.header.banner.symbiota_logo_alt_text' | translate }}"
+                >
             </a>
             <a mat-button *ngFor="let link of pluginLinks" routerLink="{{ link.url }}">
                 {{ link.name | translate }}
@@ -122,21 +131,21 @@
 <!--            <a [routerLink]="ROUTE_SITEMAP">-->
 <!--                {{ 'core.layout.header.topnav.sitemap_link' | translate }}-->
 <!--            </a>-->
-            <select id='lang-select' [ngModel]='currentLang' (ngModelChange)='useLanguage($event)'>
-                <option value="en">English</option>
-                <option value="ar">Arabic</option>
-                <option value="zh">Chinese</option>
-                <option value="fa">Farsi</option>
-                <option value="fr">French</option>
-                <option value="de">German</option>
-                <option value="hi">Hindi</option>
-                <option value="it">Italian</option>
-                <option value="ja">Japanese</option>
-                <option value="pt">Portuguese</option>
-                <option value="ru">Russian</option>
-                <option value="es">Spanish</option>
-                <option value="ur">Urdu</option>
-            </select>
+            <mat-select id='lang-select' [ngModel]='currentLang' (ngModelChange)='useLanguage($event)'>
+                <mat-option value="en">English</mat-option>
+                <mat-option value="ar">Arabic</mat-option>
+                <mat-option value="zh">Chinese</mat-option>
+                <mat-option value="fa">Farsi</mat-option>
+                <mat-option value="fr">French</mat-option>
+                <mat-option value="de">German</mat-option>
+                <mat-option value="hi">Hindi</mat-option>
+                <mat-option value="it">Italian</mat-option>
+                <mat-option value="ja">Japanese</mat-option>
+                <mat-option value="pt">Portuguese</mat-option>
+                <mat-option value="ru">Russian</mat-option>
+                <mat-option value="es">Spanish</mat-option>
+                <mat-option value="ur">Urdu</mat-option>
+            </mat-select>
         </div>
     </div>
 </div>

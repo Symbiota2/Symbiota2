@@ -38,7 +38,6 @@ import {
     CollectionRoleInput,
     CollectionRoleOutput,
 } from '../dto/CollectionRole.dto';
-import * as e from 'express';
 
 interface FindAllParams {
     id?: number | number[];
