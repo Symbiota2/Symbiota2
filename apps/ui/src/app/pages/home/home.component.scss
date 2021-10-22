@@ -1,3 +1,15 @@
+@import "../../../styles/theme.import.scss";
+
+#main{
+
+    width: inherit;
+    padding: 2rem;
+}
+
+#logo{
+    width: 48rem;
+}
 p {
-    font-size: 2ex;
+    font-size: 18px;
+    color: rgb(82, 82, 82);
 }

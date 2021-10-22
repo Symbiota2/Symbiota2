@@ -1,7 +1,17 @@
-<div>
+<div id="main" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="3rem">
+    <img
+    id="logo"
+    src="../../../assets/images/layout/logo_green.png"
+    alt="{{
+        'core.layout.header.banner.symbiota_logo_alt_text'
+            | translate
+    }}"
+/>
     <h3 *ngIf="title">
         {{ "core.layout.home.title_line" | translate: { "title": title } }}
     </h3>
+
     <p>{{ "core.layout.home.para_one" | translate }}</p>
+
     <p>{{ "core.layout.home.para_two" | translate }}</p>
 </div>
