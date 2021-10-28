@@ -73,7 +73,7 @@ export class TaxonTaxonEditorComponent implements OnInit {
     ngOnInit() {
         this.currentRoute.paramMap.subscribe(params => {
             this.taxonID = params.get('taxonID')
-            // Load the authorities
+            // Load the taxon
             this.loadTaxon(parseInt(this.taxonID))
         })
     }

@@ -44,24 +44,18 @@ export class TaxonEditorPageComponent implements OnInit {
     Called when Angular starts
      */
     ngOnInit() {
-
-        console.log("loading ")
         this.currentRoute.paramMap.subscribe(params => {
             this.taxonID = params.get('taxonID')
             // Load the profile
             this.loadProfile(parseInt(this.taxonID))
         })
-
     }
 
     /*
-Load the taxon profile
- */
+    Load the taxon profile
+    */
     loadProfile(taxonID: number) {
-        console.log(" here ")
         this.taxonDescriptionBlockService.findBlocksByTaxonID(taxonID).subscribe((blocks) => {
-
-            console.log(" blocks " + blocks.length)
             blocks.forEach((block) => {
                 if (block.descriptionStatements.length > 0) {
                     block.descriptionStatements = block.descriptionStatements.sort((a, b) => a.sortSequence - b.sortSequence)

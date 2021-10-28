@@ -10,19 +10,20 @@ import {
     Delete,
     NotFoundException,
     Patch,
-    UseGuards, SerializeOptions
+    UseGuards, SerializeOptions, ParseArrayPipe
 } from '@nestjs/common';
 import { TaxonDescriptionBlockService } from './taxonDescriptionBlock.service'
-import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { TaxonDescriptionBlockDto } from './dto/TaxonDescriptionBlockDto'
 import { TaxonDescriptionBlockFindAllParams } from './dto/taxonDescriptionBlock-find-all.input.dto'
 import { TaxonDescriptionStatementDto } from '../taxonDescriptionStatement/dto/TaxonDescriptionStatementDto';
 import { TaxonDto } from '../taxon/dto/TaxonDto';
 import { ImageDto } from '../../../api-plugin-image/src/image/dto/ImageDto';
 import { JwtAuthGuard } from '@symbiota2/api-auth';
-import { Collection, TaxonDescriptionBlock } from '@symbiota2/api-database';
+import { TaxonDescriptionBlock } from '@symbiota2/api-database';
 import { CollectionInputDto, ProtectCollection, UpdateCollectionInputDto } from '@symbiota2/api-plugin-collection';
 import { TaxonDescriptionBlockInputDto } from './dto/TaxonDescriptionBlockInputDto';
+import { OccurrenceInputDto } from '../../../api-plugin-occurrence/src/occurrence/dto/occurrence-input.dto';
 
 @ApiTags('TaxonDescriptionBlock')
 @Controller('taxonDescriptionBlock')
@@ -90,6 +91,7 @@ export class TaxonDescriptionBlockController {
         return dto
     }
 
+    //@Post(':taxonID:creatorID')
     @Post()
     @ApiOperation({
         summary: "Create a new description block"
@@ -97,12 +99,20 @@ export class TaxonDescriptionBlockController {
     @HttpCode(HttpStatus.OK)
     //@UseGuards(JwtAuthGuard)
     //@ApiBearerAuth()
-    @ApiResponse({ status: HttpStatus.OK, type: Collection })
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonDescriptionBlockDto })
     //@SerializeOptions({ groups: ['single'] })
-    async create(@Body() data: TaxonDescriptionBlockInputDto): Promise<TaxonDescriptionBlockDto> {
-        if (data.taxonID == null) data.taxonID = 2
-        if (data.creatorUID == null) data.creatorUID = 1
-        const block = await this.myService.create(data)
+    @ApiBody({ type: TaxonDescriptionBlockInputDto, isArray: true })
+    /**
+    @see - @link TaxonDescriptionBlockDto
+     **/
+    //async create(@Param('taxonID') taxonID: number, @Param('creatorID') creatorID: number, @Body() data: TaxonDescriptionBlockInputDto): Promise<TaxonDescriptionBlockDto> {
+    async create(@Body(new ParseArrayPipe({ items: TaxonDescriptionBlockInputDto })) data: TaxonDescriptionBlockInputDto[]): Promise<TaxonDescriptionBlockDto> {
+        console.log('taxon id and uid ' + (typeof data) + data[0].taxonID + data[0].creatorUID)
+        //if (taxonID != null) data.taxonID = taxonID
+        //if (creatorID != null) data.creatorUID = creatorID
+        if (data[0].taxonID == null) data[0].taxonID = 2
+        if (data[0].creatorUID == null) data[0].creatorUID = 1
+        const block = await this.myService.create(data[0])
         const dto = new TaxonDescriptionBlockDto(block)
         return dto
     }
