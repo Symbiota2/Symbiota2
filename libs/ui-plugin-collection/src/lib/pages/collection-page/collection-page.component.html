@@ -1,75 +1,162 @@
-<div *ngIf="collection" id="main">
-    <div fxLayout="row" fxLayoutAlign="start center">
-        <symbiota2-collection-logo
-            id="collectionLogo"
-            [collectionID]='collection.id'
-            src="{{ collection.icon }}"
-            size="5rem"
-            *ngIf="collection.icon"
-        >
-        </symbiota2-collection-logo>
-        <div fxLayout="column" fxLayoutAlign="center start">
-            <div fxLayout='row' fxLayoutAlign='start center'>
+<div
+    *ngIf="collection"
+    id="main"
+    fxLayout="column"
+    fxLayoutAlign="start center"
+>
+    <div class="col-header" fxLayout="row" fxLayoutAlign="start start">
+        <div id="logo">
+            <symbiota2-collection-logo
+                class="collectionLogo"
+                [collectionID]="collection.id"
+                src="{{ collection.icon }}"
+                size="150px"
+                *ngIf="collection.icon"
+            >
+            </symbiota2-collection-logo>
+        </div>
+
+        <div class="name_inst" fxLayout="column">
+            <div fxLayout="row">
                 <h1 id="collectionName">
                     {{ collection.collectionName }}
                 </h1>
                 <button
                     *ngIf="canUserEdit() | async"
-                    id='editButton'
+                    id="editButton"
                     mat-icon-button
                     (click)="openCollectionTools()"
                 >
                     <mat-icon>edit</mat-icon>
                 </button>
             </div>
-            <div id='subTitle'>
-                <small class='italic' *ngIf='collection.institution?.name'>
-                    <span >at {{ collection.institution.name }} </span>
-                </small>
-                <small class='italic' *ngIf='collection.institution?.code && collection.collectionCode'>
-                    ({{ collection.institution.code }}-{{ collection.collectionCode }})
-                </small>
-            </div>
-            <div id="links">
-                <ng-container *ngFor="let link of links$ | async">
-                    <span>
-                        <a
-                            [routerLink]="link.routerLink"
-                            [queryParams]="link.queryParams">{{ link.text }}</a>
-                    </span>
-                    <span class="pipe">|</span>
-                </ng-container>
+            <div id="subTitle" fxLayoutAlign="start end">
+                <mat-icon>account_balance</mat-icon>
+                <div class="italic" *ngIf="collection.institution?.name">
+                    <span>{{ collection.institution.name }} </span>
+                </div>
+                <div
+                    class="italic"
+                    *ngIf="
+                        collection.institution?.code &&
+                        collection.collectionCode
+                    "
+                >
+                    ({{ collection.institution.code }}-{{
+                        collection.collectionCode
+                    }})
+                </div>
             </div>
         </div>
     </div>
-    <div id='collectionDescription' fxLayout='row'>
-        {{ collection.fullDescription }}
-    </div>
-    <div id='collectionInfo' fxLayout='row' fxLayoutAlign='center start'>
-        <div fxFlex='70'>
-            <div>
-                <!-- TODO: i18n -->
-                <symbiota2-collection-field label="Contact" [value]="collection.contact"></symbiota2-collection-field>
-                <symbiota2-collection-field label="Contact email" [value]="collection.email"></symbiota2-collection-field>
-                <symbiota2-collection-field label="Home page" [href]="collection.homePage" [value]="collection.homePage"></symbiota2-collection-field>
-                <symbiota2-collection-field label="Collection type" [value]="collection.type"></symbiota2-collection-field>
-                <symbiota2-collection-field label="Management" [value]="collection.managementType"></symbiota2-collection-field>
-                <symbiota2-collection-field label="Usage rights" [value]="collection.usageTerm"></symbiota2-collection-field>
-                <symbiota2-collection-field label="Last update" [value]="collection.collectionStats?.lastModifiedTimestamp | date: 'medium'"></symbiota2-collection-field>
-            </div>
+
+    <div id="body" fxLayout="column" fxLayoutGap="1rem">
+        <div id="links">
+            <ng-container *ngFor="let link of links$ | async">
+                <a
+                    mat-stroked-button
+                    id="link"
+                    [routerLink]="link.routerLink"
+                    [queryParams]="link.queryParams"
+                    >{{ link.text }}</a
+                >
+            </ng-container>
         </div>
-        <div fxFlex='30'>
-            <div id="collectionStats" *ngIf='collection.collectionStats'>
-                <b>Collection Stats</b>
-                <ul>
-                    <li>{{ collection.collectionStats.recordCount | number }} occurrences</li>
-                    <li>{{ collection.collectionStats.georeferencedCount | number }} ({{ geoReferencedPercent }}%) georeferenced</li>
-                    <li>{{ collection.collectionStats.familyCount | number }} families</li>
-                    <li>{{ collection.collectionStats.genusCount | number }} genera</li>
-                    <li>{{ collection.collectionStats.speciesCount | number }} species</li>
-                </ul>
-                <small>Last updated {{ collection.collectionStats.lastModifiedTimestamp | date: 'medium' }}</small>
-            </div>
+        <mat-card class="collection-mat-card" id="collectionDescription">
+            <mat-card-title> Overview </mat-card-title>
+            <mat-card-content>
+                {{ collection.fullDescription }}
+            </mat-card-content>
+        </mat-card>
+        <div  fxLayout="row" fxLayoutAlign="center start" fxLayoutGap="1rem">
+            <mat-card id="collectionInfo" class="collection-mat-card" fxFlex="60">
+                <mat-card-title> Collection Info </mat-card-title>
+                <mat-card-content>
+                    <!-- TODO: i18n -->
+                    <symbiota2-collection-field
+                        label="Contact"
+                        [value]="collection.contact"
+                    ></symbiota2-collection-field>
+                    <symbiota2-collection-field
+                        label="Contact email"
+                        [value]="collection.email"
+                    ></symbiota2-collection-field>
+                    <symbiota2-collection-field
+                        label="Home page"
+                        [href]="collection.homePage"
+                        [value]="collection.homePage"
+                    ></symbiota2-collection-field>
+                    <symbiota2-collection-field
+                        label="Collection type"
+                        [value]="collection.type"
+                    ></symbiota2-collection-field>
+                    <symbiota2-collection-field
+                        label="Management"
+                        [value]="collection.managementType"
+                    ></symbiota2-collection-field>
+                    <symbiota2-collection-field
+                        label="Usage rights"
+                        [value]="collection.usageTerm"
+                    ></symbiota2-collection-field>
+                    <symbiota2-collection-field
+                        label="Last update"
+                        [value]="
+                            collection.collectionStats?.lastModifiedTimestamp
+                                | date: 'medium'
+                        "
+                    ></symbiota2-collection-field>
+                </mat-card-content>
+            </mat-card>
+            <mat-card
+                class="collection-mat-card"
+                id="collectionStats"
+                fxFlex="40"
+                *ngIf="collection.collectionStats"
+            >
+                <mat-card-title> Collection Stats </mat-card-title>
+                <mat-card-content>
+                    <ul>
+                        <li>
+                            {{
+                                collection.collectionStats.recordCount | number
+                            }}
+                            occurrences
+                        </li>
+                        <li>
+                            {{
+                                collection.collectionStats.georeferencedCount
+                                    | number
+                            }}
+                            ({{ geoReferencedPercent }}%) georeferenced
+                        </li>
+                        <li>
+                            {{
+                                collection.collectionStats.familyCount | number
+                            }}
+                            families
+                        </li>
+                        <li>
+                            {{
+                                collection.collectionStats.genusCount | number
+                            }}
+                            genera
+                        </li>
+                        <li>
+                            {{
+                                collection.collectionStats.speciesCount | number
+                            }}
+                            species
+                        </li>
+                    </ul>
+                    <small
+                        >Last updated
+                        {{
+                            collection.collectionStats.lastModifiedTimestamp
+                                | date: 'medium'
+                        }}</small
+                    >
+                </mat-card-content>
+            </mat-card>
         </div>
     </div>
 </div>

@@ -8,7 +8,6 @@ import {
     CollectionProfileService,
 } from '../../services/collection-profile.service';
 import { AlertService, UserService } from '@symbiota2/ui-common';
-import { DomSanitizer } from '@angular/platform-browser';
 import {
     ROUTE_COLLECTION_LIST,
     ROUTE_COLLECTION_COMMENTS,
@@ -47,8 +46,6 @@ export class CollectionPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-
-        //TODO: rework this into html (let collection from async for variables)
         this.getCollection().subscribe((collection) => {
             this.collection = collection;
             this.geoReferencedPercent =

@@ -17,7 +17,7 @@ import * as e from "express";
 export class AppComponent implements OnInit {
     isLoading = false;
 
-    navbarSticky:boolean = false;
+    navbarSticky:boolean = true;
 
     @HostListener('window:scroll',['$event']) onScroll(){
         if(window.scrollY > 150){
