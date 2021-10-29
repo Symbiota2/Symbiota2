@@ -26,7 +26,7 @@ import {
     take,
 } from 'rxjs/operators';
 import { Collection, CollectionListItem } from '../dto/Collection.output.dto';
-import { Injectable, IterableDiffers } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { CollectionInputDto } from '../dto/Collection.input.dto';
 import {
     ApiCollectionCategoryOutput,
@@ -280,28 +280,21 @@ export class CollectionService {
      * @see {@link updateCollectionData}
      * @see {@link currentCollection}
      */
-    updateCurrentCollection(collectionData: Partial<CollectionInputDto>) {
-        this.userService.currentUser.pipe(
-            map((user) => {
-                if (user!!) {
-                    this.currentCollection.pipe(
-                        map((collection) => {
-                            if (user.canEditCollection(collection.id)) {
-                                this.updateCollectionData.next(collectionData);
-                            } else {
-                                this.alertService.showError(
-                                    'User does not have permission to edit Collection'
-                                );
-                            }
-                        })
-                    );
+    updateCurrentCollection(collectionData: Partial<CollectionInputDto>): Observable<Boolean> {
+        return combineLatest([this.userService.currentUser, this.currentCollection]).pipe(
+            take(1),
+            map(([user, collection]) => {
+                if (!!user && !!collection && user.canEditCollection(collection.id)){
+                    this.updateCollectionData.next(collectionData);
+                    return true;
                 } else {
                     this.alertService.showError(
-                        'User must be logged in to edit collections'
+                        'User does not have permission to edit collection'
                     );
+                    return false;
                 }
             })
-        );
+        )
     }
 
     /**
