@@ -57,7 +57,7 @@ export class CollectionPage implements OnInit {
                       )
                     : 0;
             this.comments_link = {
-                text: 'view comments',
+                text: 'View comments',
                 requiresLogin: false,
                 routerLink: `/${ROUTE_COLLECTION_COMMENTS.replace(
                     ':collectionID',

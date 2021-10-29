@@ -18,6 +18,7 @@
 
 .name_inst{
     margin-left: 1rem;
+    height: 128px;
 }
 
 .col-header{
@@ -46,7 +47,6 @@
 }
 
 #subTitle {
-    margin: 1rem 0;
     mat-icon {
         color: #7D7D7D;
         padding-right: 0.5rem;
@@ -68,12 +68,22 @@
     }
 }
 
-#link{
+.primaryLink{
+    color:white !important;
+    background-color: $primaryColor;
+    border: none;
+}
+
+#collectionLink{
     color: $primaryColor;
     font-size: 12px;
     font-weight: 400;
     border-radius: .5rem;
     margin-right: 1rem;
+}
+
+#collectionLink:hover{
+    text-decoration: none;
 }
 
 .collection-mat-card{
@@ -86,15 +96,16 @@
         font-size: 18px;
         font-weight: 400;
         margin-bottom: 1rem;
+
+        mat-icon{
+            padding-right: .5rem;
+        }
     }
 
     mat-card-content{
         padding-left: 1rem;
         font-weight: 300;
     }
-}
-
-#collectionDescription {
 }
 
 #mainContent {
@@ -104,6 +115,12 @@
 
 #collectionStats {
     height: 200px;
+    color: white;
+    background-color: $primaryColor;
+    
+    mat-card-title{
+        color: white;
+    }
 }
 
 #collectionInfo {
@@ -111,5 +128,6 @@
 }
 
 #editButton {
+    color: white;
     vertical-align: middle;
 }
