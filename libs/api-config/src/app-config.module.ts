@@ -9,7 +9,7 @@ import configBuilder from './configuration';
  */
 @Module({
     imports: [
-        ConfigModule.forRoot({ load: [configBuilder] })
+        ConfigModule.forRoot({ load: [configBuilder] }),
     ],
     providers: [AppConfigService],
     exports: [AppConfigService]

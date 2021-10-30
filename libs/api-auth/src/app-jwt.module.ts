@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppConfigModule, AppConfigService } from '@symbiota2/api-config';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
+import { JwtKeyService } from './jwt-key/jwt-key.service';
+import { JwtKeyModule } from './jwt-key/jwt-key.module';
 
-async function jwtModuleFactory(appConfigService: AppConfigService): Promise<JwtModuleOptions> {
+async function jwtModuleFactory(jwtKey: JwtKeyService): Promise<JwtModuleOptions> {
     return {
-        secret: await appConfigService.jwtKey(),
+        secret: await jwtKey.getOrCreateKey(),
         signOptions: { expiresIn: '5m' }
     }
 }
@@ -16,11 +17,12 @@ async function jwtModuleFactory(appConfigService: AppConfigService): Promise<Jwt
 @Module({
     imports: [
         JwtModule.registerAsync({
-            imports: [AppConfigModule],
+            imports: [JwtKeyModule],
             useFactory: jwtModuleFactory,
-            inject: [AppConfigService]
+            inject: [JwtKeyService]
         }),
+        JwtKeyModule,
     ],
-    exports: [JwtModule]
+    exports: [JwtModule],
 })
 export class AppJwtModule {}

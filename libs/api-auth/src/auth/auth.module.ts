@@ -7,6 +7,7 @@ import { AppConfigModule } from '@symbiota2/api-config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshCookieStrategy } from './strategies/refresh-cookie.strategy';
 import { AppJwtModule } from '../app-jwt.module';
+import { JwtKeyModule } from '../jwt-key/jwt-key.module';
 
 /**
  * Module responsible for authenticating users via JWTs (https://jwt.io/).
@@ -17,13 +18,15 @@ import { AppJwtModule } from '../app-jwt.module';
         AppConfigModule,
         AppJwtModule,
         UserModule,
-        PassportModule
+        PassportModule,
+        JwtKeyModule,
     ],
     providers: [
         LocalStrategy,
         JwtStrategy,
         RefreshCookieStrategy
     ],
-    controllers: [AuthController]
+    controllers: [AuthController],
+    exports: [JwtStrategy]
 })
 export class AuthModule { }

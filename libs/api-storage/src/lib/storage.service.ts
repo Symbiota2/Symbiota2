@@ -38,6 +38,14 @@ export class StorageService {
         this.logger.debug(`Upload to s3://${this.bucket}/${objectKey} complete`);
     }
 
+    async putData(objectKey: string, data: string | Buffer, tags?: Record<string, string>) {
+        const dataStream = new PassThrough();
+        const putObjPromise = this.putObject(objectKey, dataStream, tags);
+        dataStream.write(data);
+        dataStream.end();
+        return await putObjPromise;
+    }
+
     async hasObject(objectKey: string): Promise<boolean> {
         const req: HeadObjectRequest = {
             Bucket: this.bucket,
@@ -69,6 +77,21 @@ export class StorageService {
             .send();
 
         return outputStream;
+    }
+
+    async getData(objectKey: string): Promise<Buffer> {
+        const stream = await this.getObject(objectKey);
+        const chunks = [];
+        stream.on('data', (d) => chunks.push(d));
+
+        return new Promise((resolve, reject) => {
+            stream.once('error', (e) => {
+                reject(e);
+            });
+            stream.once('end', () => {
+                resolve(Buffer.concat(chunks));
+            });
+        });
     }
 
     async deleteObject(objectKey: string) {
