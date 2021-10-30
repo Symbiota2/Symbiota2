@@ -3,7 +3,7 @@ stages:
     - deploy
 
 "Build & run tests":
-    image: "node:12"
+    image: "node:14"
     stage: test
     coverage: /All\sfiles.*?\s+(\d+.\d+)/
     script:
@@ -23,7 +23,7 @@ stages:
         - printf '\tUser symbiota2\n' >> ~/.ssh/config
         - printf '\tIdentityFile ~/.ssh/id_ed25519\n' >> ~/.ssh/config
     script:
-        - ssh demo.symbiota2.org 'cd app && git pull'
+        - ssh demo.symbiota2.org 'cd app && git reset --hard HEAD && git pull'
         - "scp $PROD_UI_ENVIRON demo.symbiota2.org:app/apps/ui/src/environments/environment.prod.ts"
         - ssh demo.symbiota2.org 'sudo systemctl restart symbiota2'
 

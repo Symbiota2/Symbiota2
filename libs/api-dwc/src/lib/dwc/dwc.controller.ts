@@ -67,25 +67,23 @@ export class DwCController {
             });
         });
     }
-
-    @Put('collections/:collectionID')
-    @ApiOperation({ summary: 'Create or publish a Darwin Core Archive for the given collection' })
-    // @ProtectCollection('collectionID')
-    async createCollectionArchive(@Param() params: CollectionIDParam, @Query() query: UpdateArchiveQuery): Promise<void> {
-        const collectionExists = await this.dwc.collectionArchiveExists(params.collectionID);
-
-        console.log(query);
-        if (!collectionExists || query.refresh) {
-            await this.dwc.createArchiveForCollection(
-                params.collectionID,
-                { publish: query.publish }
-            );
-        }
-        else if (query.publish) {
-            await this.dwc.publishCollectionArchive(params.collectionID);
-        }
-        else {
-            await this.dwc.unpublishCollectionArchive(params.collectionID);
-        }
-    }
+    // @Put('collections/:collectionID')
+    // @ApiOperation({ summary: 'Create or publish a Darwin Core Archive for the given collection' })
+    // // @ProtectCollection('collectionID')
+    // async createCollectionArchive(@Param() params: CollectionIDParam, @Query() query: UpdateArchiveQuery): Promise<void> {
+    //     const collectionExists = await this.dwc.collectionArchiveExists(params.collectionID);
+    //
+    //     if (!collectionExists || query.refresh) {
+    //         await this.dwc.createArchiveForCollection(
+    //             params.collectionID,
+    //             { publish: query.publish }
+    //         );
+    //     }
+    //     else if (query.publish) {
+    //         await this.dwc.publishCollectionArchive(params.collectionID);
+    //     }
+    //     else {
+    //         await this.dwc.unpublishCollectionArchive(params.collectionID);
+    //     }
+    // }
 }
