@@ -121,7 +121,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
     ]
 })
 export class TaxonomyPlugin extends SymbiotaUiPlugin {
-    static readonly PLUGIN_NAME = 'Taxonomy';
+    static readonly PLUGIN_NAME = 'plugins.taxa.name';
 
     private static SEARCH_TAXA_ROUTE = "taxonomy/search"
     private static TAXA_VIEWER_ROUTE = "taxonomy/viewer"

@@ -122,7 +122,7 @@ import { CollectionPermissionsConfirmDialogComponent } from './components/collec
     ]
 })
 export class CollectionPlugin extends SymbiotaUiPlugin {
-    static readonly PLUGIN_NAME = 'Collections';
+    static readonly PLUGIN_NAME = 'plugins.collection.name';
 
     static routes(): Route[] {
         return [
