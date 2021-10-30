@@ -4,8 +4,6 @@ import { Injectable } from '@nestjs/common';
 import { AppConfigService } from '@symbiota2/api-config';
 import { ApiJwtPayload } from '@symbiota2/data-access';
 import { ExtractedJwt } from '../dto/extracted-jwt';
-import { StorageService } from '@symbiota2/api-storage';
-import crypto from 'crypto';
 import { JwtKeyService } from '../../jwt-key/jwt-key.service';
 
 /**

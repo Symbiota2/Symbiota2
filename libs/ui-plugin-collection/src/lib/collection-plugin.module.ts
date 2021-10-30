@@ -27,9 +27,9 @@ import { CollectionProfileService } from './services/collection-profile.service'
 import { CommentService } from './services/comments.service';
 import { CollectionLogoComponent } from './components/collection-logo/collection-logo.component';
 import { MatInputModule } from '@angular/material/input';
-import {MatDividerModule} from '@angular/material/divider'; 
+import {MatDividerModule} from '@angular/material/divider';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {MatPaginatorModule} from '@angular/material/paginator'; 
+import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatListModule} from '@angular/material/list';
 import {MatRadioModule} from '@angular/material/radio';
@@ -122,6 +122,8 @@ import { CollectionPermissionsConfirmDialogComponent } from './components/collec
     ]
 })
 export class CollectionPlugin extends SymbiotaUiPlugin {
+    static readonly PLUGIN_NAME = 'Collections';
+
     static routes(): Route[] {
         return [
             { path: ROUTE_COLLECTION_LIST, component: CollectionListPage },
@@ -133,7 +135,7 @@ export class CollectionPlugin extends SymbiotaUiPlugin {
     }
 
     static navBarLinks(): NavBarLink[] {
-        return [{ name: 'Collections', url: ROUTE_COLLECTION_LIST }]
+        return [{ name: 'Browse Collections', url: ROUTE_COLLECTION_LIST }]
     }
 
     static userProfileTabs(): UserProfileTab[] {

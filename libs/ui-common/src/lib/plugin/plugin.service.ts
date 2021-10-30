@@ -7,7 +7,7 @@ import { UserProfileTab } from "./user-profile-tab.interface";
 
 @Injectable()
 export class PluginService {
-    private _navBarLinks = new BehaviorSubject<NavBarLink[]>([]);
+    private _navBarLinks = new BehaviorSubject<Map<string, NavBarLink[]>>(new Map());
     private _userProfileTabs = new BehaviorSubject<UserProfileTab[]>([]);
 
     navBarLinks$ = this._navBarLinks.asObservable().pipe(shareReplay(1));
@@ -19,12 +19,20 @@ export class PluginService {
         this.router.config = [...this.router.config, route];
     }
 
-    public putNavBarLink(link: NavBarLink) {
-        const currentLinks = this._navBarLinks.getValue();
-        this._navBarLinks.next([...currentLinks, link]);
+    public putNavBarLink(category: string, link: NavBarLink) {
+        const linkMap = new Map(this._navBarLinks.getValue());
+        if (!linkMap.has(category)) {
+            linkMap.set(category, []);
+        }
+        const linkList = [
+            ...linkMap.get(category),
+            link
+        ];
+        linkMap.set(category, linkList);
+        this._navBarLinks.next(linkMap);
     }
 
-    public putProfileTab(tab: UserProfileTab) {
+    public putProfileTab(category: string, tab: UserProfileTab) {
         const currentTabs = this._userProfileTabs.getValue();
         this._userProfileTabs.next([...currentTabs, tab]);
     }

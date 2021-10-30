@@ -5,6 +5,7 @@ import crypto from 'crypto';
 @Injectable()
 export class JwtKeyService {
     private static readonly JWT_KEY_FILE = '.secrets/jwtSigningKey';
+    private static JWT_KEY = '';
 
     constructor(private readonly storage: StorageService) { }
 
@@ -22,7 +23,12 @@ export class JwtKeyService {
             return newKey;
         }
 
-        const keyBuf = await this.storage.getData(JwtKeyService.JWT_KEY_FILE);
-        return keyBuf.toString('utf-8');
+        // Cache it until the server is restarted
+        if (JwtKeyService.JWT_KEY === '') {
+            const keyBuf = await this.storage.getData(JwtKeyService.JWT_KEY_FILE);
+            JwtKeyService.JWT_KEY = keyBuf.toString('utf-8');
+        }
+
+        return JwtKeyService.JWT_KEY;
     }
 }

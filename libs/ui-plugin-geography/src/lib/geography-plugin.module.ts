@@ -28,4 +28,6 @@ import { StateProvinceService } from './state-province.service';
         }
     ]
 })
-export class GeographyPlugin extends SymbiotaUiPlugin { }
+export class GeographyPlugin extends SymbiotaUiPlugin {
+    static readonly PLUGIN_NAME = 'Geography';
+}

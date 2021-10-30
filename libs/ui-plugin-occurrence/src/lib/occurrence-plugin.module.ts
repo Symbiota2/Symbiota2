@@ -116,6 +116,8 @@ import { ConfirmDialogComponent } from './pages/occurrence-upload/field-map/conf
     ]
 })
 export class OccurrencePlugin extends SymbiotaUiPlugin {
+    static readonly PLUGIN_NAME = 'Occurrences';
+
     constructor(private readonly collectionProfile: CollectionProfileService) {
         super();
 

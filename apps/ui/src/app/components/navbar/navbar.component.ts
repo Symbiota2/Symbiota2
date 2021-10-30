@@ -16,16 +16,18 @@ import { Router } from '@angular/router';
 import { HomePage } from '../../pages/home/home.component';
 import { ApiUserNotification } from '@symbiota2/data-access';
 import { NotificationDialog } from './notification-dialog/notification-dialog.component';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'symbiota2-navbar',
     templateUrl: './navbar.component.html',
     styleUrls: ['./navbar.component.scss']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent {
     navigationData: any;
-    pluginLinks: NavBarLink[] = [];
 
+    pluginLinks = this.plugins.navBarLinks$;
     currentUser = this.userService.currentUser;
     notifications = this.userService.notifications;
     notificationCount = this.userService.notificationCount;
@@ -33,7 +35,6 @@ export class NavbarComponent implements OnInit {
     readonly ROUTE_HOME = HomePage.ROUTE;
     readonly ROUTE_PROFILE = ROUTE_USER_PROFILE;
     readonly ROUTE_CREATE_PROFILE = ROUTE_USER_CREATE;
-    readonly ROUTE_SITEMAP = ROUTE_SITEMAP;
 
     constructor(
         private readonly userService: UserService,
@@ -43,6 +44,18 @@ export class NavbarComponent implements OnInit {
         private readonly plugins: PluginService,
         private readonly router: Router) { }
 
+    linkCategories(): Observable<string[]> {
+        return this.pluginLinks.pipe(
+            map((pls) => [...pls.keys()])
+        );
+    }
+
+    categoryLinks(category: string): Observable<NavBarLink[]> {
+        return this.pluginLinks.pipe(
+            map((pls) => pls.get(category))
+        );
+    }
+
     isToday(date: Date) {
         const today = new Date();
         return (
@@ -50,12 +63,6 @@ export class NavbarComponent implements OnInit {
             date.getMonth() === today.getMonth() &&
             date.getDate() === today.getDate()
         );
-    }
-
-    ngOnInit() {
-        this.plugins.navBarLinks$.subscribe((links) => {
-            this.pluginLinks = links;
-        });
     }
 
     onLogin() {
