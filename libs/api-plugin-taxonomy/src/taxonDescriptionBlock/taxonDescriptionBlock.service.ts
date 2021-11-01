@@ -49,7 +49,6 @@ Fetch the block data for a given taxon id.
      */
     async create(data: Partial<TaxonDescriptionBlock>): Promise<TaxonDescriptionBlock> {
         const block = this.myRepository.create(data)
-        //console.log(" service " + block.id + block.taxonID)
         return this.myRepository.save(block)
     }
 

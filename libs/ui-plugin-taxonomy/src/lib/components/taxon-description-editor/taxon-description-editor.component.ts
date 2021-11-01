@@ -13,12 +13,14 @@ import {
     TaxonomicEnumTreeService,
     TaxonDescriptionDialogComponent,
     TaxonDescriptionStatementListItem,
-    TaxonDescriptionStatementDialogComponent
+    TaxonDescriptionStatementDialogComponent,
+    TaxonDescriptionBlockInputDto
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TranslateService } from '@ngx-translate/core'
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { TaxonEditorDialogComponent } from '../../components';
+import { Expose } from 'class-transformer';
 
 export interface BlockInfo {
     language: string
@@ -89,7 +91,23 @@ export class TaxonDescriptionEditorComponent implements OnInit {
 
     onAddDescriptionBlock() {
         // Construct a new blcok
-        const newBlock = new TaxonDescriptionBlockListItem()
+        const data = {
+            taxonID: this.taxonID,
+            caption: null
+            /*
+            @Expose() source: string
+            @Expose() sourceUrl: string
+            @Expose() language: string
+            @Expose() adminLanguageID: number | null
+            @Expose() displayLevel: number
+            @Expose() creatorUID: number
+            @Expose() notes: string
+            @Expose() initialTimestamp: Date
+             */
+        }
+        const newBlock = new TaxonDescriptionBlockInputDto(data)
+        console.log("foo " + newBlock.taxonID)
+        newBlock.taxonID = +this.taxonID
         this.taxonBlockService.create(newBlock).subscribe((block)=> {
             // It has been added to the database, now make it part of the list of blocks
             console.log(" My block id is " + block.id)

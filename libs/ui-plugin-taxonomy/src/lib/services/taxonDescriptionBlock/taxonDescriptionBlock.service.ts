@@ -4,12 +4,8 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core'
 import { TaxonDescriptionBlockQueryBuilder } from './taxonDescriptionBlock-query-builder'
 import { TaxonDescriptionBlockListItem } from '../../dto/taxonDescriptionBlock-list-item'
-import { ApiCollectionOutput, ApiOccurrence } from '@symbiota2/data-access';
-import { Occurrence } from '@symbiota2/ui-plugin-occurrence';
-import { OccurrenceQueryBuilder } from '../../../../../ui-plugin-occurrence/src/lib/services/occurrence-query-builder';
-import { CollectionInputDto } from '../../../../../ui-plugin-collection/src/lib/dto/Collection.input.dto';
-import { Collection } from '@symbiota2/ui-plugin-collection';
-import { TaxonDescriptionBlockInputDto } from '../../../../../api-plugin-taxonomy/src/taxonDescriptionBlock/dto/TaxonDescriptionBlockInputDto';
+import { TaxonDescriptionBlockInputDto } from '../../dto';
+
 
 interface FindAllParams {
     taxonIDs: number[]
@@ -86,15 +82,16 @@ export class TaxonDescriptionBlockService {
 
     }
 
-    create(block: Partial<TaxonDescriptionBlockListItem>): Observable<TaxonDescriptionBlockListItem> {
+    create(block: Partial<TaxonDescriptionBlockInputDto>): Observable<TaxonDescriptionBlockListItem> {
 
+        console.log(" id is " + block.taxonID)
         block.creatorUID = this.creatorUID
         const url = this.createUrlBuilder().create()
             .build()
 
         //return this.jwtToken.pipe(
         //switchMap((token) => {
-        console.log("here ")
+        console.log("here " + block.creatorUID + block.taxonID)
         const query = this.apiClient.queryBuilder(url)
             //.addJwtAuth(token)
             .post()
@@ -109,7 +106,7 @@ export class TaxonDescriptionBlockService {
                 return of(null)
             }),
             map((blockJson) => {
-                console.log(" mapping ")
+                console.log(" mapping " + blockJson)
                 if (blockJson === null) {
                     return null
                 }

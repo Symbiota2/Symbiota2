@@ -9,11 +9,13 @@ import { ApiCollectionInput } from '@symbiota2/data-access';
 
 @Exclude()
 export class TaxonDescriptionBlockInputDto {
+    /*
     constructor(taxonDescriptionBlock: TaxonDescriptionBlock) {
         Object.assign(this, taxonDescriptionBlock)
     }
+     */
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
     id: number
 
@@ -21,39 +23,39 @@ export class TaxonDescriptionBlockInputDto {
     @Expose()
     taxonID: number
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
     caption: string
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
     source: string
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
     sourceUrl: string
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
     language: string
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
     adminLanguageID: number | null
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
     displayLevel: number
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
     creatorUID: number
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
     notes: string
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
     initialTimestamp: Date
 
