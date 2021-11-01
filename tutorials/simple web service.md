@@ -4,7 +4,7 @@ _by Curtis Dyreson, Evin Dunn, Darius Dumel, and Gary Fehlauer_
 
 This tutorial shows how to write an API endpoint in Symbiota2.
 
-In Symbiota2 a web service has two main parts.
+In Symbiota2 a web service has two main parts. 
 
 1. A TypeORM *entity* (or set of entities)
 2. A *controller* and a *service*
@@ -56,9 +56,9 @@ That relationship is a <code>@ManyToOne</code> relationship (the inverse to the 
   onUpdate: 'RESTRICT',  
 })  
 @JoinColumn([{ name: 'tid'}])  
-taxon: Promise<Taxon>
+taxon: Promise&lt;Taxon>
 </pre>
-<ul>
+</ul>
 
 ### Using TypeORM to write web services
 
@@ -91,7 +91,7 @@ The following controller finds a <code>Taxon</code> using the <code>taxonID</cod
 @ApiOperation({  
     summary: "Find a taxon by the taxonID"  
 })  
-async findByTID(@Param('taxonid') id: number): Promise<TaxonDto> {  
+async findByTID(@Param('taxonid') id: number): Promise&lt;TaxonDto> {  
     const taxon = await this.taxons.findByTID(id)  
     const dto = new TaxonDto(taxon)  
     return dto  
@@ -122,7 +122,7 @@ Controllers invoke services which perform the actual database operations for man
 /*  
 Find a taxon using a taxon ID.  
  */
- async findByTID(id: number): Promise<Taxon> {  
+ async findByTID(id: number): Promise&lt;Taxon> {  
     return this.myRepository.findOne({ where: {id: id} })  
 }
 </pre>

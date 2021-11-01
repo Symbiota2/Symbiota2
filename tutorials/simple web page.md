@@ -171,7 +171,7 @@ The <code>path</code> specifies what URL locates the page.   In this case, the p
 <pre>
 private static TAXON_PROFILE_ROUTE = "taxon/profile/:taxonID"
 </pre>
-</ul>
+</ul> 
 The <code>:taxonID</code> suffix indicates a URL parameter called 'taxonID' in the route.
 
 ## The Taxonomic Block Service
