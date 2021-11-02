@@ -154,11 +154,35 @@ export class TaxonDescriptionBlockService {
      * will be the deleted block or null if api has errors
      * @returns `of(null)` if user does not exist or does not have editing permission.
      */
-    /*
+
     delete(block: Partial<TaxonDescriptionBlockInputDto>): Observable<TaxonDescriptionBlockListItem> {
-        const url = this.createUrlBuilder().delete()
+        const url = this.createUrlBuilder()
             .build()
 
+        const req = this.apiClient
+            .queryBuilder(url)
+            .delete()
+            .queryParam("id", block.id.toString())
+            .body(block)
+            //.addJwtAuth(userToken)
+            .build()
+
+        return this.apiClient.send(req).pipe(
+            catchError((e) => {
+                console.log(" error ")
+                console.error(e)
+                return of(null)
+            }),
+            map((blockJson) => {
+                console.log(" mapping ")
+                if (blockJson === null) {
+                    return null
+                }
+                return TaxonDescriptionBlockListItem.fromJSON(blockJson);
+            })
+        )
+
+        /*
         return this.user.currentUser.pipe(
             switchMap((currentUser) => {
                 if (!!currentUser) {
@@ -190,8 +214,9 @@ export class TaxonDescriptionBlockService {
                 }
             }
         )
+         */
     }
-     */
+
 
     private createUrlBuilder(): TaxonDescriptionBlockQueryBuilder {
         return new TaxonDescriptionBlockQueryBuilder(this.appConfig.apiUri());

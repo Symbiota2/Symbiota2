@@ -184,6 +184,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     }
 
     deleteStatementRowData(row_obj) {
+        console.log("here ")
         this.blocks = this.blocks.filter((value,key) => {
             if(value.id == row_obj.descriptionBlockID) {
                 value.descriptionStatements = value.descriptionStatements.filter((statement) => {
