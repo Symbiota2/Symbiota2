@@ -1,20 +1,66 @@
-<mat-sidenav-container class="container">
-    <mat-sidenav
-        #sidenav
-        mode="side"
-        opened
-        class="sidenav"
-        fixedInViewport="true"
-        fixedBottomGap="100"
-        fixedTopGap="100"
-    >
-        <ul class="navList">
-            <ng-container *ngFor="let tool of collectionToolsKeys">
-                <li><a (click)="setContentView(tool)">{{tool}}</a></li>
-            </ng-container> 
-        </ul>
-    </mat-sidenav>
-    <mat-sidenav-content class="content">
-        <ng-container *ngComponentOutlet="selectedContent" collection="this."></ng-container>
-    </mat-sidenav-content>
-</mat-sidenav-container>
+<div
+    id="main"
+    *ngIf="collection"
+    fxLayout="column"
+    fxLayoutAlign="start center"
+>
+    <div class="col-header" fxLayout="row" fxLayoutAlign="start start">
+        <div id="logo">
+            <symbiota2-collection-logo
+                class="collectionLogo"
+                [collectionID]="collection.id"
+                src="{{ collection.icon }}"
+                size="150px"
+                *ngIf="collection.icon"
+            >
+            </symbiota2-collection-logo>
+        </div>
+
+        <div class="name_inst" fxLayout="column" fxLayoutAlign="space-between">
+            <div fxLayout="row">
+                <h1 id="collectionName">
+                    {{ collection.collectionName }} Admin Tools
+                </h1>
+            </div>
+            <div id="subTitle" fxLayoutAlign="start end">
+                <mat-icon>account_balance</mat-icon>
+                <div class="italic" *ngIf="collection.institution?.name">
+                    <span>{{ collection.institution.name }} </span>
+                </div>
+                <div
+                    class="italic"
+                    *ngIf="
+                        collection.institution?.code &&
+                        collection.collectionCode
+                    "
+                >
+                    ({{ collection.institution.code }}-{{
+                        collection.collectionCode
+                    }})
+                </div>
+            </div>
+        </div>
+    </div>
+    <mat-sidenav-container id="body">
+        <mat-sidenav
+            #sidenav
+            mode="side"
+            opened
+            class="sidenav"
+            fixedInViewport="true"
+            fixedBottomGap="100"
+            fixedTopGap="300"
+        >
+            <ul class="navList">
+                <ng-container *ngFor="let tool of collectionToolsKeys">
+                    <li>
+                        <a (click)="setContentView(tool)">{{ tool }}</a>
+                    </li>
+                </ng-container>
+            </ul>
+        </mat-sidenav>
+        <mat-sidenav-content class="content">
+            <ng-container *ngComponentOutlet="selectedContent"></ng-container>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+</div>
