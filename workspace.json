@@ -14,6 +14,7 @@
             "outputPath": "dist/apps/api",
             "main": "apps/api/src/main.ts",
             "tsConfig": "apps/api/tsconfig.app.json",
+            "showCircularDependencies": false,
             "assets": []
           },
           "configurations": {
@@ -71,9 +72,7 @@
             "assets": ["apps/ui/src/favicon.ico", "apps/ui/src/assets"],
             "styles": ["apps/ui/src/styles.scss"],
             "stylePreprocessorOptions": {
-              "includePaths": [
-                "apps/ui/src/"
-              ]
+              "includePaths": ["apps/ui/src/"]
             },
             "scripts": []
           },
@@ -328,9 +327,7 @@
       "prefix": "symbiota2",
       "styles": ["apps/ui/src/styles.scss"],
       "stylePreprocessorOptions": {
-        "includePaths": [
-          "apps/ui/src/"
-        ]
+        "includePaths": ["apps/ui/src/"]
       },
       "targets": {
         "build": {
@@ -758,6 +755,48 @@
           "outputs": ["coverage/libs/api-email"],
           "options": {
             "jestConfig": "libs/api-email/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "api-storage": {
+      "root": "libs/api-storage",
+      "sourceRoot": "libs/api-storage/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/api-storage/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/api-storage"],
+          "options": {
+            "jestConfig": "libs/api-storage/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "api-dwc": {
+      "root": "libs/api-dwc",
+      "sourceRoot": "libs/api-dwc/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/api-dwc/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/api-dwc"],
+          "options": {
+            "jestConfig": "libs/api-dwc/jest.config.js",
             "passWithNoTests": true
           }
         }

@@ -1,6 +1,6 @@
 import {
     Column,
-    Entity,
+    Entity, getConnection,
     Index,
     JoinColumn,
     ManyToOne,
@@ -37,7 +37,10 @@ import { TaxonDescriptionBlock } from './TaxonDescriptionBlock.entity';
 import { User } from '../user/User.entity';
 import { CharacteristicTaxonLink } from '../characteristic';
 import { EntityProvider } from '../../entity-provider.class';
+import { DwCField, DwCID, DwCRecord } from '@symbiota2/dwc';
+import { TaxonomicUnit } from './TaxonomicUnit.entity';
 
+@DwCRecord('http://rs.tdwg.org/dwc/terms/Taxon')
 @Index('sciname_unique', ['scientificName', 'rankID', 'author'], { unique: true })
 @Index('rankid_index', ['rankID'])
 @Index('unitname1_index', ['unitName1', 'unitName2'])
@@ -46,6 +49,8 @@ import { EntityProvider } from '../../entity-provider.class';
 @Index('sciname_index', ['scientificName'])
 @Entity('taxa')
 export class Taxon extends EntityProvider {
+    @DwCID()
+    @DwCField('http://rs.tdwg.org/dwc/terms/taxonID')
     @PrimaryGeneratedColumn({ type: 'int', name: 'TID', unsigned: true })
     id: number;
 
@@ -55,6 +60,7 @@ export class Taxon extends EntityProvider {
     @Column('smallint', { name: 'RankId', nullable: true, unsigned: true })
     rankID: number | null;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/scientificName')
     @Column('varchar', { name: 'SciName', length: 250 })
     scientificName: string;
 
@@ -76,6 +82,7 @@ export class Taxon extends EntityProvider {
     @Column('varchar', { name: 'UnitName3', nullable: true, length: 35 })
     unitName3: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/scientificNameAuthorship')
     @Column('varchar', { name: 'Author', nullable: true, length: 100 })
     author: string;
 
@@ -86,12 +93,14 @@ export class Taxon extends EntityProvider {
     })
     phyloSortSequence: number | null;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/taxonomicStatus')
     @Column('varchar', { name: 'Status', nullable: true, length: 50 })
     status: string;
 
     @Column('varchar', { name: 'Source', nullable: true, length: 250 })
     source: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/taxonRemarks')
     @Column('varchar', { name: 'Notes', nullable: true, length: 250 })
     notes: string;
 
@@ -241,5 +250,79 @@ export class Taxon extends EntityProvider {
             .andWhere('t.rankID = :rankID', { rankID })
             .take(1)
             .getOne();
+    }
+
+    private async ancestorSciName(ancestorRankName: string): Promise<string> {
+        const db = getConnection();
+        const taxonRepo = db.getRepository(Taxon);
+
+        const ancestor = await taxonRepo.createQueryBuilder('pt')
+            .select(['pt.scientificName'])
+            .innerJoin(TaxaEnumTreeEntry, 'te', 'pt.id = te.parentTaxonID')
+            .innerJoin(Taxon, 't', 'te.taxonID = t.id')
+            .innerJoin(TaxonomicUnit, 'parentRank', 'pt.rankID = parentRank.rankID')
+            .where('t.id = :taxonID', { taxonID: this.id })
+            .andWhere(
+                'LOWER(parentRank.rankName) = :rankName',
+                { rankName: ancestorRankName.toLocaleLowerCase() }
+            )
+            .cache(30000)
+            .groupBy('pt.scientificName')
+            .getOne();
+
+        if (!ancestor) {
+            return null;
+        }
+
+        return ancestor.scientificName;
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/kingdom')
+    async kingdom(): Promise<string> {
+        return await this.ancestorSciName('Kingdom');
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/phylum')
+    async phylum(): Promise<string> {
+        return await this.ancestorSciName('Phylum');
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/class')
+    async class(): Promise<string> {
+        return await this.ancestorSciName('Class');
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/order')
+    async order(): Promise<string> {
+        return await this.ancestorSciName('Order');
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/family')
+    async family(): Promise<string> {
+        return await this.ancestorSciName('Family');
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/genus')
+    async genus(): Promise<string> {
+        return await this.ancestorSciName('Genus');
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/acceptedNameUsage')
+    async scientificNameAccepted(): Promise<string> {
+        const db = getConnection();
+        const taxonRepo = db.getRepository(Taxon);
+
+        const acceptedTaxon = await taxonRepo.createQueryBuilder('t')
+            .select(['acceptedTaxon.scientificName'])
+            .innerJoin(TaxonomicStatus, 's', 's.taxonID = t.id')
+            .innerJoin(Taxon, 'acceptedTaxon', 's.taxonIDAccepted = acceptedTaxon.id')
+            .where('t.id = :taxonID', { taxonID: this.id })
+            .orderBy('s.sortSequence')
+            .getOne();
+
+        if (acceptedTaxon) {
+            return acceptedTaxon.scientificName;
+        }
+        return null;
     }
 }

@@ -20,5 +20,7 @@ module.exports = {
     '<rootDir>/libs/ui-plugin-geography',
     '<rootDir>/libs/dwc',
     '<rootDir>/libs/api-email',
+    '<rootDir>/libs/api-storage',
+    '<rootDir>/libs/api-dwc',
   ],
 };

@@ -31,16 +31,20 @@ import {
     getCSVFields, withTempDir
 } from '@symbiota2/api-common';
 import { OccurrenceOutputDto } from './dto/occurrence.output.dto';
-import { ProtectCollection } from '@symbiota2/api-plugin-collection';
+import {
+    CollectionService,
+    ProtectCollection
+} from '@symbiota2/api-plugin-collection';
 import { CollectionListItem } from '@symbiota2/ui-plugin-collection';
 import { CollectionIDQueryParam } from './dto/collection-id-query-param';
 import { AuthenticatedRequest, JwtAuthGuard } from '@symbiota2/api-auth';
 import { OccurrenceHeaderMapBody } from './dto/occurrence-header-map.input.dto';
 import { Occurrence, OccurrenceUpload } from '@symbiota2/api-database';
 import * as path from 'path';
-import { tmpdir } from 'os';
-import { DwcArchiveBuilder } from '@symbiota2/dwc';
 import { AppConfigService } from '@symbiota2/api-config';
+import { IsNull, Not } from 'typeorm';
+import { StorageService } from '@symbiota2/api-storage';
+import { DwCService } from '@symbiota2/api-dwc';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -50,7 +54,10 @@ const fsPromises = fs.promises;
 export class OccurrenceController {
     constructor(
         private readonly config: AppConfigService,
-        private readonly occurrenceService: OccurrenceService) { }
+        private readonly occurrenceService: OccurrenceService,
+        private readonly collectionService: CollectionService,
+        private readonly storageService: StorageService,
+        private readonly dwcService: DwCService) { }
 
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: OccurrenceList })
@@ -211,38 +218,5 @@ export class OccurrenceController {
             query.collectionID,
             uploadID
         );
-    }
-
-    @Get('download/dwca')
-    @ApiOperation({
-        summary: 'Retrieve this collection as a Darwin Core Archive'
-    })
-    @ApiResponse({
-        status: HttpStatus.OK,
-        content: {
-            'application/zip': {
-                schema: {
-                    type: 'string',
-                    format: 'binary'
-                }
-            }
-        }
-    })
-    async getCollectionAsArchive(@Query() query: CollectionIDQueryParam, @Res() response: Response): Promise<void> {
-        const dataDir = await this.config.dataDir();
-
-        withTempDir(dataDir, async (tmpDir) => {
-            const archive = await this.occurrenceService.createDwCArchive(
-                tmpDir,
-                { collectionID: query.collectionID }
-            );
-            const readStream = createReadStream(archive);
-            readStream.pipe(response);
-
-            return new Promise<void>((resolve, reject) => {
-                readStream.on('error', (e) => reject(e));
-                readStream.on('close', () => resolve());
-            });
-        });
     }
 }

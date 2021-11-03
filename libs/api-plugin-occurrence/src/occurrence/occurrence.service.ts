@@ -1,9 +1,13 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { Occurrence, OccurrenceUploadFieldMap } from '@symbiota2/api-database';
+import {
+    Occurrence,
+    OccurrenceUploadFieldMap,
+    Taxon
+} from '@symbiota2/api-database';
 import {
     DeepPartial,
     FindConditions,
-    FindManyOptions, IsNull,
+    FindManyOptions, IsNull, Not,
     Repository
 } from 'typeorm';
 import { FindAllParams } from './dto/find-all-input.dto';
@@ -399,38 +403,5 @@ export class OccurrenceService {
 
     async startUpload(uid: number, collectionID: number, uploadID: number): Promise<void> {
         await this.uploadQueue.add({ uid, collectionID, uploadID });
-    }
-
-    async createDwCArchive(tmpDir: string, findOpts: FindConditions<Occurrence>): Promise<string> {
-        const dwcBuilder = new DwcArchiveBuilder(tmpDir, 'Occurrence');
-        const archivePath = pathJoin(tmpDir, `${uuid4()}.zip`);
-
-        // Make sure all of the occurrences have a guid
-        await this.occurrenceRepo.createQueryBuilder('o')
-            .update({ occurrenceGUID: () => 'UUID()' })
-            .where({ ...findOpts, occurrenceGUID: IsNull() })
-            .execute();
-
-        let offset = 0;
-        let occurrences = await this.occurrenceRepo.find({
-            where: findOpts,
-            take: OccurrenceService.DWCA_CREATE_LIMIT,
-            skip: offset
-        });
-
-        while (occurrences.length > 0) {
-            occurrences.forEach((occurrence) => {
-                dwcBuilder.addCoreRecord(occurrence);
-            });
-            offset += occurrences.length;
-            occurrences = await this.occurrenceRepo.find({
-                where: findOpts,
-                take: OccurrenceService.DWCA_CREATE_LIMIT,
-                skip: offset,
-            });
-        }
-
-        await dwcBuilder.setCoreID('occurrenceID').build(archivePath);
-        return archivePath;
     }
 }

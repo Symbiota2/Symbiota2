@@ -14,5 +14,4 @@ export class RedundantOccurrenceFields1632242772596 implements MigrationInterfac
         await queryRunner.query("ALTER TABLE `omoccurrences` ADD `month` int NULL");
         await queryRunner.query("ALTER TABLE `omoccurrences` ADD `year` int NULL");
     }
-
 }

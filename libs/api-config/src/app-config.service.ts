@@ -16,14 +16,21 @@ import {
     ENV_NODE_ENV,
     ENV_REDIS_HOST,
     ENV_REDIS_PORT,
-    ENV_SMTP_HOST, ENV_SMTP_PASSWORD,
-    ENV_SMTP_PORT, ENV_SMTP_SENDER,
-    ENV_SMTP_USER
+    ENV_SMTP_HOST,
+    ENV_SMTP_PASSWORD,
+    ENV_SMTP_PORT,
+    ENV_SMTP_SENDER,
+    ENV_SMTP_USER,
+    ENV_STORAGE_BUCKET,
+    ENV_STORAGE_PASSWORD,
+    ENV_STORAGE_SERVER,
+    ENV_STORAGE_USER
 } from './configuration';
 
 import * as path from 'path';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
+import { StorageService } from '@symbiota2/api-storage';
 
 const fsPromises = fs.promises;
 
@@ -42,8 +49,6 @@ export enum DatabaseProtocol {
 export class AppConfigService {
     public static readonly ENV_DEV = 'development';
     public static readonly ENV_TEST = 'test';
-
-    private static readonly JWT_KEY_FILE = '.jwtSigningKey';
     private static readonly PLUGIN_DIR_NAME = 'plugins';
 
     /**
@@ -98,34 +103,6 @@ export class AppConfigService {
         }
 
         return dataDir;
-    }
-
-    /**
-     * The JWT signing key that Symbiota2 should use. This is persisted in
-     * $APP_DATA_DIR/.jwtSigningKey, since it should remain consistent. If it
-     * changes, all users will be forced to log in again.
-     */
-    async jwtKey(): Promise<string> {
-        const jwtKeyPath = path.join(
-            (await this.dataDir()),
-            AppConfigService.JWT_KEY_FILE
-        );
-        const keyFileExists = await AppConfigService.fsExists(jwtKeyPath);
-
-        if (keyFileExists) {
-            return (await fsPromises.readFile(jwtKeyPath))
-                .toString()
-                .replace(/\s+/, '');
-        }
-
-        const newKey = crypto.randomBytes(32).toString('hex');
-        await fsPromises.writeFile(
-            jwtKeyPath,
-            newKey,
-            { mode: 0o600 }
-        );
-
-        return newKey;
     }
 
     /**
@@ -215,7 +192,14 @@ export class AppConfigService {
             type: dbProto as any,
             synchronize: false,
             migrate: false,
-            logging: this.isDevelopment()
+            logging: this.isDevelopment(),
+            cache: {
+                type: 'ioredis',
+                options: {
+                    host: this.redisHost(),
+                    port: this.redisPort()
+                }
+            }
         };
 
         if (dbProto === DatabaseProtocol.SQLITE) {
@@ -288,5 +272,21 @@ export class AppConfigService {
      */
     smtpSender(): string {
         return this.configService.get<string>(ENV_SMTP_SENDER);
+    }
+
+    storageServer(): string {
+        return this.configService.get<string>(ENV_STORAGE_SERVER);
+    }
+
+    storageUser(): string {
+        return this.configService.get<string>(ENV_STORAGE_USER);
+    }
+
+    storagePassword(): string {
+        return this.configService.get<string>(ENV_STORAGE_PASSWORD);
+    }
+
+    storageBucket(): string {
+        return this.configService.get<string>(ENV_STORAGE_BUCKET);
     }
 }

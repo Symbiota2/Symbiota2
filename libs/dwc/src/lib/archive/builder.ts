@@ -1,152 +1,289 @@
 import {
     DWC_SCHEMA_LOCATION,
     DWC_XML_NS,
-    DwCAMeta,
-    DwCAMetaExtensionFileType,
-    DwCAMetaFieldType,
-    DwCAMetaFileLocationType,
-    DwCASerializable
+    IDwCAMeta,
+    IDwCAMetaExtensionFileType,
+    IDwCAMetaFieldType,
+    IDwCAMetaFileLocationType, IDwCAMetaFileType
 } from '../interfaces';
 import * as xml2js from 'xml2js';
 import { createWriteStream, WriteStream, promises as fsPromises } from 'fs';
 import { basename, join as pathJoin } from 'path';
 import { v4 as uuid4 } from 'uuid';
 import { zipFiles } from '@symbiota2/api-common';
+import { dwcField, dwcRecordType, isDwCID } from '../decorators';
+import { Logger } from '@nestjs/common';
+import { PassThrough } from 'stream';
+
+
 
 export class DwcArchiveBuilder {
-    private static readonly DWC_FIELD_PREFIX = 'http://rs.tdwg.org/dwc/terms';
     private static readonly DWC_FIELD_SEP = ',';
     private static readonly DWC_LINE_SEP = '\n';
     private static readonly DWC_FIELD_ENCLOSE = '"';
     private static readonly DWC_FIELD_ENCLOSE_REPLACE_REGEXP = new RegExp(
         DwcArchiveBuilder.DWC_FIELD_ENCLOSE
     );
+    private static readonly DWC_LINE_SEP_REGEXP = new RegExp(
+        DwcArchiveBuilder.DWC_LINE_SEP
+    );
 
-    private csvCoreFile: WriteStream;
+    private readonly logger = new Logger(DwcArchiveBuilder.name);
+    private readonly tmpDir: string;
+    private readonly fileMap: Map<string, WriteStream>;
+    private readonly fieldMap: Map<string, Map<string, string>>;
+    private readonly uniqueRecordMap: Map<string, Set<any>>;
+    private readonly coreFileType: string;
+    private coreIDField: string;
 
-    tmpDir: string;
-    meta: DwCAMeta;
-
-    constructor(tmpDir: string, coreRowType: 'Occurrence' | 'Taxon') {
+    constructor(coreClass: any, tmpDir: string) {
         this.tmpDir = tmpDir;
-        this.meta = {
-            archive: {
-                $: {
-                    xmlns: DWC_XML_NS,
-                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    "xsi:schemaLocation": DWC_SCHEMA_LOCATION
-                },
-                core: {
-                    $: {
-                        rowType: `${DwcArchiveBuilder.DWC_FIELD_PREFIX}/${coreRowType}` as any,
-                        fieldsTerminatedBy: DwcArchiveBuilder.DWC_FIELD_SEP,
-                        linesTerminatedBy: DwcArchiveBuilder.DWC_LINE_SEP,
-                        fieldsEnclosedBy: DwcArchiveBuilder.DWC_FIELD_ENCLOSE,
-                        encoding: "UTF-8"
-                    },
-                    files: new Array<DwCAMetaFileLocationType>(),
-                    field: new Array<DwCAMetaFieldType>()
-                },
-                extension: new Array<DwCAMetaExtensionFileType>()
+        this.fileMap = new Map<string, WriteStream>();
+        this.fieldMap = new Map<string, Map<string, string>>();
+        this.uniqueRecordMap = new Map<string, Set<any>>();
+        this.coreIDField = '';
+        this.coreFileType = dwcRecordType(coreClass);
+
+        if (!this.coreFileType) {
+            throw new Error(`Invalid DwC record type for class ${coreClass.name}`);
+        }
+    }
+
+    private orderedDwcFields(recordType: string): string[] {
+        return [...this.fieldMap.get(recordType).keys()].sort();
+    }
+
+    private orderedRecordFields(recordType: string): string[] {
+        return this.orderedDwcFields(recordType).map((k) => {
+            return this.fieldMap.get(recordType).get(k)
+        });
+    }
+
+    private async recordToCSVLine(recordType: string, record: Record<any, any>): Promise<string> {
+        const fields = [];
+        for (const field of this.orderedRecordFields(recordType)) {
+            let csvField = DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            let val = record[field];
+
+            if (typeof val === 'function') {
+                val = await val.bind(record)();
             }
-        }
 
-        this.csvCoreFile = createWriteStream(pathJoin(tmpDir, `${uuid4()}.csv`));
-    }
-
-    private get coreFields(): string[] {
-        return this.meta.archive.core.field
-            .map((fieldDesc) => {
-                return fieldDesc.$.term.
-                    replace(`${DwcArchiveBuilder.DWC_FIELD_PREFIX}/`, '')
-            });
-    }
-
-    private get coreFiles(): string[] {
-        const fileList = [];
-        for (const locationList of this.meta.archive.core.files.map((fieldDesc) => fieldDesc.location)) {
-            fileList.push(...locationList);
-        }
-        return fileList;
-    }
-
-    private recordToCSVLine(dwcRecord: Record<any, any>): string {
-        let line = '';
-        for (const field of this.coreFields) {
-            line += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
-            if (Object.keys(dwcRecord).includes(field)) {
-                const val = dwcRecord[field];
-                if (val) {
-                    line += val.toString().replace(
+            if (val) {
+                csvField += val.toString()
+                    .replace(
                         DwcArchiveBuilder.DWC_FIELD_ENCLOSE_REPLACE_REGEXP,
                         `\\${ DwcArchiveBuilder.DWC_FIELD_ENCLOSE }`
                     )
-                }
+                    .replace(
+                        DwcArchiveBuilder.DWC_LINE_SEP_REGEXP,
+                        `\\${ DwcArchiveBuilder.DWC_LINE_SEP }`
+                    )
             }
-            line += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
-            line += DwcArchiveBuilder.DWC_FIELD_SEP;
+            csvField += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            fields.push(csvField);
         }
+        let line = fields.join(DwcArchiveBuilder.DWC_FIELD_SEP);
         line += DwcArchiveBuilder.DWC_LINE_SEP;
         return line;
     }
 
-    addCoreRecord(serializable: DwCASerializable): DwcArchiveBuilder {
-        const asRecord = serializable.asDwCRecord();
+    private csvHeaderLine(recordType: string): string {
+        const fields = [];
+        for (const field of this.orderedRecordFields(recordType)) {
+            let csvField = DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            csvField += field.replace(
+                DwcArchiveBuilder.DWC_FIELD_ENCLOSE_REPLACE_REGEXP,
+                `\\${ DwcArchiveBuilder.DWC_FIELD_ENCLOSE }`
+            );
+            csvField += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            fields.push(csvField);
+        }
+        let line = fields.join(DwcArchiveBuilder.DWC_FIELD_SEP);
+        line += DwcArchiveBuilder.DWC_LINE_SEP;
+        return line;
+    }
 
-        if (this.coreFields.length === 0) {
-            const fields = Object.keys(asRecord);
+    async addRecord(record: any): Promise<void> {
+        const recordType = dwcRecordType(record.constructor);
+        let recordID;
 
-            for (let i = 0; i < fields.length; i++) {
-                let term = fields[i];
+        if (!recordType) {
+            this.logger.warn(`Invalid DwC record type for class ${record.constructor.name}`);
+            return;
+        }
 
-                // This is lame
-                if (term === 'modified') {
-                    term = 'http://purl.org/dc/terms/modified';
+        // Map dwcUrl --> recordField
+        if (!this.fieldMap.has(recordType)) {
+            const recordFieldMap = new Map<string, string>();
+            const allRecordFields = [
+                // This gets the properties
+                ...Object.getOwnPropertyNames(record),
+                // This gets the methods
+                ...Object.getOwnPropertyNames(record.constructor.prototype)
+            ];
+
+            for (const recordFieldName of allRecordFields) {
+                const dwcUrl = dwcField(record, recordFieldName);
+                if (!dwcUrl) {
+                    continue;
                 }
-                else {
-                    term = `${DwcArchiveBuilder.DWC_FIELD_PREFIX}/${fields[i]}`;
+
+                recordFieldMap.set(dwcUrl, recordFieldName);
+
+                if (isDwCID(record, recordFieldName) && recordType === this.coreFileType) {
+                    this.coreIDField = dwcUrl;
                 }
-                const fieldDesc: DwCAMetaFieldType = {
-                    $: {
-                        term: term,
-                        index: i
-                    }
-                };
-                this.meta.archive.core.field.push(fieldDesc);
+            }
+            this.fieldMap.set(recordType, recordFieldMap);
+        }
+
+        // Look up the dwc record id
+        for (const recordField of Object.keys(record)) {
+            if (isDwCID(record, recordField)) {
+                recordID = record[recordField];
             }
         }
 
-        const csvLine = this.recordToCSVLine(asRecord);
-        this.csvCoreFile.write(csvLine);
-        return this;
-    }
+        // Check that we have an ID and it's not a duplicate
+        // Make sure we don't include any duplicates
+        if (!this.uniqueRecordMap.has(recordType)) {
+            this.uniqueRecordMap.set(recordType, new Set<any>());
+        }
 
-    setCoreID(idFieldName: string): DwcArchiveBuilder {
-        if (this.coreFields.includes(idFieldName)) {
-            this.meta.archive.core.id = {
-                $: {
-                    index: this.coreFields.indexOf(idFieldName)
-                }
-            };
+        if (!recordID) {
+            this.logger.warn(`Invalid DwC ID for class ${record.constructor.name}`);
+            return;
         }
-        else {
-            throw new Error(`Unknown core id field '${idFieldName}'`)
+
+        if (this.uniqueRecordMap.get(recordType).has(recordID)) {
+            // this.logger.warn(`Duplicate ${record.constructor.name} detected: '${recordID}'`);
+            return;
         }
-        return this;
+
+        this.uniqueRecordMap.get(recordType).add(recordID);
+
+        // Map dwcRecordType --> writeStream
+        if (!this.fileMap.has(recordType)) {
+            const filePath = pathJoin(this.tmpDir, `${ encodeURIComponent(record.constructor.name) }.csv`);
+            const csvStream = createWriteStream(filePath);
+            csvStream.write(this.csvHeaderLine(recordType));
+            this.fileMap.set(recordType, csvStream);
+        }
+
+        const fileStream = this.fileMap.get(recordType);
+        const csvLine = await this.recordToCSVLine(recordType, record);
+        await new Promise<void>((resolve) => {
+            const keepWriting = fileStream.write(csvLine);
+            if (keepWriting) {
+                resolve();
+            }
+            else {
+                fileStream.once('drain', () => resolve());
+            }
+        })
+
+        return;
     }
 
     async build(archivePath: string) {
+        const commonOpts = {
+            fieldsTerminatedBy: DwcArchiveBuilder.DWC_FIELD_SEP,
+            linesTerminatedBy: DwcArchiveBuilder.DWC_LINE_SEP,
+            fieldsEnclosedBy: DwcArchiveBuilder.DWC_FIELD_ENCLOSE,
+            ignoreHeaderLines: 1,
+            encoding: "UTF-8"
+        };
+
+        const meta: IDwCAMeta = {
+            archive: {
+                $: {
+                    xmlns: DWC_XML_NS,
+                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                    "xmlns:xs": "http://www.w3.org/2001/XMLSchema",
+                    "xsi:schemaLocation": DWC_SCHEMA_LOCATION
+                },
+                core: {
+                    $: {
+                        rowType: this.coreFileType as any,
+                        ...commonOpts
+                    },
+                    files: [],
+                    id: { $: { index: -1 } },
+                    field: [],
+                },
+                extension: []
+            }
+        }
+
+        for (const recordType of this.fileMap.keys()) {
+            if (recordType === this.coreFileType) {
+                const coreFields = this.orderedDwcFields(this.coreFileType);
+                for (let fieldIdx = 0; fieldIdx < coreFields.length; fieldIdx++) {
+                    const field = coreFields[fieldIdx];
+                    meta.archive.core.field.push({
+                        $: { index: fieldIdx, term: field }
+                    });
+                    if (field === this.coreIDField) {
+                        meta.archive.core.id.$.index = fieldIdx;
+                    }
+                }
+            }
+            else {
+                const extension = {
+                    $: {
+                        rowType: recordType as any,
+                        ...commonOpts
+                    },
+                    files: [],
+                    coreid: { $: { index: -1 } },
+                    field: [],
+                }
+
+                const extensionFields = this.orderedDwcFields(recordType);
+                for (let fieldIdx = 0; fieldIdx < extensionFields.length; fieldIdx++) {
+                    const field = extensionFields[fieldIdx];
+                    if (field === this.coreIDField) {
+                        extension.coreid.$.index = fieldIdx;
+                    }
+                    extension.field.push({
+                        $: { index: fieldIdx, term: field }
+                    });
+                }
+
+                meta.archive.extension.push(extension);
+            }
+        }
+
+        const csvFiles = [];
+        for (const [recordType, fileStream] of this.fileMap.entries()) {
+            await new Promise<void>((resolve) => {
+                fileStream.on('finish', () => resolve());
+                fileStream.end();
+            });
+
+            let fileArr: IDwCAMetaFileLocationType[];
+            if (recordType === this.coreFileType) {
+                fileArr = meta.archive.core.files;
+            }
+            else {
+                const extensionIdx = meta.archive.extension.findIndex((e) => {
+                    return e.$.rowType === recordType
+                });
+                fileArr = meta.archive.extension[extensionIdx].files;
+            }
+
+            const targetFile = fileStream.path.toString();
+            csvFiles.push(targetFile);
+            fileArr.push({ location: [basename(targetFile)] });
+        }
+
         const metaPath = pathJoin(this.tmpDir, 'meta.xml');
 
-        this.csvCoreFile.end();
-        this.meta.archive.core.files.push({
-            location: [basename(this.csvCoreFile.path.toString())]
-        });
-
         const xmlBuilder = new xml2js.Builder();
-        const meta = xmlBuilder.buildObject(this.meta);
+        const metaXML = xmlBuilder.buildObject(meta);
 
-        await fsPromises.writeFile(metaPath, meta);
-        await zipFiles(archivePath, [metaPath, this.csvCoreFile.path.toString()]);
+        await fsPromises.writeFile(metaPath, metaXML);
+        await zipFiles(archivePath, [metaPath, ...csvFiles]);
     }
 }

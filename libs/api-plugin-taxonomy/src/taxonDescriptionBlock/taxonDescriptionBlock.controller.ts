@@ -91,7 +91,6 @@ export class TaxonDescriptionBlockController {
         return dto
     }
 
-    //@Post(':taxonID:creatorID')
     @Post()
     @ApiOperation({
         summary: "Create a new description block"
@@ -103,19 +102,25 @@ export class TaxonDescriptionBlockController {
     //@SerializeOptions({ groups: ['single'] })
     @ApiBody({ type: TaxonDescriptionBlockInputDto, isArray: true })
     /**
-    @see - @link TaxonDescriptionBlockDto
+    @see - @link TaxonDescriptionBlockInputDto
      **/
-    //async create(@Param('taxonID') taxonID: number, @Param('creatorID') creatorID: number, @Body() data: TaxonDescriptionBlockInputDto): Promise<TaxonDescriptionBlockDto> {
     async create(@Body(new ParseArrayPipe({ items: TaxonDescriptionBlockInputDto })) data: TaxonDescriptionBlockInputDto[]): Promise<TaxonDescriptionBlockDto> {
         console.log('taxon id and uid ' + (typeof data) + data[0].taxonID + data[0].creatorUID)
-        //if (taxonID != null) data.taxonID = taxonID
-        //if (creatorID != null) data.creatorUID = creatorID
         if (data[0].taxonID == null) data[0].taxonID = 2
         if (data[0].creatorUID == null) data[0].creatorUID = 1
         const block = await this.myService.create(data[0])
         const dto = new TaxonDescriptionBlockDto(block)
         return dto
     }
+    async create2(@Body() data: TaxonDescriptionBlockInputDto): Promise<TaxonDescriptionBlockDto> {
+        console.log('taxon id and uid ' + (typeof data) + data.taxonID + data.creatorUID)
+        if (data.taxonID == null) data.taxonID = 2
+        if (data.creatorUID == null) data.creatorUID = 1
+        const block = await this.myService.create(data)
+        const dto = new TaxonDescriptionBlockDto(block)
+        return dto
+    }
+
 
     @Delete(':id')
     @ApiOperation({

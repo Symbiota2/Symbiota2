@@ -1,4 +1,5 @@
 {
+  "plugins.collection.name": "Collections",
   "collection.collection_available_permission.admin": "Admin",
   "collection.collection_available_permission.collection_permissions": "Collection Permissions",
   "collection.collection_available_permission.editor": "Editor",

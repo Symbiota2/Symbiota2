@@ -1,6 +1,6 @@
-export const DWC_SCHEMA_LOCATION = 'http://rs.tdwg.org/dwc/text/tdwg_dwc_text.xsd';
+export const DWC_SCHEMA_LOCATION = 'http://rs.tdwg.org/dwc/text/ http://dwc.tdwg.org/text/tdwg_dwc_text.xsd';
 export const DWC_XML_NS = 'http://rs.tdwg.org/dwc/text/';
-export type DwCAParseCallback<T> = (tmpdir: string, archive: DwCAMeta) => Promise<T>;
+export type DwCAParseCallback<T> = (tmpdir: string, archive: IDwCAMeta) => Promise<T>;
 
 /*
 All interfaces prefixed by DwCAMeta come from the archive schema defined at
@@ -8,52 +8,48 @@ https://dwc.tdwg.org/text/
 Helpful: http://tools.gbif.org/dwca-assistant/gbif_dwc-a_asst_en_v1.1.pdf
  */
 
-export interface DwCASerializable {
-    asDwCRecord(): Record<any, any>;
-    loadDwCRecord(record: Record<any, any>);
-}
-
 /*
 The full meta.xml for a dwc archive
  */
-export interface DwCAMeta {
+export interface IDwCAMeta {
     archive: {
         $: {
             xmlns: string;
             metadata?: string;
             "xmlns:xsi": string;
             "xsi:schemaLocation": string;
+            "xmlns:xs"?: string;
         }
-        core: DwCAMetaCoreFileType;
-        extension?: DwCAMetaExtensionFileType[];
+        core: IDwCAMetaCoreFileType;
+        extension?: IDwCAMetaExtensionFileType[];
     }
 }
 
 /*
 A core file within the archive
  */
-export interface DwCAMetaCoreFileType extends DwCAMetaFileType {
-    id?: DwCAMetaIDFieldType;
+export interface IDwCAMetaCoreFileType extends IDwCAMetaFileType {
+    id?: IDwCAMetaIDFieldType;
 }
 
 /*
 An extension file within the archive
  */
-export interface DwCAMetaExtensionFileType extends DwCAMetaFileType {
-    coreid: DwCAMetaIDFieldType[];
+export interface IDwCAMetaExtensionFileType extends IDwCAMetaFileType {
+    coreid: IDwCAMetaIDFieldType;
 }
 
 /*
 List of data files within the archive
  */
-export interface DwCAMetaFileLocationType {
+export interface IDwCAMetaFileLocationType {
     location: string[];
 }
 
 /*
 Attributes shared across all file types, core or extensions
  */
-export interface DwCAMetaFileType {
+export interface IDwCAMetaFileType {
     $: {
         rowType: 'http://rs.tdwg.org/dwc/terms/Occurrence' | 'http://rs.tdwg.org/dwc/terms/Taxon';
         fieldsTerminatedBy?: string;
@@ -63,14 +59,14 @@ export interface DwCAMetaFileType {
         ignoreHeaderLines?: number;
         dateFormat?: string;
     },
-    files: DwCAMetaFileLocationType[];
-    field: DwCAMetaFieldType[];
+    files: IDwCAMetaFileLocationType[];
+    field: IDwCAMetaFieldType[];
 }
 
 /*
 A field within one of the archive data files
  */
-export interface DwCAMetaFieldType {
+export interface IDwCAMetaFieldType {
     $: {
         index?: number;
         term: string;
@@ -82,7 +78,7 @@ export interface DwCAMetaFieldType {
 /*
 Defines the column that's the primary key for the given file
  */
-export interface DwCAMetaIDFieldType {
+export interface IDwCAMetaIDFieldType {
     $: {
         index?: number;
     }
@@ -90,7 +86,7 @@ export interface DwCAMetaIDFieldType {
 
 // https://dwc.tdwg.org/terms
 
-export interface DwCEvent {
+export interface IDwCEvent {
     eventID: string;
     parentEventID: string;
     fieldNumber: string;
@@ -111,7 +107,7 @@ export interface DwCEvent {
     eventRemarks: string;
 }
 
-export interface DwCRecord {
+export interface IDwCRecord {
     accessRights: string;
     basisOfRecord: string;
     bibliographicCitation: string;
@@ -133,7 +129,7 @@ export interface DwCRecord {
     type: 'StillImage' | 'MovingImage' | 'Sound' | 'PhysicalObject' | 'Event' | 'Text';
 }
 
-export interface DwCIdentification {
+export interface IDwCIdentification {
     identificationID: string | number;
     verbatimIdentification: string;
     identificationQualifier: string;
@@ -146,7 +142,7 @@ export interface DwCIdentification {
     identificationRemarks: string;
 }
 
-export interface DwCLocation {
+export interface IDwCLocation {
     continent: string;
     coordinatePrecision: number;
     coordinateUncertaintyInMeters: number;
@@ -192,7 +188,7 @@ export interface DwCLocation {
     waterBody: string;
 }
 
-export interface DwCOccurrence {
+export interface IDwCOccurrence {
     associatedMedia: string;
     associatedOccurrences: Record<string, string>;
     associatedReferences: string[];
@@ -221,7 +217,7 @@ export interface DwCOccurrence {
     sex: string;
 }
 
-export interface DwcTaxon {
+export interface IDwcTaxon {
     acceptedNameUsage: string;
     acceptedNameUsageID: string;
     class: string;

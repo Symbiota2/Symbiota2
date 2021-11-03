@@ -33,6 +33,7 @@ import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.comp
 import { ForgotUsernamePage } from './pages/forgot-username/forgot-username.component';
 import { NotificationDialog } from './components/navbar/notification-dialog/notification-dialog.component';
 import { ImagePlugin } from '@symbiota2/ui-plugin-image';
+import { NavbarMenuComponent } from './components/navbar-menu/navbar-menu.component';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -61,6 +62,7 @@ const PLUGINS = [
         ForgotPasswordPage,
         ForgotUsernamePage,
         NotificationDialog,
+        NavbarMenuComponent,
     ],
     imports: [
         AlertModule,

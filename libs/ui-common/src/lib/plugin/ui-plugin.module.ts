@@ -7,8 +7,8 @@ function pluginServiceFactory(plugins: typeof SymbiotaUiPlugin[], router: Router
     const pluginSvc = new PluginService(router);
     plugins.forEach((plugin) => {
         plugin.routes().forEach((route) => pluginSvc.putRoute(route));
-        plugin.navBarLinks().forEach((link) => pluginSvc.putNavBarLink(link));
-        plugin.userProfileTabs().forEach((tab) => pluginSvc.putProfileTab(tab));
+        plugin.navBarLinks().forEach((link) => pluginSvc.putNavBarLink(plugin.PLUGIN_NAME, link));
+        plugin.userProfileTabs().forEach((tab) => pluginSvc.putProfileTab(plugin.PLUGIN_NAME, tab));
     });
     return pluginSvc;
 }

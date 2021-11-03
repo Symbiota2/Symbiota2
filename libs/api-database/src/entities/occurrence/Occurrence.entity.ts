@@ -37,17 +37,18 @@ import { Taxon } from '../taxonomy/Taxon.entity';
 import { User } from '../user/User.entity';
 import { OccurrenceDatasetLink } from './OccurrenceDatasetLink.entity';
 import { EntityProvider } from '../../entity-provider.class';
+import { v4 as uuid4 } from 'uuid';
 import {
-    DwCASerializable,
-    DwCEvent, DwCIdentification,
-    DwCLocation,
-    DwCOccurrence,
+    DwCID,
+    dwcField,
+    DwCField,
     DwCRecord
 } from '@symbiota2/dwc';
-import { v4 as uuid4 } from 'uuid';
+import { TaxaEnumTreeEntry, TaxonomicStatus, TaxonomicUnit } from '../taxonomy';
 
-type DwCKey = keyof DwCRecord | keyof DwCEvent | keyof DwCIdentification | keyof DwCOccurrence | keyof DwCLocation;
+// http://dwc.tdwg.org/terms/#occurrence
 
+@DwCRecord('http://rs.tdwg.org/dwc/terms/Occurrence')
 @Index('Index_collid', ['collectionID', 'dbpk'], { unique: true })
 @Index(['scientificName'])
 @Index('Index_family', ['family'])
@@ -77,77 +78,7 @@ type DwCKey = keyof DwCRecord | keyof DwCEvent | keyof DwCIdentification | keyof
 @Index('Index_otherCatalogNumbers', ['otherCatalogNumbers'])
 @Index('Index_latestDateCollected', ['latestDateCollected'])
 @Entity('omoccurrences')
-export class Occurrence extends EntityProvider implements DwCASerializable {
-    // https://dwc.tdwg.org/terms/#occurrence
-    static readonly DWCA_FIELD_MAP = new Map<DwCKey, keyof Occurrence>([
-        // Record level
-        ['basisOfRecord', 'basisOfRecord'],
-        ['collectionID', 'collectionID'],
-        ['datasetID', 'datasetID'],
-        ['dynamicProperties', 'dynamicProperties'],
-        ['modified', 'lastModifiedTimestamp'],
-        ['ownerInstitutionCode', 'ownerInstitutionCode'],
-
-        // Event level
-        ['fieldNumber', 'fieldNumber'],
-        ['eventDate', 'eventDate'],
-        ['startDayOfYear', 'startDayOfYear'],
-        ['endDayOfYear', 'endDayOfYear'],
-        ['verbatimEventDate', 'verbatimEventDate'],
-        ['habitat', 'habitat'],
-        ['samplingProtocol', 'samplingProtocol'],
-        ['fieldNotes', 'fieldNotes'],
-
-        // Identification level
-        ['typeStatus', 'typeStatus'],
-        ['identifiedBy', 'identifiedBy'],
-        ['dateIdentified', 'dateIdentified'],
-        ['identificationReferences', 'identificationReferences'],
-        ['identificationRemarks', 'identificationRemarks'],
-
-        // Location level
-        ['coordinatePrecision', 'coordinatePrecision'],
-        ['coordinateUncertaintyInMeters', 'coordinateUncertaintyInMeters'],
-        ['country', 'country'],
-        ['county', 'county'],
-        ['decimalLatitude', 'latitude'],
-        ['decimalLongitude', 'longitude'],
-        ['footprintWKT', 'footprintWKT'],
-        ['geodeticDatum', 'geodeticDatum'],
-        ['georeferencedBy', 'georeferencedBy'],
-        ['georeferenceProtocol', 'georeferenceProtocol'],
-        ['georeferenceRemarks', 'georeferenceRemarks'],
-        ['locality', 'locality'],
-        ['locationRemarks', 'locationRemarks'],
-        ['maximumDepthInMeters', 'maximumDepthInMeters'],
-        ['maximumElevationInMeters', 'maximumElevationInMeters'],
-        ['minimumDepthInMeters', 'minimumDepthInMeters'],
-        ['minimumElevationInMeters', 'minimumElevationInMeters'],
-        ['municipality', 'municipality'],
-        ['stateProvince', 'stateProvince'],
-        ['verbatimCoordinates', 'verbatimCoordinates'],
-        ['verbatimCoordinateSystem', 'verbatimCoordinateSystem'],
-        ['verbatimDepth', 'verbatimDepth'],
-        ['verbatimElevation', 'verbatimElevation'],
-
-        // Occurrence level
-        ['associatedTaxa', 'associatedTaxa'],
-        ['behavior', 'behavior'],
-        ['catalogNumber', 'catalogNumber'],
-        ['disposition', 'disposition'],
-        ['establishmentMeans', 'establishmentMeans'],
-        ['individualCount', 'individualCount'],
-        ['lifeStage', 'lifeStage'],
-        ['occurrenceID', 'occurrenceGUID'],
-        ['occurrenceRemarks', 'occurrenceRemarks'],
-        ['otherCatalogNumbers', 'otherCatalogNumbers'],
-        ['preparations', 'preparations'],
-        ['recordedBy', 'recordedBy'],
-        ['recordNumber', 'recordNumber'],
-        ['reproductiveCondition', 'reproductiveCondition'],
-        ['sex', 'sex'],
-    ]);
-
+export class Occurrence extends EntityProvider {
     @PrimaryGeneratedColumn({ type: 'int', name: 'occid', unsigned: true })
     id: number;
 
@@ -158,6 +89,7 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     @Column('varchar', { name: 'dbpk', nullable: true, length: 150 })
     dbpk: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/basisOfRecord')
     @Column('varchar', {
         name: 'basisOfRecord',
         nullable: true,
@@ -167,6 +99,8 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     })
     basisOfRecord: string;
 
+    @DwCID()
+    @DwCField('http://rs.tdwg.org/dwc/terms/occurrenceID')
     @Column('varchar', {
         name: 'occurrenceID',
         nullable: true,
@@ -183,9 +117,11 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
         }
     }
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/catalogNumber')
     @Column('varchar', { name: 'catalogNumber', nullable: true, length: 32 })
     catalogNumber: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/otherCatalogNumbers')
     @Column('varchar', {
         name: 'otherCatalogNumbers',
         nullable: true,
@@ -193,6 +129,7 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     })
     otherCatalogNumbers: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/ownerInstitutionCode')
     @Column('varchar', {
         name: 'ownerInstitutionCode',
         nullable: true,
@@ -200,25 +137,22 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     })
     ownerInstitutionCode: string;
 
-    @Column('varchar', { name: 'institutionID', nullable: true, length: 255 })
-    institutionID: string;
-
-    // TODO: What is this?
-    @Column('varchar', { name: 'collectionID', nullable: true, length: 255 })
-    collectionIDStr: string;
-
+    @DwCField('http://rs.tdwg.org/dwc/terms/datasetID')
     @Column('varchar', { name: 'datasetID', nullable: true, length: 255 })
     datasetID: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/family')
     @Column('varchar', { name: 'family', nullable: true, length: 255 })
     family: string;
 
     @Column('varchar', { name: 'scientificName', nullable: true, length: 255 })
     scientificName: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/taxonID')
     @Column('int', { name: 'tidinterpreted', nullable: true, unsigned: true })
     taxonID: number | null;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/genus')
     @Column('varchar', { name: 'genus', nullable: true, length: 255 })
     genus: string;
 
@@ -261,6 +195,7 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     @Column('varchar', { name: 'typeStatus', nullable: true, length: 255 })
     typeStatus: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/recordedBy')
     @Column('varchar', {
         name: 'recordedBy',
         nullable: true,
@@ -269,6 +204,7 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     })
     recordedByNames: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/recordNumber')
     @Column('varchar', {
         name: 'recordNumber',
         nullable: true,
@@ -345,6 +281,7 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     })
     occurrenceRemarks: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/informationWithheld')
     @Column('varchar', {
         name: 'informationWithheld',
         nullable: true,
@@ -352,6 +289,7 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     })
     informationWithheld: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/dataGeneralizations')
     @Column('varchar', {
         name: 'dataGeneralizations',
         nullable: true,
@@ -359,9 +297,11 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     })
     dataGeneralizations: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/associatedOccurrences')
     @Column('text', { name: 'associatedOccurrences', nullable: true })
     associatedOccurrences: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/associatedTaxa')
     @Column('text', {
         name: 'associatedTaxa',
         nullable: true,
@@ -369,15 +309,18 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     })
     associatedTaxa: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/dynamicProperties')
     @Column('text', { name: 'dynamicProperties', nullable: true })
     dynamicProperties: string;
 
     @Column('text', { name: 'verbatimAttributes', nullable: true })
     verbatimAttributes: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/behavior')
     @Column('varchar', { name: 'behavior', nullable: true, length: 500 })
     behavior: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/reproductiveCondition')
     @Column('varchar', {
         name: 'reproductiveCondition',
         nullable: true,
@@ -393,6 +336,7 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     })
     cultivationStatus: number | null;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/establishmentMeans')
     @Column('varchar', {
         name: 'establishmentMeans',
         nullable: true,
@@ -400,12 +344,15 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     })
     establishmentMeans: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/lifeStage')
     @Column('varchar', { name: 'lifeStage', nullable: true, length: 45 })
     lifeStage: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/sex')
     @Column('varchar', { name: 'sex', nullable: true, length: 45 })
     sex: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/individualCount')
     @Column('varchar', { name: 'individualCount', nullable: true, length: 45 })
     individualCount: string;
 
@@ -419,6 +366,7 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     @Column('varchar', { name: 'samplingEffort', nullable: true, length: 200 })
     samplingEffort: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/preparations')
     @Column('varchar', { name: 'preparations', nullable: true, length: 100 })
     preparations: string;
 
@@ -527,6 +475,7 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     })
     georeferenceSources: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus')
     @Column('varchar', {
         name: 'georeferenceVerificationStatus',
         nullable: true,
@@ -566,6 +515,7 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     @Column('text', { name: 'previousIdentifications', nullable: true })
     previousIdentifications: string;
 
+    @DwCField('http://rs.tdwg.org/dwc/terms/disposition')
     @Column('varchar', { name: 'disposition', nullable: true, length: 250 })
     disposition: string;
 
@@ -586,6 +536,7 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     })
     modified: Date | null;
 
+    @DwCField('http://purl.org/dc/elements/1.1/language')
     @Column('varchar', { name: 'language', nullable: true, length: 20 })
     language: string;
 
@@ -614,6 +565,7 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
     @Column('datetime', { name: 'dateEntered', nullable: true })
     initialTimestamp: Date | null;
 
+    @DwCField('http://purl.org/dc/terms/modified')
     @Column('timestamp', {
         name: 'dateLastModified',
         default: () => 'CURRENT_TIMESTAMP()',
@@ -831,34 +783,48 @@ export class Occurrence extends EntityProvider implements DwCASerializable {
         }
     }
 
-    asDwCRecord(): Record<DwCKey, any> {
-        const dwcRecord = {};
-        for (const [dwcKey, databaseKey] of Occurrence.DWCA_FIELD_MAP.entries()) {
-            if (this[databaseKey]) {
-                dwcRecord[dwcKey] = this[databaseKey];
-            }
+    @DwCField('http://rs.tdwg.org/dwc/terms/acceptedNameUsage')
+    async scientificNameAccepted(): Promise<string> {
+        const taxon = await this.taxon;
+        if (taxon) {
+            return await taxon.scientificNameAccepted();
         }
-        return dwcRecord as Record<DwCKey, any>;
+        return null;
     }
 
-    loadDwCRecord(dwc: Record<DwCKey, any>) {
-        for (const [dwcKey, databaseKey] of Occurrence.DWCA_FIELD_MAP.entries()) {
-            if (!['day', 'month', 'year'].includes(dwcKey)) {
-                // @ts-ignore
-                this[databaseKey] = dwc[dwcKey];
-            }
+    @DwCField('http://rs.tdwg.org/dwc/terms/kingdom')
+    async kingdom(): Promise<string> {
+        const taxon = await this.taxon;
+        if (taxon) {
+            return await taxon.kingdom();
         }
-        if (!dwc.eventDate && (dwc.day || dwc.month || dwc.year)) {
-            this.eventDate = new Date();
-            if (dwc.year) {
-                this.eventDate.setFullYear(dwc.year);
-            }
-            if (dwc.month) {
-                this.eventDate.setMonth(dwc.month);
-            }
-            if (dwc.day) {
-                this.eventDate.setDate(dwc.day);
-            }
+        return null;
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/phylum')
+    async phylum(): Promise<string> {
+        const taxon = await this.taxon;
+        if (taxon) {
+            return await taxon.phylum();
         }
+        return null;
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/class')
+    async class(): Promise<string> {
+        const taxon = await this.taxon;
+        if (taxon) {
+            return await taxon.class();
+        }
+        return null;
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/order')
+    async order(): Promise<string> {
+        const taxon = await this.taxon;
+        if (taxon) {
+            return await taxon.order();
+        }
+        return null;
     }
 }

@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core'
 import { TaxonDescriptionBlockQueryBuilder } from './taxonDescriptionBlock-query-builder'
 import { TaxonDescriptionBlockListItem } from '../../dto/taxonDescriptionBlock-list-item'
 import { TaxonDescriptionBlockInputDto } from '../../dto';
+import { CollectionRoleOutput } from '../../../../../ui-plugin-collection/src/lib/dto/CollectionRole.dto';
 
 
 interface FindAllParams {
@@ -145,6 +146,52 @@ export class TaxonDescriptionBlockService {
             })
         )
     }
+
+    /**
+     * sends request to api to delete a taxon description block
+     * @param block - the block to delete, it should be just the block id that is needed
+     * @returns Observable of response from api casted as `TaxonDescriptionBlockListItem`.
+     * will be the deleted block or null if api has errors
+     * @returns `of(null)` if user does not exist or does not have editing permission.
+     */
+    /*
+    delete(block: Partial<TaxonDescriptionBlockInputDto>): Observable<TaxonDescriptionBlockListItem> {
+        const url = this.createUrlBuilder().delete()
+            .build()
+
+        return this.user.currentUser.pipe(
+            switchMap((currentUser) => {
+                if (!!currentUser) {
+                        switchMap((collection) => {
+                            if (currentUser.canEditCollection(collection.id)) {
+                                //const url = `${this.COLLECTION_BASE_URL}/${collection.id}/roles`;
+                                const req = this.api
+                                    .queryBuilder(url)
+                                    .delete()
+                                    .body([block])
+                                    .addJwtAuth(currentUser.token)
+                                    .build();
+
+                                return this.api.send(req).pipe(
+                                    map((response: CollectionRoleOutput) => {
+                                        return response;
+                                    })
+                                )
+                            } else {
+                                this.alertService.showError(`User does not have permission to delete taxon block`)
+                                return null
+                            }
+                        }
+                } else {
+                    this.alertService.showError(
+                        `User must be logged in to delete taxon block`
+                    )
+                    return null
+                }
+            }
+        )
+    }
+     */
 
     private createUrlBuilder(): TaxonDescriptionBlockQueryBuilder {
         return new TaxonDescriptionBlockQueryBuilder(this.appConfig.apiUri());

@@ -32,13 +32,19 @@
                     }}"
                 />
             </a>
-            <a
-                mat-button
-                *ngFor="let link of pluginLinks"
-                routerLink="{{ link.url }}"
+
+            <symbiota2-navbar-menu
+                *ngFor='let category of (linkCategories() | async)'
+                [title]='category'
+                [items]='categoryLinks(category) | async'
             >
+            </symbiota2-navbar-menu>
+
+            <!--
+            <a mat-button *ngFor="let link of pluginLinks" routerLink="{{ link.url }}">
                 {{ link.name | translate }}
             </a>
+            -->
             <button mat-button [matMenuTriggerFor]="symbiota">
                 {{ 'core.layout.header.topnav.symbiota_link' | translate }}
             </button>

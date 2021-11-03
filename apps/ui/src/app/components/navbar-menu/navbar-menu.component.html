@@ -1,0 +1,6 @@
+<button mat-button [matMenuTriggerFor]='navbarItems'>{{ title | translate }}</button>
+<mat-menu #navbarItems='matMenu'>
+    <a *ngFor='let link of items' mat-menu-item [routerLink]=link.url>
+        {{ link.name | translate }}
+    </a>
+</mat-menu>

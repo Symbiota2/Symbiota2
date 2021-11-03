@@ -9,13 +9,15 @@ import { TaxonomyModule } from '@symbiota2/api-plugin-taxonomy'
 import { GeographyModule } from '@symbiota2/api-plugin-geography'
 import { BullModule } from '@nestjs/bull';
 import { DatabaseModule } from '@symbiota2/api-database';
+import { DwCModule } from '@symbiota2/api-dwc';
 
 const ENABLED_PLUGINS = [
     CollectionModule,
     OccurrenceModule,
     GeographyModule,
     ImageModule,
-    TaxonomyModule
+    TaxonomyModule,
+    DwCModule
 ];
 
 /**

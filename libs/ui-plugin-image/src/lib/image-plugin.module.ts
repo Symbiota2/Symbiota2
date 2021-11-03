@@ -81,6 +81,8 @@ import { FilterPipe } from './pages/image-search/filter.pipe';
     ]
 })
 export class ImagePlugin extends SymbiotaUiPlugin {
+    static readonly PLUGIN_NAME = 'plugins.image.name';
+
     private static IMAGE_LIBRARY_ROUTE = "images/library/:level"
     private static IMAGE_DETAILS_ROUTE = "image/details/:imageID"
     private static IMAGE_SEARCH_ROUTE = "image/search"
