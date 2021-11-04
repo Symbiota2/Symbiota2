@@ -1,4 +1,5 @@
 import { Q_PARAM_TAXAIDS } from '../../../constants';
+import { TaxonDescriptionBlockQueryBuilder } from '../taxonDescriptionBlock/taxonDescriptionBlock-query-builder';
 
 export class TaxonDescriptionStatementQueryBuilder {
     protected baseUrl: string
@@ -23,10 +24,69 @@ export class TaxonDescriptionStatementQueryBuilder {
         return new FindOneBuilder(this.baseUrl)
     }
 
+    create(): CreateOneBuilder {
+        return new CreateOneBuilder(this.baseUrl);
+    }
+
+    delete(): DeleteOneBuilder {
+        return new DeleteOneBuilder(this.baseUrl);
+    }
+
+    upload(): UploadBuilder {
+        return new UploadBuilder(this.baseUrl);
+    }
+
     build(): string {
         return this.url.toString()
     }
 }
+
+class CreateOneBuilder extends TaxonDescriptionStatementQueryBuilder {
+    protected _myID: number;
+
+    myID(id: number): CreateOneBuilder {
+        this._myID = id;
+        return this;
+    }
+
+    build(): string {
+        return super.build();
+    }
+}
+
+class DeleteOneBuilder extends TaxonDescriptionStatementQueryBuilder {
+    protected _id: number;
+
+    id(id: number): DeleteOneBuilder {
+        this._id = id
+        return this;
+    }
+
+    build(): string {
+        if (this._id) {
+            this.url.pathname += `/${this._id}`
+        }
+        return super.build()
+    }
+}
+
+class UploadBuilder extends TaxonDescriptionStatementQueryBuilder {
+    private _id: number = null;
+
+    id(id: number): UploadBuilder {
+        this._id = id;
+        return this;
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/upload`;
+        if (this._id) {
+            this.url.pathname += `/${this._id}`;
+        }
+        return super.build();
+    }
+}
+
 
 class FindOneBuilder extends TaxonDescriptionStatementQueryBuilder {
     protected taxonID: number = null

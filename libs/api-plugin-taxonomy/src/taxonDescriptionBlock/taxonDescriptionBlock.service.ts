@@ -45,7 +45,7 @@ Fetch the block data for a given taxon id.
     }
 
     /*
-    TODO: Not sure if this is implemented correctly, what about errors?
+    Create a taxon description block
      */
     async create(data: Partial<TaxonDescriptionBlock>): Promise<TaxonDescriptionBlock> {
         const block = this.myRepository.create(data)
@@ -53,7 +53,7 @@ Fetch the block data for a given taxon id.
     }
 
     /*
-    TODO: Implement error handling
+    Update a taxon description block
      */
     async updateByID(id: number, data: Partial<TaxonDescriptionBlock>): Promise<TaxonDescriptionBlock> {
         console.log("id is " + id)

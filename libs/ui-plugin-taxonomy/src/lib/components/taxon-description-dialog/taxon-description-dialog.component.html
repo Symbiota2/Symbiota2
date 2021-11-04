@@ -1,4 +1,3 @@
-<!-- <h1 mat-dialog-title>Row Action :: <strong>{{action}}</strong></h1> -->
 <div mat-dialog-content>
         <form *ngIf="action == 'Update'; else elseTemplate" class="name-autocomplete-form">
             <mat-form-field appearance="fill">
@@ -23,7 +22,6 @@
                        [value]="local_data.source"
                        [(ngModel)]="local_data.source"
                        [ngModelOptions]="{standalone: true}">
-                <!-- <mat-icon matSuffix>mode_edit</mat-icon> -->
             </mat-form-field>
             <mat-form-field appearance="fill">
                 <mat-label>{{'taxon.description.editor.sourceUrl' | translate}}</mat-label>
@@ -49,15 +47,6 @@
                        [(ngModel)]="local_data.displayLevel"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-            <!--
-            <mat-form-field class="name-autocomplete-full-width">
-                <input placeholder="{{'taxon.editor.common.sortSequence' | translate}}"
-                       type="text"
-                       aria-label="String"
-                       matInput
-                       [formControl]="commonSortSequenceControl">
-            </mat-form-field>
-            -->
         </form>
     <ng-template #elseTemplate>
         {{'taxon.editor.dialog.confirm.delete' | translate}}<b>{{local_data.name}}</b>?

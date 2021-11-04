@@ -28,6 +28,10 @@ export class TaxonDescriptionBlockQueryBuilder {
         return new CreateOneBuilder(this.baseUrl);
     }
 
+    delete(): DeleteOneBuilder {
+        return new DeleteOneBuilder(this.baseUrl);
+    }
+
     upload(): UploadBuilder {
         return new UploadBuilder(this.baseUrl);
     }
@@ -46,8 +50,23 @@ class CreateOneBuilder extends TaxonDescriptionBlockQueryBuilder {
     }
 
     build(): string {
-        //this.url.searchParams.set('collectionID', this._myID.toString());
         return super.build();
+    }
+}
+
+class DeleteOneBuilder extends TaxonDescriptionBlockQueryBuilder {
+    protected _id: number;
+
+    id(id: number): DeleteOneBuilder {
+        this._id = id
+        return this;
+    }
+
+    build(): string {
+        if (this._id) {
+            this.url.pathname += `/${this._id}`
+        }
+        return super.build()
     }
 }
 
