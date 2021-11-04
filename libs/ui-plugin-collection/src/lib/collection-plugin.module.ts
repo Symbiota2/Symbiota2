@@ -60,6 +60,7 @@ import { CollectionPermissionsComponent } from './components/collection-permissi
 import { UserSearchableSelectComponent } from './components/user-searchable-select/user-searchable-select.component';
 import { CollectionPermissionsConfirmDialogComponent } from './components/collection-permissions-confirm-dialog/collection-permissions-confirm-dialog.component';
 import { DarwinCoreArchivePublishingComponent } from './components/darwincore-archive-publishing/darwincore-archive-publishing.component';
+import { DarwinCoreArchiveService } from './services/darwin-core-archive.service';
 
 @NgModule({
     declarations: [
@@ -118,6 +119,7 @@ import { DarwinCoreArchivePublishingComponent } from './components/darwincore-ar
         CollectionProfileService,
         InstitutionService,
         CommentService,
+        DarwinCoreArchiveService
     ],
     exports: [CollectionCheckboxSelectorComponent, CollectionLogoComponent],
 })
