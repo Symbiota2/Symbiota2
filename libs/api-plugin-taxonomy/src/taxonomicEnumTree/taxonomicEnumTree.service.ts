@@ -5,6 +5,7 @@ import { BaseService } from '@symbiota2/api-common';
 import { TaxaEnumTreeEntry } from '@symbiota2/api-database';
 //import { TaxonomicEnumTreeDto } from './dto/TaxonomicEnumTreeDto';
 import {In} from "typeorm";
+import { TaxonomicEnumTreeMoveTaxonParams } from './dto/taxonomicEnumTreeQueryParams';
 
 @Injectable()
 export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
@@ -154,9 +155,42 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
 
     }
 
-    async create(data: Partial<TaxaEnumTreeEntry>): Promise<TaxaEnumTreeEntry> {
-        const taxon = this.taxonomicEnumTrees.create(data)
-        return this.taxonomicEnumTrees.save(taxon)
+    async save(data: Partial<TaxaEnumTreeEntry>): Promise<TaxaEnumTreeEntry> {
+        return await this.taxonomicEnumTrees.save(data)
+    }
+
+    async moveTaxon(params: TaxonomicEnumTreeMoveTaxonParams): Promise<TaxaEnumTreeEntry> {
+        const { ...qParams } = params
+
+        // Delete the taxonID's taxaEnum tree entries
+        await this.taxonomicEnumTrees.delete({
+            taxonAuthorityID: params.taxonAuthorityID,
+            taxonID: params.taxonID
+        })
+
+        // Find all of the new parent's taxaEnum tree entries
+        const entries =
+            await this.taxonomicEnumTrees.find({
+                where: {
+                    taxonAuthorityID: params.taxonAuthorityID,
+                    taxonID: params.parentTaxonID
+                }})
+
+        // Update the enum tree pointing the taxonID to the new parent's ancestors
+        entries.forEach((entry) => {
+            entry.taxonID = params.taxonID
+            entry.initialTimestamp = new Date()
+            this.save(entry)
+        })
+
+        // Add the entry for taxon with the new parent
+        const data = new TaxaEnumTreeEntry()
+        data.parentTaxonID = params.parentTaxonID
+        data.taxonID = params.taxonID
+        data.taxonAuthorityID = params.taxonAuthorityID
+        data.initialTimestamp = new Date()
+
+        return this.save(data)
     }
 
     async updateByID(taxonID: number, data: Partial<TaxaEnumTreeEntry>): Promise<TaxaEnumTreeEntry> {

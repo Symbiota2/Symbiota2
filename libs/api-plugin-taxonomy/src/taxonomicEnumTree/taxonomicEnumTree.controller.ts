@@ -1,4 +1,17 @@
-import { Controller, Get, Param, Query, Post, Body, HttpStatus, HttpCode, Delete, NotFoundException, Patch } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Param,
+    Query,
+    Post,
+    Body,
+    HttpStatus,
+    HttpCode,
+    Delete,
+    NotFoundException,
+    Patch,
+    SerializeOptions
+} from '@nestjs/common';
 import { TaxonomicEnumTreeService } from './taxonomicEnumTree.service';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import {
@@ -7,6 +20,8 @@ import {
 import { TaxonomicEnumTreeFindAllParams } from './dto/taxonomicEnumTree-find-all.input.dto';
 import { TaxonDto } from '../taxon/dto/TaxonDto';
 import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
+import { TaxonDescriptionBlock } from '@symbiota2/api-database';
+import { TaxonomicEnumTreeMoveTaxonParams } from './dto/taxonomicEnumTreeQueryParams';
 
 @ApiTags('TaxonomicEnumTree')
 @Controller('taxonomicEnumTree')
@@ -28,7 +43,6 @@ export class TaxonomicEnumTreeController {
         });
         return Promise.all(taxonDtos);
     }
-
 
     @Get('ancestorTaxons/:taxonID')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDto })
@@ -134,6 +148,21 @@ export class TaxonomicEnumTreeController {
         const taxon = await this.myService.findByID(id)
         const dto = new TaxonomicEnumTreeDto(taxon)
         return dto
+    }
+
+    @Patch('move')
+    @ApiOperation({
+        summary: "Move taxon to a new parent in the enum tree."
+    })
+    //@ProtectCollection('id')
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonomicEnumTreeDto })
+    //@SerializeOptions({ groups: ['single'] })
+    async moveTaxon(@Query() myParams: TaxonomicEnumTreeMoveTaxonParams): Promise<TaxonomicEnumTreeDto> {
+        const enumTree = await this.myService.moveTaxon(myParams);
+        if (!enumTree) {
+            throw new NotFoundException()
+        }
+        return new TaxonomicEnumTreeDto(enumTree)
     }
 
 }
