@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Taxon } from '@symbiota2/api-database'
+import { Taxon, TaxonomicUnit } from '@symbiota2/api-database';
 import { In, Like, Repository } from 'typeorm';
 import { TaxonFindAllParams } from './dto/taxon-find-all.input.dto'
 import { BaseService } from '@symbiota2/api-common'
@@ -9,8 +9,8 @@ import { TaxonFindNamesParams } from './dto/taxon-find-names.input.dto';
 export class TaxonService extends BaseService<Taxon>{
     constructor(
         @Inject(Taxon.PROVIDER_ID)
-        private readonly myRepository: Repository<Taxon>) {
-        super(myRepository);
+        private readonly taxonRepo: Repository<Taxon>) {
+        super(taxonRepo);
     }
 
     /*
@@ -21,7 +21,7 @@ export class TaxonService extends BaseService<Taxon>{
 
         if (qParams.taxonAuthorityID) {
             // Have to use query builder since filter on nested relations does not work
-            const qb = this.myRepository.createQueryBuilder('o')
+            const qb = this.taxonRepo.createQueryBuilder('o')
                 .leftJoin('o.taxonStatuses', 'c')
                 //.take(limit)
 
@@ -38,12 +38,12 @@ export class TaxonService extends BaseService<Taxon>{
         } else {
             // Can use nested relations
             return (qParams.id)?
-                await this.myRepository.find({
+                await this.taxonRepo.find({
                     // No limit or offset if we have a list of ids
                     // take: limit,
                     // skip: offset,
                     where: { id: In(params.id) }})
-                : await this.myRepository.find({
+                : await this.taxonRepo.find({
                     take: limit,
                     skip: offset })
         }
@@ -55,7 +55,7 @@ export class TaxonService extends BaseService<Taxon>{
     async findAllScientificNamesPlusAuthors(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         const { limit,...qParams } = params
         if (qParams.taxonAuthorityID) {
-            const qb = this.myRepository.createQueryBuilder('o')
+            const qb = this.taxonRepo.createQueryBuilder('o')
                 .select([
                     'o.scientificName',
                     'o.author'
@@ -74,11 +74,11 @@ export class TaxonService extends BaseService<Taxon>{
             return await qb.getMany()
         } else {
             return (qParams.id)?
-                await this.myRepository.find({
+                await this.taxonRepo.find({
                     select: ["scientificName", "author"],
                     where: { id: In(params.id) },
                     take: TaxonFindAllParams.MAX_LIMIT})
-                : await this.myRepository.find({
+                : await this.taxonRepo.find({
                     select: ["scientificName", "author"],
                     take: TaxonFindAllParams.MAX_LIMIT
                 })
@@ -93,7 +93,7 @@ export class TaxonService extends BaseService<Taxon>{
         const { limit,...qParams } = params
 
         if (qParams.taxonAuthorityID) {
-            const qb = this.myRepository.createQueryBuilder('o')
+            const qb = this.taxonRepo.createQueryBuilder('o')
                 .select([
                     'o.scientificName'
                 ])
@@ -110,11 +110,11 @@ export class TaxonService extends BaseService<Taxon>{
             return await qb.getMany()
         } else {
             return (qParams.id)?
-                await this.myRepository.find({
+                await this.taxonRepo.find({
                     select: ["scientificName"],
                     where: { id: In(params.id) },
                     take: TaxonFindAllParams.MAX_LIMIT})
-                : await this.myRepository.find({
+                : await this.taxonRepo.find({
                     select: ["scientificName"],
                     take: TaxonFindAllParams.MAX_LIMIT
                 })
@@ -130,7 +130,7 @@ export class TaxonService extends BaseService<Taxon>{
         const { limit,...qParams } = params
 
         if (qParams.taxonAuthorityID) {
-            const qb = this.myRepository.createQueryBuilder('o')
+            const qb = this.taxonRepo.createQueryBuilder('o')
                 .select([
                     'o.scientificName', 'o.id'
                 ])
@@ -149,12 +149,12 @@ export class TaxonService extends BaseService<Taxon>{
             return await qb.getMany()
         } else {
             return (qParams.id)?
-                await this.myRepository.find({
+                await this.taxonRepo.find({
                     select: ["scientificName", "id"],
                     where: { id: In(params.id), rankID: 140 }
                     // take: TaxonFindAllParams.MAX_LIMIT
                 })
-                : await this.myRepository.find({
+                : await this.taxonRepo.find({
                     select: ["scientificName","id"],
                     where: { rankID: 140 }
                    // take: TaxonFindAllParams.MAX_LIMIT
@@ -171,7 +171,7 @@ and an authority ID
         const { limit,...qParams } = params
 
         if (qParams.taxonAuthorityID) {
-            const qb = this.myRepository.createQueryBuilder('o')
+            const qb = this.taxonRepo.createQueryBuilder('o')
                 .select([
                     'o.scientificName','o.id'
                 ])
@@ -190,12 +190,12 @@ and an authority ID
             return await qb.getMany()
         } else {
             return (qParams.id)?
-                await this.myRepository.find({
+                await this.taxonRepo.find({
                     select: ["scientificName", "id"],
                     where: { id: In(params.id), rankID: 180 }
                     //take: TaxonFindAllParams.MAX_LIMIT
                 })
-                : await this.myRepository.find({
+                : await this.taxonRepo.find({
                     select: ["scientificName","id"],
                     where: { rankID: 180 }
                     //take: TaxonFindAllParams.MAX_LIMIT
@@ -212,7 +212,7 @@ and an authority ID
         const { limit,...qParams } = params
 
         if (qParams.taxonAuthorityID) {
-            const qb = this.myRepository.createQueryBuilder('o')
+            const qb = this.taxonRepo.createQueryBuilder('o')
                 .select([
                     'o.scientificName', 'o.id'
                 ])
@@ -232,20 +232,20 @@ and an authority ID
         } else {
             return (qParams.id)?
                 (qParams.partialName)?
-                    await this.myRepository.find({
+                    await this.taxonRepo.find({
                         select: ["scientificName", "id"],
                         where: { id: In(params.id),
                             rankID: 220,
                             scientificName: Like(params.partialName + '%') }
                         //take: TaxonFindAllParams.MAX_LIMIT
                     })
-                    : await this.myRepository.find({
+                    : await this.taxonRepo.find({
                         select: ["scientificName", "id"],
                         where: { id: In(params.id), rankID: 220 }
                         //take: TaxonFindAllParams.MAX_LIMIT
                     })
                 : (qParams.partialName)?
-                    await this.myRepository.find({
+                    await this.taxonRepo.find({
                         select: ["scientificName","id"],
                         where: {
                             rankID: 220,
@@ -253,7 +253,7 @@ and an authority ID
                         }
                         //take: TaxonFindAllParams.MAX_LIMIT
                     })
-                    : await this.myRepository.find({
+                    : await this.taxonRepo.find({
                         select: ["scientificName","id"],
                         where: { rankID: 220 }
                         //take: TaxonFindAllParams.MAX_LIMIT
@@ -268,14 +268,14 @@ and an authority ID
         const { ...qParams } = params
         if (qParams.taxonAuthorityID) {
             // Have to use the query builder since where filter on nested relations does not work
-            const qb = this.myRepository.createQueryBuilder('o')
+            const qb = this.taxonRepo.createQueryBuilder('o')
                 .innerJoin('o.taxonStatuses', 'c')
                 .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
                 .andWhere('o.scientificName = :sciname', {sciname: sciname})
 
             return await qb.getMany()
         } else {
-            return await this.myRepository.find({ where: { scientificName: sciname } })
+            return await this.taxonRepo.find({ where: { scientificName: sciname } })
         }
     }
 
@@ -293,26 +293,46 @@ and an authority ID
     Find a taxon using a taxon ID.
      */
     async findByTID(id: number): Promise<Taxon> {
-        return this.myRepository.findOne({ where: {id: id} })
+        return this.taxonRepo.findOne({ where: {id: id} })
     }
 
     /*
     Create a new taxon
      */
     async create(data: Partial<Taxon>): Promise<Taxon> {
-        const taxon = this.myRepository.create(data);
-        return this.myRepository.save(taxon);
+        const taxon = this.taxonRepo.create(data);
+        return this.taxonRepo.save(taxon);
     }
 
     /*
     Update a taxon record using a taxon id.
      */
     async updateByID(id: number, data: Partial<Taxon>): Promise<Taxon> {
-        const updateResult = await this.myRepository.update({ id }, data);
+        const updateResult = await this.taxonRepo.update({ id }, data);
         if (updateResult.affected > 0) {
             return this.findByID(id)
         }
         return null
     }
 
+    /**
+     * @param kingdomName The kingdom that the taxon belongs to
+     * @param rankName The name of the taxon's rank
+     * @param scientificName The scientificName for the taxon
+     * @return number The taxonID if it exists, otherwise -1
+     */
+    async taxonExists(kingdomName: string, rankName: string, scientificName: string): Promise<number> {
+        const taxon = await this.taxonRepo.findOne({
+            select: ['id'],
+            where: {
+                scientificName,
+                rank: {
+                    kingdomName,
+                    rankName
+                }
+            },
+            relations: ['rank']
+        });
+        return taxon === null ? -1 : taxon.id;
+    }
 }

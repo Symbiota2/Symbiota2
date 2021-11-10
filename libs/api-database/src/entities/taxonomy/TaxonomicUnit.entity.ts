@@ -1,7 +1,14 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    Index,
+    OneToMany,
+    PrimaryGeneratedColumn
+} from 'typeorm';
 import { EntityProvider } from '../../entity-provider.class';
 
 @Index('UNIQUE_taxonunits', ['kingdomName', 'rankID'], { unique: true })
+@Index(['rankID'])
 @Entity('taxonunits')
 export class TaxonomicUnit extends EntityProvider {
     @PrimaryGeneratedColumn({ type: 'int', name: 'taxonunitid' })

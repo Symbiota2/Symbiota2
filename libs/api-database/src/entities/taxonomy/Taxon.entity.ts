@@ -277,6 +277,21 @@ export class Taxon extends EntityProvider {
         return ancestor.scientificName;
     }
 
+    async rank(): Promise<TaxonomicUnit> {
+        const db = getConnection();
+        const taxonUnitRepo = db.getRepository(TaxonomicUnit);
+        return taxonUnitRepo.findOne({
+            kingdomName: this.kingdomName,
+            rankID: this.rankID
+        });
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/taxonRank')
+    async rankName(): Promise<string> {
+        const rank = await this.rank();
+        return rank !== null ? rank.rankName : null;
+    }
+
     @DwCField('http://rs.tdwg.org/dwc/terms/kingdom')
     async kingdom(): Promise<string> {
         return await this.ancestorSciName('Kingdom');
