@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
-export class PublishedCollection {
+export class CollectionArchive {
     constructor(archiveData: Record<string, unknown>) {
         Object.assign(this, archiveData);
     }
@@ -13,4 +13,8 @@ export class PublishedCollection {
     @ApiProperty()
     @Expose()
     archive: string;
+
+    @ApiProperty()
+    @Expose()
+    isPublic: boolean;
 }

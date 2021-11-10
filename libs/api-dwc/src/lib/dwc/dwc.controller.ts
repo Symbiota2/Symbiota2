@@ -1,20 +1,24 @@
 import {
-    Controller,
+    Controller, ForbiddenException,
     Get, HttpStatus,
     NotFoundException,
     Param,
     Patch,
     Put,
-    Query, Res
+    Query, Req, Res, UseGuards
 } from '@nestjs/common';
-import { PublishedCollection } from './dto/published-collection';
+import { CollectionArchive } from './dto/collection-archive';
 import { DwCService } from './dwc.service';
 import { CollectionIDParam } from './dto/collection-id-param';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateArchiveQuery } from './dto/update-archive-query';
 import { basename } from 'path';
 import { Response } from 'express';
-import { strict } from 'assert';
+import {
+    AuthenticatedRequest,
+    JwtAuthGuard,
+    TokenService
+} from '@symbiota2/api-auth';
 
 @ApiTags('Darwin Core Archives')
 @Controller('dwc')
@@ -23,11 +27,12 @@ export class DwCController {
 
     @Get('collections')
     @ApiOperation({ summary: 'Retrieve the list of publicly-available Darwin Core Archives for this portal' })
-    async getPublishedCollections(): Promise<PublishedCollection[]> {
-        const archives = await this.dwc.listPublishedCollectionArchives();
+    async getPublishedCollections(): Promise<CollectionArchive[]> {
+        const archives = await this.dwc.listArchives();
         return archives.map((a) => {
-            return new PublishedCollection({
+            return new CollectionArchive({
                 collectionID: a.collectionID,
+                isPublic: a.isPublic,
                 archive: basename(a.objectKey)
             });
         });
@@ -67,23 +72,47 @@ export class DwCController {
             });
         });
     }
-    // @Put('collections/:collectionID')
-    // @ApiOperation({ summary: 'Create or publish a Darwin Core Archive for the given collection' })
-    // // @ProtectCollection('collectionID')
-    // async createCollectionArchive(@Param() params: CollectionIDParam, @Query() query: UpdateArchiveQuery): Promise<void> {
-    //     const collectionExists = await this.dwc.collectionArchiveExists(params.collectionID);
-    //
-    //     if (!collectionExists || query.refresh) {
-    //         await this.dwc.createArchiveForCollection(
-    //             params.collectionID,
-    //             { publish: query.publish }
-    //         );
-    //     }
-    //     else if (query.publish) {
-    //         await this.dwc.publishCollectionArchive(params.collectionID);
-    //     }
-    //     else {
-    //         await this.dwc.unpublishCollectionArchive(params.collectionID);
-    //     }
-    // }
+
+    // TODO: Return archive generation date
+
+    @Put('collections/:collectionID')
+    @ApiOperation({ summary: 'Create or publish a Darwin Core Archive for the given collection' })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    async createCollectionArchive(
+        @Req() req: AuthenticatedRequest,
+        @Param() params: CollectionIDParam,
+        @Query() query: UpdateArchiveQuery): Promise<void> {
+
+        const [isSuperAdmin, isCollectionAdmin] = await Promise.all([
+            TokenService.isSuperAdmin(req.user),
+            TokenService.isCollectionAdmin(req.user, params.collectionID)
+        ]);
+
+        if (!(isSuperAdmin || isCollectionAdmin)) {
+            throw new ForbiddenException();
+        }
+
+        const collectionExists = await this.dwc.collectionArchiveExists(
+            params.collectionID
+        );
+
+        if (!collectionExists || query.refresh) {
+            await this.dwc.createArchiveForCollection(
+                params.collectionID,
+                { publish: query.publish }
+            );
+        }
+        else if (collectionExists) {
+            if (query.publish) {
+                await this.dwc.publishCollectionArchive(params.collectionID);
+            }
+            else {
+                await this.dwc.unpublishCollectionArchive(params.collectionID);
+            }
+        }
+        else {
+            throw new NotFoundException("Archive not found")
+        }
+    }
 }
