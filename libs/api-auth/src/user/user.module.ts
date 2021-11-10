@@ -41,7 +41,8 @@ import { NotificationController } from './controllers/notification/notification.
     ],
     exports: [
         UserService,
-        TokenService
+        TokenService,
+        NotificationService
     ]
 })
 export class UserModule {}

@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Controller, ForbiddenException,
     Get, HttpStatus,
     NotFoundException,
@@ -19,21 +20,28 @@ import {
     JwtAuthGuard,
     TokenService
 } from '@symbiota2/api-auth';
+import { InjectQueue } from '@nestjs/bull';
+import { QUEUE_ID_GENERATE_DWC } from './queues/dwc-generate.queue';
+import { Queue } from 'bull';
+import { DwcGenerateJob } from './queues/dwc-generate.processor';
 
 @ApiTags('Darwin Core Archives')
 @Controller('dwc')
 export class DwCController {
-    constructor(private readonly dwc: DwCService) { }
+    constructor(
+        @InjectQueue(QUEUE_ID_GENERATE_DWC) private readonly dwcQueue: Queue<DwcGenerateJob>,
+        private readonly dwc: DwCService) { }
 
     @Get('collections')
     @ApiOperation({ summary: 'Retrieve the list of publicly-available Darwin Core Archives for this portal' })
     async getPublishedCollections(): Promise<CollectionArchive[]> {
         const archives = await this.dwc.listArchives();
+
         return archives.map((a) => {
+            const { objectKey, ...archive } = a;
             return new CollectionArchive({
-                collectionID: a.collectionID,
-                isPublic: a.isPublic,
-                archive: basename(a.objectKey)
+                archive: basename(objectKey),
+                ...archive,
             });
         });
     }
@@ -98,10 +106,17 @@ export class DwCController {
         );
 
         if (!collectionExists || query.refresh) {
-            await this.dwc.createArchiveForCollection(
-                params.collectionID,
-                { publish: query.publish }
-            );
+            if (await this.jobIsRunning(params.collectionID)) {
+                throw new BadRequestException(
+                    `A job for collectionID ${params.collectionID} is already running`
+                );
+            }
+
+            await this.dwcQueue.add({
+                collectionID: params.collectionID,
+                publish: query.publish,
+                userID: req.user.uid
+            });
         }
         else if (collectionExists) {
             if (query.publish) {
@@ -114,5 +129,11 @@ export class DwCController {
         else {
             throw new NotFoundException("Archive not found")
         }
+    }
+
+    private async jobIsRunning(collectionID: number): Promise<boolean> {
+        const jobs = await this.dwcQueue.getJobs(['active', 'waiting']);
+        const matchingJobs = jobs.filter((j) => j.data.collectionID === collectionID);
+        return matchingJobs.length > 0;
     }
 }

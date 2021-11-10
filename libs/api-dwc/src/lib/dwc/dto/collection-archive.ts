@@ -17,4 +17,12 @@ export class CollectionArchive {
     @ApiProperty()
     @Expose()
     isPublic: boolean;
+
+    @ApiProperty()
+    @Expose()
+    updatedAt: Date;
+
+    @ApiProperty()
+    @Expose()
+    size: number;
 }

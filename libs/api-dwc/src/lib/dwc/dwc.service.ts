@@ -107,12 +107,18 @@ export class DwCService {
         return archiveName;
     }
 
-    async listArchives(): Promise<{ collectionID: number, objectKey: string, isPublic: boolean }[]> {
+    async listArchives(): Promise<{ collectionID: number, objectKey: string, isPublic: boolean, updatedAt: Date, size: number }[]> {
         const archiveKeys = await this.storage.listObjects(DwCService.S3_PREFIX);
         const archives = await Promise.all(
             archiveKeys.map(async (k) => {
-                const archiveTags = await this.storage.getTags(k);
-                const archive = { objectKey: k, collectionID: -1, isPublic: false };
+                const archiveTags = await this.storage.getTags(k.key);
+                const archive = {
+                    objectKey: k.key,
+                    collectionID: -1,
+                    isPublic: false,
+                    updatedAt: k.updatedAt,
+                    size: k.size
+                };
                 const tagNames = Object.keys(archiveTags);
                 if (tagNames.includes('collectionID')) {
                     archive.collectionID = parseInt(archiveTags['collectionID']);
