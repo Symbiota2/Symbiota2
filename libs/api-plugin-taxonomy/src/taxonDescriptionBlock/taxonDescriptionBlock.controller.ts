@@ -121,12 +121,11 @@ export class TaxonDescriptionBlockController {
         return dto
     }
 
-
     @Delete(':id')
     @ApiOperation({
         summary: "Delete a taxon description block by ID"
     })
-    @ProtectCollection('id')
+    //@ProtectCollection('id')
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiResponse({ status: HttpStatus.NO_CONTENT })
     async deleteByID(@Param('id') id: number): Promise<void> {
@@ -138,7 +137,7 @@ export class TaxonDescriptionBlockController {
 
     @Patch(':id')
     @ApiOperation({
-        summary: "Update a specimen collection by ID"
+        summary: "Update a taxon description block by ID"
     })
     //@ProtectCollection('id')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDescriptionBlock })
@@ -149,7 +148,6 @@ export class TaxonDescriptionBlockController {
         if (!block) {
             throw new NotFoundException()
         }
-
         return block
     }
 }

@@ -4,8 +4,7 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core'
 import { TaxonDescriptionBlockQueryBuilder } from './taxonDescriptionBlock-query-builder'
 import { TaxonDescriptionBlockListItem } from '../../dto/taxonDescriptionBlock-list-item'
-import { TaxonDescriptionBlockInputDto } from '../../dto';
-import { CollectionRoleOutput } from '../../../../../ui-plugin-collection/src/lib/dto/CollectionRole.dto';
+import { TaxonDescriptionBlockInputDto } from '../../dto'
 
 
 interface FindAllParams {
@@ -37,8 +36,8 @@ export class TaxonDescriptionBlockService {
     }
 
     public getUrl() {
-        const apiBaseUrl = this.appConfig.apiUri()
-        const x = new URL(`${apiBaseUrl}/taxonDescriptionBlock`)
+        //const apiBaseUrl = this.appConfig.apiUri()
+        //const x = new URL(`${apiBaseUrl}/taxonDescriptionBlock`)
         return this.apiClient.apiRoot()
     }
 
@@ -85,21 +84,18 @@ export class TaxonDescriptionBlockService {
 
     create(block: Partial<TaxonDescriptionBlockInputDto>): Observable<TaxonDescriptionBlockListItem> {
 
-        console.log(" id is " + block.taxonID)
         block.creatorUID = this.creatorUID
         const url = this.createUrlBuilder().create()
             .build()
 
         //return this.jwtToken.pipe(
         //switchMap((token) => {
-        console.log("here " + block.creatorUID + block.taxonID)
         const query = this.apiClient.queryBuilder(url)
             //.addJwtAuth(token)
             .post()
             .body([block])
             .build()
 
-        console.log("here2 " + query.method + query.urlWithParams)
         return this.apiClient.send(query).pipe(
             catchError((e) => {
                 console.log(" error ")
@@ -107,14 +103,12 @@ export class TaxonDescriptionBlockService {
                 return of(null)
             }),
             map((blockJson) => {
-                console.log(" mapping " + blockJson)
                 if (blockJson === null) {
                     return null
                 }
                 return TaxonDescriptionBlockListItem.fromJSON(blockJson);
             })
         )
-        console.log("no pipe ")
         //})
         //)
     }
@@ -138,7 +132,6 @@ export class TaxonDescriptionBlockService {
                 return of(null)
             }),
             map((blockJson) => {
-                console.log(" mapping ")
                 if (blockJson === null) {
                     return null
                 }
@@ -154,11 +147,37 @@ export class TaxonDescriptionBlockService {
      * will be the deleted block or null if api has errors
      * @returns `of(null)` if user does not exist or does not have editing permission.
      */
-    /*
-    delete(block: Partial<TaxonDescriptionBlockInputDto>): Observable<TaxonDescriptionBlockListItem> {
-        const url = this.createUrlBuilder().delete()
+
+    delete(id): Observable<TaxonDescriptionBlockListItem> {
+        const url = this.createUrlBuilder()
+            .delete()
+            .id(id)
             .build()
 
+        const req = this.apiClient
+            .queryBuilder(url)
+            .delete()
+            //.queryParam("id", id.toString())
+            //.body(block)
+            //.addJwtAuth(userToken)
+            .build()
+
+        return this.apiClient.send(req).pipe(
+            catchError((e) => {
+                console.log(" error ")
+                console.error(e)
+                return of(null)
+            }),
+            map((blockJson) => {
+                console.log(" mapping ")
+                if (blockJson === null) {
+                    return null
+                }
+                return TaxonDescriptionBlockListItem.fromJSON(blockJson);
+            })
+        )
+
+        /*
         return this.user.currentUser.pipe(
             switchMap((currentUser) => {
                 if (!!currentUser) {
@@ -190,8 +209,9 @@ export class TaxonDescriptionBlockService {
                 }
             }
         )
+         */
     }
-     */
+
 
     private createUrlBuilder(): TaxonDescriptionBlockQueryBuilder {
         return new TaxonDescriptionBlockQueryBuilder(this.appConfig.apiUri());

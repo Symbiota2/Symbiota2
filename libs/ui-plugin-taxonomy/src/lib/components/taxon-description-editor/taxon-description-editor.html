@@ -1,9 +1,4 @@
 <div>
-    <!--
-    <button class="editor-button" (click)="onAddDescriptionBlock()">
-        {{"taxon.description.editor.add.button.label" | translate}}
-    </button>
-    -->
     <button style='float:right' mat-icon-button>
         <mat-icon color="primary" (click)="onAddDescriptionBlock()">add</mat-icon>
     </button>
@@ -23,17 +18,8 @@
                 <button mat-icon-button>
                     <mat-icon color="primary" (click)="openDialog('Update',block)">edit</mat-icon>
                 </button>
-                <!--
-                <button class="editor-button" (click)="openDialog('Update',block)">{{'taxon.editor.dialog.edit' | translate}}</button>
-                <button class="editor-button" (click)="openDialog('Delete',block)">{{'taxon.editor.dialog.delete' | translate}}</button>
-          -->
             </div>
             <symbiota2-expansion-panel label='{{"taxon.description.editor.statements" | translate}}'>
-                <!--
-                <button class="editor-button" (click)="onAddStatement(block)">
-                    {{"taxon.description.editor.add.statement.button.label" | translate}}
-                </button>
-                -->
                 <button style='float:right' mat-icon-button>
                     <mat-icon color="primary" (click)="onAddStatement(block)">add</mat-icon>
                 </button>
@@ -55,10 +41,6 @@
                         <button mat-icon-button>
                             <mat-icon color="primary" (click)="openStatementDialog('Update',statement)">edit</mat-icon>
                         </button>
-                        <!--
-                        <button class="editor-button" (click)="openStatementDialog('Update',statement)">{{'taxon.editor.dialog.edit' | translate}}</button>
-                        <button class="editor-button" (click)="openStatementDialog('Delete',statement)">{{'taxon.editor.dialog.delete' | translate}}</button>
-                        -->
                     </div>
                     <hr/>
                 </div>

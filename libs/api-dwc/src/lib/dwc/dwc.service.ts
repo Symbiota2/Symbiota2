@@ -37,6 +37,9 @@ export class DwCService {
         return [DwCService.S3_PREFIX, objectName].join('/');
     }
 
+    // TODO: Redact sensitive localities
+    // TODO: Include determination history
+
     private async createArchive<T>(archiveName: string, entityCls: EntityTarget<T>, findOpts: FindManyOptions<T>, objectTags = {}) {
         const db = getConnection();
         const repo = db.getRepository(entityCls);
@@ -104,28 +107,39 @@ export class DwCService {
         return archiveName;
     }
 
-    async listPublishedCollectionArchives(): Promise<{ collectionID: number, objectKey: string }[]> {
+    async listArchives(): Promise<{ collectionID: number, objectKey: string, isPublic: boolean, updatedAt: Date, size: number }[]> {
         const archiveKeys = await this.storage.listObjects(DwCService.S3_PREFIX);
         const archives = await Promise.all(
             archiveKeys.map(async (k) => {
-                const archiveTags = await this.storage.getTags(k);
-                const archive = { objectKey: k, collectionID: -1, isPublic: false };
+                const archiveTags = await this.storage.getTags(k.key);
+                const archive = {
+                    objectKey: k.key,
+                    collectionID: -1,
+                    isPublic: false,
+                    updatedAt: k.updatedAt,
+                    size: k.size
+                };
                 const tagNames = Object.keys(archiveTags);
                 if (tagNames.includes('collectionID')) {
                     archive.collectionID = parseInt(archiveTags['collectionID']);
                 }
-                if (tagNames.includes('public') && archiveTags['public'] === 'true') {
-                    archive.isPublic = true;
-                }
+                archive.isPublic = (
+                    tagNames.includes('public') &&
+                    archiveTags['public'] === 'true'
+                );
+
                 return archive;
             })
         );
 
-        return archives.filter((a) => {
-            return a.collectionID !== -1 && a.isPublic;
-        }).map((a) => {
-            const { isPublic, ...archive } = a;
-            return archive;
+        return archives.filter((a) => a.collectionID !== -1).sort((a, b) => {
+            if (a.collectionID > b.collectionID) {
+                return 1;
+            }
+            else if (a.collectionID < b.collectionID) {
+                return -1;
+            }
+            return 0;
         });
     }
 

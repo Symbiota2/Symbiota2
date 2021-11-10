@@ -11,6 +11,12 @@ import {
     PutObjectRequest, PutObjectTaggingRequest, Tag
 } from 'aws-sdk/clients/s3';
 
+interface S3Object {
+    key: string;
+    updatedAt: Date;
+    size: number;
+}
+
 @Injectable()
 export class StorageService {
     private readonly logger = new Logger(StorageService.name);
@@ -140,13 +146,19 @@ export class StorageService {
         return currentTags;
     }
 
-    async listObjects(pathPrefix: string): Promise<string[]> {
+    async listObjects(pathPrefix: string): Promise<S3Object[]> {
         const req: ListObjectsRequest = {
             Bucket: this.bucket,
             Prefix: pathPrefix
         };
         const objs = await this.s3Client.listObjectsV2(req).promise();
-        return objs.Contents.map((o) => o.Key);
+        return objs.Contents.map((o) => {
+            return {
+                key: o.Key,
+                updatedAt: o.LastModified,
+                size: o.Size
+            }
+        });
     }
 
     private static encodeObjectTags(tags: Record<string, string>): string {

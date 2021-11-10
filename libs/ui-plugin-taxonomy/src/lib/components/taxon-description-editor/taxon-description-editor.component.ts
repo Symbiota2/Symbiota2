@@ -14,13 +14,14 @@ import {
     TaxonDescriptionDialogComponent,
     TaxonDescriptionStatementListItem,
     TaxonDescriptionStatementDialogComponent,
-    TaxonDescriptionBlockInputDto
+    TaxonDescriptionBlockInputDto, TaxonDescriptionStatementService
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TranslateService } from '@ngx-translate/core'
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { TaxonEditorDialogComponent } from '../../components';
 import { Expose } from 'class-transformer';
+import { TaxonDescriptionStatementInputDto } from '../../dto/taxonDescriptionStatementInputDto';
 
 export interface BlockInfo {
     language: string
@@ -48,11 +49,11 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     blocks: TaxonDescriptionBlockListItem[] = []
     dataSource = this.blocks
     private taxonID: string
-    private idCounter = 0
 
     constructor(
         //private readonly userService: UserService,  // TODO: needed for species hiding
         private readonly taxonBlockService: TaxonDescriptionBlockService,
+        private readonly taxonDescriptionStatementService: TaxonDescriptionStatementService,
         //private readonly taxaService: TaxonService,
         //private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
         //private readonly taxonomicStatusService: TaxonomicStatusService,
@@ -62,10 +63,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
         private formBuilder: FormBuilder,
         private currentRoute: ActivatedRoute,
         private readonly translate: TranslateService,
-        public dialog: MatDialog
-    ) {
-
-    }
+        public dialog: MatDialog ) { }
 
     /*
     Called when Angular starts
@@ -93,17 +91,8 @@ export class TaxonDescriptionEditorComponent implements OnInit {
         // Construct a new blcok
         const data = {
             taxonID: this.taxonID,
-            caption: null
-            /*
-            @Expose() source: string
-            @Expose() sourceUrl: string
-            @Expose() language: string
-            @Expose() adminLanguageID: number | null
-            @Expose() displayLevel: number
-            @Expose() creatorUID: number
-            @Expose() notes: string
-            @Expose() initialTimestamp: Date
-             */
+            caption: null,
+            initialTimestamp: new Date()
         }
         const newBlock = new TaxonDescriptionBlockInputDto(data)
         console.log("foo " + newBlock.taxonID)
@@ -117,11 +106,24 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     }
 
     onAddStatement(block: TaxonDescriptionBlockListItem) {
-        console.log(" here " + block.descriptionStatements.length)
-        // Initialize list if it does not exist
-        if (!block.descriptionStatements) block.descriptionStatements = []
-        block.descriptionStatements.unshift(new TaxonDescriptionStatementListItem())
-        this.dataSource = this.blocks
+
+        // Construct a new statement
+        const data = {
+            descriptionBlockID: block.id,
+            sortSequence: 1,
+            initialTimestamp: new Date()
+        }
+
+        const newStatement = new TaxonDescriptionStatementInputDto(data)
+        this.taxonDescriptionStatementService.create(newStatement).subscribe((statement)=> {
+            // It has been added to the database, now make it part of the list of blocks
+            console.log(" My statement id is " + statement.id)
+
+            // Initialize list if it does not exist
+            if (!block.descriptionStatements) block.descriptionStatements = []
+            block.descriptionStatements.unshift(new TaxonDescriptionStatementListItem())
+            this.dataSource = this.blocks
+        })
     }
 
     openDialog(action, obj) {
@@ -140,7 +142,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
             if (result.event == 'Update') {
                 this.updateRowData(result.data)
             } else if (result.event == 'Delete') {
-                this.deleteRowData(result.data)
+                this.deleteBlockData(result.data)
             }
         })
     }
@@ -215,8 +217,16 @@ export class TaxonDescriptionEditorComponent implements OnInit {
         })
     }
 
-    deleteRowData(row_obj) {
+    deleteBlockData(row_obj) {
+        console.log("here")
         this.blocks = this.blocks.filter((value,key)=>{
+            if (value.id == row_obj.id) {
+                // Found a block
+                this.taxonBlockService.delete(row_obj.id)
+                    .subscribe((itemList) => {
+                        // Assume deleted [TODO: add error handling ]
+                    })
+            }
             return value.id != row_obj.id
         })
         this.dataSource = this.blocks

@@ -26,10 +26,8 @@ export class TaxonDescriptionStatementService extends BaseService<TaxonDescripti
             : this.myRepository.find({take: limit, skip: offset})
     }
 
-
-
     /*
-    TODO: Not sure if this is implemented correctly.
+    Creata a taxon description statement
      */
     async create(data: Partial<TaxonDescriptionStatement>): Promise<TaxonDescriptionStatement> {
         const taxon = this.myRepository.create(data)
@@ -37,7 +35,7 @@ export class TaxonDescriptionStatementService extends BaseService<TaxonDescripti
     }
 
     /*
-    TODO: Implement
+    Update a taxon description statement
      */
     async updateByID(id: number, data: Partial<TaxonDescriptionStatement>): Promise<TaxonDescriptionStatement> {
         const updateResult = await this.myRepository.update({ id }, data)
