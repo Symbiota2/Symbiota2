@@ -35,12 +35,25 @@ export class TaxonDescriptionBlockService {
         return new TaxonDescriptionBlockQueryBuilder(this.appConfig.apiUri());
     }
 
+    /**
+     * fetches the base url for the api
+     * @returns url of the api
+     */
     public getUrl() {
         //const apiBaseUrl = this.appConfig.apiUri()
         //const x = new URL(`${apiBaseUrl}/taxonDescriptionBlock`)
         return this.apiClient.apiRoot()
     }
 
+    /**
+     * sends request to api to find all of the taxon description blocks
+     * @param params? - could be null, but the query params include the limit, offset, and
+     * list of taxon ids.
+     * @returns Observable of response from api casted as `TaxonDescriptionBlockListItem[]`
+     * will be the found blocks
+     * @returns `of(null)` if api errors
+     * @returns [] if no such blocks
+     */
     findAll(params?: FindAllParams): Observable<TaxonDescriptionBlockListItem[]> {
         const url = this.createQueryBuilder()
             .findAll()
@@ -56,6 +69,13 @@ export class TaxonDescriptionBlockService {
             );
     }
 
+    /**
+     * sends request to api to find a taxon description blocks using a taxpm id
+     * @param tid - the taxon id
+     * @returns Observable of response from api casted as `TaxonDescriptionBlockListItem`.
+     * will be the found block
+     * @returns `of(null)` if block does not exist or api has errors
+     */
     findBlocksByTaxonID(tid): Observable<TaxonDescriptionBlockListItem[]> {
         const url = this.createQueryBuilder()
             .findBlocksByTaxonID(tid)
@@ -70,6 +90,13 @@ export class TaxonDescriptionBlockService {
             )
     }
 
+    /**
+     * sends request to api to find a taxon description block using the block's id
+     * @param block - the block's id
+     * @returns Observable of response from api casted as `TaxonDescriptionBlockListItem`.
+     * will be the found block or null if api has errors or block not found
+     * @returns `of(null)` if block does not exist
+     */
     findByID(id: number): Observable<TaxonDescriptionBlockListItem> {
         const url = this.createQueryBuilder()
             .findOne()
@@ -82,6 +109,13 @@ export class TaxonDescriptionBlockService {
 
     }
 
+    /**
+     * sends request to api to create a taxon description block
+     * @param block - the block to create
+     * @returns Observable of response from api casted as `TaxonDescriptionBlockListItem`
+     * will be the created block
+     * @returns `of(null)` if block does not exist or does not have editing permission or api errors
+     */
     create(block: Partial<TaxonDescriptionBlockInputDto>): Observable<TaxonDescriptionBlockListItem> {
 
         block.creatorUID = this.creatorUID
@@ -113,6 +147,13 @@ export class TaxonDescriptionBlockService {
         //)
     }
 
+    /**
+     * sends request to api to update a taxon description block
+     * @param block - the block to update
+     * @returns Observable of response from api casted as `TaxonDescriptionBlockListItem`
+     * will be the updated block
+     * @returns `of(null)` if block does not exist or does not have editing permission or api errors
+     */
     update(block: TaxonDescriptionBlockInputDto): Observable<TaxonDescriptionBlockListItem> {
         const url = this.createUrlBuilder()
             .upload()
@@ -145,11 +186,10 @@ export class TaxonDescriptionBlockService {
     /**
      * sends request to api to delete a taxon description block
      * @param block - the block to delete, it should be just the block id that is needed
-     * @returns Observable of response from api casted as `TaxonDescriptionBlockListItem`.
-     * will be the deleted block or null if api has errors
-     * @returns `of(null)` if user does not exist or does not have editing permission.
+     * @returns Observable of response from api casted as `TaxonDescriptionBlockListItem`
+     * will be the deleted block
+     * @returns `of(null)` if block does not exist or does not have editing permission or api errors
      */
-
     delete(id): Observable<TaxonDescriptionBlockListItem> {
         const url = this.createUrlBuilder()
             .delete()
@@ -213,7 +253,6 @@ export class TaxonDescriptionBlockService {
         )
          */
     }
-
 
     private createUrlBuilder(): TaxonDescriptionBlockQueryBuilder {
         return new TaxonDescriptionBlockQueryBuilder(this.appConfig.apiUri());

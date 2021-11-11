@@ -38,6 +38,15 @@ export class TaxonDescriptionStatementService {
         return this.apiClient.apiRoot()
     }
 
+    /**
+     * sends request to api to find all of the taxon description statements
+     * @param params? - could be null, but the query params include the limit, offset, and
+     * list of taxon ids.
+     * @returns Observable of response from api casted as `TaxonDescriptionStatementListItem[]`.
+     * will be the found statements
+     * @returns `of(null)` if api errors
+     * @returns [] if no such statements
+     */
     findAll(params?: FindAllParams): Observable<TaxonDescriptionStatementListItem[]> {
         const url = this.createQueryBuilder()
             .findAll()
@@ -53,6 +62,13 @@ export class TaxonDescriptionStatementService {
             );
     }
 
+    /**
+     * sends request to api to find a taxon description statements using a tid
+     * @param tid - the taxon id
+     * @returns Observable of response from api casted as `TaxonDescriptionStatementListItem[]`
+     * will be the found statements
+     * @returns `of(null)` if block does not exist or api has errors
+     */
     findDescriptions(tid): Observable<TaxonDescriptionStatementListItem[]> {
         const url = this.createQueryBuilder()
             .findDescriptions()
@@ -68,6 +84,13 @@ export class TaxonDescriptionStatementService {
             );
     }
 
+    /**
+     * sends request to api to find a taxon description statements using an id
+     * @param id - the taxon description statement id
+     * @returns Observable of response from api casted as `TaxonDescriptionStatementListItem`
+     * will be the found statement
+     * @returns `of(null)` if block does not exist or api has errors
+     */
     findByID(id: number): Observable<TaxonDescriptionStatementListItem> {
         const url = this.createQueryBuilder()
             .findOne()
@@ -80,6 +103,13 @@ export class TaxonDescriptionStatementService {
 
     }
 
+    /**
+     * sends request to api to create a taxon description statement
+     * @param statement - the statement to create
+     * @returns Observable of response from api casted as `TaxonDescriptionStatementListItem`
+     * will be the created statement
+     * @returns `of(null)` if statement does not exist or does not have editing permission or api errors
+     */
     create(statement: Partial<TaxonDescriptionStatementInputDto>): Observable<TaxonDescriptionStatementListItem> {
 
         const url = this.createUrlBuilder().create()
@@ -109,6 +139,13 @@ export class TaxonDescriptionStatementService {
         )
     }
 
+    /**
+     * sends request to api to update a taxon description statement
+     * @param statement - the statement to update
+     * @returns Observable of response from api casted as `TaxonDescriptionStatementListItem`
+     * will be the updated block
+     * @returns `of(null)` if block does not exist or does not have editing permission or api errors
+     */
     update(statement: TaxonDescriptionStatementListItem): Observable<TaxonDescriptionStatementListItem> {
         const url = this.createUrlBuilder().upload()
             .build()
@@ -139,12 +176,11 @@ export class TaxonDescriptionStatementService {
 
     /**
      * sends request to api to delete a taxon description statement
-     * @param block - the statement to delete, it should be just the statement id that is needed
-     * @returns Observable of response from api casted as `TaxonDescriptionStatementListItem`.
-     * will be the deleted statement or null if api has errors
-     * @returns `of(null)` if user does not exist or does not have editing permission.
+     * @param id - the id of the statement to delete
+     * @returns Observable of response from api casted as `TaxonDescriptionStatementListItem`
+     * will be the deleted statement
+     * @returns `of(null)` if user does not exist or does not have editing permission or api errors
      */
-
     delete(id): Observable<TaxonDescriptionStatementListItem> {
         const url = this.createUrlBuilder()
             .delete()

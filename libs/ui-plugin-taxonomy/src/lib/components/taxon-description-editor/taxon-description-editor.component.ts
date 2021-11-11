@@ -65,6 +65,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
         //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
         private router: Router,
         private formBuilder: FormBuilder,
+
         private currentRoute: ActivatedRoute,
         private readonly translate: TranslateService,
         public dialog: MatDialog ) { }
@@ -116,7 +117,6 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     }
 
     onAddStatement(block: TaxonDescriptionBlockListItem) {
-
         // Construct a new statement
         const data = {
             descriptionBlockID: block.id,
@@ -127,8 +127,6 @@ export class TaxonDescriptionEditorComponent implements OnInit {
         const newStatement = new TaxonDescriptionStatementInputDto(data)
         this.taxonDescriptionStatementService.create(newStatement).subscribe((statement)=> {
             // It has been added to the database, now make it part of the list of blocks
-            console.log(" My statement id is " + statement.id)
-
             // Initialize list if it does not exist
             if (!block.descriptionStatements) block.descriptionStatements = []
             block.descriptionStatements.unshift(new TaxonDescriptionStatementListItem())
@@ -150,7 +148,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result.event == 'Update') {
-                this.updateRowData(result.data)
+                this.updateBlockData(result.data)
             } else if (result.event == 'Delete') {
                 this.deleteBlockData(result.data)
             }
@@ -199,6 +197,13 @@ export class TaxonDescriptionEditorComponent implements OnInit {
         this.blocks = this.blocks.filter((value,key) => {
             if(value.id == row_obj.descriptionBlockID) {
                 value.descriptionStatements = value.descriptionStatements.filter((statement) => {
+                    if (statement.id == row_obj.id) {
+                        // Found a statement
+                        this.taxonDescriptionStatementService.delete(row_obj.id)
+                            .subscribe((itemList) => {
+                                // Assume deleted [TODO: add error handling ]
+                            })
+                    }
                     return statement.id != row_obj.id
                 })
             }
@@ -207,8 +212,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
         this.dataSource = this.blocks
     }
 
-    updateRowData(row_obj) {
-        console.log(" updating ")
+    updateBlockData(row_obj) {
         this.blocks = this.blocks.filter((value,key)=>{
             if(value.id == row_obj.id){
                 // copy temporary info to display info
@@ -218,7 +222,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
                 value.sourceUrl = row_obj.sourceUrl
                 value.notes = row_obj.notes
                 value.displayLevel = row_obj.displayLevel
-                // Construct a new blcok
+                // Construct a new block
                 const data = {
                     id: row_obj.id,
                     taxonID: this.taxonID,
@@ -243,7 +247,6 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     }
 
     deleteBlockData(row_obj) {
-        console.log("here")
         this.blocks = this.blocks.filter((value,key)=>{
             if (value.id == row_obj.id) {
                 // Found a block
