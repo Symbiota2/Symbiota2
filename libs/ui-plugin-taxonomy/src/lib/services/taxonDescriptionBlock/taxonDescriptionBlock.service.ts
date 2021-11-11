@@ -113,15 +113,17 @@ export class TaxonDescriptionBlockService {
         //)
     }
 
-    update(block: TaxonDescriptionBlockListItem): Observable<TaxonDescriptionBlockListItem> {
-        const url = this.createUrlBuilder().upload()
+    update(block: TaxonDescriptionBlockInputDto): Observable<TaxonDescriptionBlockListItem> {
+        const url = this.createUrlBuilder()
+            .upload()
+            .id(block.id)
             .build()
 
         const req = this.apiClient
             .queryBuilder(url)
             .patch()
-            .queryParam("id", block.id.toString())
-            .body(block)
+            //.queryParam("id", block.id.toString())
+            .body([block])
             //.addJwtAuth(userToken)
             .build()
 

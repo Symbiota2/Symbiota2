@@ -22,6 +22,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { TaxonEditorDialogComponent } from '../../components';
 import { Expose } from 'class-transformer';
 import { TaxonDescriptionStatementInputDto } from '../../dto/taxonDescriptionStatementInputDto';
+import { UserService } from '@symbiota2/ui-common';
+import { filter, map } from 'rxjs/operators';
 
 export interface BlockInfo {
     language: string
@@ -46,12 +48,14 @@ export interface StatementInfo {
 })
 
 export class TaxonDescriptionEditorComponent implements OnInit {
+    private jwtToken = this.userService.currentUser.pipe(map((user) => user.token))
+    userID : number = 1
     blocks: TaxonDescriptionBlockListItem[] = []
     dataSource = this.blocks
     private taxonID: string
 
     constructor(
-        //private readonly userService: UserService,  // TODO: needed for species hiding
+        private readonly userService: UserService,  // TODO: needed for species hiding
         private readonly taxonBlockService: TaxonDescriptionBlockService,
         private readonly taxonDescriptionStatementService: TaxonDescriptionStatementService,
         //private readonly taxaService: TaxonService,
@@ -74,6 +78,13 @@ export class TaxonDescriptionEditorComponent implements OnInit {
             // Load the authorities
             this.loadBlocks(parseInt(this.taxonID))
         })
+
+       this.userService.currentUser
+            .pipe(filter((user) => user !== null))
+            .subscribe((user) => {
+                this.userID = user.uid
+            })
+        console.log("here " + this.userID)
     }
 
     /*
@@ -90,16 +101,15 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     onAddDescriptionBlock() {
         // Construct a new blcok
         const data = {
-            taxonID: this.taxonID,
-            caption: null,
+            taxonID: +this.taxonID,
+            creatorUID: +1, //this.userID,
             initialTimestamp: new Date()
         }
         const newBlock = new TaxonDescriptionBlockInputDto(data)
-        console.log("foo " + newBlock.taxonID)
-        newBlock.taxonID = +this.taxonID
+        //newBlock.taxonID = +this.taxonID
+        //newBlock.creatorUID = +this.userID
         this.taxonBlockService.create(newBlock).subscribe((block)=> {
             // It has been added to the database, now make it part of the list of blocks
-            console.log(" My block id is " + block.id)
             this.blocks.push(block)
             this.dataSource = this.blocks
         })
@@ -198,6 +208,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     }
 
     updateRowData(row_obj) {
+        console.log(" updating ")
         this.blocks = this.blocks.filter((value,key)=>{
             if(value.id == row_obj.id){
                 // copy temporary info to display info
@@ -207,7 +218,21 @@ export class TaxonDescriptionEditorComponent implements OnInit {
                 value.sourceUrl = row_obj.sourceUrl
                 value.notes = row_obj.notes
                 value.displayLevel = row_obj.displayLevel
-                this.taxonBlockService.update(value).subscribe((block)=> {
+                // Construct a new blcok
+                const data = {
+                    id: row_obj.id,
+                    taxonID: this.taxonID,
+                    language: value.language,
+                    caption: value.caption,
+                    source: value.source,
+                    sourceUrl: value.sourceUrl,
+                    notes: value.notes,
+                    displayLevel: value.displayLevel,
+                    creatorUID: this.userID,
+                    initialTimestamp: new Date()
+                }
+                const newBlock = new TaxonDescriptionBlockInputDto(data)
+                this.taxonBlockService.update(new TaxonDescriptionBlockInputDto(data)).subscribe((block)=> {
                     // It has been updated in the database
                     //this.blocks.push(block)
                     //this.dataSource = this.blocks

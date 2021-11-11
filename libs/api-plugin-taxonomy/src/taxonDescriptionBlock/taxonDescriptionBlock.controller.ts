@@ -105,17 +105,11 @@ export class TaxonDescriptionBlockController {
     @see - @link TaxonDescriptionBlockInputDto
      **/
     async create(@Body(new ParseArrayPipe({ items: TaxonDescriptionBlockInputDto })) data: TaxonDescriptionBlockInputDto[]): Promise<TaxonDescriptionBlockDto> {
-        console.log('taxon id and uid ' + (typeof data) + data[0].taxonID + data[0].creatorUID)
-        if (data[0].taxonID == null) data[0].taxonID = 2
-        if (data[0].creatorUID == null) data[0].creatorUID = 1
         const block = await this.myService.create(data[0])
         const dto = new TaxonDescriptionBlockDto(block)
         return dto
     }
     async create2(@Body() data: TaxonDescriptionBlockInputDto): Promise<TaxonDescriptionBlockDto> {
-        console.log('taxon id and uid ' + (typeof data) + data.taxonID + data.creatorUID)
-        if (data.taxonID == null) data.taxonID = 2
-        if (data.creatorUID == null) data.creatorUID = 1
         const block = await this.myService.create(data)
         const dto = new TaxonDescriptionBlockDto(block)
         return dto
@@ -141,10 +135,10 @@ export class TaxonDescriptionBlockController {
     })
     //@ProtectCollection('id')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDescriptionBlock })
-    @SerializeOptions({ groups: ['single'] })
-    async updateByID(@Param('id') id: number, @Body() data: TaxonDescriptionBlock): Promise<TaxonDescriptionBlock> {
-        console.log("data is " + data.caption)
-        const block = await this.myService.updateByID(id, data)
+    @ApiBody({ type: TaxonDescriptionBlockInputDto, isArray: true })
+    //@SerializeOptions({ groups: ['single'] })
+    async updateByID(@Param('id') id: number, @Body(new ParseArrayPipe({ items: TaxonDescriptionBlockInputDto })) data: TaxonDescriptionBlockInputDto[]): Promise<TaxonDescriptionBlock> {
+        const block = await this.myService.updateByID(id, data[0])
         if (!block) {
             throw new NotFoundException()
         }
