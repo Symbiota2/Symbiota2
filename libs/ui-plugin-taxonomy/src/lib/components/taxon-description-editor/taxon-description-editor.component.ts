@@ -49,7 +49,7 @@ export interface StatementInfo {
 
 export class TaxonDescriptionEditorComponent implements OnInit {
     private jwtToken = this.userService.currentUser.pipe(map((user) => user.token))
-    userID : number = 1
+    userID : number = null
     blocks: TaxonDescriptionBlockListItem[] = []
     dataSource = this.blocks
     private taxonID: string
