@@ -148,13 +148,14 @@ export class TaxonDescriptionStatementService {
      */
     update(statement: TaxonDescriptionStatementListItem): Observable<TaxonDescriptionStatementListItem> {
         const url = this.createUrlBuilder().upload()
+            .id(statement.id)
             .build()
 
         const req = this.apiClient
             .queryBuilder(url)
             .patch()
-            .queryParam("id", statement.id.toString())
-            .body(statement)
+            //.queryParam("id", statement.id.toString())
+            .body([statement])
             //.addJwtAuth(userToken)
             .build()
 

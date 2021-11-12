@@ -53,6 +53,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     blocks: TaxonDescriptionBlockListItem[] = []
     dataSource = this.blocks
     private taxonID: string
+    maxDisplayLevel = 0
 
     constructor(
         private readonly userService: UserService,  // TODO: needed for species hiding
@@ -96,14 +97,20 @@ export class TaxonDescriptionEditorComponent implements OnInit {
             .subscribe((itemList) => {
                 this.blocks = itemList
                 this.dataSource = this.blocks
+                this.blocks.forEach((block) => {
+                    this.maxDisplayLevel = block.displayLevel > this.maxDisplayLevel ?
+                        block.displayLevel : this.maxDisplayLevel
+                })
             })
     }
 
     onAddDescriptionBlock() {
-        // Construct a new blcok
+        // Construct a new block
+        this.maxDisplayLevel += 1
         const data = {
             taxonID: +this.taxonID,
             creatorUID: +1, //this.userID,
+            displayLevel: this.maxDisplayLevel,
             initialTimestamp: new Date()
         }
         const newBlock = new TaxonDescriptionBlockInputDto(data)
@@ -129,7 +136,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
             // It has been added to the database, now make it part of the list of blocks
             // Initialize list if it does not exist
             if (!block.descriptionStatements) block.descriptionStatements = []
-            block.descriptionStatements.unshift(new TaxonDescriptionStatementListItem())
+            block.descriptionStatements.unshift(statement)
             this.dataSource = this.blocks
         })
     }
@@ -177,6 +184,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
     }
 
     updateStatementRowData(row_obj) {
+        console.log("updating " + row_obj.descriptionBlockID + " " + row_obj.id)
         this.blocks = this.blocks.filter((value,key) => {
             if(value.id == row_obj.descriptionBlockID) {
                 value.descriptionStatements.filter((statement) => {
@@ -186,6 +194,25 @@ export class TaxonDescriptionEditorComponent implements OnInit {
                         statement.heading = row_obj.heading
                         statement.statement = row_obj.statement
                         statement.displayHeader = row_obj.displayHeader
+                        // Construct a new statement
+                        const data = {
+                            id: row_obj.id,
+                            taxonID: this.taxonID,
+                            descriptionBlockID: statement.descriptionBlockID,
+                            sortSequence: statement.sortSequence,
+                            heading: statement.heading,
+                            statement: statement.statement,
+                            displayHeader: statement.displayHeader,
+                            creatorUID: this.userID,
+                            initialTimestamp: new Date()
+                        }
+                        const newStatement = new TaxonDescriptionStatementInputDto(data)
+                        this.taxonDescriptionStatementService
+                            .update(new TaxonDescriptionStatementInputDto(data))
+                            .subscribe((block)=> {
+                                // It has been updated in the database
+                                //[TODO: If null throw error permission error]
+                        })
                     }
                 })
             }
@@ -236,7 +263,9 @@ export class TaxonDescriptionEditorComponent implements OnInit {
                     initialTimestamp: new Date()
                 }
                 const newBlock = new TaxonDescriptionBlockInputDto(data)
-                this.taxonBlockService.update(new TaxonDescriptionBlockInputDto(data)).subscribe((block)=> {
+                this.taxonBlockService
+                    .update(new TaxonDescriptionBlockInputDto(data))
+                    .subscribe((block)=> {
                     // It has been updated in the database
                     //this.blocks.push(block)
                     //this.dataSource = this.blocks

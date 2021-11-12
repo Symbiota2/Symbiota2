@@ -64,8 +64,7 @@ export class TaxonDescriptionStatementController {
     /**
      @see - @link TaxonDescriptionBlockInputDto
      **/
-    async create(@Body(new ParseArrayPipe({ items: TaxonDescriptionStatementInputDto })) data: TaxonDescriptionStatementInputDto[]): Promise<TaxonDescriptionStatementDto> {
-        //console.log('taxon id and uid ' + (typeof data) + data[0].taxonID + data[0].creatorUID)
+    async create(@Body(new ParseArrayPipe({ items: TaxonDescriptionStatementInputDto })) data: TaxonDescriptionStatementInputDto[]): Promise<TaxonDescriptionStatementDto> {//console.log('taxon id and uid ' + (typeof data) + data[0].taxonID + data[0].creatorUID)
         const block = await this.myService.create(data[0])
         const dto = new TaxonDescriptionStatementDto(block)
         return dto
@@ -77,10 +76,10 @@ export class TaxonDescriptionStatementController {
     })
     //@ProtectCollection('id')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDescriptionStatement })
-    @SerializeOptions({ groups: ['single'] })
-    async updateByID(@Param('id') id: number, @Body() data: TaxonDescriptionStatement): Promise<TaxonDescriptionStatement> {
+    //@SerializeOptions({ groups: ['single'] })
+    async updateByID(@Param('id') id: number, @Body(new ParseArrayPipe({ items: TaxonDescriptionStatementInputDto })) data: TaxonDescriptionStatement[]): Promise<TaxonDescriptionStatement> {
         //console.log("data is " + data.caption)
-        const statement = await this.myService.updateByID(id, data)
+        const statement = await this.myService.updateByID(id, data[0])
         if (!statement) {
             throw new NotFoundException()
         }
