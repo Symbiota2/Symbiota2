@@ -114,7 +114,7 @@ export class TaxonDescriptionBlockService {
      * @param block - the block to create
      * @returns Observable of response from api casted as `TaxonDescriptionBlockListItem`
      * will be the created block
-     * @returns `of(null)` if block does not exist or does not have editing permission or api errors
+     * @returns `of(null)` if does not have editing permission or api errors
      */
     create(block: Partial<TaxonDescriptionBlockInputDto>): Observable<TaxonDescriptionBlockListItem> {
 
@@ -122,29 +122,28 @@ export class TaxonDescriptionBlockService {
         const url = this.createUrlBuilder().create()
             .build()
 
-        //return this.jwtToken.pipe(
-        //switchMap((token) => {
-        const query = this.apiClient.queryBuilder(url)
-            //.addJwtAuth(token)
-            .post()
-            .body([block])
-            .build()
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const query = this.apiClient.queryBuilder(url)
+                    .addJwtAuth(token)
+                    .post()
+                    .body([block])
+                    .build()
 
-        return this.apiClient.send(query).pipe(
-            catchError((e) => {
-                console.log(" error ")
-                console.error(e)
-                return of(null)
-            }),
-            map((blockJson) => {
-                if (blockJson === null) {
-                    return null
-                }
-                return TaxonDescriptionBlockListItem.fromJSON(blockJson);
+                return this.apiClient.send(query).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((blockJson) => {
+                        if (blockJson === null) {
+                            return null
+                        }
+                        return TaxonDescriptionBlockListItem.fromJSON(blockJson);
+                    })
+                )
             })
         )
-        //})
-        //)
     }
 
     /**
@@ -160,98 +159,69 @@ export class TaxonDescriptionBlockService {
             .id(block.id)
             .build()
 
-        const req = this.apiClient
-            .queryBuilder(url)
-            .patch()
-            //.queryParam("id", block.id.toString())
-            .body([block])
-            //.addJwtAuth(userToken)
-            .build()
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .patch()
+                    .body([block])
+                    .addJwtAuth(token)
+                    .build()
 
-        return this.apiClient.send(req).pipe(
-            catchError((e) => {
-                console.log(" error ")
-                console.error(e)
-                return of(null)
-            }),
-            map((blockJson) => {
-                if (blockJson === null) {
-                    return null
-                }
-                return TaxonDescriptionBlockListItem.fromJSON(blockJson);
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((blockJson) => {
+                        if (blockJson === null) {
+                            return null
+                        }
+                        return TaxonDescriptionBlockListItem.fromJSON(blockJson);
+                    })
+                )
             })
         )
+
     }
 
     /**
      * sends request to api to delete a taxon description block
-     * @param block - the block to delete, it should be just the block id that is needed
-     * @returns Observable of response from api casted as `TaxonDescriptionBlockListItem`
-     * will be the deleted block
+     * @param id - the id of the block to delete
+     * @returns Observable of response from api casted as `string`
      * @returns `of(null)` if block does not exist or does not have editing permission or api errors
      */
-    delete(id): Observable<TaxonDescriptionBlockListItem> {
+    delete(id): Observable<string> {
         const url = this.createUrlBuilder()
             .delete()
             .id(id)
             .build()
 
-        const req = this.apiClient
-            .queryBuilder(url)
-            .delete()
-            //.queryParam("id", id.toString())
-            //.body(block)
-            //.addJwtAuth(userToken)
-            .build()
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .delete()
+                    .addJwtAuth(token)
+                    .build()
 
-        return this.apiClient.send(req).pipe(
-            catchError((e) => {
-                console.log(" error ")
-                console.error(e)
-                return of(null)
-            }),
-            map((blockJson) => {
-                console.log(" mapping ")
-                if (blockJson === null) {
-                    return null
-                }
-                return TaxonDescriptionBlockListItem.fromJSON(blockJson);
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((blockJson) => {
+                        return "success"
+                        /*  //API returns null on success so return something else to signal "success"
+                        if (blockJson === null) {
+                            return null
+                        }
+                        return TaxonDescriptionBlockListItem.fromJSON(blockJson)
+                         */
+                    })
+                )
             })
         )
-
-        /*
-        return this.user.currentUser.pipe(
-            switchMap((currentUser) => {
-                if (!!currentUser) {
-                        switchMap((collection) => {
-                            if (currentUser.canEditCollection(collection.id)) {
-                                //const url = `${this.COLLECTION_BASE_URL}/${collection.id}/roles`;
-                                const req = this.api
-                                    .queryBuilder(url)
-                                    .delete()
-                                    .body([block])
-                                    .addJwtAuth(currentUser.token)
-                                    .build();
-
-                                return this.api.send(req).pipe(
-                                    map((response: CollectionRoleOutput) => {
-                                        return response;
-                                    })
-                                )
-                            } else {
-                                this.alertService.showError(`User does not have permission to delete taxon block`)
-                                return null
-                            }
-                        }
-                } else {
-                    this.alertService.showError(
-                        `User must be logged in to delete taxon block`
-                    )
-                    return null
-                }
-            }
-        )
-         */
     }
 
     private createUrlBuilder(): TaxonDescriptionBlockQueryBuilder {

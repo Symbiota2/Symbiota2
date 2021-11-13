@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { DatabaseModule } from '@symbiota2/api-database'
+import { AppConfigModule, AppConfigService } from '@symbiota2/api-config';
 import { TaxonService } from './taxon/taxon.service'
 import { TaxonController } from './taxon/taxon.controller'
 import {TaxonomicAuthorityService} from "./taxonomicAuthority/taxonomicAuthority.service"
@@ -29,7 +30,7 @@ import { TaxonProfilePublicationService } from './taxonProfilePublication/taxonP
 import { TaxonProfilePublicationController } from './taxonProfilePublication/taxonProfilePublication.controller';
 
 @Module({
-    imports: [DatabaseModule],
+    imports: [DatabaseModule, AppConfigModule],
     providers: [
         TaxonService,
         TaxonVernacularService,

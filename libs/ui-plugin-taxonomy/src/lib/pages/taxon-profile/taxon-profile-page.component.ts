@@ -23,6 +23,7 @@ export class TaxonProfilePageComponent implements OnInit {
     taxon: TaxonListItem
     taxonomicStatus: TaxonomicStatusListItem
     userID : number = null
+    userCanEdit: boolean = false
 
     constructor(
         private readonly userService: UserService,
@@ -48,6 +49,7 @@ export class TaxonProfilePageComponent implements OnInit {
             .pipe(filter((user) => user !== null))
             .subscribe((user) => {
                 this.userID = user.uid
+                this.userCanEdit = user.canEditTaxonProfile(user.uid)
             })
     }
 

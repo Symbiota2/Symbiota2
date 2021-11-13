@@ -134,7 +134,6 @@ export class TaxonService extends BaseService<Taxon>{
                 .select([
                     'o.scientificName', 'o.id'
                 ])
-                //.limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
                 .innerJoin('o.taxonStatuses', 'c')
                 .where('c.taxonAuthorityID = :authorityID',
                     { authorityID: params.taxonAuthorityID })
@@ -176,7 +175,6 @@ and an authority ID
                 .select([
                     'o.scientificName','o.id'
                 ])
-                //.limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
                 .innerJoin('o.taxonStatuses', 'c')
                 .where('c.taxonAuthorityID = :authorityID',
                     { authorityID: params.taxonAuthorityID })
@@ -218,7 +216,6 @@ and an authority ID
                 .select([
                     'o.scientificName', 'o.id'
                 ])
-                //.limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
                 .innerJoin('o.taxonStatuses', 'c')
                 .where('c.taxonAuthorityID = :authorityID',
                     { authorityID: params.taxonAuthorityID })
@@ -290,7 +287,7 @@ and an authority ID
     }
 
     /*
-    TODO: implement
+    Create a new taxon
      */
     async create(data: Partial<Taxon>): Promise<Taxon> {
         const taxon = this.myRepository.create(data);
@@ -303,9 +300,9 @@ and an authority ID
     async updateByID(id: number, data: Partial<Taxon>): Promise<Taxon> {
         const updateResult = await this.myRepository.update({ id }, data);
         if (updateResult.affected > 0) {
-            return this.findByID(id);
+            return this.findByID(id)
         }
-        return null;
+        return null
     }
 
 }

@@ -10,7 +10,7 @@ import {
     Delete,
     NotFoundException,
     Patch,
-    UseGuards, SerializeOptions, ParseArrayPipe
+    UseGuards, SerializeOptions, ParseArrayPipe, Req, ForbiddenException, InternalServerErrorException
 } from '@nestjs/common';
 import { TaxonDescriptionBlockService } from './taxonDescriptionBlock.service'
 import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
@@ -19,7 +19,11 @@ import { TaxonDescriptionBlockFindAllParams } from './dto/taxonDescriptionBlock-
 import { TaxonDescriptionStatementDto } from '../taxonDescriptionStatement/dto/TaxonDescriptionStatementDto';
 import { TaxonDto } from '../taxon/dto/TaxonDto';
 import { ImageDto } from '../../../api-plugin-image/src/image/dto/ImageDto';
-import { JwtAuthGuard } from '@symbiota2/api-auth';
+import {
+    AuthenticatedRequest,
+    JwtAuthGuard,
+    TokenService
+} from '@symbiota2/api-auth';
 import { TaxonDescriptionBlock } from '@symbiota2/api-database';
 import { CollectionInputDto, ProtectCollection, UpdateCollectionInputDto } from '@symbiota2/api-plugin-collection';
 import { TaxonDescriptionBlockInputDto } from './dto/TaxonDescriptionBlockInputDto';
@@ -95,49 +99,77 @@ export class TaxonDescriptionBlockController {
     @ApiOperation({
         summary: "Create a new description block"
     })
-    @HttpCode(HttpStatus.OK)
-    //@UseGuards(JwtAuthGuard)
-    //@ApiBearerAuth()
-    @ApiResponse({ status: HttpStatus.OK, type: TaxonDescriptionBlockDto })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiResponse({ type: TaxonDescriptionBlockDto })
     //@SerializeOptions({ groups: ['single'] })
     @ApiBody({ type: TaxonDescriptionBlockInputDto, isArray: true })
     /**
     @see - @link TaxonDescriptionBlockInputDto
      **/
-    async create(@Body(new ParseArrayPipe({ items: TaxonDescriptionBlockInputDto })) data: TaxonDescriptionBlockInputDto[]): Promise<TaxonDescriptionBlockDto> {
+    async create(@Req() request: AuthenticatedRequest, @Body(new ParseArrayPipe({ items: TaxonDescriptionBlockInputDto })) data: TaxonDescriptionBlockInputDto[]): Promise<TaxonDescriptionBlockDto> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
         const block = await this.myService.create(data[0])
         const dto = new TaxonDescriptionBlockDto(block)
         return dto
     }
+    // Could not get the non-list version to see the body, it was always undefined no matter what, so put it in a list!
     async create2(@Body() data: TaxonDescriptionBlockInputDto): Promise<TaxonDescriptionBlockDto> {
         const block = await this.myService.create(data)
         const dto = new TaxonDescriptionBlockDto(block)
         return dto
     }
 
+    private canEdit(request) {
+        // SuperAdmins and TaxonProfileEditors have editing privileges
+        const isSuperAdmin = TokenService.isSuperAdmin(request.user)
+        const isProfileEditor = TokenService.isTaxonProfileEditor(request.user)
+        return isSuperAdmin || isProfileEditor
+    }
+
     @Delete(':id')
     @ApiOperation({
         summary: "Delete a taxon description block by ID"
     })
-    //@ProtectCollection('id')
     @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @ApiResponse({ status: HttpStatus.NO_CONTENT })
-    async deleteByID(@Param('id') id: number): Promise<void> {
+    async deleteByID(@Req() request: AuthenticatedRequest, @Param('id') id: number): Promise<void> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
         const block = await this.myService.deleteByID(id);
         if (!block) {
-            throw new NotFoundException();
+            throw new NotFoundException("Block not found");
         }
+
     }
 
     @Patch(':id')
     @ApiOperation({
         summary: "Update a taxon description block by ID"
     })
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     //@ProtectCollection('id')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDescriptionBlock })
     @ApiBody({ type: TaxonDescriptionBlockInputDto, isArray: true })
     //@SerializeOptions({ groups: ['single'] })
-    async updateByID(@Param('id') id: number, @Body(new ParseArrayPipe({ items: TaxonDescriptionBlockInputDto })) data: TaxonDescriptionBlockInputDto[]): Promise<TaxonDescriptionBlock> {
+    async updateByID(
+        @Req() request: AuthenticatedRequest,
+        @Param('id') id: number,
+        @Body(new ParseArrayPipe({ items: TaxonDescriptionBlockInputDto })) data: TaxonDescriptionBlockInputDto[]
+    ): Promise<TaxonDescriptionBlock> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
         const block = await this.myService.updateByID(id, data[0])
         if (!block) {
             throw new NotFoundException()

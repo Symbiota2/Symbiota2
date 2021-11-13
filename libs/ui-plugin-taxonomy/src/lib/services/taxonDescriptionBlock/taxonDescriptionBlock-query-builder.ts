@@ -1,5 +1,4 @@
 import { Q_PARAM_TAXAIDS } from '../../../constants';
-import { OccurrenceQueryBuilder } from '../../../../../ui-plugin-occurrence/src/lib/services/occurrence-query-builder';
 
 export class TaxonDescriptionBlockQueryBuilder {
     protected baseUrl: string

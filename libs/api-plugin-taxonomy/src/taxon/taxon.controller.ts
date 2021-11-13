@@ -1,17 +1,35 @@
-import { Controller, Get, Param, Query, Post, Body, HttpStatus, HttpCode, Delete, NotFoundException, Patch } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Param,
+    Query,
+    Post,
+    Body,
+    HttpStatus,
+    HttpCode,
+    Delete,
+    NotFoundException,
+    Patch,
+    UseGuards, Req, ParseArrayPipe, ForbiddenException
+} from '@nestjs/common';
 import { TaxonService } from './taxon.service';
-import { ApiProperty, ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiProperty, ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import {
     TaxonDto
 } from './dto/TaxonDto';
 import { TaxonFindAllParams } from './dto/taxon-find-all.input.dto';
 import { TaxonFindNamesParams } from './dto/taxon-find-names.input.dto';
 import { TaxonIDandNameDto } from './dto/TaxonIDandNameDto';
+import { AuthenticatedRequest, JwtAuthGuard, TokenService } from '@symbiota2/api-auth';
+import { TaxonDescriptionStatementDto } from '../taxonDescriptionStatement/dto/TaxonDescriptionStatementDto';
+import { TaxonDescriptionStatementInputDto } from '../taxonDescriptionStatement/dto/TaxonDescriptionStatemenInputtDto';
+import { Taxon, TaxonDescriptionStatement } from '@symbiota2/api-database';
+import { TaxonInputDto } from './dto/TaxonInputDto';
 
 @ApiTags('Taxon')
 @Controller('taxon')
 export class TaxonController {
-    constructor(private readonly taxons: TaxonService) { }
+    constructor(private readonly myService: TaxonService) { }
     public static taxaAuthorityID = 1  // default taxa authority ID
 
     // The default controller fetches all of the records
@@ -21,7 +39,7 @@ export class TaxonController {
         summary: "Retrieve a list of taxons.  The list can be narrowed by taxon IDs and/or a taxa authority."
     })
     async findAll(@Query() findAllParams: TaxonFindAllParams): Promise<TaxonDto[]> {
-        const taxons = await this.taxons.findAll(findAllParams)
+        const taxons = await this.myService.findAll(findAllParams)
         const taxonDtos = taxons.map(async (c) => {
             const taxon = new TaxonDto(c)
             return taxon
@@ -36,7 +54,7 @@ export class TaxonController {
         summary: "Retrieve a list of scientific names.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
     async findAllScientificNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<string[]> {
-        const taxons = await this.taxons.findAllScientificNames(findNamesParams)
+        const taxons = await this.myService.findAllScientificNames(findNamesParams)
         const names = taxons.map(async (c) => {
             return c.scientificName
         });
@@ -50,7 +68,7 @@ export class TaxonController {
         summary: "Retrieve a list of family names.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
     async findFamilyNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
-        const items = await this.taxons.findFamilyNames(findNamesParams)
+        const items = await this.myService.findFamilyNames(findNamesParams)
         const names = items.map(async (c) => {
             return new TaxonIDandNameDto(c.scientificName, c.id)
         });
@@ -64,7 +82,7 @@ export class TaxonController {
         summary: "Retrieve a list of genus names.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
     async findGenusNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
-        const items = await this.taxons.findGenusNames(findNamesParams)
+        const items = await this.myService.findGenusNames(findNamesParams)
         const names = items.map(async (c) => {
             return new TaxonIDandNameDto(c.scientificName, c.id)
         });
@@ -78,7 +96,7 @@ export class TaxonController {
         summary: "Retrieve a list of genus names.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
     async findSpeciesNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
-        const items = await this.taxons.findSpeciesNames(findNamesParams)
+        const items = await this.myService.findSpeciesNames(findNamesParams)
         const names = items.map(async (c) => {
             return new TaxonIDandNameDto(c.scientificName, c.id)
         });
@@ -92,7 +110,7 @@ export class TaxonController {
         summary: "Retrieve a list of scientific names and authors.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
     async findAllScientificNamesPlusAuthors(@Query() findNamesParams: TaxonFindNamesParams): Promise<string[]> {
-        const taxons = await this.taxons.findAllScientificNamesPlusAuthors(findNamesParams)
+        const taxons = await this.myService.findAllScientificNamesPlusAuthors(findNamesParams)
         const names = taxons.map(async (c) => {
             return c.scientificName + (c.author? " - " + c.author : "")
         });
@@ -106,7 +124,7 @@ export class TaxonController {
         summary: "Retrieve a scientific name."
     })
     async findByScientificName(@Param('scientificName') sciname: string, @Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonDto> {
-        const taxons = await this.taxons.findByScientificName(sciname, findNamesParams)
+        const taxons = await this.myService.findByScientificName(sciname, findNamesParams)
         const dto = new TaxonDto(taxons[0])
         return dto
     }
@@ -117,9 +135,88 @@ export class TaxonController {
         summary: "Find a taxon by the taxonID"
     })
     async findByTID(@Param('taxonid') id: number): Promise<TaxonDto> {
-        const taxon = await this.taxons.findByTID(id)
+        const taxon = await this.myService.findByTID(id)
         const dto = new TaxonDto(taxon)
         return dto
     }
+
+    private canEdit(request) {
+        // SuperAdmins and TaxonProfileEditors have editing privileges
+        const isSuperAdmin = TokenService.isSuperAdmin(request.user)
+        const isEditor = TokenService.isTaxonEditor(request.user)
+        return isSuperAdmin || isEditor
+    }
+
+    @Post()
+    @ApiOperation({
+        summary: "Create a new taxon"
+    })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonDto })
+    //@SerializeOptions({ groups: ['single'] })
+    @ApiBody({ type: TaxonInputDto, isArray: true })
+    /**
+     @see - @link TaxonInputDto
+     **/
+    async create(
+        @Req() request: AuthenticatedRequest,
+        @Body(new ParseArrayPipe({ items: TaxonInputDto })) data: TaxonInputDto[]
+    ): Promise<TaxonDto> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const block = await this.myService.create(data[0])
+        const dto = new TaxonDto(block)
+        return dto
+    }
+
+    @Patch(':id')
+    @ApiOperation({
+        summary: "Update a taxon by ID"
+    })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({ status: HttpStatus.OK, type: Taxon })
+    @ApiBody({ type: TaxonInputDto, isArray: true })
+    //@SerializeOptions({ groups: ['single'] })
+    async updateByID(
+        @Req() request: AuthenticatedRequest,
+        @Param('id') id: number,
+        @Body(new ParseArrayPipe({ items: TaxonInputDto })) data: Taxon[]
+    ): Promise<Taxon> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const statement = await this.myService.updateByID(id, data[0])
+        if (!statement) {
+            throw new NotFoundException()
+        }
+        return statement
+    }
+
+    @Delete(':id')
+    @ApiOperation({
+        summary: "Delete a taxon by ID"
+    })
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiResponse({ status: HttpStatus.NO_CONTENT })
+    async deleteByID(@Req() request: AuthenticatedRequest, @Param('id') id: number): Promise<void> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const block = await this.myService.deleteByID(id);
+        if (!block) {
+            throw new NotFoundException();
+        }
+    }
+
 
 }

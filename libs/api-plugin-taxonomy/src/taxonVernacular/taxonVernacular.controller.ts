@@ -10,17 +10,18 @@ import {
     Delete,
     NotFoundException,
     Patch,
-    UseGuards
+    UseGuards, Req, ParseArrayPipe, ForbiddenException
 } from '@nestjs/common';
 import { TaxonVernacularService } from './taxonVernacular.service';
-import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import {
     TaxonVernacularOutputDto
 } from './dto/TaxonVernacular.output.dto';
 import { TaxonVernacularFindAllParams } from './dto/taxonVernacular-find-all.input.dto';
 import { TaxonVernacularFindParams } from './dto/taxonVernacular-find.input.dto';
-import { JwtAuthGuard } from '@symbiota2/api-auth';
+import { AuthenticatedRequest, JwtAuthGuard, TokenService } from '@symbiota2/api-auth';
 import { TaxonVernacularInputDto } from './dto/TaxonVernacular.input.dto';
+import { TaxonDescriptionStatementInputDto } from '../taxonDescriptionStatement/dto/TaxonDescriptionStatemenInputtDto';
 
 @ApiTags('TaxonVernacular')
 @Controller('taxonVernacular')
@@ -138,16 +139,33 @@ export class TaxonVernacularController {
         return dto
     }
 
+    private canEdit(request) {
+        // SuperAdmins and TaxonProfileEditors have editing privileges
+        const isSuperAdmin = TokenService.isSuperAdmin(request.user)
+        const isEditor = TokenService.isTaxonEditor(request.user)
+        return isSuperAdmin || isEditor
+    }
+
     @Post()
     @ApiOperation({
         summary: "Create a new taxon vernacular record"
     })
     @HttpCode(HttpStatus.OK)
-    //@UseGuards(JwtAuthGuard)
-    //@ApiBearerAuth()
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @ApiResponse({ status: HttpStatus.OK, type: TaxonVernacularOutputDto })
-    async create(@Body() data: TaxonVernacularInputDto): Promise<TaxonVernacularOutputDto> {
-        const vernacular = await this.myService.create(data)
+    @ApiBody({ type: TaxonVernacularInputDto, isArray: true })
+    async create(
+        @Req() request: AuthenticatedRequest,
+        @Body(new ParseArrayPipe({ items: TaxonVernacularInputDto })) data: TaxonVernacularInputDto[]
+    ): Promise<TaxonVernacularOutputDto>
+    {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+
+        const vernacular = await this.myService.create(data[0])
         return new TaxonVernacularOutputDto(vernacular)
     }
 
@@ -156,8 +174,14 @@ export class TaxonVernacularController {
         summary: "Delete a taxon vernacular record by ID"
     })
     @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @ApiResponse({ status: HttpStatus.NO_CONTENT })
-    async deleteByID(@Param('id') id: number): Promise<void> {
+    async deleteByID(@Req() request: AuthenticatedRequest, @Param('id') id: number): Promise<void> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
         const vernacular = await this.myService.deleteByID(id)
         if (!vernacular) {
             throw new NotFoundException()
@@ -168,9 +192,22 @@ export class TaxonVernacularController {
     @ApiOperation({
         summary: "Update a taxon vernacular record by ID"
     })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @ApiResponse({ status: HttpStatus.OK, type: TaxonVernacularOutputDto })
-    async updateByID(@Param('id') id: number, @Body() data: TaxonVernacularOutputDto): Promise<TaxonVernacularOutputDto> {
-        const vernacular = await this.myService.updateByID(id, data)
+    @ApiBody({ type: TaxonVernacularInputDto, isArray: true })
+    async updateByID(
+        @Req() request: AuthenticatedRequest,
+        @Param('id') id: number,
+        @Body(new ParseArrayPipe({ items: TaxonVernacularInputDto })) data: TaxonVernacularInputDto[]
+    )
+        : Promise<TaxonVernacularOutputDto>
+    {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const vernacular = await this.myService.updateByID(id, data[0])
         if (!vernacular) {
             throw new NotFoundException()
         }

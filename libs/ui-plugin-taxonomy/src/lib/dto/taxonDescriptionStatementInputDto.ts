@@ -1,4 +1,4 @@
-import { Exclude, Expose, plainToClass } from 'class-transformer'
+import { Exclude, Expose} from 'class-transformer'
 
 @Exclude()
 export class TaxonDescriptionStatementInputDto {

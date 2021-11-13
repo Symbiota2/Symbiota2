@@ -36,8 +36,8 @@ export class TaxonDescriptionBlockService extends BaseService<TaxonDescriptionBl
     }
 
     /*
-Fetch the block data for a given taxon id.
-*/
+    Fetch the block data for a given taxon id.
+    */
     async findBlocksAndImagesForTaxon(taxonID): Promise<TaxonDescriptionBlock[]> {
         return await
             this.myRepository.find({
@@ -49,9 +49,6 @@ Fetch the block data for a given taxon id.
     Create a taxon description block
      */
     async create(data: Partial<TaxonDescriptionBlockInputDto>): Promise<TaxonDescriptionBlock> {
-        //const block = this.myRepository.create(data)
-        data.creatorUID = 1 //[TODO: Why do I always need to set this to 1, it is null coming in?]
-        console.log(" data is id " + data.id)
         return this.myRepository.save(data)
     }
 
