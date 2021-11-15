@@ -102,7 +102,7 @@ export class TaxonVernacularService {
             );
     }
 
-    findByID(id: number): Observable<Taxon> {
+    findByID(id: number): Observable<TaxonVernacularListItem> {
         const url = this.createQueryBuilder()
             .findOne()
             .id(id)
@@ -110,7 +110,7 @@ export class TaxonVernacularService {
 
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, Record<string, unknown>>(query)
-            .pipe(map((o) => Taxon.fromJSON(o)))
+            .pipe(map((o) => TaxonVernacularListItem.fromJSON(o)))
 
     }
 

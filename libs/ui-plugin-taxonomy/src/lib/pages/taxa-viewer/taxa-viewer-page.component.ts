@@ -5,7 +5,7 @@ import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import {
     TaxonListItem, TaxonomicAuthorityService,
-    TaxonomicStatusService,
+    TaxonomicStatusService, TaxonomicUnitService,
     TaxonService, TaxonVernacularService
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TaxonomicEnumTreeService } from '@symbiota2/ui-plugin-taxonomy'
@@ -63,6 +63,7 @@ export class TaxaViewerPageComponent implements OnInit {
         private readonly taxonomicStatusService: TaxonomicStatusService,
         private readonly taxonVernacularService: TaxonVernacularService,
         private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
+        private readonly taxonomicUnitService: TaxonomicUnitService,
         private router: Router,
         private formBuilder: FormBuilder,
         private currentRoute: ActivatedRoute,

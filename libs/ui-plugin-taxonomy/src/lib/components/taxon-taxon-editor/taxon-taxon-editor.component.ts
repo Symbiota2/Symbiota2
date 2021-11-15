@@ -3,7 +3,7 @@ import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
     TaxonDescriptionBlockInputDto,
-    TaxonListItem,
+    TaxonListItem, TaxonomicUnitService,
     TaxonService,
     TaxonTaxonDialogComponent
 } from '@symbiota2/ui-plugin-taxonomy';
@@ -42,11 +42,14 @@ export class TaxonTaxonEditorComponent implements OnInit {
     private idCounter = 0
     userID : number = null
     userCanEdit: boolean = false
+    ranksIDtoName = new Map()
+    rankName = ""
 
     constructor(
         private readonly userService: UserService,
         //private readonly taxonBlockService: TaxonDescriptionBlockService,
         private readonly taxaService: TaxonService,
+        private readonly taxonomicUnitService: TaxonomicUnitService,
         //private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
         //private readonly taxonomicStatusService: TaxonomicStatusService,
         //private readonly taxonVernacularService: TaxonVernacularService,
@@ -65,6 +68,7 @@ export class TaxonTaxonEditorComponent implements OnInit {
     Called when Angular starts
      */
     ngOnInit() {
+
         this.currentRoute.paramMap.subscribe(params => {
             this.taxonID = params.get('taxonID')
             // Load the taxon
@@ -87,6 +91,29 @@ export class TaxonTaxonEditorComponent implements OnInit {
             .subscribe((item) => {
                 this.taxon = item
                 this.dataSource = this.taxon
+                const key = item.rankID + item.kingdomName
+                //this.rankName = this.taxonomicUnitService.lookupRankName(item.rankID,item.kingdomName)
+                this.ranksIDtoName = this.taxonomicUnitService.getRanksLookup()
+                if (this.ranksIDtoName == null) {
+                    // First load the names of the ranks
+                    this.taxonomicUnitService.findAll().subscribe((ranks) => {
+                        ranks.forEach((rank) => {
+                            this.ranksIDtoName.set(rank.rankID,rank.rankName)
+                        })
+                    })
+                    this.rankName = this.ranksIDtoName.has(key) ? this.ranksIDtoName.get(key) : 'unknown'
+                } else {
+                    this.rankName = this.ranksIDtoName.has(key) ? this.ranksIDtoName.get(key) : 'unknown'
+                }
+
+
+
+                /* Name is cache in service
+                this.rankName = this.ranksIDtoName.has(item.rankID) ?
+                    this.ranksIDtoName.get(item.rankID)
+                    : 'unknown'
+
+                 */
             })
     }
 

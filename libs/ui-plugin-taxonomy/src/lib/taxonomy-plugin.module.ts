@@ -31,7 +31,10 @@ import {
     TaxonService,
     TaxonomicStatusService,
     TaxonVernacularService,
-    TaxonomicAuthorityService, TaxonDescriptionBlockService, TaxonDescriptionStatementService
+    TaxonomicAuthorityService,
+    TaxonDescriptionBlockService,
+    TaxonDescriptionStatementService,
+    TaxonomicUnitService
 } from './services';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
@@ -105,6 +108,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
         TaxonDescriptionBlockService,
         TaxonDescriptionStatementService,
         TaxonomicAuthorityService,
+        TaxonomicUnitService
     ],
     entryComponents: [
         TaxaSearchPage,

@@ -77,4 +77,6 @@ import { TaxonProfilePublicationController } from './taxonProfilePublication/tax
         TaxonResourceLinkService
     ]
 })
-export class TaxonomyModule extends SymbiotaApiPlugin {}
+export class TaxonomyModule extends SymbiotaApiPlugin {
+
+}

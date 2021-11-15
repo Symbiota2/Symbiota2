@@ -4,9 +4,9 @@ import { Type } from 'class-transformer';
 import { BaseFindAllParams } from '@symbiota2/api-common';
 
 export class TaxonomicUnitFindAllParams extends BaseFindAllParams {
-    static readonly DEFAULT_LIMIT = 5;
+    static readonly DEFAULT_LIMIT = 1000;
     static readonly DEFAULT_OFFSET = 0;
-    static readonly MAX_LIMIT = 15;
+    static readonly MAX_LIMIT = 1000;
 
     @ApiProperty({ name: 'id[]', type: [Number], required: false })
     @Type(() => Number)
