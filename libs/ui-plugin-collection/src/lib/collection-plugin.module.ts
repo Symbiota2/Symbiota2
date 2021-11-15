@@ -28,19 +28,20 @@ import { CollectionProfileService } from './services/collection-profile.service'
 import { CommentService } from './services/comments.service';
 import { CollectionLogoComponent } from './components/collection-logo/collection-logo.component';
 import { MatInputModule } from '@angular/material/input';
-import {MatDividerModule} from '@angular/material/divider';
-import {MatTooltipModule} from '@angular/material/tooltip';
-import {MatPaginatorModule} from '@angular/material/paginator';
-import {MatSidenavModule} from '@angular/material/sidenav';
-import {MatListModule} from '@angular/material/list';
-import {MatRadioModule} from '@angular/material/radio';
-import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import {
     ROUTE_COLLECTION_LIST,
     ROUTE_COLLECTION_PROFILE,
     ROUTE_COLLECTION_NEW,
     ROUTE_COLLECTION_COMMENTS,
     ROUTE_COLLECTION_TOOLS,
+    ROUTE_COLLECTION_DWCARCHIVES,
 } from './routes';
 import { CollectionFieldComponent } from './components/collection-field/collection-field.component';
 import { CollectionListPage } from './pages/collection-list-page/collection-list-page.component';
@@ -61,6 +62,7 @@ import { UserSearchableSelectComponent } from './components/user-searchable-sele
 import { CollectionPermissionsConfirmDialogComponent } from './components/collection-permissions-confirm-dialog/collection-permissions-confirm-dialog.component';
 import { DarwinCoreArchivePublishingComponent } from './components/darwincore-archive-publishing/darwincore-archive-publishing.component';
 import { DarwinCoreArchiveService } from './services/darwin-core-archive.service';
+import { CollectionDwCPage } from './pages/collection-dw-cpage/collection-dw-cpage.component';
 
 @NgModule({
     declarations: [
@@ -85,6 +87,7 @@ import { DarwinCoreArchiveService } from './services/darwin-core-archive.service
         UserSearchableSelectComponent,
         CollectionPermissionsConfirmDialogComponent,
         DarwinCoreArchivePublishingComponent,
+        CollectionDwCPage,
     ],
     imports: [
         AppTranslationModule,
@@ -119,7 +122,7 @@ import { DarwinCoreArchiveService } from './services/darwin-core-archive.service
         CollectionProfileService,
         InstitutionService,
         CommentService,
-        DarwinCoreArchiveService
+        DarwinCoreArchiveService,
     ],
     exports: [CollectionCheckboxSelectorComponent, CollectionLogoComponent],
 })
@@ -136,11 +139,18 @@ export class CollectionPlugin extends SymbiotaUiPlugin {
                 component: CollectionCommentPage,
             },
             { path: ROUTE_COLLECTION_TOOLS, component: CollectionToolsPage },
+            {
+                path: ROUTE_COLLECTION_DWCARCHIVES,
+                component: CollectionDwCPage,
+            },
         ];
     }
 
     static navBarLinks(): NavBarLink[] {
-        return [{ name: 'Browse Collections', url: ROUTE_COLLECTION_LIST }]
+        return [
+            { name: 'Browse Collections', url: ROUTE_COLLECTION_LIST },
+            { name: 'Darwin Core Archives', url: ROUTE_COLLECTION_DWCARCHIVES },
+        ];
     }
 
     static userProfileTabs(): UserProfileTab[] {
