@@ -33,12 +33,19 @@ export class DarwinCoreArchivePublishingComponent implements OnInit {
 
     ngOnInit(): void {
         this.collection$ = this.collectionService.currentCollection;
-        this.publishedCollection$ = this.dwcService.getCurrentCollectionArchive();
+        this.dwcService.getCurrentCollectionArchive().subscribe();
     }
     
 
     onPublishArchive(): void{
-      //TODO: when Evin implements imageURLs and RedactSensitiveLocalities Flags add them to function
-      this.alerts.showMessage("hey ho i work ;)");
+      this.collection$.subscribe(collection => {
+        this.dwcService.createDarwinCoreArchive(collection.id).subscribe(res => {
+          if(res){
+            this.alerts.showMessage(`Darwin Core Archive publishing job successfully sent!`);
+          }else{
+            this.alerts.showError(`Something went wrong submitting DwC-Archive publish request`);
+          }
+        })
+      })
     }
 }
