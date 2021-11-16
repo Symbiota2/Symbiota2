@@ -1,0 +1,19 @@
+<symbiota2-expansion-panel label='{{"taxon.status.placement.label" | translate}}'>
+    <button *ngIf='userCanEdit' style='float:right' mat-icon-button>
+        <mat-icon color="primary" (click)="openDialog('Update',taxon)">edit</mat-icon>
+    </button>
+    <div><b>{{"taxon.status.status.label" | translate}}</b>:
+        <span *ngIf='currentIsAccepted'>{{"taxon.status.accepted" | translate}}</span>
+        <span *ngIf='!currentIsAccepted'>{{"taxon.status.not.accepted" | translate}}</span>
+    </div>
+    <div>
+        <b>{{"taxon.status.parent.taxon.label" | translate}}</b>: {{currentParentName}}
+    </div>
+    <div *ngIf='!currentIsAccepted'>
+        <b>{{"taxon.status.accepted.taxon.label" | translate}}</b>: {{currentAcceptedName}}
+    </div>
+    <div *ngIf='currentIsAccepted'>
+        <!-- List of synonnyms
+        -->
+    </div>
+</symbiota2-expansion-panel>

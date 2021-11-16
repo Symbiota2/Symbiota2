@@ -34,6 +34,10 @@ export class TaxonQueryBuilder {
         return new FindOneBuilder(this.baseUrl)
     }
 
+    findOneWithSynonyms(): FindOneWithSynonymsBuilder {
+        return new FindOneWithSynonymsBuilder(this.baseUrl)
+    }
+
     create(): CreateOneBuilder {
         return new CreateOneBuilder(this.baseUrl);
     }
@@ -150,6 +154,29 @@ class FindOneBuilder extends TaxonQueryBuilder {
 
     build(): string {
         this.url.pathname = `${this.url.pathname}/${this.taxonID}`
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
+        }
+        return super.build()
+    }
+}
+
+class FindOneWithSynonymsBuilder extends TaxonQueryBuilder {
+    protected taxonID: number = null
+
+    id(id: number): FindOneWithSynonymsBuilder {
+        this.taxonID = id
+        return this
+    }
+
+
+    authorityID(authorityID? : string): FindOneWithSynonymsBuilder {
+        this._authorityID = authorityID? authorityID : undefined
+        return this
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/withSynonyms/${this.taxonID}`
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
         }

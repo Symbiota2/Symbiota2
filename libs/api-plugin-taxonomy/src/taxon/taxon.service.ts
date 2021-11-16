@@ -280,6 +280,16 @@ and an authority ID
     }
 
     /*
+    Find a taxon and its synonyms using a taxon ID.
+    */
+    async findByTIDWithSynonyms(id: number): Promise<Taxon> {
+        return this.myRepository.findOne({
+            relations: ["acceptedTaxonStatuses", "acceptedTaxonStatuses.parentTaxon"],
+            where: {id: id}
+        })
+    }
+
+    /*
     Find a taxon using a taxon ID.
      */
     async findByTID(id: number): Promise<Taxon> {

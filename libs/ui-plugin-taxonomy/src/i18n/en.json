@@ -92,6 +92,13 @@
     "taxon.taxon.editor.source": "Source",
     "taxon.taxon.editor.notes": "Notes",
     "taxon.taxon.editor.hybrid": "Hybrid",
+    "taxon.status.status.label": "Status",
+    "taxon.status.placement.label": "Taxonomic Placement",
+    "taxon.status.accepted": "Accepted",
+    "taxon.status.not.accepted": "Not Accepted",
+    "taxon.status.parent.taxon.label": "Parent Taxon",
+    "taxon.status.accepted.taxon.label": "Accepted Taxon",
+
     "taxon.taxon.editor.securityStatus": "Security Status",
     "taxon.vernacular.editor.block.added": "Common name added",
     "taxon.vernacular.editor.block.updated": "Common name updated",

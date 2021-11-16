@@ -25,6 +25,7 @@ import { TaxonDescriptionStatementDto } from '../taxonDescriptionStatement/dto/T
 import { TaxonDescriptionStatementInputDto } from '../taxonDescriptionStatement/dto/TaxonDescriptionStatemenInputtDto';
 import { Taxon, TaxonDescriptionStatement } from '@symbiota2/api-database';
 import { TaxonInputDto } from './dto/TaxonInputDto';
+import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
 
 @ApiTags('Taxon')
 @Controller('taxon')
@@ -126,6 +127,26 @@ export class TaxonController {
     async findByScientificName(@Param('scientificName') sciname: string, @Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonDto> {
         const taxons = await this.myService.findByScientificName(sciname, findNamesParams)
         const dto = new TaxonDto(taxons[0])
+        return dto
+    }
+
+    @Get('withSynonyms/:taxonid')
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonDto })
+    @ApiOperation({
+        summary: "Find a taxon by the taxonID"
+    })
+    async findByTIDWithSynonyms(@Param('taxonid') id: number): Promise<TaxonDto> {
+        const taxon = await this.myService.findByTID(id)
+        if (taxon == null) return null  // nothing found, should never happen unless data is corrupted
+        // Wait for the accepted statuses
+        const statuses = await taxon.acceptedTaxonStatuses
+        const a = []
+        statuses.forEach((status) => {
+            const dto = new TaxonomicStatusDto(status)
+            a.push(dto)
+        })
+        const dto = new TaxonDto(taxon)
+        dto.acceptedTaxonStatuses = a
         return dto
     }
 

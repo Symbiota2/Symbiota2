@@ -50,7 +50,8 @@ import {
     TaxonDescriptionEditorComponent,
     TaxonDescriptionStatementDialogComponent,
     TaxonTaxonEditorComponent,
-    TaxonTaxonDialogComponent
+    TaxonTaxonDialogComponent,
+    TaxonStatusEditorComponent
 } from './components';
 import { TaxonEditorPageComponent } from './pages'
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -98,7 +99,8 @@ import { MatGridListModule } from '@angular/material/grid-list';
         TaxonDescriptionEditorComponent,
         TaxonDescriptionStatementDialogComponent,
         TaxonTaxonEditorComponent,
-        TaxonTaxonDialogComponent
+        TaxonTaxonDialogComponent,
+        TaxonStatusEditorComponent
     ],
     providers: [
         TaxonService,
@@ -121,7 +123,8 @@ import { MatGridListModule } from '@angular/material/grid-list';
         TaxonDescriptionEditorComponent,
         TaxonDescriptionStatementDialogComponent,
         TaxonTaxonEditorComponent,
-        TaxonTaxonDialogComponent
+        TaxonTaxonDialogComponent,
+        TaxonStatusEditorComponent
     ]
 })
 export class TaxonomyPlugin extends SymbiotaUiPlugin {

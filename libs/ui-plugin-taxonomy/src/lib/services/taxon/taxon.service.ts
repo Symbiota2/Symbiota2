@@ -104,6 +104,19 @@ export class TaxonService {
             )
     }
 
+    findByIDWithSynonyms(id: number, authorityID?): Observable<TaxonListItem> {
+        const url = this.createQueryBuilder()
+            .findOneWithSynonyms()
+            .authorityID(authorityID)
+            .id(id)
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, Record<string, unknown>>(query)
+            .pipe(map((o) => TaxonListItem.fromJSON(o)))
+
+    }
+
     findByID(id: number, authorityID?): Observable<TaxonListItem> {
         const url = this.createQueryBuilder()
             .findOne()
