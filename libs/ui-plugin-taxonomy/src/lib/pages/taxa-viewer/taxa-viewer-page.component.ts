@@ -141,7 +141,9 @@ export class TaxaViewerPageComponent implements OnInit {
             .subscribe((authorities) => {
             this.taxonomicAuthorityList = authorities
         })
-
+        this.taxonomicAuthorityList.sort(function (a, b) {
+            return (a.id > b.id ? 1 : -1)
+        })
     }
 
     /*

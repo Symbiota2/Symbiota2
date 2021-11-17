@@ -55,6 +55,7 @@ import {
 } from './components';
 import { TaxonEditorPageComponent } from './pages'
 import { MatGridListModule } from '@angular/material/grid-list';
+import { TaxonStatusParentEditorDialogComponent } from './components/taxon-status-parent-editor-dialog/taxon-status-parent-editor-dialog.component';
 
 @NgModule({
   imports: [
@@ -100,7 +101,8 @@ import { MatGridListModule } from '@angular/material/grid-list';
         TaxonDescriptionStatementDialogComponent,
         TaxonTaxonEditorComponent,
         TaxonTaxonDialogComponent,
-        TaxonStatusEditorComponent
+        TaxonStatusEditorComponent,
+        TaxonStatusParentEditorDialogComponent
     ],
     providers: [
         TaxonService,
@@ -124,7 +126,8 @@ import { MatGridListModule } from '@angular/material/grid-list';
         TaxonDescriptionStatementDialogComponent,
         TaxonTaxonEditorComponent,
         TaxonTaxonDialogComponent,
-        TaxonStatusEditorComponent
+        TaxonStatusEditorComponent,
+        TaxonStatusParentEditorDialogComponent
     ]
 })
 export class TaxonomyPlugin extends SymbiotaUiPlugin {

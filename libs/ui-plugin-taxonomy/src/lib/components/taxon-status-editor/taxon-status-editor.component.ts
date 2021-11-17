@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonListItem, TaxonomicStatusService, TaxonomicUnitService,
+    TaxonListItem, TaxonomicAuthorityService, TaxonomicStatusService, TaxonomicUnitService,
     TaxonService,
     TaxonTaxonDialogComponent
 } from '@symbiota2/ui-plugin-taxonomy';
@@ -11,6 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { filter } from 'rxjs/operators';
 import { TaxonInputDto } from '../../dto/taxonInputDto';
+import { TaxonStatusParentEditorDialogComponent } from '../taxon-status-parent-editor-dialog/taxon-status-parent-editor-dialog.component';
 
 export interface TaxStatusInfo {
     kingdomName: string
@@ -47,6 +48,9 @@ export class TaxonStatusEditorComponent implements OnInit {
     currentSynonyms = []
     currentAcceptedName = "unknown name"
 
+    taxonomicAuthorityList = []
+    allTaxonomicAuthorityList = []
+
     taxon: TaxonListItem
     dataSource
     private taxonID: string
@@ -65,7 +69,7 @@ export class TaxonStatusEditorComponent implements OnInit {
         //private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
         private readonly taxonomicStatusService: TaxonomicStatusService,
         //private readonly taxonVernacularService: TaxonVernacularService,
-        //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
+        private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
         private readonly alertService: AlertService,
         private router: Router,
         private formBuilder: FormBuilder,
@@ -87,6 +91,8 @@ export class TaxonStatusEditorComponent implements OnInit {
         this.synonyms.set(this.currentAuthorityID, [])
         this.parentName.set(this.currentAuthorityID, 'unknown')
 
+        this.loadAuthorities()
+
         this.currentRoute.paramMap.subscribe(params => {
             this.taxonID = params.get('taxonID')
             // Load the taxon
@@ -102,30 +108,107 @@ export class TaxonStatusEditorComponent implements OnInit {
     }
 
     /*
+    Load the taxa authorities
+    */
+    public loadAuthorities() {
+        this.taxonomicAuthorityService.findAll()
+            .subscribe((authorities) => {
+                this.allTaxonomicAuthorityList = authorities
+            })
+
+    }
+
+    /*
+    Taxonomic authority has a new value
+    */
+    authorityChangeAction() {
+        // If the authority changes...
+        this.setCurrentAuthorityID(this.currentAuthorityID)
+    }
+
+    /*
     Load the taxon's status, synonyms, etc.
     */
     loadTaxonStatus(taxonID: number) {
         // First let's figure out if the taxon is accepted or not, let's fetch the status for the given taxaid
         // Is this taxon a synonym?
-        this.taxonomicStatusService.findAll(
-            {taxonIDs: [+this.taxonID], taxonomicAuthorityID: this.currentAuthorityID} )
+        this.taxonomicStatusService
+            .findAll({taxonIDs: [+this.taxonID], taxonomicAuthorityID: this.currentAuthorityID} )
             .subscribe((myStatii) => {
-                if (myStatii.length > 1) {
-                    // In conflict! [TODO Add in conflict processing, basically should never happen]
-                }
-                myStatii.forEach((myStatus) => {
-                    if (taxonID != myStatus.taxonIDAccepted) {
-                        // I am a synonym, let's look for the accepted id taxon
-                        this.taxaService.findByID(myStatus.taxonIDAccepted, this.currentAuthorityID)
-                            .subscribe((myTaxon) => {
+                // There are statuses for each taxa authority, so let's break up the status per taxa authority
+                const statusMap = new Map()
+                myStatii.forEach((status) => {
+                    // If we haven't yet seen the authority id, set up an empty list of statuses for it
+                    if (!statusMap.has(status.taxonAuthorityID)) {
+                        statusMap.set(status.taxonAuthorityID,[])
+                        // Run through the entire list of taxonomic authorities and move this authority into the list
+                        this.allTaxonomicAuthorityList.forEach((authority) => {
+                            if (authority.id == status.taxonAuthorityID) {
+                                this.taxonomicAuthorityList.unshift(authority)
+                            }
+                        })
+                    }
+                    // Sort the taxonomic list
+                    this.taxonomicAuthorityList.sort(function (a, b) {
+                        return (a.id > b.id ? 1 : -1)
+                    })
+                    // Add the status to the list of statuses for this authorityID
+                    const statusList = statusMap.get(status.taxonAuthorityID)
+                    statusList.push(status)
+                    statusMap.set(status.taxonAuthorityID, statusList)
+                })
+                // Run through the authorities
+                statusMap.forEach((statusList, authorityID) => {
+                    if (statusList.length > 1) {
+                        // In conflict! [TODO Add in conflict processing, basically should never happen]
+                    } else if (statusList.length == 0) {
+                        // database is corrupt [TODO how to fix corrupt data?]
+                    } else {
+                        const myStatus = statusList[0]
+                        // Find the name of the accepted and parent taxons
+                        this.taxaService.findByID(myStatus.taxonIDAccepted).subscribe((acceptedTaxon) => {
+                            this.acceptedName.set(myStatus.taxonAuthorityID,acceptedTaxon.scientificName)
+                            this.parentName.set(myStatus.taxonAuthorityID,myStatus.parent.scientificName)
+                            if (taxonID != myStatus.taxonIDAccepted) {
+                                // I am a synonym, let's look for the accepted id taxon
+                                this.isAccepted.set(myStatus.taxonAuthorityID,false)
 
-
-                            })
+                                // Trigger rebinding
+                                this.setCurrentAuthorityID(this.currentAuthorityID)
+                            } else {
+                                // I am not a synonym, let's look to see if anyone is a synonym of me
+                                this.isAccepted.set(myStatus.taxonAuthorityID,true)
+                                // Find the name of the accepted taxon
+                                this.taxaService.findByIDWithSynonyms(taxonID)
+                                    .subscribe((item) => {
+                                        this.taxon = item
+                                        const key = item.rankID + item.kingdomName
+                                        //this.rankName = this.taxonomicUnitService.lookupRankName(item.rankID,item.kingdomName)
+                                        this.ranksIDtoName = this.taxonomicUnitService.getRanksLookup()
+                                        if (this.ranksIDtoName == null) {
+                                            // First load the names of the ranks
+                                            this.taxonomicUnitService.findAll().subscribe((ranks) => {
+                                                ranks.forEach((rank) => {
+                                                    this.ranksIDtoName.set(rank.rankID, rank.rankName)
+                                                })
+                                            })
+                                            this.rankName = this.ranksIDtoName.has(key) ? this.ranksIDtoName.get(key) : 'unknown'
+                                        } else {
+                                            this.rankName = this.ranksIDtoName.has(key) ? this.ranksIDtoName.get(key) : 'unknown'
+                                        }
+                                    })
+                                // Trigger rebinding
+                                this.setCurrentAuthorityID(this.currentAuthorityID)
+                            }
+                        })
                     }
                 })
+
+
             })
 
 
+        /*
         this.taxaService.findByIDWithSynonyms(taxonID)
             .subscribe((item) => {
                 //console.log("loading taxon " + item.scientificName)
@@ -172,19 +255,15 @@ export class TaxonStatusEditorComponent implements OnInit {
                                     })
                                 })
                         } else {
-                            console.log(" synonomy " + status.taxonIDAccepted)
-                            this.isAccepted.set(status.taxonAuthorityID,false)
-                            // Find the name of the accepted taxon
-                            this.taxaService.findByID(status.taxonIDAccepted).subscribe((acceptedTaxon) => {
-                                //console.log("setting name " + status.taxonAuthorityID, acceptedTaxon.scientificName)
-                                this.acceptedName.set(status.taxonAuthorityID,acceptedTaxon.scientificName)
-                            })
+
                         }
-                        // Trigger rebinding
-                        this.setCurrentAuthorityID(this.currentAuthorityID)
+
                     })
+
                 })
             })
+
+         */
 
     }
 
@@ -192,26 +271,26 @@ export class TaxonStatusEditorComponent implements OnInit {
     Call this whenever there is a change to the current authorityID
      */
     setCurrentAuthorityID(id) {
-
         this.currentParentName = this.parentName.get(id)
         this.currentAcceptedName = this.acceptedName.get(id)
         this.currentSynonyms = this.synonyms.get(id)
         this.currentIsAccepted = this.isAccepted.get(id)
-        //console.log("setting authority id " + this.currentParentName)
     }
 
     openDialog(action, obj) {
         obj.action = action
-        const dialogRef = (action == 'Delete') ?
-            this.dialog.open(TaxonTaxonDialogComponent, {
+        let dialogRef = null
+        if (action == 'Update Parent') {
+            dialogRef = this.dialog.open(TaxonStatusParentEditorDialogComponent, {
                 width: '100',
                 data: obj
             })
-            : this.dialog.open(TaxonTaxonDialogComponent, {
-                width: '80%',
+        } else if (action == 'Update Accepted') {
+            dialogRef = this.dialog.open(TaxonTaxonDialogComponent, {
+                width: '100',
                 data: obj
             })
-
+        }
         dialogRef.afterClosed().subscribe(result => {
             if (result.event == 'Update') {
                 this.updateData(result.data)
