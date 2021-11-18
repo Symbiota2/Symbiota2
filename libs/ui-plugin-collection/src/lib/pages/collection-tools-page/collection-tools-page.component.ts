@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
@@ -15,6 +16,8 @@ import { DarwinCoreArchivePublishingComponent } from '../../components/darwincor
 })
 export class CollectionToolsPage implements OnInit {
     private static readonly ROUTE_PARAM_COLLID = 'collectionID';
+
+    @ViewChild('sidenav') sidenav : MatSidenav;
 
     static collectionTools: Map<string, Component> = new Map()
         .set('Edit Collection', CollectionEditorComponent)
@@ -47,7 +50,13 @@ export class CollectionToolsPage implements OnInit {
                 );
             }
         });
+
+        this.sidenav.position = 'end';
     }
+
+    ngAfterViewInit() {
+        console.log(this.sidenav.fixedBottomGap);
+      }
 
     setContentView(key: string): void {
         this.selectedContent = CollectionToolsPage.collectionTools.get(key);

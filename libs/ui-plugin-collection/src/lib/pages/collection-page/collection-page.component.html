@@ -22,12 +22,12 @@
                     {{ collection.collectionName }}
                 </h1>
                 <button
-                    mat-icon-button
+                    mat-stroked-button
                     *ngIf="canUserEdit() | async"
                     id="editButton"
                     (click)="openCollectionTools()"
                 >
-                    <mat-icon>edit</mat-icon>
+                    <mat-icon>build</mat-icon> Admin Tools
                 </button>
             </div>
             <div id="subTitle" fxLayoutAlign="start end">
