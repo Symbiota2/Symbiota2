@@ -26,7 +26,21 @@ For development, a [.env file](https://www.npmjs.com/package/dotenv) can be used
 | DATABASE_NAME | The name of the database on DATABASE_HOST | 'symbiota' |
 | DATABASE_USER | The user used to connection to DATABASE_NAME | 'root' |
 | DATABASE_PASSWORD | The password for DATABASE_USER | 'password' |
+| REDIS_HOST | The redis server to use for asynchronous job queues | '127.0.0.1' |
+| REDIS_PORT | The port for REDIS_HOST | 6379 |
+| SMTP_HOST | The smtp server to use for sending emails | '127.0.0.1' |
+| SMTP_PORT | The port to use on SMTP_HOST | 25 |
+| SMTP_USER | The optional user to use for authentication with SMTP_HOST | '' |
+| SMTP_PASSWORD | The optional password for SMTP_USER | '' |
+| SMTP_SENDER | The email address that emails will originate from | 'noreply@symbiota2.org' |
+| STORAGE_SERVER | The S3 server to use for backend storage | '127.0.0.1' |
+| STORAGE_USER | The AWS Access Key ID (or equivalent) to use for authentication with STORAGE_SERVER | 'symbiota2' |
+| STORAGE_PASSWORD | The AWS Secret Access Key (or equivalent) to use for authentication with STORAGE_SERVER | 'password' |
+| STORAGE_BUCKET | The S3 bucket to use on STORAGE_SERVER | 'symbiota2' |
 | ENABLE_AUTH | FOR DEBUGGING ONLY: Set to 0 to disable API authentication | 1 |
+
+## Overall architecture
+![Architecture](./docs/app-architecture.png)
 
 ## Database
 
