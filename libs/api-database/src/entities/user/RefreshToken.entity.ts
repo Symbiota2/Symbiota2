@@ -18,10 +18,10 @@ export class RefreshToken extends EntityProvider {
     @Column('int', { name: 'uid', unsigned: true, primary: true })
     uid: number;
 
-    @Column('varchar', { name: 'clientID', primary: true, length: 36, default: () => 'UUID()' })
+    @Column('varchar', { name: 'clientID', primary: true, length: 36, default: () => 'uuid()' })
     clientID: string;
 
-    @Column('varchar', { name: 'token', primary: true, length: 36, default: () => 'UUID()'  })
+    @Column('varchar', { name: 'token', primary: true, length: 36, default: () => 'uuid()'  })
     token: string;
 
     @Column('timestamp', { name: 'expiresAt', default: () => 'CURRENT_TIMESTAMP()' })

@@ -10,27 +10,33 @@ import {
     Delete,
     NotFoundException,
     Patch,
-    UseGuards, Req, ParseArrayPipe, ForbiddenException
+    UseInterceptors,
+    UseGuards,
+    UploadedFile,
+    BadRequestException,
+    Req,
+    ForbiddenException, ParseArrayPipe
 } from '@nestjs/common';
 import { TaxonService } from './taxon.service';
-import { ApiProperty, ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
-import {
-    TaxonDto
-} from './dto/TaxonDto';
+import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { TaxonDto } from './dto/TaxonDto';
 import { TaxonFindAllParams } from './dto/taxon-find-all.input.dto';
 import { TaxonFindNamesParams } from './dto/taxon-find-names.input.dto';
 import { TaxonIDandNameDto } from './dto/TaxonIDandNameDto';
 import { AuthenticatedRequest, JwtAuthGuard, TokenService } from '@symbiota2/api-auth';
-import { TaxonDescriptionStatementDto } from '../taxonDescriptionStatement/dto/TaxonDescriptionStatementDto';
-import { TaxonDescriptionStatementInputDto } from '../taxonDescriptionStatement/dto/TaxonDescriptionStatemenInputtDto';
-import { Taxon, TaxonDescriptionStatement } from '@symbiota2/api-database';
+import { Taxon } from '@symbiota2/api-database';
 import { TaxonInputDto } from './dto/TaxonInputDto';
 import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiFileInput } from '@symbiota2/api-common';
+import { Express } from 'express';
+
+type File = Express.Multer.File;
 
 @ApiTags('Taxon')
 @Controller('taxon')
 export class TaxonController {
-    constructor(private readonly myService: TaxonService) { }
+    constructor(private readonly taxa: TaxonService) { }
     public static taxaAuthorityID = 1  // default taxa authority ID
 
     // The default controller fetches all of the records
@@ -40,7 +46,7 @@ export class TaxonController {
         summary: "Retrieve a list of taxons.  The list can be narrowed by taxon IDs and/or a taxa authority."
     })
     async findAll(@Query() findAllParams: TaxonFindAllParams): Promise<TaxonDto[]> {
-        const taxons = await this.myService.findAll(findAllParams)
+        const taxons = await this.taxa.findAll(findAllParams)
         const taxonDtos = taxons.map(async (c) => {
             const taxon = new TaxonDto(c)
             return taxon
@@ -55,7 +61,7 @@ export class TaxonController {
         summary: "Retrieve a list of scientific names.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
     async findAllScientificNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<string[]> {
-        const taxons = await this.myService.findAllScientificNames(findNamesParams)
+        const taxons = await this.taxa.findAllScientificNames(findNamesParams)
         const names = taxons.map(async (c) => {
             return c.scientificName
         });
@@ -69,7 +75,7 @@ export class TaxonController {
         summary: "Retrieve a list of family names.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
     async findFamilyNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
-        const items = await this.myService.findFamilyNames(findNamesParams)
+        const items = await this.taxa.findFamilyNames(findNamesParams)
         const names = items.map(async (c) => {
             return new TaxonIDandNameDto(c.scientificName, c.id)
         });
@@ -83,7 +89,7 @@ export class TaxonController {
         summary: "Retrieve a list of genus names.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
     async findGenusNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
-        const items = await this.myService.findGenusNames(findNamesParams)
+        const items = await this.taxa.findGenusNames(findNamesParams)
         const names = items.map(async (c) => {
             return new TaxonIDandNameDto(c.scientificName, c.id)
         });
@@ -97,7 +103,7 @@ export class TaxonController {
         summary: "Retrieve a list of genus names.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
     async findSpeciesNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
-        const items = await this.myService.findSpeciesNames(findNamesParams)
+        const items = await this.taxa.findSpeciesNames(findNamesParams)
         const names = items.map(async (c) => {
             return new TaxonIDandNameDto(c.scientificName, c.id)
         });
@@ -111,7 +117,7 @@ export class TaxonController {
         summary: "Retrieve a list of scientific names and authors.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
     async findAllScientificNamesPlusAuthors(@Query() findNamesParams: TaxonFindNamesParams): Promise<string[]> {
-        const taxons = await this.myService.findAllScientificNamesPlusAuthors(findNamesParams)
+        const taxons = await this.taxa.findAllScientificNamesPlusAuthors(findNamesParams)
         const names = taxons.map(async (c) => {
             return c.scientificName + (c.author? " - " + c.author : "")
         });
@@ -125,7 +131,7 @@ export class TaxonController {
         summary: "Retrieve a scientific name."
     })
     async findByScientificName(@Param('scientificName') sciname: string, @Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonDto> {
-        const taxons = await this.myService.findByScientificName(sciname, findNamesParams)
+        const taxons = await this.taxa.findByScientificName(sciname, findNamesParams)
         const dto = new TaxonDto(taxons[0])
         return dto
     }
@@ -136,7 +142,7 @@ export class TaxonController {
         summary: "Find a taxon by the taxonID"
     })
     async findByTIDWithSynonyms(@Param('taxonid') id: number): Promise<TaxonDto> {
-        const taxon = await this.myService.findByTID(id)
+        const taxon = await this.taxa.findByTID(id)
         if (taxon == null) return null  // nothing found, should never happen unless data is corrupted
         // Wait for the accepted statuses
         const statuses = await taxon.acceptedTaxonStatuses
@@ -156,7 +162,7 @@ export class TaxonController {
         summary: "Find a taxon by the taxonID"
     })
     async findByTID(@Param('taxonid') id: number): Promise<TaxonDto> {
-        const taxon = await this.myService.findByTID(id)
+        const taxon = await this.taxa.findByTID(id)
         const dto = new TaxonDto(taxon)
         return dto
     }
@@ -189,7 +195,7 @@ export class TaxonController {
             throw new ForbiddenException()
         }
 
-        const block = await this.myService.create(data[0])
+        const block = await this.taxa.create(data[0])
         const dto = new TaxonDto(block)
         return dto
     }
@@ -213,7 +219,7 @@ export class TaxonController {
             throw new ForbiddenException()
         }
 
-        const statement = await this.myService.updateByID(id, data[0])
+        const statement = await this.taxa.updateByID(id, data[0])
         if (!statement) {
             throw new NotFoundException()
         }
@@ -233,11 +239,23 @@ export class TaxonController {
             throw new ForbiddenException()
         }
 
-        const block = await this.myService.deleteByID(id);
+        const block = await this.taxa.deleteByID(id);
         if (!block) {
             throw new NotFoundException();
         }
     }
 
+    @Post('dwc')
+    @HttpCode(HttpStatus.CREATED)
+    @UseInterceptors(FileInterceptor('file'))
+    // @UseGuards(JwtAuthGuard)
+    @ApiOperation({ summary: "Upload a CSV or DwCA file containing taxa" })
+    @ApiFileInput('file')
+    async uploadTaxaDwcA(@UploadedFile() file: File) {
+        if (!file.mimetype.startsWith('application/zip')) {
+            throw new BadRequestException('Invalid DwCA');
+        }
 
+        await this.taxa.fromDwcA(file.path);
+    }
 }

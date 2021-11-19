@@ -1,5 +1,6 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
+// This looks useless but whatever
 export class RefreshTokens1636527024696 implements MigrationInterface {
     name = 'RefreshTokens1636527024696'
 

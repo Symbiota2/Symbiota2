@@ -10,7 +10,7 @@ import {TaxonomicUnitController} from "./taxonomicUnit/taxonomicUnit.controller"
 import {TaxonomicStatusService} from "./taxonomicStatus/taxonomicStatus.service"
 import {TaxonomicStatusController} from "./taxonomicStatus/taxonomicStatus.controller"
 import {TaxonDescriptionBlockController} from "./taxonDescriptionBlock/taxonDescriptionBlock.controller"
-import { SymbiotaApiPlugin } from '@symbiota2/api-common'
+import { SymbiotaApiPlugin } from '@symbiota2/api-common';
 import { TaxonomicEnumTreeService } from './taxonomicEnumTree/taxonomicEnumTree.service'
 import { TaxonomicEnumTreeController } from './taxonomicEnumTree/taxonomicEnumTree.controller'
 import { TaxonVernacularService } from './taxonVernacular/taxonVernacular.service'
@@ -28,9 +28,44 @@ import { TaxonProfilePublicationDescriptionLinkController } from './taxonProfile
 import { TaxonProfilePublicationDescriptionLinkService } from './taxonProfilePublicationDescriptionLink/taxonProfilePublicationDescriptionLink.service';
 import { TaxonProfilePublicationService } from './taxonProfilePublication/taxonProfilePublication.service';
 import { TaxonProfilePublicationController } from './taxonProfilePublication/taxonProfilePublication.controller';
+import { MulterModule } from '@nestjs/platform-express';
+import { promises as fsPromises } from 'fs';
+import { join as pathJoin } from 'path';
 
 @Module({
-    imports: [DatabaseModule, AppConfigModule],
+    imports: [
+        AppConfigModule,
+        DatabaseModule,
+        MulterModule.registerAsync({
+            imports: [AppConfigModule],
+            inject: [AppConfigService],
+            useFactory: async (appConfig: AppConfigService) => {
+                const uploadDirectory = pathJoin(
+                    await appConfig.dataDir(),
+                    'uploads',
+                    'taxa'
+                );
+
+                try {
+                    await fsPromises.stat(uploadDirectory);
+                }
+                catch (e) {
+                    await fsPromises.mkdir(
+                        uploadDirectory,
+                        { mode: 0o700, recursive: true }
+                    );
+                }
+
+                return {
+                    // TODO: Configurable upload limit
+                    dest: uploadDirectory,
+                    limits: {
+                        fileSize: 1074000000 // 1GiB
+                    }
+                }
+            },
+        }),
+    ],
     providers: [
         TaxonService,
         TaxonVernacularService,

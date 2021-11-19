@@ -1,15 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Taxon, TaxonomicUnit } from '@symbiota2/api-database';
 import { In, Like, Repository } from 'typeorm';
 import { TaxonFindAllParams } from './dto/taxon-find-all.input.dto'
 import { BaseService } from '@symbiota2/api-common'
 import { TaxonFindNamesParams } from './dto/taxon-find-names.input.dto';
+import { DwCArchiveParser, dwcCoreID, getDwcField, isDwCID } from '@symbiota2/dwc';
 
 @Injectable()
 export class TaxonService extends BaseService<Taxon>{
+    private static readonly UPLOAD_CHUNK_SIZE = 1024;
+    private static readonly LOGGER = new Logger(TaxonService.name);
+
     constructor(
-        @Inject(Taxon.PROVIDER_ID)
-        private readonly taxonRepo: Repository<Taxon>) {
+        @Inject(Taxon.PROVIDER_ID) private readonly taxonRepo: Repository<Taxon>,
+        @Inject(TaxonomicUnit.PROVIDER_ID) private readonly rankRepo: Repository<TaxonomicUnit>) {
         super(taxonRepo);
     }
 
@@ -283,7 +287,7 @@ and an authority ID
     Find a taxon and its synonyms using a taxon ID.
     */
     async findByTIDWithSynonyms(id: number): Promise<Taxon> {
-        return this.myRepository.findOne({
+        return this.taxonRepo.findOne({
             relations: ["acceptedTaxonStatuses", "acceptedTaxonStatuses.parentTaxon"],
             where: {id: id}
         })
@@ -322,17 +326,113 @@ and an authority ID
      * @return number The taxonID if it exists, otherwise -1
      */
     async taxonExists(kingdomName: string, rankName: string, scientificName: string): Promise<number> {
+        const taxonRank = await this.rankRepo.findOne({ kingdomName, rankName });
+
+        if (!taxonRank) {
+            return -1;
+        }
+
         const taxon = await this.taxonRepo.findOne({
             select: ['id'],
             where: {
                 scientificName,
-                rank: {
-                    kingdomName,
-                    rankName
-                }
-            },
-            relations: ['rank']
+                rankID: taxonRank.rankID
+            }
         });
-        return taxon === null ? -1 : taxon.id;
+        return taxon ? taxon.id : -1;
+    }
+
+    async fromDwcA(filename: string): Promise<void> {
+        let taxonBuffer = [];
+        const kingdomNameDwcUri = getDwcField(Taxon, 'kingdom');
+        const sciNameDwcUri = getDwcField(Taxon, 'scientificName');
+        const rankNameDwcUri = getDwcField(Taxon, 'rankName');
+        const authorDwcUri = getDwcField(Taxon, 'author');
+
+        for await (const csvTaxon of DwCArchiveParser.read(filename, Taxon.DWC_TYPE)) {
+            if (taxonBuffer.length > TaxonService.UPLOAD_CHUNK_SIZE) {
+                await this.taxonRepo.save(taxonBuffer);
+                taxonBuffer = [];
+            }
+
+            let author = csvTaxon[authorDwcUri];
+            const kingdomName = csvTaxon[kingdomNameDwcUri];
+            const rankName = csvTaxon[rankNameDwcUri];
+            let sciName = csvTaxon[sciNameDwcUri];
+
+            // Clean authorship out of sciName
+            if (author) {
+                // Thanks to
+                // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+                // For the replace regex
+                const authorRegexpClean = author.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const authorRegexp = new RegExp(`\\s*(${authorRegexpClean})\\s*`)
+                sciName = sciName.replace(authorRegexp, '');
+            }
+
+            if (!kingdomName) {
+                TaxonService.LOGGER.warn(`Taxon does not have a kingdom! Skipping...`);
+                continue;
+            }
+            if (!rankName) {
+                TaxonService.LOGGER.warn(`Taxon does not have a rankName! Skipping...`);
+                continue;
+            }
+            if (!sciName) {
+                TaxonService.LOGGER.warn(`Taxon does not have a scientificName! Skipping...`);
+                continue;
+            }
+
+            const taxon = this.taxonRepo.create();
+            taxon.scientificName = sciName;
+            taxon.author = author;
+
+            // Avoid duplicate uploads
+            const taxonID = await this.taxonExists(kingdomName, rankName, sciName);
+            if (taxonID !== -1) {
+                taxon.id = taxonID;
+            }
+
+            // Since we've already manipulated these we don't want to overwrite
+            // them
+            const setFields = [
+                getDwcField(Taxon, 'id'),
+                sciNameDwcUri,
+                authorDwcUri
+            ];
+
+            let extraTaxonFields = this.taxonRepo.manager.connection
+                .getMetadata(Taxon)
+                .columns
+                .map((c) => c.propertyName);
+
+            const csvFields = Object.keys(csvTaxon);
+
+            for (const field of extraTaxonFields) {
+                const dwcFieldUri = getDwcField(Taxon, field);
+                const isAlreadySet = setFields.includes(dwcFieldUri);
+
+                if (isAlreadySet) {
+                    continue;
+                }
+
+                if (dwcFieldUri && csvFields.includes(dwcFieldUri)) {
+                    taxon[field] = csvTaxon[dwcFieldUri];
+                    setFields.push(dwcFieldUri);
+                }
+            }
+
+            // Store any fields we don't support in dynamic properties
+            taxon.dynamicProperties = csvFields.filter((f) => {
+                return !setFields.includes(f);
+            }).reduce((props, f) => {
+                props[f] = csvTaxon[f];
+                return props;
+            }, { ...taxon.dynamicProperties });
+
+            taxonBuffer.push(taxon);
+        }
+
+        await this.taxonRepo.save(taxonBuffer);
     }
 }
