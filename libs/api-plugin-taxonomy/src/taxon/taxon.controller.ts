@@ -23,7 +23,12 @@ import { TaxonDto } from './dto/TaxonDto';
 import { TaxonFindAllParams } from './dto/taxon-find-all.input.dto';
 import { TaxonFindNamesParams } from './dto/taxon-find-names.input.dto';
 import { TaxonIDandNameDto } from './dto/TaxonIDandNameDto';
-import { AuthenticatedRequest, JwtAuthGuard, TokenService } from '@symbiota2/api-auth';
+import {
+    AuthenticatedRequest,
+    JwtAuthGuard,
+    SuperAdminGuard,
+    TokenService
+} from '@symbiota2/api-auth';
 import { Taxon } from '@symbiota2/api-database';
 import { TaxonInputDto } from './dto/TaxonInputDto';
 import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
@@ -251,6 +256,7 @@ export class TaxonController {
     // @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: "Upload a CSV or DwCA file containing taxa" })
     @ApiFileInput('file')
+    @UseGuards(SuperAdminGuard)
     async uploadTaxaDwcA(@UploadedFile() file: File) {
         if (!file.mimetype.startsWith('application/zip')) {
             throw new BadRequestException('Invalid DwCA');
