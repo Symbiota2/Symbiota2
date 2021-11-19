@@ -40,9 +40,9 @@ import { EntityProvider } from '../../entity-provider.class';
 import { v4 as uuid4 } from 'uuid';
 import {
     DwCID,
-    dwcField,
+    getDwcField,
     DwCField,
-    DwCRecord
+    DwCRecord, dwcRecordType
 } from '@symbiota2/dwc';
 import { TaxaEnumTreeEntry, TaxonomicStatus, TaxonomicUnit } from '../taxonomy';
 
@@ -79,6 +79,10 @@ import { TaxaEnumTreeEntry, TaxonomicStatus, TaxonomicUnit } from '../taxonomy';
 @Index('Index_latestDateCollected', ['latestDateCollected'])
 @Entity('omoccurrences')
 export class Occurrence extends EntityProvider {
+    static get DWC_TYPE(): string {
+        return dwcRecordType(Occurrence);
+    }
+
     @PrimaryGeneratedColumn({ type: 'int', name: 'occid', unsigned: true })
     id: number;
 

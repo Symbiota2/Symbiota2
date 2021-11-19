@@ -11,7 +11,7 @@ import { createWriteStream, WriteStream, promises as fsPromises } from 'fs';
 import { basename, join as pathJoin } from 'path';
 import { v4 as uuid4 } from 'uuid';
 import { zipFiles } from '@symbiota2/api-common';
-import { dwcField, dwcRecordType, isDwCID } from '../decorators';
+import { getDwcField, dwcRecordType, isDwCID } from '../decorators';
 import { Logger } from '@nestjs/common';
 import { PassThrough } from 'stream';
 
@@ -124,7 +124,7 @@ export class DwcArchiveBuilder {
             ];
 
             for (const recordFieldName of allRecordFields) {
-                const dwcUrl = dwcField(record, recordFieldName);
+                const dwcUrl = getDwcField(record.constructor, recordFieldName);
                 if (!dwcUrl) {
                     continue;
                 }
@@ -140,7 +140,7 @@ export class DwcArchiveBuilder {
 
         // Look up the dwc record id
         for (const recordField of Object.keys(record)) {
-            if (isDwCID(record, recordField)) {
+            if (isDwCID(record.constructor, recordField)) {
                 recordID = record[recordField];
             }
         }

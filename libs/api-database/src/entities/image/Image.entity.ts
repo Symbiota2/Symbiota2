@@ -18,13 +18,19 @@ import { SpeciesProcessorRawLabel } from '../species-processor/SpeciesProcessorR
 import { ImageTag } from './ImageTag.entity';
 import { ImageAnnotation } from './ImageAnnotation.entity';
 import { EntityProvider } from '../../entity-provider.class';
+import { DwCField, DwCRecord, dwcRecordType } from '@symbiota2/dwc';
 
 @Index('Index_tid', ['taxonID'])
 @Index(['occurrenceID'])
 @Index(['photographerUID'])
 @Index(['initialTimestamp'])
+@DwCRecord('http://purl.org/dc/dcmitype/Image')
 @Entity('images')
 export class Image extends EntityProvider {
+    static get DWC_TYPE(): string {
+        return dwcRecordType(Image);
+    }
+
     @PrimaryGeneratedColumn({ type: 'int', name: 'imgid', unsigned: true })
     id: number;
 
@@ -44,6 +50,7 @@ export class Image extends EntityProvider {
     archiveUrl: string;
 
     @Column('varchar', { name: 'photographer', nullable: true, length: 100 })
+    @DwCField('http://purl.org/dc/terms/creator')
     photographerName: string;
 
     @Column('int', { name: 'photographeruid', nullable: true, unsigned: true })
@@ -56,12 +63,14 @@ export class Image extends EntityProvider {
     format: string;
 
     @Column('varchar', { name: 'caption', nullable: true, length: 100 })
+    @DwCField('http://purl.org/dc/terms/description')
     caption: string;
 
     @Column('varchar', { name: 'owner', nullable: true, length: 250 })
     owner: string;
 
     @Column('varchar', { name: 'sourceurl', nullable: true, length: 255 })
+    @DwCField('http://purl.org/dc/terms/identifier')
     sourceUrl: string;
 
     @Column('varchar', { name: 'referenceUrl', nullable: true, length: 255 })
@@ -71,9 +80,11 @@ export class Image extends EntityProvider {
     copyright: string;
 
     @Column('varchar', { name: 'rights', nullable: true, length: 255 })
+    @DwCField('http://purl.org/dc/terms/rights')
     rights: string;
 
     @Column('varchar', { name: 'accessrights', nullable: true, length: 255 })
+    @DwCField('http://purl.org/dc/terms/accessRights')
     accessRights: string;
 
     @Column('varchar', { name: 'locality', nullable: true, length: 250 })
@@ -115,6 +126,7 @@ export class Image extends EntityProvider {
         name: 'InitialTimeStamp',
         default: () => 'CURRENT_TIMESTAMP()',
     })
+    @DwCField('http://purl.org/dc/terms/created')
     initialTimestamp: Date;
 
     @OneToMany(() => TraitAttribute, (tmattributes) => tmattributes.image)

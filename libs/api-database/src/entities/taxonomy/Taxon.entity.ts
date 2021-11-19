@@ -37,18 +37,21 @@ import { TaxonDescriptionBlock } from './TaxonDescriptionBlock.entity';
 import { User } from '../user/User.entity';
 import { CharacteristicTaxonLink } from '../characteristic';
 import { EntityProvider } from '../../entity-provider.class';
-import { DwCField, DwCID, DwCRecord } from '@symbiota2/dwc';
+import { DwCField, DwCID, DwCRecord, dwcRecordType } from '@symbiota2/dwc';
 import { TaxonomicUnit } from './TaxonomicUnit.entity';
 
 @DwCRecord('http://rs.tdwg.org/dwc/terms/Taxon')
 @Index('sciname_unique', ['scientificName', 'rankID', 'author'], { unique: true })
 @Index('rankid_index', ['rankID'])
-@Index('unitname1_index', ['unitName1', 'unitName2'])
 @Index('idx_taxacreated', ['initialTimestamp'])
 @Index(['lastModifiedUID'])
 @Index('sciname_index', ['scientificName'])
 @Entity('taxa')
 export class Taxon extends EntityProvider {
+    static get DWC_TYPE(): string {
+        return dwcRecordType(Taxon);
+    }
+
     @DwCID()
     @DwCField('http://rs.tdwg.org/dwc/terms/taxonID')
     @PrimaryGeneratedColumn({ type: 'int', name: 'TID', unsigned: true })
@@ -64,23 +67,37 @@ export class Taxon extends EntityProvider {
     @Column('varchar', { name: 'SciName', length: 250 })
     scientificName: string;
 
+    get unitName1(): string {
+        return this.scientificName.split(' ')[0];
+    }
+
+    get unitName2(): string {
+        const parts = this.scientificName.split(' ');
+        if (parts.length > 1) {
+            return parts[1];
+        }
+        return parts[0];
+    }
+
+    get unitName3(): string {
+        const parts = this.scientificName.split(' ');
+        if (parts.length > 2) {
+            return parts[2];
+        }
+        if (parts.length > 1) {
+            return parts[1];
+        }
+        return parts[0];
+    }
+
     @Column('varchar', { name: 'UnitInd1', nullable: true, length: 1 })
     unitInd1: string;
-
-    @Column('varchar', { name: 'UnitName1', length: 50 })
-    unitName1: string;
 
     @Column('varchar', { name: 'UnitInd2', nullable: true, length: 1 })
     unitInd2: string;
 
-    @Column('varchar', { name: 'UnitName2', nullable: true, length: 50 })
-    unitName2: string;
-
     @Column('varchar', { name: 'UnitInd3', nullable: true, length: 7 })
     unitInd3: string;
-
-    @Column('varchar', { name: 'UnitName3', nullable: true, length: 35 })
-    unitName3: string;
 
     @DwCField('http://rs.tdwg.org/dwc/terms/scientificNameAuthorship')
     @Column('varchar', { name: 'Author', nullable: true, length: 100 })
@@ -101,7 +118,7 @@ export class Taxon extends EntityProvider {
     source: string;
 
     @DwCField('http://rs.tdwg.org/dwc/terms/taxonRemarks')
-    @Column('varchar', { name: 'Notes', nullable: true, length: 250 })
+    @Column('text', { name: 'Notes', nullable: true })
     notes: string;
 
     @Column('varchar', { name: 'Hybrid', nullable: true, length: 50 })
@@ -126,6 +143,10 @@ export class Taxon extends EntityProvider {
         default: () => 'CURRENT_TIMESTAMP()',
     })
     initialTimestamp: Date;
+
+    @Column('simple-json', { nullable: true })
+    @DwCField('http://rs.tdwg.org/dwc/terms/dynamicProperties')
+    dynamicProperties: Record<string, unknown>;
 
     @OneToMany(() => Unknown, (unknowns) => unknowns.taxon)
     unknowns: Promise<Unknown[]>;
@@ -252,6 +273,17 @@ export class Taxon extends EntityProvider {
             .getOne();
     }
 
+    async setAncestor(taxaEnumRepo: Repository<TaxaEnumTreeEntry>, ancestor: Taxon) {
+        const oldAncestorLink = await taxaEnumRepo.findOne({
+            relations: ['parentTaxon'],
+            where: {
+                taxonID: this.id,
+                'parentTaxon.rankID': ancestor.rankID
+            }
+        });
+        console.log(JSON.stringify(oldAncestorLink));
+    }
+
     private async ancestorSciName(ancestorRankName: string): Promise<string> {
         const db = getConnection();
         const taxonRepo = db.getRepository(Taxon);
@@ -275,6 +307,37 @@ export class Taxon extends EntityProvider {
         }
 
         return ancestor.scientificName;
+    }
+
+    async getRank(): Promise<TaxonomicUnit> {
+        const db = getConnection();
+        const taxonUnitRepo = db.getRepository(TaxonomicUnit);
+        return taxonUnitRepo.findOne({
+            kingdomName: this.kingdomName,
+            rankID: this.rankID
+        });
+    }
+
+    async setRank(rankName: string): Promise<TaxonomicUnit> {
+        const db = getConnection();
+        const taxonUnitRepo = db.getRepository(TaxonomicUnit);
+        const rank = await taxonUnitRepo.findOne({
+            kingdomName: this.kingdomName,
+            rankName: rankName
+        });
+        if (!rank) {
+            throw new Error(
+                `Rank '${rankName}' not found in kingdom ${this.kingdomName}`
+            );
+        }
+        this.rankID = rank.rankID;
+        return rank;
+    }
+
+    @DwCField('http://rs.tdwg.org/dwc/terms/taxonRank')
+    async rankName(): Promise<string> {
+        const rank = await this.getRank();
+        return rank !== null ? rank.rankName : null;
     }
 
     @DwCField('http://rs.tdwg.org/dwc/terms/kingdom')
