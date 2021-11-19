@@ -133,4 +133,21 @@ export class TaxonomicEnumTreeService {
 
     }
 
+    /*
+    Move a taxon id to a new parent taxon id within the context of a taxa authority id
+    */
+    move(id: number, parentId: number, authorityID: number): Observable<TaxonomicEnumTreeListItem> {
+        const url = this.createQueryBuilder()
+            .move()
+            .id(id)
+            .parentId(id)
+            .authorityId(authorityID)
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, Record<string, unknown>>(query)
+            .pipe(map((o) => TaxonomicEnumTreeListItem.fromJSON(o)))
+
+    }
+
 }

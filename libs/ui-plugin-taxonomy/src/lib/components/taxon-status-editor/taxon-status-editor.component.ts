@@ -52,7 +52,7 @@ export class TaxonStatusEditorComponent implements OnInit {
     allTaxonomicAuthorityList = []
 
     taxon: TaxonListItem
-    dataSource
+    //dataSource
     private taxonID: string
     private idCounter = 0
     userID : number = null
@@ -279,8 +279,12 @@ export class TaxonStatusEditorComponent implements OnInit {
 
     openDialog(action, obj) {
         obj.action = action
+        obj.currentParentName = this.currentParentName
+        obj.taxonomicAuthorityID = this.currentAuthorityID
+        obj.taxonID = this.taxonID
         let dialogRef = null
         if (action == 'Update Parent') {
+            console.log("updating parent")
             dialogRef = this.dialog.open(TaxonStatusParentEditorDialogComponent, {
                 width: '100',
                 data: obj
