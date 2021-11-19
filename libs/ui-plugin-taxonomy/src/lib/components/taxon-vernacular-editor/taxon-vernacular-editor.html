@@ -1,20 +1,11 @@
 
-<form (ngSubmit)="onSubmit()">
-    <!--
-    <button class="editor-button" (click)="onAddCommonName()">{{"taxon.editor.add.button.label" | translate}} </button>
-    -->
-    <button style='float:right' mat-icon-button>
+<form>
+    <button *ngIf='userCanEdit' style='float:right' mat-icon-button>
         <mat-icon color="primary" (click)="onAddCommonName()">add</mat-icon>
     </button>
     <br/>
     <mat-table #table [dataSource]="dataSource">
 
-        <!-- Position Column
-        <ng-container matColumnDef="position">
-            <mat-header-cell *matHeaderCellDef> No. </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.position}} </mat-cell>
-        </ng-container>
-        -->
         <!-- Name Column -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>{{"taxon.editor.common.name" | translate}}</mat-header-cell>
@@ -51,64 +42,22 @@
         <ng-container matColumnDef="sortSequence">
             <mat-header-cell *matHeaderCellDef>{{'taxon.editor.common.sortSequence' | translate}}</mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.sortSequence}} </mat-cell>
-            <!--
-            <mat-cell *matCellDef="let element">
-                <mat-form-field floatLabel="never" appearance="fill">
-                    <input matInput placeholder="{{'taxon.editor.common.sortSequence' | translate}}"
-                           [value]="element.sortSequence"
-                           [(ngModel)]="element.sortSequence"
-                           [ngModelOptions]="{standalone: true}">
-                </mat-form-field>
-            </mat-cell>
-            -->
         </ng-container>
 
         <!-- Action Column -->
         <ng-container matColumnDef="action">
-            <mat-header-cell *matHeaderCellDef> {{'taxon.editor.common.action' | translate}} </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef> <div *ngIf='userCanEdit'>{{'taxon.editor.common.action' | translate}}</div> </mat-header-cell>
             <mat-cell *matCellDef="let element">
-                <!--
-                <button class="editor-button"
-                        (click)="openDialog('Update',element)">
-                    {{'taxon.editor.dialog.edit' | translate}}
-                </button>
-                                <button class="editor-button"
-                        (click)="openDialog('Delete',element)">
-                    {{'taxon.editor.dialog.delete' | translate}}
-                </button>
-
-                <button
-                    mat-raised-button
-                    color="primary"
-                    (click)="openDialog('Update',element)">
-                    <span> <i class="fa fa-pencil" uib-tooltip="Edit" tooltip-trigger="mouseenter" tooltip-append-to-body="true" tooltip-placement="left"></i>
-         </span>
-                </button>
-                 -->
-                <button mat-icon-button>
-                    <mat-icon color="warn" (click)="openDialog('Delete',element)">delete</mat-icon>
-                </button>
-                <button mat-icon-button>
-                    <mat-icon color="primary" (click)="openDialog('Update',element)">edit</mat-icon>
-                </button>
-
+                <div *ngIf='userCanEdit'>
+                    <button mat-icon-button>
+                        <mat-icon color="warn" (click)="openDialog('Delete',element)">delete</mat-icon>
+                    </button>
+                    <button mat-icon-button>
+                        <mat-icon color="primary" (click)="openDialog('Update',element)">edit</mat-icon>
+                    </button>
+                </div>
             </mat-cell>
         </ng-container>
-
-        <!-- Language Column
-        <ng-container matColumnDef="language">
-            <mat-header-cell *matHeaderCellDef>{{"taxon.editor.common.language" | translate}}</mat-header-cell>
-            <mat-cell *matCellDef="let element">
-                <mat-form-field floatLabel="never" appearance="fill">
-                    <mat-select [(value)]="element.language"
-                                placeholder="{{'taxon.editor.common.language' | translate}}">
-                        <mat-option>None</mat-option>
-                        <mat-option value="Yes">Yes</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </mat-cell>
-        </ng-container>
-         -->
 
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>

@@ -10,16 +10,17 @@ import {
     Delete,
     NotFoundException,
     Patch,
-    ParseArrayPipe, SerializeOptions
+    ParseArrayPipe, SerializeOptions, UseGuards, ForbiddenException, Req
 } from '@nestjs/common';
 import { TaxonDescriptionStatementService } from './taxonDescriptionStatement.service'
-import { ApiTags, ApiResponse, ApiOperation, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiOperation, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { TaxonDescriptionStatementDto } from './dto/TaxonDescriptionStatementDto'
 import { TaxonDescriptionStatementFindAllParams } from './dto/taxonDescriptionStatement-find-all.input.dto'
 import { TaxonDescriptionBlockDto } from '../taxonDescriptionBlock/dto/TaxonDescriptionBlockDto';
 import { TaxonDescriptionBlockInputDto } from '../taxonDescriptionBlock/dto/TaxonDescriptionBlockInputDto';
 import { TaxonDescriptionStatementInputDto } from './dto/TaxonDescriptionStatemenInputtDto';
 import { TaxonDescriptionBlock, TaxonDescriptionStatement } from '@symbiota2/api-database';
+import { AuthenticatedRequest, JwtAuthGuard, TokenService } from '@symbiota2/api-auth';
 
 @ApiTags('TaxonDescriptionStatement')
 @Controller('taxonDescriptionStatement')
@@ -51,21 +52,34 @@ export class TaxonDescriptionStatementController {
         return dto
     }
 
+    private canEdit(request) {
+        // SuperAdmins and TaxonProfileEditors have editing privileges
+        const isSuperAdmin = TokenService.isSuperAdmin(request.user)
+        const isProfileEditor = TokenService.isTaxonProfileEditor(request.user)
+        return isSuperAdmin || isProfileEditor
+    }
+
     @Post()
     @ApiOperation({
         summary: "Create a new description statement"
     })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @HttpCode(HttpStatus.OK)
-    //@UseGuards(JwtAuthGuard)
-    //@ApiBearerAuth()
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDescriptionStatementDto })
     //@SerializeOptions({ groups: ['single'] })
     @ApiBody({ type: TaxonDescriptionStatementInputDto, isArray: true })
     /**
-     @see - @link TaxonDescriptionBlockInputDto
+     @see - @link TaxonDescriptionStatementInputDto
      **/
-    async create(@Body(new ParseArrayPipe({ items: TaxonDescriptionStatementInputDto })) data: TaxonDescriptionStatementInputDto[]): Promise<TaxonDescriptionStatementDto> {
-        //console.log('taxon id and uid ' + (typeof data) + data[0].taxonID + data[0].creatorUID)
+    async create(
+        @Req() request: AuthenticatedRequest,
+        @Body(new ParseArrayPipe({ items: TaxonDescriptionStatementInputDto })) data: TaxonDescriptionStatementInputDto[]
+    ): Promise<TaxonDescriptionStatementDto> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
         const block = await this.myService.create(data[0])
         const dto = new TaxonDescriptionStatementDto(block)
         return dto
@@ -75,12 +89,22 @@ export class TaxonDescriptionStatementController {
     @ApiOperation({
         summary: "Update a taxon description statement by ID"
     })
-    //@ProtectCollection('id')
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDescriptionStatement })
-    @SerializeOptions({ groups: ['single'] })
-    async updateByID(@Param('id') id: number, @Body() data: TaxonDescriptionStatement): Promise<TaxonDescriptionStatement> {
-        //console.log("data is " + data.caption)
-        const statement = await this.myService.updateByID(id, data)
+    @ApiBody({ type: TaxonDescriptionStatementInputDto, isArray: true })
+    //@SerializeOptions({ groups: ['single'] })
+    async updateByID(
+        @Req() request: AuthenticatedRequest,
+        @Param('id') id: number,
+        @Body(new ParseArrayPipe({ items: TaxonDescriptionStatementInputDto })) data: TaxonDescriptionStatement[]
+    ): Promise<TaxonDescriptionStatement> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const statement = await this.myService.updateByID(id, data[0])
         if (!statement) {
             throw new NotFoundException()
         }
@@ -91,10 +115,15 @@ export class TaxonDescriptionStatementController {
     @ApiOperation({
         summary: "Delete a taxon description statement by ID"
     })
-    //@ProtectCollection('id')
     @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @ApiResponse({ status: HttpStatus.NO_CONTENT })
-    async deleteByID(@Param('id') id: number): Promise<void> {
+    async deleteByID(@Req() request: AuthenticatedRequest, @Param('id') id: number): Promise<void> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
         const block = await this.myService.deleteByID(id);
         if (!block) {
             throw new NotFoundException();

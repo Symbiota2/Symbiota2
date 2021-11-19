@@ -1,0 +1,35 @@
+<symbiota2-expansion-panel label='{{"taxon.status.placement.label" | translate}}'>
+    <mat-form-field appearance="fill">
+        <mat-label>{{"taxonomy.viewer.label.authority" | translate}}</mat-label>
+        <mat-select field-class="symbiota2-field-class"
+                    placeholder='{{"taxonomy.viewer.label.authority" | translate}}'
+                    [(value)]="currentAuthorityID"
+                    (selectionChange)="authorityChangeAction()">
+            <mat-option *ngFor="let authority of taxonomicAuthorityList"
+                        [value]="authority.id" >{{ authority.name }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <div><b>{{"taxon.status.status.label" | translate}}</b>:
+        <span *ngIf='currentIsAccepted'>{{"taxon.status.accepted" | translate}}</span>
+        <span style="color:#ff0000" *ngIf='!currentIsAccepted'>{{"taxon.status.not.accepted" | translate}}</span>
+    </div>
+
+    <div>
+        <b>{{"taxon.status.parent.taxon.label" | translate}}</b>: {{currentParentName}}
+        <button *ngIf='userCanEdit' mat-icon-button>
+            <mat-icon color="primary" (click)="openDialog('Update Parent',taxon)">edit</mat-icon>
+        </button>
+    </div>
+
+    <div *ngIf='!currentIsAccepted'>
+        <b>{{"taxon.status.accepted.taxon.label" | translate}}</b>: {{currentAcceptedName}}
+        <button *ngIf='userCanEdit' mat-icon-button>
+            <mat-icon color="primary" (click)="openDialog('Update Accepted',taxon)">edit</mat-icon>
+        </button>
+    </div>
+    <div *ngIf='currentIsAccepted'>
+        <!-- List of synonnyms
+        -->
+    </div>
+</symbiota2-expansion-panel>

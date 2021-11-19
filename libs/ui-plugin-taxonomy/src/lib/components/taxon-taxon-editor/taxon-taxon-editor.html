@@ -1,8 +1,9 @@
 <symbiota2-expansion-panel label='{{taxon?.scientificName}}'>
-    <button style='float:right' mat-icon-button>
+    <button *ngIf='userCanEdit' style='float:right' mat-icon-button>
         <mat-icon color="primary" (click)="openDialog('Update',taxon)">edit</mat-icon>
     </button>
     <div><b>{{"taxon.taxon.editor.kingdomName" | translate}}</b>: {{taxon?.kingdomName}}</div>
+    <div><b>{{"taxon.taxon.editor.rankName" | translate}}</b>: {{rankName}}</div>
     <div><b>{{"taxon.taxon.editor.rankID" | translate}}</b>: {{taxon?.rankID}}</div>
     <div><b>{{"taxon.taxon.editor.scientificName" | translate}}</b>: {{taxon?.scientificName}}</div>
     <div><b>{{"taxon.taxon.editor.unitName1" | translate}}</b>: {{taxon?.unitName1}}</div>

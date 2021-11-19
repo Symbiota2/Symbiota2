@@ -1,7 +1,6 @@
 import { Q_PARAM_TAXAIDS } from '../../../constants';
-import { TaxonDescriptionBlockQueryBuilder } from '../taxonDescriptionBlock/taxonDescriptionBlock-query-builder';
 
-export class TaxonDescriptionStatementQueryBuilder {
+export class TaxonomicUnitQueryBuilder {
     protected baseUrl: string
     protected namesUrl: URL
     protected nameUrl: URL
@@ -9,15 +8,11 @@ export class TaxonDescriptionStatementQueryBuilder {
 
     constructor(apiBaseUrl: string) {
         this.baseUrl = apiBaseUrl
-        this.url = new URL(`${apiBaseUrl}/taxonDescriptionStatement`)
+        this.url = new URL(`${apiBaseUrl}/taxonomicUnit`)
     }
 
     findAll(): FindAllBuilder {
         return new FindAllBuilder(this.baseUrl)
-    }
-
-    findDescriptions(): FindDescriptionsBuilder {
-        return new FindDescriptionsBuilder(this.baseUrl)
     }
 
     findOne(): FindOneBuilder {
@@ -41,7 +36,7 @@ export class TaxonDescriptionStatementQueryBuilder {
     }
 }
 
-class CreateOneBuilder extends TaxonDescriptionStatementQueryBuilder {
+class CreateOneBuilder extends TaxonomicUnitQueryBuilder {
     protected _myID: number;
 
     myID(id: number): CreateOneBuilder {
@@ -54,7 +49,7 @@ class CreateOneBuilder extends TaxonDescriptionStatementQueryBuilder {
     }
 }
 
-class DeleteOneBuilder extends TaxonDescriptionStatementQueryBuilder {
+class DeleteOneBuilder extends TaxonomicUnitQueryBuilder {
     protected _id: number;
 
     id(id: number): DeleteOneBuilder {
@@ -70,7 +65,7 @@ class DeleteOneBuilder extends TaxonDescriptionStatementQueryBuilder {
     }
 }
 
-class UploadBuilder extends TaxonDescriptionStatementQueryBuilder {
+class UploadBuilder extends TaxonomicUnitQueryBuilder {
     private _id: number = null;
 
     id(id: number): UploadBuilder {
@@ -87,49 +82,27 @@ class UploadBuilder extends TaxonDescriptionStatementQueryBuilder {
     }
 }
 
-
-class FindOneBuilder extends TaxonDescriptionStatementQueryBuilder {
-    protected taxonID: number = null
+class FindOneBuilder extends TaxonomicUnitQueryBuilder {
+    protected _taxonID: number = null
 
     id(id: number): FindOneBuilder {
-        this.taxonID = id
+        this._taxonID = id
         return this
     }
 
     build(): string {
-        this.url.pathname = `${this.url.pathname}/${this.taxonID}`;
+        this.url.pathname = `${this.url.pathname}/${this._taxonID}`
         return super.build()
     }
 }
 
-class FindAllBuilder extends TaxonDescriptionStatementQueryBuilder {
-    protected _taxonIDs: number[] = [];
-
-    taxonIDs(ids: number[]): FindAllBuilder {
-        this._taxonIDs = ids
-        return this
-    }
-
-    build(): string {
-        this._taxonIDs.forEach((id) => {
-            this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString());
-        })
-
-        return super.build();
-    }
-}
-
-class FindDescriptionsBuilder extends TaxonDescriptionStatementQueryBuilder {
+class FindAllBuilder extends TaxonomicUnitQueryBuilder {
     protected _taxonIDs: number[] = []
 
-    constructor(apiBaseUrl: string) {
-        super(apiBaseUrl)
-        this.baseUrl = apiBaseUrl
-        this.url = new URL(`${apiBaseUrl}/taxonDescriptionStatement/descriptions`)
-    }
-
-    taxonIDs(ids: number[]): FindDescriptionsBuilder {
-        this._taxonIDs = ids
+    IDs(ids: number[]): FindAllBuilder {
+        if (ids) {
+            this._taxonIDs = ids
+        }
         return this
     }
 

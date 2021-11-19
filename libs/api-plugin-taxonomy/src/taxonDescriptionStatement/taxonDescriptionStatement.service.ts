@@ -30,6 +30,13 @@ export class TaxonDescriptionStatementService extends BaseService<TaxonDescripti
     Creata a taxon description statement
      */
     async create(data: Partial<TaxonDescriptionStatement>): Promise<TaxonDescriptionStatement> {
+        // fill in fields that need a default value
+        if (!data.heading) {
+            data.heading = ""
+        }
+        if (!data.statement) {
+            data.statement = ""
+        }
         const taxon = this.myRepository.create(data)
         return this.myRepository.save(taxon)
     }

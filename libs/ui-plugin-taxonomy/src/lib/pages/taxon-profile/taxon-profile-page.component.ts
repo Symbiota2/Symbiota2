@@ -6,6 +6,8 @@ import {
     TaxonDescriptionBlockService, TaxonListItem, TaxonomicStatusListItem, TaxonomicStatusService, TaxonService
 } from '@symbiota2/ui-plugin-taxonomy';
 import { ImageListItem, ImageService } from '@symbiota2/ui-plugin-image';
+import { filter } from 'rxjs/operators';
+import { UserService } from '@symbiota2/ui-common';
 
 @Component({
     selector: 'taxon-profile',
@@ -20,9 +22,11 @@ export class TaxonProfilePageComponent implements OnInit {
     images: ImageListItem[] = []
     taxon: TaxonListItem
     taxonomicStatus: TaxonomicStatusListItem
+    userID : number = null
+    userCanEdit: boolean = false
 
     constructor(
-        //private readonly userService: UserService,  // TODO: needed for species hiding
+        private readonly userService: UserService,
         private readonly taxonDescriptionBlockService: TaxonDescriptionBlockService,
         private readonly imageService: ImageService,
         private readonly taxonStatusService: TaxonomicStatusService,
@@ -40,6 +44,13 @@ export class TaxonProfilePageComponent implements OnInit {
             // Load the profile
             this.loadProfile(parseInt(this.taxonID))
         })
+
+        this.userService.currentUser
+            .pipe(filter((user) => user !== null))
+            .subscribe((user) => {
+                this.userID = user.uid
+                this.userCanEdit = user.canEditTaxonProfile(user.uid)
+            })
     }
 
     /*

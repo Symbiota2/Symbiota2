@@ -1,4 +1,5 @@
 import { Q_PARAM_TAXAIDS, Q_PARAM_AUTHORITYID, Q_PARAM_PARTIALNAME } from '../../../constants';
+import { TaxonDescriptionBlockQueryBuilder } from '../taxonDescriptionBlock/taxonDescriptionBlock-query-builder';
 
 export class TaxonQueryBuilder {
     protected baseUrl: string
@@ -33,9 +34,71 @@ export class TaxonQueryBuilder {
         return new FindOneBuilder(this.baseUrl)
     }
 
+    findOneWithSynonyms(): FindOneWithSynonymsBuilder {
+        return new FindOneWithSynonymsBuilder(this.baseUrl)
+    }
+
+    create(): CreateOneBuilder {
+        return new CreateOneBuilder(this.baseUrl);
+    }
+
+    delete(): DeleteOneBuilder {
+        return new DeleteOneBuilder(this.baseUrl);
+    }
+
+    upload(): UploadBuilder {
+        return new UploadBuilder(this.baseUrl);
+    }
+
     build(): string {
 
         return this.url.toString()
+    }
+}
+
+class CreateOneBuilder extends TaxonQueryBuilder {
+    protected _myID: number;
+
+    myID(id: number): CreateOneBuilder {
+        this._myID = id;
+        return this;
+    }
+
+    build(): string {
+        return super.build();
+    }
+}
+
+class DeleteOneBuilder extends TaxonQueryBuilder {
+    protected _id: number;
+
+    id(id: number): DeleteOneBuilder {
+        this._id = id
+        return this;
+    }
+
+    build(): string {
+        if (this._id) {
+            this.url.pathname += `/${this._id}`
+        }
+        return super.build()
+    }
+}
+
+class UploadBuilder extends TaxonQueryBuilder {
+    private _id: number = null;
+
+    id(id: number): UploadBuilder {
+        this._id = id;
+        return this;
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}`;
+        if (this._id) {
+            this.url.pathname += `/${this._id}`;
+        }
+        return super.build();
     }
 }
 
@@ -91,6 +154,29 @@ class FindOneBuilder extends TaxonQueryBuilder {
 
     build(): string {
         this.url.pathname = `${this.url.pathname}/${this.taxonID}`
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
+        }
+        return super.build()
+    }
+}
+
+class FindOneWithSynonymsBuilder extends TaxonQueryBuilder {
+    protected taxonID: number = null
+
+    id(id: number): FindOneWithSynonymsBuilder {
+        this.taxonID = id
+        return this
+    }
+
+
+    authorityID(authorityID? : string): FindOneWithSynonymsBuilder {
+        this._authorityID = authorityID? authorityID : undefined
+        return this
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/withSynonyms/${this.taxonID}`
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
         }

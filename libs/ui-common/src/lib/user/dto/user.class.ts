@@ -51,6 +51,20 @@ export class User {
         return this.isSuperAdmin() || isGlobalEditor || isGlobalAdmin || isAdmin;
     }
 
+    canEditTaxonProfile(id: number): boolean {
+        const isGlobalAdmin = this.hasRole(ApiUserRoleName.TAXON_PROFILE_EDITOR);
+        const isAdmin = this.hasRole(ApiUserRoleName.TAXON_PROFILE_EDITOR, id);
+
+        return this.isSuperAdmin() || isGlobalAdmin || isAdmin;
+    }
+
+    canEditTaxon(id: number): boolean {
+        const isGlobalAdmin = this.hasRole(ApiUserRoleName.TAXON_EDITOR);
+        const isAdmin = this.hasRole(ApiUserRoleName.TAXON_EDITOR, id);
+
+        return this.isSuperAdmin() || isGlobalAdmin || isAdmin;
+    }
+
     canEditProject(id: number): boolean {
         const isGlobalAdmin = this.hasRole(ApiUserRoleName.PROJECT_ADMIN);
         const isAdmin = this.hasRole(ApiUserRoleName.PROJECT_ADMIN, id);

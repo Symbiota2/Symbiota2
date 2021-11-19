@@ -31,7 +31,10 @@ import {
     TaxonService,
     TaxonomicStatusService,
     TaxonVernacularService,
-    TaxonomicAuthorityService, TaxonDescriptionBlockService, TaxonDescriptionStatementService
+    TaxonomicAuthorityService,
+    TaxonDescriptionBlockService,
+    TaxonDescriptionStatementService,
+    TaxonomicUnitService
 } from './services';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
@@ -47,10 +50,12 @@ import {
     TaxonDescriptionEditorComponent,
     TaxonDescriptionStatementDialogComponent,
     TaxonTaxonEditorComponent,
-    TaxonTaxonDialogComponent
+    TaxonTaxonDialogComponent,
+    TaxonStatusEditorComponent
 } from './components';
 import { TaxonEditorPageComponent } from './pages'
 import { MatGridListModule } from '@angular/material/grid-list';
+import { TaxonStatusParentEditorDialogComponent } from './components/taxon-status-parent-editor-dialog/taxon-status-parent-editor-dialog.component';
 
 @NgModule({
   imports: [
@@ -95,7 +100,9 @@ import { MatGridListModule } from '@angular/material/grid-list';
         TaxonDescriptionEditorComponent,
         TaxonDescriptionStatementDialogComponent,
         TaxonTaxonEditorComponent,
-        TaxonTaxonDialogComponent
+        TaxonTaxonDialogComponent,
+        TaxonStatusEditorComponent,
+        TaxonStatusParentEditorDialogComponent
     ],
     providers: [
         TaxonService,
@@ -105,6 +112,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
         TaxonDescriptionBlockService,
         TaxonDescriptionStatementService,
         TaxonomicAuthorityService,
+        TaxonomicUnitService
     ],
     entryComponents: [
         TaxaSearchPage,
@@ -117,7 +125,9 @@ import { MatGridListModule } from '@angular/material/grid-list';
         TaxonDescriptionEditorComponent,
         TaxonDescriptionStatementDialogComponent,
         TaxonTaxonEditorComponent,
-        TaxonTaxonDialogComponent
+        TaxonTaxonDialogComponent,
+        TaxonStatusEditorComponent,
+        TaxonStatusParentEditorDialogComponent
     ]
 })
 export class TaxonomyPlugin extends SymbiotaUiPlugin {

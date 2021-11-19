@@ -2,25 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonDescriptionBlockListItem,
-    TaxonDescriptionBlockService,
-    TaxonListItem,
-    TaxonomicAuthorityService,
-    TaxonomicStatusService,
+    TaxonDescriptionBlockInputDto,
+    TaxonListItem, TaxonomicUnitService,
     TaxonService,
-    TaxonVernacularListItem,
-    TaxonVernacularService,
-    TaxonomicEnumTreeService,
-    TaxonDescriptionDialogComponent,
-    TaxonDescriptionStatementListItem,
-    TaxonDescriptionStatementDialogComponent, TaxonTaxonDialogComponent
+    TaxonTaxonDialogComponent
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TranslateService } from '@ngx-translate/core'
-import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
-import { TaxonEditorDialogComponent } from '../../components';
-import { Expose, Type } from 'class-transformer';
-import { TaxonomicStatusOnlyListItem } from '../../dto/taxon-status-only-list-item';
+import { AlertService, UserService } from '@symbiota2/ui-common';
+import { filter } from 'rxjs/operators';
+import { TaxonInputDto } from '../../dto/taxonInputDto';
 
 export interface TaxonInfo {
     kingdomName: string
@@ -49,15 +40,21 @@ export class TaxonTaxonEditorComponent implements OnInit {
     dataSource
     private taxonID: string
     private idCounter = 0
+    userID : number = null
+    userCanEdit: boolean = false
+    ranksIDtoName = new Map()
+    rankName = ""
 
     constructor(
-        //private readonly userService: UserService,  // TODO: needed for species hiding
+        private readonly userService: UserService,
         //private readonly taxonBlockService: TaxonDescriptionBlockService,
         private readonly taxaService: TaxonService,
+        private readonly taxonomicUnitService: TaxonomicUnitService,
         //private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
         //private readonly taxonomicStatusService: TaxonomicStatusService,
         //private readonly taxonVernacularService: TaxonVernacularService,
         //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
+        private readonly alertService: AlertService,
         private router: Router,
         private formBuilder: FormBuilder,
         private currentRoute: ActivatedRoute,
@@ -71,11 +68,19 @@ export class TaxonTaxonEditorComponent implements OnInit {
     Called when Angular starts
      */
     ngOnInit() {
+
         this.currentRoute.paramMap.subscribe(params => {
             this.taxonID = params.get('taxonID')
             // Load the taxon
             this.loadTaxon(parseInt(this.taxonID))
         })
+
+        this.userService.currentUser
+            .pipe(filter((user) => user !== null))
+            .subscribe((user) => {
+                this.userID = user.uid
+                this.userCanEdit = user.canEditTaxon(user.uid)
+            })
     }
 
     /*
@@ -86,6 +91,29 @@ export class TaxonTaxonEditorComponent implements OnInit {
             .subscribe((item) => {
                 this.taxon = item
                 this.dataSource = this.taxon
+                const key = item.rankID + item.kingdomName
+                //this.rankName = this.taxonomicUnitService.lookupRankName(item.rankID,item.kingdomName)
+                this.ranksIDtoName = this.taxonomicUnitService.getRanksLookup()
+                if (this.ranksIDtoName == null) {
+                    // First load the names of the ranks
+                    this.taxonomicUnitService.findAll().subscribe((ranks) => {
+                        ranks.forEach((rank) => {
+                            this.ranksIDtoName.set(rank.rankID,rank.rankName)
+                        })
+                    })
+                    this.rankName = this.ranksIDtoName.has(key) ? this.ranksIDtoName.get(key) : 'unknown'
+                } else {
+                    this.rankName = this.ranksIDtoName.has(key) ? this.ranksIDtoName.get(key) : 'unknown'
+                }
+
+
+
+                /* Name is cache in service
+                this.rankName = this.ranksIDtoName.has(item.rankID) ?
+                    this.ranksIDtoName.get(item.rankID)
+                    : 'unknown'
+
+                 */
             })
     }
 
@@ -104,13 +132,12 @@ export class TaxonTaxonEditorComponent implements OnInit {
         dialogRef.afterClosed().subscribe(result => {
             if (result.event == 'Update') {
                 this.updateData(result.data)
-            } else if (result.event == 'Delete') {
-                this.deleteData(result.data)
             }
         })
     }
 
     updateData(obj) {
+        // Copy data to current state
         this.taxon.scientificName = obj.scientificName
         this.taxon.unitName1 = obj.unitName1
         this.taxon.unitName2 = obj.unitName2
@@ -124,10 +151,54 @@ export class TaxonTaxonEditorComponent implements OnInit {
         this.taxon.notes = obj.notes
         this.taxon.hybrid = obj.hybrid
         this.taxon.securityStatus = obj.securityStatus
+        // Construct a new taxon
+        const data = {
+            id: this.taxonID,
+            scientificName: obj.scientificName,
+            unitName1: obj.unitName1,
+            unitName2: obj.unitName2,
+            unitName3: obj.unitName3,
+            kingdomName: obj.kingdomName,
+            rankID: obj.rankID,
+            author: obj.author,
+            phyloSortSequence: obj.phyloSortSequence,
+            status: obj.status,
+            source: obj.source,
+            notes: obj.notes,
+            hybrid: obj.hybrid,
+            securityStatus: obj.securityStatus,
+            initialTimestamp: new Date()
+        }
+        const newTaxon = new TaxonInputDto(data)
+        this.taxaService
+            .update(new TaxonInputDto(data))
+            .subscribe((taxon)=> {
+                if (taxon) {
+                    // It has been updated in the database
+                    this.showMessage("taxon.editor.updated")
+                } else {
+                    // Error in adding
+                    this.showError("taxon.editor.updated.error")
+                }
+            })
     }
 
-    deleteData(obj) {
+    /*
+    Internal routine to encapsulate the show error message at the bottom in case something goes awry
+    */
+    private showError(s) {
+        this.translate.get(s).subscribe((r)  => {
+            this.alertService.showError(r)
+        })
+    }
 
+    /*
+    Internal routine to encapsulate the show message at the bottom to confirm things actually happened
+    */
+    private showMessage(s) {
+        this.translate.get(s).subscribe((r)  => {
+            this.alertService.showMessage(r)
+        })
     }
 
 }

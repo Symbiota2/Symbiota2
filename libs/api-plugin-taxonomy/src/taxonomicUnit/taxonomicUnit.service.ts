@@ -22,7 +22,11 @@ export class TaxonomicUnitService extends BaseService<TaxonomicUnit>{
         const { limit, offset, ...qParams } = params;
 
         return await (qParams.id)?
-            this.myRepository.find({take: limit, skip: offset, where: { id: In(params.id)}})
+            this.myRepository.find({
+                take: limit,  // Set default limit high since table is small
+                skip: offset,
+                where: { id: In(params.id) }
+            })
             : this.myRepository.find({take: limit, skip: offset})
     }
 

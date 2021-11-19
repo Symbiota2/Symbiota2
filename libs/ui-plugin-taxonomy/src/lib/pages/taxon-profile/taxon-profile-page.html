@@ -13,7 +13,7 @@
         <b>Family: </b>{{taxonomicStatus.family}}
     </div>
 </div>
-<button style='float:right' mat-icon-button>
+<button *ngIf='userCanEdit' style='float:right' mat-icon-button>
     <mat-icon color="primary" (click)="goToLink(taxonID)">edit</mat-icon>
 </button>
 <!-- <button appearance='fill' (click)="goToLink(taxonID)">{{"taxon.editor.link.label" | translate}}</button> -->

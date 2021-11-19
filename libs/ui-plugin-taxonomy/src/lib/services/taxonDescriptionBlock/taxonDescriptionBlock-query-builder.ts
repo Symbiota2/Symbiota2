@@ -1,5 +1,4 @@
 import { Q_PARAM_TAXAIDS } from '../../../constants';
-import { OccurrenceQueryBuilder } from '../../../../../ui-plugin-occurrence/src/lib/services/occurrence-query-builder';
 
 export class TaxonDescriptionBlockQueryBuilder {
     protected baseUrl: string
@@ -79,7 +78,7 @@ class UploadBuilder extends TaxonDescriptionBlockQueryBuilder {
     }
 
     build(): string {
-        this.url.pathname = `${this.url.pathname}/upload`;
+        this.url.pathname = `${this.url.pathname}`;
         if (this._id) {
             this.url.pathname += `/${this._id}`;
         }

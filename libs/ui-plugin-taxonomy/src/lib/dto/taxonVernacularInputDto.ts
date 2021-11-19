@@ -1,7 +1,8 @@
 import { Exclude, Expose} from 'class-transformer';
+import { TaxonVernacularListItem } from '@symbiota2/ui-plugin-taxonomy';
 
 @Exclude()
-export class TaxonDescriptionBlockInputDto {
+export class TaxonVernacularInputDto {
 
     constructor(data: Record<string, unknown>) {
         Object.assign(this, data);
@@ -9,14 +10,14 @@ export class TaxonDescriptionBlockInputDto {
 
     @Expose() id: number
     @Expose() taxonID: number
-    @Expose() caption: string
-    @Expose() source: string
-    @Expose() sourceUrl: string
+    @Expose() vernacularName: string
     @Expose() language: string
     @Expose() adminLanguageID: number | null
-    @Expose() displayLevel: number
-    @Expose() creatorUID: number
+    @Expose() source: string
     @Expose() notes: string
+    @Expose() username: string
+    @Expose() isUpperTerm: number | null
+    @Expose() sortSequence: number | null
     @Expose() initialTimestamp: Date
 
 }

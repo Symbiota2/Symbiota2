@@ -11,6 +11,12 @@ import { TranslateService } from '@ngx-translate/core'
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { TaxonEditorDialogComponent } from '../../components';
+import { AlertService, UserService } from '@symbiota2/ui-common';
+import { filter } from 'rxjs/operators';
+import { TaxonDescriptionStatementInputDto } from '../../dto/taxonDescriptionStatementInputDto';
+import { TaxonVernacularInputDto } from '../../dto/taxonVernacularInputDto';
+import { Expose } from 'class-transformer';
+
 
 export interface CommonNameInfo {
     name: string
@@ -32,14 +38,17 @@ export class TaxonVernacularEditorComponent implements OnInit {
     dataSource = new MatTableDataSource(this.data)
     private taxonID: string
     languageList = []
+    userID : number = null
+    userCanEdit: boolean = false
 
     constructor(
-        //private readonly userService: UserService,  // TODO: needed for species hiding
+        private readonly userService: UserService,
         private readonly taxaService: TaxonService,
         private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
         private readonly taxonomicStatusService: TaxonomicStatusService,
         private readonly taxonVernacularService: TaxonVernacularService,
         private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
+        private readonly alertService: AlertService,
         private router: Router,
         private formBuilder: FormBuilder,
         private currentRoute: ActivatedRoute,
@@ -74,18 +83,45 @@ export class TaxonVernacularEditorComponent implements OnInit {
                 itemList.forEach((item) => {
                 })
             })
-    }
 
-    onSubmit() {
-
+        this.userService.currentUser
+            .pipe(filter((user) => user !== null))
+            .subscribe((user) => {
+                this.userID = user.uid
+                this.userCanEdit = user.canEditTaxon(user.uid)
+            })
     }
 
     /*
      Add a row to the common names
      */
     onAddCommonName() {
-        this.data.push(new TaxonVernacularListItem())
-        this.dataSource = new MatTableDataSource(this.data)
+        // Construct a new common name
+        const data = {
+            taxonID: +this.taxonID,
+            vernacularName: "",
+            adminLanguageID: +1, //[TODO Set up the default admin language]
+            initialTimestamp: new Date()
+            //name: string
+            //notes: string
+            //source: ""str
+            //language:
+            //sortSequence: 50
+        }
+
+        const newName = new TaxonVernacularInputDto(data)
+        this.taxonVernacularService.create(newName).subscribe((name)=> {
+            if (name) {
+                // It has been added to the database, add it to the current data
+                this.data.push(name)
+                this.dataSource = new MatTableDataSource(this.data)
+                this.showMessage("taxon.vernacular.editor.added")
+            } else {
+                // Error in adding
+                this.showError("taxon.vernacular.editor.added.error")
+            }
+
+        })
     }
 
     openDialog(action, obj) {
@@ -102,14 +138,14 @@ export class TaxonVernacularEditorComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result.event == 'Update') {
-                this.updateRowData(result.data)
+                this.updateCommonName(result.data)
             } else if (result.event == 'Delete') {
-                this.deleteRowData(result.data)
+                this.deleteCommonName(result.data)
             }
         })
     }
 
-    updateRowData(row_obj) {
+    updateCommonName(row_obj) {
         this.data = this.data.filter((value,key)=>{
             if(value.id == row_obj.id){
                 // copy temporary info to display info
@@ -118,17 +154,74 @@ export class TaxonVernacularEditorComponent implements OnInit {
                 value.sortSequence = row_obj.sortSequence
                 value.notes = row_obj.notes
                 value.language = row_obj.language
+                // Construct a new name
+                const data = {
+                    id: value.id,
+                    taxonID: value.taxonID,
+                    vernacularName: value.vernacularName,
+                    notes: value.notes,
+                    source: value.source,
+                    language: value.language,
+                    sortSequence: value.sortSequence,
+                    adminLanguageID: value.adminLanguageID,
+                    username: value.username,
+                    isUpperTerm: value.isUpperTerm,
+                    initialTimestamp: value.initialTimestamp
+                }
+
+                const newName = new TaxonVernacularInputDto(data)
+                this.taxonVernacularService
+                    .update(newName)
+                    .subscribe((name)=> {
+                        if (name) {
+                            // It has been updated in the database
+                            this.showMessage("taxon.vernacular.editor.updated")
+                        } else {
+                            // Error in adding
+                            this.showError("taxon.vernacular.editor.updated.error")
+                        }
+                    })
             }
             return true
         })
     }
 
-    deleteRowData(row_obj) {
-        console.log("made it here")
+    deleteCommonName(row_obj) {
         this.data = this.data.filter((value,key)=>{
+            if (value.id == row_obj.id) {
+                // Found a statement
+                this.taxonVernacularService.delete(row_obj.id)
+                    .subscribe((result) => {
+                        if (result) {
+                            // It has been deleted in the database
+                            this.showMessage("taxon.vernacular.editor.deleted")
+                        } else {
+                            // Error in deleting
+                            this.showError("taxon.vernacular.editor.deleted.error")
+                        }
+                    })
+            }
             return value.id != row_obj.id
         })
         this.dataSource = new MatTableDataSource(this.data)
+    }
+
+    /*
+    Internal routine to encapsulate the show error message at the bottom in case something goes awry
+    */
+    private showError(s) {
+        this.translate.get(s).subscribe((r)  => {
+            this.alertService.showError(r)
+        })
+    }
+
+    /*
+    Internal routine to encapsulate the show message at the bottom to confirm things actually happened
+    */
+    private showMessage(s) {
+        this.translate.get(s).subscribe((r)  => {
+            this.alertService.showMessage(r)
+        })
     }
 
 }
