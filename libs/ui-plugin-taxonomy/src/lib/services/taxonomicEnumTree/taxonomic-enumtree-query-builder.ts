@@ -93,7 +93,7 @@ class MoveBuilder extends TaxonomicEnumTreeQueryBuilder {
     build(): string {
         this.url.searchParams.append(Q_PARAM_TAXAID, this._id.toString())
         this.url.searchParams.append(Q_PARAM_PARENTID, this._parentId.toString())
-        this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._id.toString())
+        this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityId.toString())
         this.url.pathname += `/move`
         return super.build();
     }

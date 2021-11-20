@@ -137,10 +137,11 @@ export class TaxonomicEnumTreeService {
     Move a taxon id to a new parent taxon id within the context of a taxa authority id
     */
     move(id: number, parentId: number, authorityID: number): Observable<TaxonomicEnumTreeListItem> {
+        console.log(" doing " + id + " " + parentId + " " + authorityID)
         const url = this.createQueryBuilder()
             .move()
             .id(id)
-            .parentId(id)
+            .parentId(parentId)
             .authorityId(authorityID)
             .build()
 

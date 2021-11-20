@@ -124,13 +124,19 @@ export class TaxonStatusParentEditorDialogComponent {
         let children = []
         const childrenSynonyms = {}
 
+        console.log(" moving parent " + newParent)
         // Look up the scientific name first
         this.taxaService.findScientificName(newParent.trim(),this.taxonomicAuthorityID)
             .subscribe((taxon) => {
                 let parentTaxonID = taxon.id
                 // Move in taxa enum tree
-                this.taxonomicEnumTreeService.move(this.taxonID, parentTaxonID, this.taxonomicAuthorityID)
-                // Move in tax status
+                this.taxonomicEnumTreeService.move(this.taxonID, parentTaxonID, this.taxonomicAuthorityID).subscribe((enumTree) => {
+                    if (!enumTree) {
+                        // Error occurred
+                    }
+                    // Move in tax status
+                })
+
             })
     }
 

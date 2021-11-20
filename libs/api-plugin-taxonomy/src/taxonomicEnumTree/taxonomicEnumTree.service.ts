@@ -162,6 +162,10 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
     async moveTaxon(params: TaxonomicEnumTreeMoveTaxonParams): Promise<TaxaEnumTreeEntry> {
         const { ...qParams } = params
 
+        console.log("moving " + qParams.taxonAuthorityID + " " + params.taxonID + " " + params.parentTaxonID)
+        return null
+
+        /*
         // Delete the taxonID's taxaEnum tree entries
         await this.taxonomicEnumTrees.delete({
             taxonAuthorityID: params.taxonAuthorityID,
@@ -191,6 +195,7 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
         data.initialTimestamp = new Date()
 
         return this.save(data)
+         */
     }
 
     async updateByID(taxonID: number, data: Partial<TaxaEnumTreeEntry>): Promise<TaxaEnumTreeEntry> {

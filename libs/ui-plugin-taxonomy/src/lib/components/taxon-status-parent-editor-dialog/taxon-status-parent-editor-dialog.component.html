@@ -14,18 +14,10 @@
             -->
 
                 <mat-form-field class="name-autocomplete-full-width">
-                    <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxonomy.viewer.label.name.scientific" | translate}}</mat-label>
-                    <mat-label *ngIf='kindOfName == "Common"'>{{"taxonomy.viewer.label.name.common" | translate}}</mat-label>
+                    <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxon.status.parent.editor.dialog.parent.taxon.label" | translate}}</mat-label>
                     <!-- (keypress)="onKey($event)" -->
                     <input *ngIf='kindOfName == "Scientific"' type="text"
-                           placeholder='{{"taxonomy.viewer.label.name.scientific" | translate}}'
-                           aria-label="String"
-                           matInput
-                           (keyup)="onKey($event)"
-                           [formControl]="nameControl"
-                           [matAutocomplete]="auto">
-                    <input *ngIf='kindOfName == "Common"' type="text"
-                           placeholder='{{"taxonomy.viewer.label.name.common" | translate}}'
+                           placeholder='{{"taxon.status.parent.editor.dialog.parent.taxon.placeholder" | translate}}'
                            aria-label="String"
                            matInput
                            (keyup)="onKey($event)"
@@ -37,8 +29,6 @@
                         </mat-option>
                     </mat-autocomplete>
                 </mat-form-field>
-                <button class="button" type="submit">{{"taxonomy.viewer.label.taxonomy" | translate}}</button>
-
         </form>
 </div>
 <div mat-dialog-actions>

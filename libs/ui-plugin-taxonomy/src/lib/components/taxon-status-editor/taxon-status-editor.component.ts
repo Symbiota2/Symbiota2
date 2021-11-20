@@ -296,9 +296,9 @@ export class TaxonStatusEditorComponent implements OnInit {
             })
         }
         dialogRef.afterClosed().subscribe(result => {
-            if (result.event == 'Update') {
-                this.updateData(result.data)
-            }
+            //if (result.event == 'Update') {
+            //    this.updateData(result.data)
+            //}
         })
     }
 
