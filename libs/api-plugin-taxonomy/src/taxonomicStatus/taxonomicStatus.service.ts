@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { In, Repository, Not } from 'typeorm'
 import { TaxonomicStatusFindAllParams } from './dto/taxonomicStatus-find-all.input.dto'
 import { BaseService } from '@symbiota2/api-common'
-import { TaxonomicStatus } from '@symbiota2/api-database'
+import { Taxon, TaxonomicStatus } from '@symbiota2/api-database';
 
 @Injectable()
 export class TaxonomicStatusService extends BaseService<TaxonomicStatus>{
@@ -60,8 +60,31 @@ export class TaxonomicStatusService extends BaseService<TaxonomicStatus>{
         return children
     }
 
+    /*
+    Find one taxonomic status using a taxon id and a taxa authority id
+    */
+    async findOne(taxonid: number, taxonomicAuthorityID: number): Promise<TaxonomicStatus> {
+        const status = await this.myRepository.findOne({
+            relations: ["taxon"],
+            where: {taxonID: taxonid, taxonAuthorityID: taxonomicAuthorityID}
+        })
+        return status
+    }
+
     async create(data: Partial<TaxonomicStatus>): Promise<TaxonomicStatus> {
         const taxon = this.myRepository.create(data);
         return this.myRepository.save(taxon);
     }
+
+    /*
+    Update a taxon status record using a taxon id and authority id
+    */
+    async updateByID(taxonID: number, taxonAuthorityID:number, data: Partial<TaxonomicStatus>): Promise<TaxonomicStatus> {
+        const updateResult = await this.myRepository.update({ taxonID, taxonAuthorityID }, data);
+        if (updateResult.affected > 0) {
+            return this.findOne(taxonID, taxonAuthorityID)
+        }
+        return null
+    }
+
 }

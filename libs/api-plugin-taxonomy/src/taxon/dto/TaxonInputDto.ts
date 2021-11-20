@@ -1,7 +1,6 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import { Taxon } from '@symbiota2/api-database';
 import { ApiProperty } from '@nestjs/swagger';
-import { TaxonomicStatusDto } from '../../taxonomicStatus/dto/TaxonomicStatusDto';
+
 
 @Exclude()
 export class TaxonInputDto {

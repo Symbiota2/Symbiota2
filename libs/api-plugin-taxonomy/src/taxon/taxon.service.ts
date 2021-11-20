@@ -1,10 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Taxon, TaxonomicUnit } from '@symbiota2/api-database';
 import { In, Like, Repository } from 'typeorm';
-import { TaxonFindAllParams } from './dto/taxon-find-all.input.dto'
 import { BaseService } from '@symbiota2/api-common'
-import { TaxonFindNamesParams } from './dto/taxon-find-names.input.dto';
 import { DwCArchiveParser, dwcCoreID, getDwcField, isDwCID } from '@symbiota2/dwc';
+import { TaxonFindAllParams, TaxonFindNamesParams } from './dto/taxon-find-parms';
 
 @Injectable()
 export class TaxonService extends BaseService<Taxon>{
@@ -66,14 +65,23 @@ export class TaxonService extends BaseService<Taxon>{
                 ])
                 .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
                 .innerJoin('o.taxonStatuses', 'c')
-                .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
+                .where(
+                    'c.taxonAuthorityID = :authorityID',
+                    { authorityID: params.taxonAuthorityID }
+                )
 
             if (qParams.id) {
-                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
+                qb.andWhere(
+                    'o.id IN (:...taxonIDs)',
+                    {taxonIDs: params.id}
+                )
             }
 
             if (qParams.partialName) {
-                qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
+                qb.andWhere(
+                    'o.scientificName LIKE :name',
+                    {name: params.partialName + '%'}
+                )
             }
             return await qb.getMany()
         } else {
@@ -90,8 +98,8 @@ export class TaxonService extends BaseService<Taxon>{
     }
 
     /*
- Project the sciname from the taxa table using possibly a list of taxaIDs and an authority ID
-  */
+    Project the sciname from the taxa table using possibly a list of taxaIDs and an authority ID
+    */
     async findAllScientificNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         //console.log("Taxon service: finding scientific names")
         const { limit,...qParams } = params
@@ -308,8 +316,11 @@ and an authority ID
         return this.taxonRepo.save(taxon);
     }
 
-    /*
-    Update a taxon record using a taxon id.
+    /**
+     * Update a taxon record using a taxon id.
+     * @param id The id of the taxon
+     * @param data The data to update
+     * @return number The updated data or null (not found)
      */
     async updateByID(id: number, data: Partial<Taxon>): Promise<Taxon> {
         const updateResult = await this.taxonRepo.update({ id }, data);

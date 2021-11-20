@@ -4,7 +4,7 @@ import { In, Repository } from 'typeorm';
 import { TaxonVernacularFindAllParams } from './dto/taxonVernacular-find-all.input.dto';
 import { BaseService } from '@symbiota2/api-common';
 import { TaxonVernacularFindParams } from './dto/taxonVernacular-find.input.dto';
-import { TaxonFindNamesParams } from '../taxon/dto/taxon-find-names.input.dto';
+import { TaxonFindNamesParams } from '../taxon/dto/taxon-find-parms';
 
 
 @Injectable()

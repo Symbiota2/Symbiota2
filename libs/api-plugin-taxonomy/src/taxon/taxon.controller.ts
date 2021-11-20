@@ -20,8 +20,6 @@ import {
 import { TaxonService } from './taxon.service';
 import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { TaxonDto } from './dto/TaxonDto';
-import { TaxonFindAllParams } from './dto/taxon-find-all.input.dto';
-import { TaxonFindNamesParams } from './dto/taxon-find-names.input.dto';
 import { TaxonIDandNameDto } from './dto/TaxonIDandNameDto';
 import {
     AuthenticatedRequest,
@@ -35,6 +33,7 @@ import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiFileInput } from '@symbiota2/api-common';
 import { Express } from 'express';
+import { TaxonFindAllParams, TaxonFindNamesParams } from './dto/taxon-find-parms';
 
 type File = Express.Multer.File;
 
@@ -52,6 +51,9 @@ export class TaxonController {
     })
     async findAll(@Query() findAllParams: TaxonFindAllParams): Promise<TaxonDto[]> {
         const taxons = await this.taxa.findAll(findAllParams)
+        if (!taxons) {
+            throw new NotFoundException()
+        }
         const taxonDtos = taxons.map(async (c) => {
             const taxon = new TaxonDto(c)
             return taxon
@@ -67,6 +69,9 @@ export class TaxonController {
     })
     async findAllScientificNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<string[]> {
         const taxons = await this.taxa.findAllScientificNames(findNamesParams)
+        if (!taxons) {
+            throw new NotFoundException()
+        }
         const names = taxons.map(async (c) => {
             return c.scientificName
         });
@@ -81,6 +86,9 @@ export class TaxonController {
     })
     async findFamilyNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
         const items = await this.taxa.findFamilyNames(findNamesParams)
+        if (!items) {
+            throw new NotFoundException()
+        }
         const names = items.map(async (c) => {
             return new TaxonIDandNameDto(c.scientificName, c.id)
         });
@@ -95,6 +103,9 @@ export class TaxonController {
     })
     async findGenusNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
         const items = await this.taxa.findGenusNames(findNamesParams)
+        if (!items) {
+            throw new NotFoundException()
+        }
         const names = items.map(async (c) => {
             return new TaxonIDandNameDto(c.scientificName, c.id)
         });
@@ -109,6 +120,9 @@ export class TaxonController {
     })
     async findSpeciesNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
         const items = await this.taxa.findSpeciesNames(findNamesParams)
+        if (!items) {
+            throw new NotFoundException()
+        }
         const names = items.map(async (c) => {
             return new TaxonIDandNameDto(c.scientificName, c.id)
         });
@@ -123,6 +137,9 @@ export class TaxonController {
     })
     async findAllScientificNamesPlusAuthors(@Query() findNamesParams: TaxonFindNamesParams): Promise<string[]> {
         const taxons = await this.taxa.findAllScientificNamesPlusAuthors(findNamesParams)
+        if (!taxons) {
+            throw new NotFoundException()
+        }
         const names = taxons.map(async (c) => {
             return c.scientificName + (c.author? " - " + c.author : "")
         });
@@ -137,6 +154,9 @@ export class TaxonController {
     })
     async findByScientificName(@Param('scientificName') sciname: string, @Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonDto> {
         const taxons = await this.taxa.findByScientificName(sciname, findNamesParams)
+        if (!taxons) {
+            throw new NotFoundException()
+        }
         const dto = new TaxonDto(taxons[0])
         return dto
     }
@@ -148,7 +168,9 @@ export class TaxonController {
     })
     async findByTIDWithSynonyms(@Param('taxonid') id: number): Promise<TaxonDto> {
         const taxon = await this.taxa.findByTID(id)
-        if (taxon == null) return null  // nothing found, should never happen unless data is corrupted
+        if (!taxon) {
+            throw new NotFoundException()
+        }
         // Wait for the accepted statuses
         const statuses = await taxon.acceptedTaxonStatuses
         const a = []
@@ -168,6 +190,9 @@ export class TaxonController {
     })
     async findByTID(@Param('taxonid') id: number): Promise<TaxonDto> {
         const taxon = await this.taxa.findByTID(id)
+        if (!taxon) {
+            throw new NotFoundException()
+        }
         const dto = new TaxonDto(taxon)
         return dto
     }
