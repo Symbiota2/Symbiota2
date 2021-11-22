@@ -1,4 +1,4 @@
-import { HttpResponse } from '@angular/common/http';
+import { HttpHeaderResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
     AlertService,
@@ -10,11 +10,16 @@ import { CollectionService } from '@symbiota2/ui-plugin-collection';
 import { HttpRequest } from 'aws-sdk';
 import { combineLatest, Observable, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
-import { PublishedCollection } from '../dto/DwCCollection.dto';
+import {
+    CollectionArchive,
+    PublishedCollection,
+} from '../dto/DwcCollection.dto';
 
 @Injectable()
 export class DarwinCoreArchiveService {
     private readonly DARWINCORE_BASE_URL = `${this.api.apiRoot()}/dwc`;
+
+    ArchiveList: Observable<CollectionArchive[]> = this.getArchiveList();
 
     constructor(
         private readonly api: ApiClientService,
@@ -23,24 +28,46 @@ export class DarwinCoreArchiveService {
         private readonly alertService: AlertService
     ) {}
 
-    getCurrentCollectionArchive(): Observable<unknown> {
+    getCurrentCollectionArchiveInfo(): Observable<CollectionArchive> {
         return this.collectionService.currentCollection.pipe(
             switchMap((collection) => {
                 var req = this.api
                     .queryBuilder(
                         `${this.DARWINCORE_BASE_URL}/collections/${collection.id}`
                     )
-                    .get()
+                    .head()
                     .build();
 
-                return this.api.send(req).pipe(
-                    map((dwc: unknown) => {
-                        //console.log(dwc);
-                        return dwc;
+                return this.api.sendFullResponse(req).pipe(
+                    switchMap((dwc: HttpResponse<ResponseType>) => {
+                        if (dwc.ok) {
+                            return this.ArchiveList.pipe(
+                                map((archiveList) => {
+                                    archiveList[0].updatedAt.toDateString
+                                    return archiveList.find(
+                                        ({ collectionID }) =>
+                                            collectionID === collection.id
+                                    );
+                                })
+                            );
+                        } else {
+                            return null;
+                        }
                     })
                 );
             })
         );
+    }
+
+    getArchiveList(): Observable<CollectionArchive[]> {
+        const req = this.api
+            .queryBuilder(`${this.DARWINCORE_BASE_URL}/collections`)
+            .get()
+            .build();
+
+        return this.api
+            .send(req)
+            .pipe(map((archiveList: CollectionArchive[]) => archiveList));
     }
 
     /**
@@ -64,20 +91,21 @@ export class DarwinCoreArchiveService {
                     !!collection &&
                     user.canEditCollection(collection.id)
                 ) {
-                    var req = this.api.queryBuilder(
-                        `${this.DARWINCORE_BASE_URL}/collections/${collection.id}`
-                    )
-                    .put()
-                    .addJwtAuth(user.token)
-                    .queryParam(`publish`, true)
-                    .build();
+                    var req = this.api
+                        .queryBuilder(
+                            `${this.DARWINCORE_BASE_URL}/collections/${collection.id}`
+                        )
+                        .put()
+                        .addJwtAuth(user.token)
+                        .queryParam(`publish`, true)
+                        .build();
 
-                    return this.api.send(req).pipe(
-                        map((res: HttpResponse<unknown>) => {
-                            return (!res||res.status==200)?true:false;
-                        } )
-                    )
-                    
+                    return this.api.sendFullResponse(req).pipe(
+                        map((res: HttpResponse<ResponseType>) => {
+                            console.log(res);
+                            return res.ok;
+                        })
+                    );
                 } else {
                     this.alertService.showError(
                         'User does not have permission to edit collection'

@@ -24,6 +24,7 @@ import {
     shareReplay,
     switchMap,
     take,
+    tap,
 } from 'rxjs/operators';
 import { Collection, CollectionListItem } from '../dto/Collection.output.dto';
 import { Injectable } from '@angular/core';
@@ -104,6 +105,7 @@ export class CollectionService {
                             collectionData
                         );
                     }),
+                    map(collection => {console.log(collection.id)}),
                     catchError((e) => {
                         this.alertService.showError(
                             `Cannot update collection: ${e.message}`

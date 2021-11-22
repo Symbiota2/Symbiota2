@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AlertService } from '@symbiota2/ui-common';
 import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { Observable } from 'rxjs';
-import { PublishedCollection } from '../../dto/DwCCollection.dto';
+import { CollectionArchive, PublishedCollection } from '../../dto/DwcCollection.dto';
 import { DarwinCoreArchiveService } from '../../services/darwin-core-archive.service';
 
 @Component({
@@ -14,7 +14,7 @@ import { DarwinCoreArchiveService } from '../../services/darwin-core-archive.ser
 })
 export class DarwinCoreArchivePublishingComponent implements OnInit {
     collection$: Observable<Collection>;
-    publishedCollection$: Observable<PublishedCollection>;
+    archiveInfo$: Observable<CollectionArchive>;
 
     publishArchiveForm: FormGroup = this.fb.group(
       {
@@ -33,7 +33,7 @@ export class DarwinCoreArchivePublishingComponent implements OnInit {
 
     ngOnInit(): void {
         this.collection$ = this.collectionService.currentCollection;
-        this.dwcService.getCurrentCollectionArchive().subscribe();
+        this.archiveInfo$ =this.dwcService.getCurrentCollectionArchiveInfo();
     }
     
 

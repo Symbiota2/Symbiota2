@@ -44,28 +44,25 @@
                     ><mat-icon>description</mat-icon>Archive
                     Details</mat-card-title
                 >
-                <mat-card-content>
+                <mat-card-content *ngIf="archiveInfo$ | async as archive">
                     <p>
-                        <b>Title:</b>
-                        {{ collection.institution.code }}-{{
-                            collection.collectionCode
-                        }} DwC-Archive
+                        <b>DwC-Archive File:</b>
+                        <ng-container>
+                            {{ archive.archive }}
+                        </ng-container>
                     </p>
                     <p>
                         <b>Description:</b>
                         Darwin Core Archive for {{ collection.collectionName }}
                     </p>
-                    <ng-container *ngIf="publishedCollection$ | async as dwc">
-                        <p>
-                            <b>DwC-Archive File:</b>
-                            {{dwc.archive}}
-                        </p>
-                        <p>
-                            <b>PublicationDate:</b>
-                            {{dwc.timestamp}}
-                        </p>
-                    </ng-container>
-                    
+                    <p>
+                        <b>Size in bytes:</b>
+                        {{ archive.size }}
+                    </p>
+                    <p>
+                        <b>Last Update:</b>
+                        {{ archive.updatedAt.toString()}}
+                    </p>
                 </mat-card-content>
             </mat-card>
         </div>
