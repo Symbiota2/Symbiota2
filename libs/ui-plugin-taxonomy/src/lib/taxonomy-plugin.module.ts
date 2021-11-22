@@ -51,7 +51,7 @@ import {
     TaxonDescriptionStatementDialogComponent,
     TaxonTaxonEditorComponent,
     TaxonTaxonDialogComponent,
-    TaxonStatusEditorComponent
+    TaxonStatusEditorComponent, TaxonStatusAcceptedEditorDialogComponent
 } from './components';
 import { TaxonEditorPageComponent } from './pages'
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -101,6 +101,7 @@ import { TaxonStatusParentEditorDialogComponent } from './components/taxon-statu
         TaxonDescriptionStatementDialogComponent,
         TaxonTaxonEditorComponent,
         TaxonTaxonDialogComponent,
+        TaxonStatusAcceptedEditorDialogComponent,
         TaxonStatusEditorComponent,
         TaxonStatusParentEditorDialogComponent
     ],
@@ -126,6 +127,7 @@ import { TaxonStatusParentEditorDialogComponent } from './components/taxon-statu
         TaxonDescriptionStatementDialogComponent,
         TaxonTaxonEditorComponent,
         TaxonTaxonDialogComponent,
+        TaxonStatusAcceptedEditorDialogComponent,
         TaxonStatusEditorComponent,
         TaxonStatusParentEditorDialogComponent
     ]

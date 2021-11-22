@@ -3,7 +3,7 @@ import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
     TaxonListItem, TaxonomicAuthorityService, TaxonomicEnumTreeService, TaxonomicStatusService, TaxonomicUnitService,
-    TaxonService,
+    TaxonService, TaxonStatusAcceptedEditorDialogComponent,
     TaxonTaxonDialogComponent
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TranslateService } from '@ngx-translate/core'
@@ -12,6 +12,7 @@ import { AlertService, UserService } from '@symbiota2/ui-common';
 import { filter } from 'rxjs/operators';
 import { TaxonInputDto } from '../../dto/taxonInputDto';
 import { TaxonStatusParentEditorDialogComponent } from '../taxon-status-parent-editor-dialog/taxon-status-parent-editor-dialog.component';
+import { TaxonomicStatusInputDto } from '../../dto/taxonomicStatusInputDto';
 
 export interface TaxStatusInfo {
     kingdomName: string
@@ -38,6 +39,7 @@ export interface TaxStatusInfo {
 export class TaxonStatusEditorComponent implements OnInit {
     isAccepted = new Map<number,boolean>()
     acceptedName = new Map<number,string>()
+    acceptedID = new Map<number,number>()
     parentName = new Map<number,string>()
     synonyms = new Map<number,string[]>()
 
@@ -45,6 +47,7 @@ export class TaxonStatusEditorComponent implements OnInit {
     currentAuthorityID = 1  // [TODO set up a default value somewhere]
     currentParentName = "unknown parent"
     currentIsAccepted = false
+    currentAcceptedID = null
     currentSynonyms = []
     currentAcceptedName = "unknown name"
 
@@ -88,6 +91,7 @@ export class TaxonStatusEditorComponent implements OnInit {
         // Set up default case
         this.isAccepted.set(this.currentAuthorityID, false)
         this.acceptedName.set(this.currentAuthorityID, 'unknown')
+        this.acceptedID.set(this.currentAuthorityID, null)
         this.synonyms.set(this.currentAuthorityID, [])
         this.parentName.set(this.currentAuthorityID, 'unknown')
 
@@ -168,6 +172,7 @@ export class TaxonStatusEditorComponent implements OnInit {
                         // Find the name of the accepted and parent taxons
                         this.taxaService.findByID(myStatus.taxonIDAccepted).subscribe((acceptedTaxon) => {
                             this.acceptedName.set(myStatus.taxonAuthorityID,acceptedTaxon.scientificName)
+                            this.acceptedID.set(myStatus.taxonAuthorityID, acceptedTaxon.id)
                             this.parentName.set(myStatus.taxonAuthorityID,myStatus.parent.scientificName)
                             if (taxonID != myStatus.taxonIDAccepted) {
                                 // I am a synonym, let's look for the accepted id taxon
@@ -273,8 +278,10 @@ export class TaxonStatusEditorComponent implements OnInit {
     setCurrentAuthorityID(id) {
         this.currentParentName = this.parentName.get(id)
         this.currentAcceptedName = this.acceptedName.get(id)
+        this.currentAcceptedID = this.acceptedID.get(id)
         this.currentSynonyms = this.synonyms.get(id)
         this.currentIsAccepted = this.isAccepted.get(id)
+        this.currentAuthorityID = id
     }
 
     openDialog(action, obj) {
@@ -284,19 +291,17 @@ export class TaxonStatusEditorComponent implements OnInit {
         obj.taxonID = this.taxonID
         let dialogRef = null
         if (action == 'Update Parent') {
-            console.log("updating parent")
             dialogRef = this.dialog.open(TaxonStatusParentEditorDialogComponent, {
                 width: '100',
                 data: obj
             })
         } else if (action == 'Update Accepted') {
-            dialogRef = this.dialog.open(TaxonTaxonDialogComponent, {
+            dialogRef = this.dialog.open(TaxonStatusAcceptedEditorDialogComponent, {
                 width: '100',
                 data: obj
             })
         }
         dialogRef.afterClosed().subscribe(result => {
-            console.log(" zzzz " + result.data)
             if (result.event == 'Update Parent') {
                 this.moveTaxonToNewParent(result.data)
             }
@@ -308,7 +313,6 @@ export class TaxonStatusEditorComponent implements OnInit {
         let children = []
         const childrenSynonyms = {}
 
-        console.log(" moving parent " + newParent)
         // Look up the scientific name first
         this.taxaService.findScientificName(newParent.trim(),this.currentAuthorityID)
             .subscribe((taxon) => {
@@ -316,63 +320,29 @@ export class TaxonStatusEditorComponent implements OnInit {
                 // Move in taxa enum tree
                 this.taxonomicEnumTreeService.move(+this.taxonID, parentTaxonID, this.currentAuthorityID).subscribe((enumTree) => {
                     if (!enumTree) {
-                        // Error occurred
+                        // [TODO fix since Error occurred]
+                        this.showError("taxon.editor.updated.error")
                     }
-                    // Move in tax status
+                    // Update the parent to the new parent
+                    this.taxonomicStatusService.findByID(+this.taxonID, +this.currentAuthorityID, this.currentAcceptedID).subscribe((status) => {
+                        let a = status as unknown as Record<PropertyKey, unknown>
+                        const data = new TaxonomicStatusInputDto(a)
+                        data.parentTaxonID = parentTaxonID
+                        this.taxonomicStatusService
+                            .update(data)
+                            .subscribe((taxStatus)=> {
+                                if (taxStatus) {
+                                    // It has been updated in the database
+                                    this.showMessage("taxon.editor.updated")
+                                } else {
+                                    // Error in adding
+                                    this.showError("taxon.editor.updated.error")
+                                }
+                            })
+                    })
                 })
-
             })
     }
-
-    /*
-    updateData(obj) {
-        // Copy data to current state
-        this.taxon.scientificName = obj.scientificName
-        this.taxon.unitName1 = obj.unitName1
-        this.taxon.unitName2 = obj.unitName2
-        this.taxon.unitName3 = obj.unitName3
-        this.taxon.kingdomName = obj.kingdomName
-        this.taxon.rankID = obj.rankID
-        this.taxon.author = obj.author
-        this.taxon.phyloSortSequence = obj.phyloSortSequence
-        this.taxon.status = obj.status
-        this.taxon.source = obj.source
-        this.taxon.notes = obj.notes
-        this.taxon.hybrid = obj.hybrid
-        this.taxon.securityStatus = obj.securityStatus
-        // Construct a new taxon
-        const data = {
-            id: this.taxonID,
-            scientificName: obj.scientificName,
-            unitName1: obj.unitName1,
-            unitName2: obj.unitName2,
-            unitName3: obj.unitName3,
-            kingdomName: obj.kingdomName,
-            rankID: obj.rankID,
-            author: obj.author,
-            phyloSortSequence: obj.phyloSortSequence,
-            status: obj.status,
-            source: obj.source,
-            notes: obj.notes,
-            hybrid: obj.hybrid,
-            securityStatus: obj.securityStatus,
-            initialTimestamp: new Date()
-        }
-        const newTaxon = new TaxonInputDto(data)
-        this.taxaService
-            .update(new TaxonInputDto(data))
-            .subscribe((taxon)=> {
-                if (taxon) {
-                    // It has been updated in the database
-                    this.showMessage("taxon.editor.updated")
-                } else {
-                    // Error in adding
-                    this.showError("taxon.editor.updated.error")
-                }
-            })
-    }
-
-     */
 
     /*
     Internal routine to encapsulate the show error message at the bottom in case something goes awry

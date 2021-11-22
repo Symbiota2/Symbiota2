@@ -12,11 +12,11 @@ import {
 } from '../../services';
 
 @Component({
-    selector: 'taxon-status-parent-editor-dialog',
-    templateUrl: './taxon-status-parent-editor-dialog.component.html',
-    styleUrls: ['./taxon-status-parent-editor-dialog.component.scss']
+    selector: 'taxon-status-accepted-editor-dialog',
+    templateUrl: './taxon-status-accepted-editor-dialog.component.html',
+    styleUrls: ['./taxon-status-accepted-editor-dialog.component.scss']
 })
-export class TaxonStatusParentEditorDialogComponent {
+export class TaxonStatusAcceptedEditorDialogComponent {
 
     public action : string
     public local_data : any
@@ -27,7 +27,6 @@ export class TaxonStatusParentEditorDialogComponent {
     nameOptions: string[] = []
     hasAuthors = true
     taxonID
-    //public currentParentName
 
     constructor(
         private readonly taxaService: TaxonService,
@@ -36,7 +35,7 @@ export class TaxonStatusParentEditorDialogComponent {
         //private readonly taxonVernacularService: TaxonVernacularService,
         //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
         //private readonly taxonomicUnitService: TaxonomicUnitService,
-        public dialogRef: MatDialogRef<TaxonStatusParentEditorDialogComponent>,
+        public dialogRef: MatDialogRef<TaxonStatusAcceptedEditorDialogComponent>,
         //@Optional() is used to prevent error if no data is passed
         @Optional() @Inject(MAT_DIALOG_DATA) public data
     ) {
@@ -72,19 +71,6 @@ export class TaxonStatusParentEditorDialogComponent {
                 })
         }
     }
-
-    /* Called when the taxon is chosen to display */
-    /*
-    onSubmit(): void {
-        if (this.kindOfName == 'Scientific') {
-            const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
-            this.moveTaxonToNewParent(sname)
-        } else {
-            // Not this one
-        }
-
-    }
-     */
 
     /*
     Reload the names as a user types

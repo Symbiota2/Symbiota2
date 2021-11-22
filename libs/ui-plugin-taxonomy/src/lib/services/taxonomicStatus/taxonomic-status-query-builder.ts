@@ -1,4 +1,5 @@
 import { Q_PARAM_AUTHORITYID, Q_PARAM_TAXAIDS } from '../../../constants';
+import { TaxonDescriptionBlockQueryBuilder } from '../taxonDescriptionBlock/taxonDescriptionBlock-query-builder';
 
 export class TaxonomicStatusQueryBuilder {
     protected baseUrl: string
@@ -31,24 +32,113 @@ export class TaxonomicStatusQueryBuilder {
         return new FindOneBuilder(this.baseUrl)
     }
 
+    create(): CreateOneBuilder {
+        return new CreateOneBuilder(this.baseUrl);
+    }
+
+    delete(): DeleteOneBuilder {
+        return new DeleteOneBuilder(this.baseUrl);
+    }
+
+    upload(): UploadBuilder {
+        return new UploadBuilder(this.baseUrl);
+    }
+
     build(): string {
         return this.url.toString()
     }
 }
 
+class CreateOneBuilder extends TaxonomicStatusQueryBuilder {
+    protected _myID: number
 
-class FindOneBuilder extends TaxonomicStatusQueryBuilder {
-    protected taxonID: number = null
-
-
-    id(id: number): FindOneBuilder {
-        this.taxonID = id
+    myID(id: number): CreateOneBuilder {
+        this._myID = id
         return this
     }
 
+    build(): string {
+        return super.build()
+    }
+}
+
+class DeleteOneBuilder extends TaxonomicStatusQueryBuilder {
+    protected _id: number
+    protected _authorityId: number
+    protected _acceptedId: number
+
+    id(id: number): DeleteOneBuilder {
+        this._id = id
+        return this;
+    }
+
+    authorityId(id: number): DeleteOneBuilder {
+        this._authorityId = id
+        return this;
+    }
+
+    acceptedId(id: number): DeleteOneBuilder {
+        this._acceptedId = id
+        return this;
+    }
 
     build(): string {
-        this.url.pathname = `${this.url.pathname}/${this.taxonID.toString()}`;
+        // Should have all of these to work
+        this.url.pathname += `/${this._id}/${this._authorityId}/${this._acceptedId}`
+        return super.build()
+    }
+}
+
+class UploadBuilder extends TaxonomicStatusQueryBuilder {
+    protected _id: number
+    protected _authorityId: number
+    protected _acceptedId: number
+
+    id(id: number): UploadBuilder {
+        this._id = id
+        return this;
+    }
+
+    authorityId(id: number): UploadBuilder {
+        this._authorityId = id
+        return this;
+    }
+
+    acceptedId(id: number): UploadBuilder {
+        this._acceptedId = id
+        return this;
+    }
+
+    build(): string {
+        // Should have all of these to work
+        this.url.pathname += `/${this._id}/${this._authorityId}/${this._acceptedId}`
+        return super.build()
+    }
+}
+
+class FindOneBuilder extends TaxonomicStatusQueryBuilder {
+    protected _id: number
+    protected _authorityId: number
+    protected _acceptedId: number
+
+    id(id: number): FindOneBuilder {
+        this._id = id
+        return this;
+    }
+
+    authorityId(id: number): FindOneBuilder {
+        this._authorityId = id
+        return this;
+    }
+
+    acceptedId(id: number): FindOneBuilder {
+        this._acceptedId = id
+        return this;
+    }
+
+    build(): string {
+        // Should have all of these to work
+        this.url.pathname += `/${this._id}/${this._authorityId}/${this._acceptedId}`
         return super.build()
     }
 }

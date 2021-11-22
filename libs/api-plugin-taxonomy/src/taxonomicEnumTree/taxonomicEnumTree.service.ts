@@ -196,7 +196,6 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
         const { ...qParams } = params
 
         console.log("moving " + qParams.taxonAuthorityID + " " + params.taxonID + " " + params.parentTaxonID)
-        return null
 
         // First find all of the new parent's taxaEnum tree entries
         const entries =
