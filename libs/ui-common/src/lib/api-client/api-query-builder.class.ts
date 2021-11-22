@@ -2,7 +2,7 @@ import { HttpHeaders, HttpParams, HttpRequest } from '@angular/common/http';
 
 export class ApiQueryBuilder<T> {
     private readonly url: string;
-    private method: "GET" | "PUT" | "PATCH" | "POST" | "DELETE";
+    private method: "GET" | "PUT" | "PATCH" | "POST" | "DELETE" | "HEAD";
     private _body: T = null;
 
     private withCredentials = false;
@@ -22,6 +22,11 @@ export class ApiQueryBuilder<T> {
 
     get(): ApiQueryBuilder<T> {
         this.method = "GET";
+        return this;
+    }
+
+    head(): ApiQueryBuilder<T> {
+        this.method = "HEAD";
         return this;
     }
 
