@@ -23,7 +23,7 @@
                 </h1>
                 <button
                     mat-stroked-button
-                    *ngIf="canUserEdit() | async"
+                    *ngIf="isColAdmin"
                     id="editButton"
                     (click)="openCollectionTools()"
                 >

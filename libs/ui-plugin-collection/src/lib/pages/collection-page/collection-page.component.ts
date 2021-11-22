@@ -36,6 +36,8 @@ export class CollectionPage implements OnInit {
 
     public geoReferencedPercent: number;
 
+    public isColAdmin: boolean = false;
+
     constructor(
         private readonly userService: UserService,
         private readonly collections: CollectionService,
@@ -64,7 +66,10 @@ export class CollectionPage implements OnInit {
                     this.collection.id.toString()
                 )}`,
             };
+
             this.links$ = this.getLinks();
+            
+            this.canUserEdit().subscribe(bool => this.isColAdmin = bool);
         });
     }
 
@@ -79,6 +84,7 @@ export class CollectionPage implements OnInit {
                         : -1;
                 }),
                 switchMap((collectionID) => {
+                    console.log("getCollection: Collection ID: ", collectionID);
                     this.collections.setCollectionID(collectionID);
 
                     return this.collections.currentCollection;
@@ -115,6 +121,7 @@ export class CollectionPage implements OnInit {
         ])
             .pipe(
                 map(([user, collection]) => {
+                    console.error("canUserEditCollection: Collection ID: ", collection.id);
                     return (
                         !!user &&
                         !!collection &&
@@ -130,10 +137,7 @@ export class CollectionPage implements OnInit {
             this.collection.id.toString()
         )}`;
 
-        this.canUserEdit().subscribe((bool) => {
-            if (bool) {
-                this.router.navigate([route]);
-            }
-        });
+        this.router.navigate([route]);
+
     }
 }
