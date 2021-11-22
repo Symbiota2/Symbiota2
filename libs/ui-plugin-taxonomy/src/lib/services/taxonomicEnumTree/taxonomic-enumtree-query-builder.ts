@@ -1,4 +1,5 @@
-import { Q_PARAM_TAXAIDS, Q_PARAM_AUTHORITYID } from '../../../constants';
+import { Q_PARAM_TAXAIDS, Q_PARAM_AUTHORITYID, Q_PARAM_PARENTID, Q_PARAM_TAXAID } from '../../../constants';
+import { TaxonDescriptionBlockQueryBuilder } from '../taxonDescriptionBlock/taxonDescriptionBlock-query-builder';
 
 export class TaxonomicEnumTreeQueryBuilder {
     protected baseUrl: string
@@ -35,8 +36,99 @@ export class TaxonomicEnumTreeQueryBuilder {
         return new FindOneBuilder(this.baseUrl)
     }
 
+    create(): CreateOneBuilder {
+        return new CreateOneBuilder(this.baseUrl);
+    }
+
+    move(): MoveBuilder {
+        return new MoveBuilder(this.baseUrl);
+    }
+
+    delete(): DeleteOneBuilder {
+        return new DeleteOneBuilder(this.baseUrl);
+    }
+
+    upload(): UploadBuilder {
+        return new UploadBuilder(this.baseUrl);
+    }
+
     build(): string {
         return this.url.toString()
+    }
+}
+
+class CreateOneBuilder extends TaxonomicEnumTreeQueryBuilder {
+    protected _myID: number;
+
+    myID(id: number): CreateOneBuilder {
+        this._myID = id;
+        return this;
+    }
+
+    build(): string {
+        return super.build();
+    }
+}
+
+class MoveBuilder extends TaxonomicEnumTreeQueryBuilder {
+    protected _id: number
+    protected _parentId: number
+    protected _authorityId: number
+
+    id(id: number): MoveBuilder {
+        this._id = id
+        return this;
+    }
+
+    parentId(id: number): MoveBuilder {
+        this._parentId = id
+        return this;
+    }
+
+    authorityId(id: number): MoveBuilder {
+        this._authorityId = id
+        return this
+    }
+
+    build(): string {
+        this.url.searchParams.append(Q_PARAM_TAXAID, this._id.toString())
+        this.url.searchParams.append(Q_PARAM_PARENTID, this._parentId.toString())
+        this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityId.toString())
+        this.url.pathname += `/move`
+        return super.build();
+    }
+}
+
+class DeleteOneBuilder extends TaxonomicEnumTreeQueryBuilder {
+    protected _id: number;
+
+    id(id: number): DeleteOneBuilder {
+        this._id = id
+        return this;
+    }
+
+    build(): string {
+        if (this._id) {
+            this.url.pathname += `/${this._id}`
+        }
+        return super.build()
+    }
+}
+
+class UploadBuilder extends TaxonomicEnumTreeQueryBuilder {
+    private _id: number = null;
+
+    id(id: number): UploadBuilder {
+        this._id = id;
+        return this;
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}`;
+        if (this._id) {
+            this.url.pathname += `/${this._id}`;
+        }
+        return super.build();
     }
 }
 

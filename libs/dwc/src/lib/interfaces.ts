@@ -1,6 +1,6 @@
 export const DWC_SCHEMA_LOCATION = 'http://rs.tdwg.org/dwc/text/ http://dwc.tdwg.org/text/tdwg_dwc_text.xsd';
 export const DWC_XML_NS = 'http://rs.tdwg.org/dwc/text/';
-export type DwCAParseCallback<T> = (tmpdir: string, archive: IDwCAMeta) => Promise<T>;
+export type DwCAParseCallback = (tmpdir: string, archive: IDwCAMeta) => any;
 
 /*
 All interfaces prefixed by DwCAMeta come from the archive schema defined at

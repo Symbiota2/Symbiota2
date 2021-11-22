@@ -10,7 +10,7 @@ import { AppConfigService } from '@symbiota2/api-config';
  */
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-    constructor(private readonly configService: AppConfigService) {
+    constructor(protected readonly configService: AppConfigService) {
         super();
     }
 

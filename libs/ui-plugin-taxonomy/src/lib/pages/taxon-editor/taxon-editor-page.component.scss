@@ -49,10 +49,30 @@ table{
     width: 100%;
 }
 
+/*
 ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
     min-width: 0!important;
     padding: 3px!important;
     margin: 3px!important;
+}
+ */
+
+/* Styles for tab labels */
+.ng-deep.mat-tab-label {
+    min-width: 25px !important;
+    padding: 5px;
+    background-color: transparent;
+    color: grey;
+    font-weight: 700;
+}
+
+/* Styles for the active tab label */
+.mat-tab-label.mat-tab-label-active {
+    min-width: 25px !important;
+    padding: 5px;
+    background-color: transparent;
+    color: red;
+    font-weight: 700;
 }
 
 .mat-table {

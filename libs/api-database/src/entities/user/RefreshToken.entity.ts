@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from './User.entity';
 import { EntityProvider } from '../../entity-provider.class';
+import { v4 as uuid4 } from 'uuid';
 
 @Index(['clientID', 'token'])
 @Entity('userRefreshTokens')
@@ -17,10 +18,10 @@ export class RefreshToken extends EntityProvider {
     @Column('int', { name: 'uid', unsigned: true, primary: true })
     uid: number;
 
-    @PrimaryGeneratedColumn('uuid', { name: 'clientID' })
+    @Column('varchar', { name: 'clientID', primary: true, length: 36, default: () => 'uuid()' })
     clientID: string;
 
-    @PrimaryGeneratedColumn('uuid', { name: 'token' })
+    @Column('varchar', { name: 'token', primary: true, length: 36, default: () => 'uuid()'  })
     token: string;
 
     @Column('timestamp', { name: 'expiresAt', default: () => 'CURRENT_TIMESTAMP()' })
@@ -39,6 +40,17 @@ export class RefreshToken extends EntityProvider {
                 expiresAtDate.getDate() + RefreshToken.EXPIRES_IN_DAYS
             );
             this.expiresAt = expiresAtDate;
+        }
+    }
+
+    @BeforeInsert()
+    setClientIDAndToken() {
+        // See https://github.com/typeorm/typeorm/issues/7643
+        if (!this.clientID) {
+            this.clientID = uuid4();
+        }
+        if (!this.token) {
+            this.token = uuid4();
         }
     }
 

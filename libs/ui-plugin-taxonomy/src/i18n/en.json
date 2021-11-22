@@ -98,6 +98,8 @@
     "taxon.status.not.accepted": "Not Accepted",
     "taxon.status.parent.taxon.label": "Parent Taxon",
     "taxon.status.accepted.taxon.label": "Accepted Taxon",
+    "taxon.status.parent.editor.dialog.parent.taxon.label": "Enter Scientific Name of Parent Taxon",
+    "taxon.status.parent.editor.dialog.parent.taxon.placeholder": "Scientific Name",
 
     "taxon.taxon.editor.securityStatus": "Security Status",
     "taxon.vernacular.editor.block.added": "Common name added",

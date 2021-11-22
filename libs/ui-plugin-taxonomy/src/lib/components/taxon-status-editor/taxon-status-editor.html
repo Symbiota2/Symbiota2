@@ -18,14 +18,14 @@
     <div>
         <b>{{"taxon.status.parent.taxon.label" | translate}}</b>: {{currentParentName}}
         <button *ngIf='userCanEdit' mat-icon-button>
-            <mat-icon color="primary" (click)="openDialog('Update Parent',taxon)">edit</mat-icon>
+            <mat-icon color="primary" (click)="openDialog('Update Parent',{})">edit</mat-icon>
         </button>
     </div>
 
     <div *ngIf='!currentIsAccepted'>
         <b>{{"taxon.status.accepted.taxon.label" | translate}}</b>: {{currentAcceptedName}}
         <button *ngIf='userCanEdit' mat-icon-button>
-            <mat-icon color="primary" (click)="openDialog('Update Accepted',taxon)">edit</mat-icon>
+            <mat-icon color="primary" (click)="openDialog('Update Accepted',{})">edit</mat-icon>
         </button>
     </div>
     <div *ngIf='currentIsAccepted'>

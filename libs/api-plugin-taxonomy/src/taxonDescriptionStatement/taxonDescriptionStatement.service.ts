@@ -13,10 +13,17 @@ export class TaxonDescriptionStatementService extends BaseService<TaxonDescripti
         super(myRepository)
     }
 
-    /*
-    Fetch all of the taxonomic authorities.
-    Can limit the list by a list of authority IDs.
-    Can also limit the number fetched and use an offset.
+    /**
+     * Fetch all of the taxonomic description statements meeting some conditions.
+     * Can limit the list by a list of authority IDs.
+     * Can also limit the number fetched and use an offset.
+     * Set find params using the 'TaxonDescriptionStatementFindAllParams'
+     * @param params - the 'TaxonDescriptionStatementFindAllParams'
+     * @returns Observable of response from api casted as `TaxonDescriptionStatement[]`
+     * will be the found statements
+     * @returns `of(null)` if api errors
+     * @see TaxonDescriptionStatement
+     * @see TaxonDescriptionStatementFindAllParams
      */
     async findAll(params?: TaxonDescriptionStatementFindAllParams): Promise<TaxonDescriptionStatement[]> {
         const { limit, offset, ...qParams } = params
@@ -26,8 +33,13 @@ export class TaxonDescriptionStatementService extends BaseService<TaxonDescripti
             : this.myRepository.find({take: limit, skip: offset})
     }
 
-    /*
-    Creata a taxon description statement
+    /**
+     * Create a taxon description statement, inserting into database
+     * @param data - data for the inserted statement
+     * @returns Observable of response from api casted as `TaxonDescriptionStatement`
+     * will be the inserted statement
+     * @returns `of(null)` if api errors
+     * @see TaxonDescriptionStatement
      */
     async create(data: Partial<TaxonDescriptionStatement>): Promise<TaxonDescriptionStatement> {
         // fill in fields that need a default value
@@ -41,8 +53,14 @@ export class TaxonDescriptionStatementService extends BaseService<TaxonDescripti
         return this.myRepository.save(taxon)
     }
 
-    /*
-    Update a taxon description statement
+    /**
+     * Update a taxon description statement
+     * @param id - id of taxon description statement to update
+     * @param data - data for the updated statement
+     * @returns Observable of response from api casted as `TaxonDescriptionStatement`
+     * will be the updated statement
+     * @returns `of(null)` if api errors or id not found
+     * @see TaxonDescriptionStatement
      */
     async updateByID(id: number, data: Partial<TaxonDescriptionStatement>): Promise<TaxonDescriptionStatement> {
         const updateResult = await this.myRepository.update({ id }, data)
