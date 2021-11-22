@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonListItem, TaxonomicAuthorityService, TaxonomicStatusService, TaxonomicUnitService,
+    TaxonListItem, TaxonomicAuthorityService, TaxonomicEnumTreeService, TaxonomicStatusService, TaxonomicUnitService,
     TaxonService,
     TaxonTaxonDialogComponent
 } from '@symbiota2/ui-plugin-taxonomy';
@@ -51,7 +51,7 @@ export class TaxonStatusEditorComponent implements OnInit {
     taxonomicAuthorityList = []
     allTaxonomicAuthorityList = []
 
-    taxon: TaxonListItem
+    //taxon: TaxonListItem
     //dataSource
     private taxonID: string
     private idCounter = 0
@@ -66,7 +66,7 @@ export class TaxonStatusEditorComponent implements OnInit {
         //private readonly taxonBlockService: TaxonDescriptionBlockService,
         private readonly taxaService: TaxonService,
         private readonly taxonomicUnitService: TaxonomicUnitService,
-        //private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
+        private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
         private readonly taxonomicStatusService: TaxonomicStatusService,
         //private readonly taxonVernacularService: TaxonVernacularService,
         private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
@@ -181,7 +181,7 @@ export class TaxonStatusEditorComponent implements OnInit {
                                 // Find the name of the accepted taxon
                                 this.taxaService.findByIDWithSynonyms(taxonID)
                                     .subscribe((item) => {
-                                        this.taxon = item
+                                        //this.taxon = item
                                         const key = item.rankID + item.kingdomName
                                         //this.rankName = this.taxonomicUnitService.lookupRankName(item.rankID,item.kingdomName)
                                         this.ranksIDtoName = this.taxonomicUnitService.getRanksLookup()
@@ -296,12 +296,35 @@ export class TaxonStatusEditorComponent implements OnInit {
             })
         }
         dialogRef.afterClosed().subscribe(result => {
-            //if (result.event == 'Update') {
-            //    this.updateData(result.data)
-            //}
+            console.log(" zzzz " + result.data)
+            if (result.event == 'Update Parent') {
+                this.moveTaxonToNewParent(result.data)
+            }
         })
     }
 
+    moveTaxonToNewParent(newParent: string) {
+        // Figure out taxon id for the new parent
+        let children = []
+        const childrenSynonyms = {}
+
+        console.log(" moving parent " + newParent)
+        // Look up the scientific name first
+        this.taxaService.findScientificName(newParent.trim(),this.currentAuthorityID)
+            .subscribe((taxon) => {
+                let parentTaxonID = taxon.id
+                // Move in taxa enum tree
+                this.taxonomicEnumTreeService.move(+this.taxonID, parentTaxonID, this.currentAuthorityID).subscribe((enumTree) => {
+                    if (!enumTree) {
+                        // Error occurred
+                    }
+                    // Move in tax status
+                })
+
+            })
+    }
+
+    /*
     updateData(obj) {
         // Copy data to current state
         this.taxon.scientificName = obj.scientificName
@@ -348,6 +371,8 @@ export class TaxonStatusEditorComponent implements OnInit {
                 }
             })
     }
+
+     */
 
     /*
     Internal routine to encapsulate the show error message at the bottom in case something goes awry

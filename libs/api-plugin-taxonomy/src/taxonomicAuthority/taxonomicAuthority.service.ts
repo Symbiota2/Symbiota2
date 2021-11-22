@@ -13,10 +13,17 @@ export class TaxonomicAuthorityService extends BaseService<TaxonomicAuthority>{
         super(myRepository);
     }
 
-    /*
-    Fetch all of the taxonomic authorities.
-    Can limit the list by a list of authority IDs.
-    Can also limit the number fetched and use an offset.
+    /**
+     * Find all of the taxonomic authority records potentially using an
+     * optional list of taxonomic authority ids
+     * Can also limit the number fetched and use an offset.
+     * Set find params using the 'TaxonomicAuthorityFindAllParamss'
+     * @param params - the 'TaxonomicAuthorityFindAllParams'
+     * @returns Observable of response from api casted as `TaxonomicAuthority[]`
+     * will be the found authorities
+     * @returns `of(null)` if api errors or not found
+     * @see TaxonomicAuthority
+     * @see TaxonomicAuthorityFindAllParams
      */
     async findAll(params?: TaxonomicAuthorityFindAllParams): Promise<TaxonomicAuthority[]> {
         const { limit, offset, ...qParams } = params;
@@ -26,16 +33,21 @@ export class TaxonomicAuthorityService extends BaseService<TaxonomicAuthority>{
             : this.myRepository.find({take: limit, skip: offset})
     }
 
-    /*
-    TODO: Not sure if this is implemented correctly.
+    /**
+     * Create a taxonomic authority record using a Partial TaxonomicAuthority record
+     * @param data The Partial data for the record to create
+     * @return number The created data or null (not found)
      */
     async create(data: Partial<TaxonomicAuthority>): Promise<TaxonomicAuthority> {
         const taxon = this.myRepository.create(data);
         return this.myRepository.save(taxon);
     }
 
-    /*
-    TODO: Implement
+    /**
+     * Update a taxononomic authority record using an authority id.
+     * @param id The id of the taxonomic authority
+     * @param data The data to update
+     * @return TaxonomicAuthority The updated data or null (not found or api error)
      */
     async updateByID(id: number, data: Partial<TaxonomicAuthority>): Promise<TaxonomicAuthority> {
         const updateResult = await this.myRepository.update({ id }, data);

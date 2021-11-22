@@ -14,10 +14,17 @@ export class TaxonDescriptionBlockService extends BaseService<TaxonDescriptionBl
         super(myRepository)
     }
 
-    /*
-    Fetch all of the descriptions.
-    Can limit the list by a list of authority IDs.
-    Can also limit the number fetched and use an offset.
+    /**
+     * Fetch all of the taxonomic description blocks meeting some conditions.
+     * Can limit the list by a list of authority IDs.
+     * Can also limit the number fetched and use an offset.
+     * Set find params using the 'TaxonDescriptionBlockFindAllParams'
+     * @param params - the 'TaxonDescriptionBlockFindAllParams'
+     * @returns Observable of response from api casted as `TaxonDescriptionBlock[]`
+     * will be the found blocks
+     * @returns `of(null)` if api errors
+     * @see TaxonDescriptionBlock
+     * @see TaxonDescriptionBlockFindAllParams
      */
     async findAll(params?: TaxonDescriptionBlockFindAllParams): Promise<TaxonDescriptionBlock[]> {
         const { limit, offset, ...qParams } = params
@@ -27,17 +34,27 @@ export class TaxonDescriptionBlockService extends BaseService<TaxonDescriptionBl
             : this.myRepository.find({take: limit, skip: offset})
     }
 
-    /*
-    Fetch the block data for a given taxon id.
-    */
+    /**
+     * Fetch the block data for a given taxon id.
+     * @param taxonID - the id of the taxon
+     * @returns Observable of response from api casted as `TaxonDescriptionBlock[]`
+     * will be the found blocks
+     * @returns `of(null)` if api errors
+     * @see TaxonDescriptionBlock
+     */
     async findBlocksForTaxon(taxonID): Promise<TaxonDescriptionBlock[]> {
         return await
             this.myRepository.find({ relations: ["descriptionStatements"], where: { taxonID: taxonID}})
     }
 
-    /*
-    Fetch the block data for a given taxon id.
-    */
+    /**
+     * Fetch the block data and the image data associated with those blocks for a given taxon id.
+     * @param taxonID - the id of the taxon
+     * @returns Observable of response from api casted as `TaxonDescriptionBlock[]`
+     * will be the found blocks
+     * @returns `of(null)` if api errors
+     * @see TaxonDescriptionBlock
+     */
     async findBlocksAndImagesForTaxon(taxonID): Promise<TaxonDescriptionBlock[]> {
         return await
             this.myRepository.find({
@@ -45,15 +62,26 @@ export class TaxonDescriptionBlockService extends BaseService<TaxonDescriptionBl
                 where: { taxonID: taxonID}})
     }
 
-    /*
-    Create a taxon description block
+    /**
+     * Create a taxon description block, inserting into database
+     * @param data - data for the inserted block
+     * @returns Observable of response from api casted as `TaxonDescriptionBlock`
+     * will be the inserted block
+     * @returns `of(null)` if api errors
+     * @see TaxonDescriptionBlock
      */
     async create(data: Partial<TaxonDescriptionBlockInputDto>): Promise<TaxonDescriptionBlock> {
         return this.myRepository.save(data)
     }
 
-    /*
-    Update a taxon description block
+    /**
+     * Update a taxon description block
+     * @param id - id of taxon description block to update
+     * @param data - data for the updated block
+     * @returns Observable of response from api casted as `TaxonDescriptionBlock`
+     * will be the updated block
+     * @returns `of(null)` if api errors or id not found
+     * @see TaxonDescriptionBlock
      */
     async updateByID(id: number, data: Partial<TaxonDescriptionBlock>): Promise<TaxonDescriptionBlock> {
         const updateResult = await this.myRepository.update({ id }, data)

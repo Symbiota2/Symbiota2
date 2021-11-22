@@ -31,14 +31,15 @@ export class TaxonStatusParentEditorDialogComponent {
 
     constructor(
         private readonly taxaService: TaxonService,
-        private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
-        private readonly taxonomicStatusService: TaxonomicStatusService,
-        private readonly taxonVernacularService: TaxonVernacularService,
-        private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
-        private readonly taxonomicUnitService: TaxonomicUnitService,
+        //private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
+        //private readonly taxonomicStatusService: TaxonomicStatusService,
+        //private readonly taxonVernacularService: TaxonVernacularService,
+        //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
+        //private readonly taxonomicUnitService: TaxonomicUnitService,
         public dialogRef: MatDialogRef<TaxonStatusParentEditorDialogComponent>,
         //@Optional() is used to prevent error if no data is passed
-        @Optional() @Inject(MAT_DIALOG_DATA) public data) {
+        @Optional() @Inject(MAT_DIALOG_DATA) public data
+    ) {
         this.local_data = {...data}
         this.action = this.local_data.action
         this.taxonomicAuthorityID = this.local_data.taxonomicAuthorityID
@@ -108,36 +109,14 @@ export class TaxonStatusParentEditorDialogComponent {
 
     doAction(){
         // Need to update the parent
-        console.log(" updated parent " + this.local_data.currentParentName)
+        console.log(" updated parent " + this.action)
         const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
-        this.moveTaxonToNewParent(sname)
         //this.moveTaxonToNewParent(this.local_data.currentParentName)
-        this.dialogRef.close({event:this.action,data:this.local_data})
+        this.dialogRef.close({event:this.action,data:sname})
     }
 
     closeDialog(){
         this.dialogRef.close({event:'Cancel'})
-    }
-
-    moveTaxonToNewParent(newParent: string) {
-        // Figure out taxon id for the new parent
-        let children = []
-        const childrenSynonyms = {}
-
-        console.log(" moving parent " + newParent)
-        // Look up the scientific name first
-        this.taxaService.findScientificName(newParent.trim(),this.taxonomicAuthorityID)
-            .subscribe((taxon) => {
-                let parentTaxonID = taxon.id
-                // Move in taxa enum tree
-                this.taxonomicEnumTreeService.move(this.taxonID, parentTaxonID, this.taxonomicAuthorityID).subscribe((enumTree) => {
-                    if (!enumTree) {
-                        // Error occurred
-                    }
-                    // Move in tax status
-                })
-
-            })
     }
 
 }

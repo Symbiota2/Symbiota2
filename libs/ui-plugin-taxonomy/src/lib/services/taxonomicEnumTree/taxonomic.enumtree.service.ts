@@ -1,10 +1,10 @@
 import { Observable, of } from 'rxjs';
-import { ApiClientService, AppConfigService } from '@symbiota2/ui-common';
-import { catchError, map } from 'rxjs/operators';
+import { AlertService, ApiClientService, AppConfigService, UserService } from '@symbiota2/ui-common';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { TaxonomicEnumTreeQueryBuilder } from './taxonomic-enumtree-query-builder';
 import { TaxonomicEnumTreeListItem } from '../../dto/taxonomic-enumtree-list-item';
-import { TaxonListItem } from '../../dto';
+import { TaxonDescriptionBlockListItem, TaxonListItem } from '../../dto';
 
 interface FindParams {
     taxonID: number
@@ -13,17 +13,35 @@ interface FindParams {
 
 @Injectable()
 export class TaxonomicEnumTreeService {
+    private jwtToken = this.user.currentUser.pipe(map((user) => user.token))
+    private creatorUID = null
+
     constructor(
+        private readonly alerts: AlertService,
+        private readonly user: UserService,
         private readonly apiClient: ApiClientService,
-        private readonly appConfig: AppConfigService) { }
+        private readonly appConfig: AppConfigService)
+    {
+        //Fill in the current user id
+        this.user.currentUser.subscribe((user) => {
+            if (user) {
+                this.creatorUID = user.uid
+            }
+        })
+    }
 
     private createQueryBuilder(): TaxonomicEnumTreeQueryBuilder {
         return new TaxonomicEnumTreeQueryBuilder(this.appConfig.apiUri());
     }
 
-    /*
-    Find all of the ancestors for a given taxon id and taxa authorityid
-    */
+    /**
+     * Find all of the ancestors for a given taxon id and taxa authority id
+     * @param tid - the id of the taxon to move
+     * @param authorityID - the taxonomic authority under which the find should happen
+     * @returns Observable of response from api casted as `TaxonomicEnumTreeListItem[]`
+     * will be the enum tree records of the found taxon
+     * @returns `of(null)` if taxon id does not exist or api errors
+     */
     findAncestors(tid: number, authorityID: number): Observable<TaxonomicEnumTreeListItem[]> {
         const url = this.createQueryBuilder()
             .findAncestors()
@@ -34,15 +52,24 @@ export class TaxonomicEnumTreeService {
         const query = this.apiClient.queryBuilder(url).get().build();
         return this.apiClient.send<any, Record<string, unknown>[]>(query)
             .pipe(
+                catchError((e) => {
+                    console.error(e)
+                    return of(null)
+                }),
                 map((taxonenumtree) => taxonenumtree.map((o) => {
                     return TaxonomicEnumTreeListItem.fromJSON(o);
                 }))
             )
     }
 
-    /*
-    Find all of the descendants for a given taxon id and taxa authorityid
-    */
+    /**
+     * Find all of the descendants for a given taxon id and taxa authorityid
+     * @param tid - the id of the taxon to move
+     * @param authorityID - the taxonomic authority under which the find should happen
+     * @returns Observable of response from api casted as `TaxonomicEnumTreeListItem[]`
+     * will be the enum tree records of the found descendants
+     * @returns `of(null)` if taxon id does not exist or api errors
+     */
     findDescendants(tid: number, authorityID: number): Observable<TaxonomicEnumTreeListItem[]> {
         const url = this.createQueryBuilder()
             .findDescendants()
@@ -53,15 +80,25 @@ export class TaxonomicEnumTreeService {
         const query = this.apiClient.queryBuilder(url).get().build();
         return this.apiClient.send<any, Record<string, unknown>[]>(query)
             .pipe(
+                catchError((e) => {
+                    console.error(e)
+                    return of(null)
+                }),
                 map((taxonenumtree) => taxonenumtree.map((o) => {
                     return TaxonomicEnumTreeListItem.fromJSON(o);
                 }))
             )
     }
 
-    /*
-    Find all of the descendants for a given taxon id and taxa authorityid
-    */
+    /**
+     * Find all of the descendants for a given taxon id and taxa authority id at a given rank
+     * @param tid - the id of the taxon to move
+     * @param rankID - the id of the rank to look for
+     * @param authorityID - the taxonomic authority under which the find should happen
+     * @returns Observable of response from api casted as `TaxonomicEnumTreeListItem[]`
+     * will be the enum tree records of the found descendants at this rank
+     * @returns `of(null)` if taxon id does not exist or api errors
+     */
     findDescendantsByRank(tid: number, rankID: number, authorityID?: number): Observable<TaxonomicEnumTreeListItem[]> {
         const url = this.createQueryBuilder()
             .findDescendantsByRank()
@@ -75,14 +112,23 @@ export class TaxonomicEnumTreeService {
         const query = this.apiClient.queryBuilder(url.build()).get().build();
         return this.apiClient.send<any, Record<string, unknown>[]>(query)
             .pipe(
+                catchError((e) => {
+                    console.error(e)
+                    return of(null)
+                }),
                 map((taxonenumtree) => taxonenumtree.map((o) => {
                     return TaxonomicEnumTreeListItem.fromJSON(o);
                 }))
             )
     }
 
-    /*
-    Find all of the ancestors for a given taxon id and taxa authorityid as taxon records
+    /**
+     * Find all of the ancestors for a given taxon id and taxa authorityid as taxon records
+     * @param tid - the id of the taxon to move
+     * @param authorityID - the taxonomic authority under which the find should happen
+     * @returns Observable of response from api casted as `TaxonListItem[]`
+     * will be the taxon records of the found ancestors
+     * @returns `of(null)` if taxon id does not exist or api errors
      */
     findAncestorTaxons(tid: number, authorityID: number): Observable<TaxonListItem[]> {
         const url = this.createQueryBuilder()
@@ -94,50 +140,26 @@ export class TaxonomicEnumTreeService {
         const query = this.apiClient.queryBuilder(url).get().build();
         return this.apiClient.send<any, Record<string, unknown>[]>(query)
             .pipe(
+                catchError((e) => {
+                    console.error(e)
+                    return of(null)
+                }),
                 map((taxon) => taxon.map((o) => {
                     return TaxonListItem.fromJSON(o);
                 }))
             )
     }
 
-    /*
-    Find all of the taxa enum records (the API service has a default taxa authority)
+    /**
+     * Move a taxon id to a new parent taxon id within the context of a taxa authority id
+     * @param id - the id of the taxon to move
+     * @param parentId - the id of the taxon to move it to (its new parent)
+     * @param authorityID - the taxonomic authority under which the move should happen
+     * @returns Observable of response from api casted as `TaxonomicEnumTreeListItem`
+     * will be the updated enum tree record
+     * @returns `of(null)` if taxon id does not exist or does not have editing permission or api errors
      */
-    findAll(params?: FindParams): Observable<TaxonomicEnumTreeListItem[]> {
-        const url = this.createQueryBuilder()
-            .findAll()
-            .build();
-
-        const query = this.apiClient.queryBuilder(url).get().build();
-        return this.apiClient.send<any, Record<string, unknown>[]>(query)
-            .pipe(
-                map((taxonenumtree) => taxonenumtree.map((o) => {
-                    return TaxonomicEnumTreeListItem.fromJSON(o);
-                }))
-            );
-    }
-
-    /*
-    Find a given taxon enum record, using a taxon id and a taxa authority id
-     */
-    findByID(id: number, authorityID: number): Observable<TaxonomicEnumTreeListItem> {
-        const url = this.createQueryBuilder()
-            .findOne()
-            .id(id)
-            .authorityID(authorityID)
-            .build();
-
-        const query = this.apiClient.queryBuilder(url).get().build()
-        return this.apiClient.send<any, Record<string, unknown>>(query)
-            .pipe(map((o) => TaxonomicEnumTreeListItem.fromJSON(o)))
-
-    }
-
-    /*
-    Move a taxon id to a new parent taxon id within the context of a taxa authority id
-    */
     move(id: number, parentId: number, authorityID: number): Observable<TaxonomicEnumTreeListItem> {
-        console.log(" doing " + id + " " + parentId + " " + authorityID)
         const url = this.createQueryBuilder()
             .move()
             .id(id)
@@ -145,10 +167,28 @@ export class TaxonomicEnumTreeService {
             .authorityId(authorityID)
             .build()
 
-        const query = this.apiClient.queryBuilder(url).get().build()
-        return this.apiClient.send<any, Record<string, unknown>>(query)
-            .pipe(map((o) => TaxonomicEnumTreeListItem.fromJSON(o)))
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .patch()
+                    .addJwtAuth(token)
+                    .build()
 
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((enumJson) => {
+                        if (enumJson === null) {
+                            return null
+                        }
+                        return TaxonomicEnumTreeListItem.fromJSON(enumJson);
+                    })
+                )
+            })
+        )
     }
 
 }

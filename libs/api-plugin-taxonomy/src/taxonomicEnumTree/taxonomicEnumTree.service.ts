@@ -15,8 +15,17 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
         super(taxonomicEnumTrees)
     }
 
-    /*
-    Get all of the taxon enum tree records (optionally narrow to a specific taxonomic authority by id).
+    /**
+     * Get all of the taxon enum tree records (optionally narrow to a specific taxonomic
+     * authority by id).
+     * Can also limit the number fetched and use an offset.
+     * Set find params using the 'TaxonomicEnumTreeFindAllParams'
+     * @param params - the 'TaxonomicEnumTreeFindAllParams'
+     * @returns Observable of response from api casted as `TaxaEnumTreeEntry[]`
+     * will be the found enum tree entries
+     * @returns `of(null)` if api errors or not found
+     * @see TaxaEnumTreeEntry
+     * @see TaxonomicEnumTreeFindAllParams
      */
     async findAll(params?: TaxonomicEnumTreeFindAllParams): Promise<TaxaEnumTreeEntry[]> {
         const { limit, offset, ...qParams } = params
@@ -51,8 +60,16 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
         }
     }
 
-    /*
-    Find the descendants for a given taxon and taxon authority (which is optional, in which case all are returned)
+    /**
+     * Find the descendants for a given taxon and taxon authority (which is optional, in
+     * which case all are returned)
+     * Set find params using the 'TaxonomicEnumTreeFindAllParams'
+     * @param params - the 'TaxonomicEnumTreeFindAllParams'
+     * @returns Observable of response from api casted as `TaxaEnumTreeEntry[]`
+     * will be the found enum tree entries
+     * @returns `of(null)` if api errors or not found
+     * @see TaxaEnumTreeEntry
+     * @see TaxonomicEnumTreeFindAllParams
      */
     async findDescendants(taxonid: string, params?: TaxonomicEnumTreeFindAllParams): Promise<TaxaEnumTreeEntry[]> {
         const { ...qParams } = params
@@ -66,38 +83,52 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
                 where: { parentTaxonID: taxonid}})
     }
 
-    /*
- Find the descendants for a given taxon id, rank id, and taxon authority (which is optional, in which case all are returned)
-  */
-    async findDescendantsByRank(taxonid: number, rankID: number, params?: TaxonomicEnumTreeFindAllParams): Promise<TaxaEnumTreeEntry[]> {
-        const { ...qParams } = params
+    /**
+     * Find the descendants for a given taxon id, rank id, and taxon authority
+     * (which is optional, in which case all are returned)
+     * Only fetches the scientific name and the taxon id
+     * Set find params using the 'TaxonomicEnumTreeFindAllParams'
+     * @param taxonid - the id of the taxon
+     * @param rankID - the id of the rank
+     * @param params - the 'TaxonomicEnumTreeFindAllParams'
+     * @returns Observable of response from api casted as `TaxaEnumTreeEntry[]`
+     * will be the found enum tree entries
+     * @returns `of(null)` if api errors or not found
+     * @see TaxaEnumTreeEntry
+     * @see TaxonomicEnumTreeFindAllParams
+     */
+    async findDescendantsByRank(taxonID: number, rankID: number, params?: TaxonomicEnumTreeFindAllParams): Promise<TaxaEnumTreeEntry[]> {
         const qb = this.taxonomicEnumTrees.createQueryBuilder('o')
-            //.select(['o.*', 'c.*'])
             .select([
                 'c.scientificName', 'o.taxonID'
             ])
-            //.limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
             .innerJoin('o.taxon', 'c')
             .where('c.rankID = :rankID AND o.parentTaxonID = :parentTaxonID',
-                { rankID: 220, parentTaxonID: taxonid })
+                { rankID: rankID, parentTaxonID: taxonID})
 
-        /*
-        if (qParams.taxonAuthorityID) {
-            qb.innerJoin('c.taxonStatuses', 'd')
-               .andWhere('d.taxonAuthorityID = :authorityID',
-                { authorityID: params.taxonAuthorityID })
+        // If authorityID is present use it
+        if (params.taxonAuthorityID) {
+            qb.andWhere('o.taxonomicAuthorityID = :authorityID',
+                    { authorityID: params.taxonAuthorityID })
         }
 
-         */
-
         return await qb.getMany()
-
     }
 
-    /*
-    Retrieve the ancestor records for a given taxon and taxon authority id (which is optional, in which case for any taxon authority are returned)
+    /**
+     * Retrieve the ancestor records for a given taxon and taxon authority id
+     * (which is optional, in which case for any taxon authority are returned)
+     * Fetches the entire record
+     * Set authority id as a param using the 'TaxonomicEnumTreeFindAllParams'
+     * @param taxonID - the id of the taxon
+     * @param params - the 'TaxonomicEnumTreeFindAllParams'
+     * @returns Observable of response from api casted as `TaxaEnumTreeEntry[]`
+     * will be the found enum tree entries
+     * @returns `of(null)` if api errors or not found
+     * @see TaxaEnumTreeEntry
+     * @see TaxonomicEnumTreeFindAllParams
      */
-    async findAncestors(taxonid: string, params?: TaxonomicEnumTreeFindAllParams): Promise<TaxaEnumTreeEntry[]> {
+    async findAncestors(taxonID: string, params?: TaxonomicEnumTreeFindAllParams): Promise<TaxaEnumTreeEntry[]> {
         const { ...qParams } = params
 
         // Fetch me, the underlying table stores a row for each tid/self->parenttid/ancestor relationship
@@ -107,39 +138,27 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
                     "parentTaxon",
                     "parentTaxon.acceptedTaxonStatuses",
                     "parentTaxon.acceptedTaxonStatuses.taxon"],
-                where: {taxonAuthorityID: params.taxonAuthorityID, taxonID: taxonid}})
+                where: {taxonAuthorityID: params.taxonAuthorityID, taxonID: taxonID}})
             : this.taxonomicEnumTrees.find({
                 relations: [
                     "parentTaxon",
                     "parentTaxon.acceptedTaxonStatuses",
                     "parentTaxon.acceptedTaxonStatuses.taxon"],
-                where: {taxonID: taxonid}})
+                where: {taxonID: taxonID}})
     }
 
-    /*
- Retrieve the ancestor records for a given taxon and taxon authority id (which is optional, in which case for any taxon authority are returned)
-  */
-    async findAncestors2(taxonid: string, params?: TaxonomicEnumTreeFindAllParams): Promise<TaxaEnumTreeEntry[]> {
-        const { ...qParams } = params
-
-        // Fetch me, the underlying table stores a row for each tid/self->parenttid/ancestor relationship
-        return (qParams.taxonAuthorityID) ?
-            await this.taxonomicEnumTrees.find({
-                relations: [
-                    "parentTaxon",
-                    "parentTaxon.acceptedTaxonStatuses",
-                    "parentTaxon.acceptedTaxonStatuses.taxon"],
-                where: {taxonAuthorityID: params.taxonAuthorityID, taxonID: taxonid}})
-            : await this.taxonomicEnumTrees.find({
-                relations: [
-                    "parentTaxon",
-                    "parentTaxon.acceptedTaxonStatuses",
-                    "parentTaxon.acceptedTaxonStatuses.taxon"],
-                where: {taxonID: taxonid}})
-    }
-
-    /*
-    TODO: Is this used?
+    /**
+     * Retrieve the children records for a given taxon and taxon authority id
+     * (which is optional, in which case for any taxon authority are returned)
+     * Fetches the entire record + parent taxon + taxon
+     * Set authority id as a param using the 'TaxonomicEnumTreeFindAllParams'
+     * @param taxonID - the id of the taxon
+     * @param params - the 'TaxonomicEnumTreeFindAllParams'
+     * @returns Observable of response from api casted as `TaxaEnumTreeEntry[]`
+     * will be the found enum tree entries
+     * @returns `of(null)` if api errors or not found
+     * @see TaxaEnumTreeEntry
+     * @see TaxonomicEnumTreeFindAllParams
      */
     async findChildren(taxonid: number[], params?: TaxonomicEnumTreeFindAllParams): Promise<TaxaEnumTreeEntry[]> {
         const { ...qParams } = params
@@ -155,30 +174,46 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
 
     }
 
+    /**
+     * Insert a taxonomic enum tree record using a Partial TaxaEnumTreeEntry record
+     * @param data The Partial data for the record to create
+     * @return number The created data or null (not found)
+     */
     async save(data: Partial<TaxaEnumTreeEntry>): Promise<TaxaEnumTreeEntry> {
         return await this.taxonomicEnumTrees.save(data)
     }
 
+    /**
+     * Modify the taxa enum tree by moving a taxon within the tree.
+     * Delete from the tree the records for the taxon
+     * Insert into the tree the records for where the taxon moved to
+     * @param params The TaxonomicEnumTreeMoveTaxonParams for the taxon to move
+     * @return TaxaEnumTreeEntry One of the moved taxons or null (not found)
+     * @see TaxaEnumTreeEntry
+     * @see TaxonomicEnumTreeMoveTaxonParams
+     */
     async moveTaxon(params: TaxonomicEnumTreeMoveTaxonParams): Promise<TaxaEnumTreeEntry> {
         const { ...qParams } = params
 
         console.log("moving " + qParams.taxonAuthorityID + " " + params.taxonID + " " + params.parentTaxonID)
         return null
 
-        /*
-        // Delete the taxonID's taxaEnum tree entries
-        await this.taxonomicEnumTrees.delete({
-            taxonAuthorityID: params.taxonAuthorityID,
-            taxonID: params.taxonID
-        })
-
-        // Find all of the new parent's taxaEnum tree entries
+        // First find all of the new parent's taxaEnum tree entries
         const entries =
             await this.taxonomicEnumTrees.find({
                 where: {
                     taxonAuthorityID: params.taxonAuthorityID,
                     taxonID: params.parentTaxonID
                 }})
+
+        // Sanity check, don't delete if entry not found!
+        if (!entries) return null
+
+        // Delete the taxonID's taxaEnum tree entries
+        await this.taxonomicEnumTrees.delete({
+            taxonAuthorityID: params.taxonAuthorityID,
+            taxonID: params.taxonID
+        })
 
         // Update the enum tree pointing the taxonID to the new parent's ancestors
         entries.forEach((entry) => {
@@ -195,15 +230,7 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
         data.initialTimestamp = new Date()
 
         return this.save(data)
-         */
     }
 
-    async updateByID(taxonID: number, data: Partial<TaxaEnumTreeEntry>): Promise<TaxaEnumTreeEntry> {
-        const updateResult = await this.taxonomicEnumTrees.update({ taxonID }, data)
-        if (updateResult.affected > 0) {
-            return this.findByID(taxonID)
-        }
-        return null
-    }
 
 }

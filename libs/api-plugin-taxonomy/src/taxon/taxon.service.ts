@@ -16,8 +16,16 @@ export class TaxonService extends BaseService<Taxon>{
         super(taxonRepo);
     }
 
-    /*
-    Service to find all of the taxons possibly using an array of ids and a taxonomic authority ID
+    /**
+     * Service to find all of the taxons possibly using an array of ids and a taxonomic authority ID
+     * Can also limit the number fetched and use an offset.
+     * Set find params using the 'TaxonAllParams'
+     * @param params - the 'TaxonAllParams'
+     * @returns Observable of response from api casted as `Taxon[]`
+     * will be the found statements
+     * @returns `of(null)` if api errors
+     * @see Taxon
+     * @see TaxonAllParams
      */
     async findAll(params?: TaxonFindAllParams): Promise<Taxon[]> {
         const { limit, offset, ...qParams } = params
@@ -52,8 +60,17 @@ export class TaxonService extends BaseService<Taxon>{
         }
     }
 
-    /*
-    Project the author and sciname from the taxa table using possibly a list of taxaIDs and an authority ID
+    /**
+     * Find all of the taxons possibly using an array of ids and
+     * a taxonomic authority ID, and include the authors with the result
+     * Can also limit the number fetched and use an offset.
+     * Set find params using the 'TaxonFindNamesParams'
+     * @param params - the 'TaxonFindNamesParams'
+     * @returns Observable of response from api casted as `Taxon[]`
+     * will be the found statements
+     * @returns `of(null)` if api errors
+     * @see Taxon
+     * @see TaxonFindNamesParams
      */
     async findAllScientificNamesPlusAuthors(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         const { limit,...qParams } = params
@@ -97,9 +114,17 @@ export class TaxonService extends BaseService<Taxon>{
         }
     }
 
-    /*
-    Project the sciname from the taxa table using possibly a list of taxaIDs and an authority ID
-    */
+    /**
+     * Find all of the scientific names of taxons possibly using an array of ids and
+     * a taxonomic authority ID
+     * Set find params using the 'TaxonFindNamesParams'
+     * @param params - the 'TaxonFindNamesParams'
+     * @returns Observable of response from api casted as `Taxon[]`
+     * will be the found statements
+     * @returns `of(null)` if api errors
+     * @see Taxon
+     * @see TaxonFindNamesParams
+     */
     async findAllScientificNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         //console.log("Taxon service: finding scientific names")
         const { limit,...qParams } = params
@@ -133,12 +158,18 @@ export class TaxonService extends BaseService<Taxon>{
         }
     }
 
-    /*
-    Project the sciname from the taxa table for the rank of family using possibly a list of taxaIDs
-    and an authority ID
+    /**
+     * Project the sciname from the taxa table for the rank of family using possibly
+     * a list of taxaIDs and an authority ID
+     * Set find params using the 'TaxonFindNamesParams'
+     * @param params - the 'TaxonFindNamesParams'
+     * @returns Observable of response from api casted as `Taxon[]`
+     * will be the found statements
+     * @returns `of(null)` if api errors
+     * @see Taxon
+     * @see TaxonFindNamesParams
      */
     async findFamilyNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
-        //console.log("Taxon service: finding scientific names")
         const { limit,...qParams } = params
 
         if (qParams.taxonAuthorityID) {
@@ -150,7 +181,7 @@ export class TaxonService extends BaseService<Taxon>{
                 .where('c.taxonAuthorityID = :authorityID',
                     { authorityID: params.taxonAuthorityID })
                 .andWhere('c.rankID = :rankID',
-                    { rankID: 140 })
+                    { rankID: 140 }) // [TODO Get the actual family rank id]
 
             if (qParams.partialName) {
                 qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
@@ -163,21 +194,26 @@ export class TaxonService extends BaseService<Taxon>{
             return (qParams.id)?
                 await this.taxonRepo.find({
                     select: ["scientificName", "id"],
-                    where: { id: In(params.id), rankID: 140 }
-                    // take: TaxonFindAllParams.MAX_LIMIT
+                    where: { id: In(params.id), rankID: 140 } // [TODO Get the actual family rank id]
                 })
                 : await this.taxonRepo.find({
                     select: ["scientificName","id"],
-                    where: { rankID: 140 }
-                   // take: TaxonFindAllParams.MAX_LIMIT
+                    where: { rankID: 140 } // [TODO Get the actual family rank id]
                 })
         }
     }
 
-    /*
-Project the sciname from the taxa table for the rank of genus using possibly a list of taxaIDs
-and an authority ID
- */
+    /**
+     * Project the sciname from the taxa table for the rank of genus using possibly
+     * a list of taxaIDs and an authority ID
+     * Set find params using the 'TaxonFindNamesParams'
+     * @param params - the 'TaxonFindNamesParams'
+     * @returns Observable of response from api casted as `Taxon[]`
+     * will be the found statements
+     * @returns `of(null)` if api errors
+     * @see Taxon
+     * @see TaxonFindNamesParams
+     */
     async findGenusNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         //console.log("Taxon service: finding scientific names")
         const { limit,...qParams } = params
@@ -191,7 +227,7 @@ and an authority ID
                 .where('c.taxonAuthorityID = :authorityID',
                     { authorityID: params.taxonAuthorityID })
                 .andWhere('c.rankID = :rankID',
-                    { rankID: 180 })
+                    { rankID: 180 }) // [TODO Get the actual genus rank id]
 
             if (qParams.partialName) {
                 qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
@@ -204,23 +240,27 @@ and an authority ID
             return (qParams.id)?
                 await this.taxonRepo.find({
                     select: ["scientificName", "id"],
-                    where: { id: In(params.id), rankID: 180 }
-                    //take: TaxonFindAllParams.MAX_LIMIT
+                    where: { id: In(params.id), rankID: 180 } // [TODO Get the actual genus rank id]
                 })
                 : await this.taxonRepo.find({
                     select: ["scientificName","id"],
-                    where: { rankID: 180 }
-                    //take: TaxonFindAllParams.MAX_LIMIT
+                    where: { rankID: 180 } // [TODO Get the actual genus rank id]
                 })
         }
     }
 
-    /*
-Project the sciname from the taxa table for the rank of species using possibly a list of taxaIDs
-and an authority ID
- */
+    /**
+     * Project the sciname from the taxa table for the rank of species using possibly
+     * a list of taxaIDs and an authority ID
+     * Set find params using the 'TaxonFindNamesParams'
+     * @param params - the 'TaxonFindNamesParams'
+     * @returns Observable of response from api casted as `Taxon[]`
+     * will be the found statements
+     * @returns `of(null)` if api errors
+     * @see Taxon
+     * @see TaxonFindNamesParams
+     */
     async findSpeciesNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
-        //console.log("Taxon service: finding scientific names")
         const { limit,...qParams } = params
 
         if (qParams.taxonAuthorityID) {
@@ -232,7 +272,7 @@ and an authority ID
                 .where('c.taxonAuthorityID = :authorityID',
                     { authorityID: params.taxonAuthorityID })
                 .andWhere('c.rankID = :rankID',
-                    { rankID: 220 })
+                    { rankID: 220 }) // [TODO Get the actual genus rank id]
 
             if (qParams.partialName) {
                 qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
@@ -247,34 +287,37 @@ and an authority ID
                     await this.taxonRepo.find({
                         select: ["scientificName", "id"],
                         where: { id: In(params.id),
-                            rankID: 220,
+                            rankID: 220, // [TODO Get the actual genus rank id]
                             scientificName: Like(params.partialName + '%') }
-                        //take: TaxonFindAllParams.MAX_LIMIT
                     })
                     : await this.taxonRepo.find({
                         select: ["scientificName", "id"],
-                        where: { id: In(params.id), rankID: 220 }
-                        //take: TaxonFindAllParams.MAX_LIMIT
+                        where: { id: In(params.id), rankID: 220 } // [TODO Get the actual genus rank id]
                     })
                 : (qParams.partialName)?
                     await this.taxonRepo.find({
                         select: ["scientificName","id"],
                         where: {
-                            rankID: 220,
+                            rankID: 220, // [TODO Get the actual genus rank id]
                             scientificName: Like(params.partialName + '%')
                         }
-                        //take: TaxonFindAllParams.MAX_LIMIT
                     })
                     : await this.taxonRepo.find({
                         select: ["scientificName","id"],
-                        where: { rankID: 220 }
-                        //take: TaxonFindAllParams.MAX_LIMIT
+                        where: { rankID: 220 } // [TODO Get the actual genus rank id]
                     })
         }
     }
 
-    /*
-    Find all of the taxons that have a particular scientific name.
+    /**
+     * Find the taxons that match a given scientific name, possibly using an authority id
+     * Set find params using the 'TaxonFindNamesParams'
+     * @param params - the 'TaxonFindNamesParams'
+     * @returns Observable of response from api casted as `Taxon[]`
+     * will be the found statements
+     * @returns `of(null)` if api errors
+     * @see Taxon
+     * @see TaxonFindNamesParams
      */
     async findByScientificName(sciname: string, params?: TaxonFindNamesParams): Promise<Taxon[]> {
         const { ...qParams } = params
@@ -291,9 +334,14 @@ and an authority ID
         }
     }
 
-    /*
-    Find a taxon and its synonyms using a taxon ID.
-    */
+    /**
+     * Find a taxon and its synonyms using a taxon ID.
+     * @param id - the taxon id
+     * @returns Observable of response from api casted as `Taxon`
+     * will be the found taxon
+     * @returns `of(null)` if api errors or not found
+     * @see Taxon
+     */
     async findByTIDWithSynonyms(id: number): Promise<Taxon> {
         return this.taxonRepo.findOne({
             relations: ["acceptedTaxonStatuses", "acceptedTaxonStatuses.parentTaxon"],
@@ -301,15 +349,22 @@ and an authority ID
         })
     }
 
-    /*
-    Find a taxon using a taxon ID.
+    /**
+     * Find a taxon using a taxon ID.
+     * @param id - the taxon id
+     * @returns Observable of response from api casted as `Taxon`
+     * will be the found taxon
+     * @returns `of(null)` if api errors or not found
+     * @see Taxon
      */
     async findByTID(id: number): Promise<Taxon> {
         return this.taxonRepo.findOne({ where: {id: id} })
     }
 
-    /*
-    Create a new taxon
+    /**
+     * Create a taxon record using a Partial Taxon record
+     * @param data The data for the record to create
+     * @return number The created data or null (not found)
      */
     async create(data: Partial<Taxon>): Promise<Taxon> {
         const taxon = this.taxonRepo.create(data);
@@ -320,7 +375,7 @@ and an authority ID
      * Update a taxon record using a taxon id.
      * @param id The id of the taxon
      * @param data The data to update
-     * @return number The updated data or null (not found)
+     * @return Taxon The updated data or null (not found or api error)
      */
     async updateByID(id: number, data: Partial<Taxon>): Promise<Taxon> {
         const updateResult = await this.taxonRepo.update({ id }, data);
