@@ -56,6 +56,7 @@ import {
 import { TaxonEditorPageComponent } from './pages'
 import { MatGridListModule } from '@angular/material/grid-list';
 import { TaxonStatusParentEditorDialogComponent } from './components/taxon-status-parent-editor-dialog/taxon-status-parent-editor-dialog.component';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @NgModule({
   imports: [
@@ -87,7 +88,8 @@ import { TaxonStatusParentEditorDialogComponent } from './components/taxon-statu
     ScrollingModule,
     MatTabsModule,
     MatTableModule,
-    MatGridListModule
+    MatGridListModule,
+    MatExpansionModule
   ],
     declarations: [
         TaxaSearchPage,

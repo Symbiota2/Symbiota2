@@ -1,37 +1,28 @@
-<!-- <h1 mat-dialog-title>Row Action :: <strong>{{action}}</strong></h1> -->
-<div mat-dialog-content>
-        <form *ngIf="action == 'Update Parent'" class="name-autocomplete-form">
+<symbiota2-expansion-panel label='{{"taxon.status.accepted.editor.dialog.change.link" | translate}}'>
+    <form class="name-autocomplete-form">
+        <mat-form-field class="name-autocomplete-full-width">
+            <mat-label>{{"taxon.status.accepted.editor.dialog.new.accepted" | translate}}</mat-label>
+            <input type="text"
+                   placeholder='{{"taxon.status.accepted.editor.dialog.sciname.placeholder" | translate}}'
+                   aria-label="String"
+                   matInput
+                   (keyup)="onKey($event)"
+                   [formControl]="nameControl"
+                   [matAutocomplete]="auto">
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option *ngFor="let option of nameOptions" [value]="nameFor(option)">
+                    {{nameFor(option)}} <small>{{authorFor(option)}}</small>
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+    </form>
+    <button mat-button (click)="doUpdateParentAction()">{{"taxon.status.accepted.editor.dialog.add.link" | translate}}</button>
+</symbiota2-expansion-panel>
+<p></p>
+<symbiota2-expansion-panel label='{{"taxon.status.accepted.editor.dialog.change.accepted" | translate}}'>
+    <button mat-button (click)="doMakeAcceptedAction()">{{"taxon.status.accepted.editor.dialog.change.status" | translate}}</button>
+</symbiota2-expansion-panel>
 
-            <!--
-            <mat-form-field appearance="fill">
-                <mat-label>{{'taxon.taxon.editor.scientificName' | translate}}</mat-label>
-                <input matInput
-                       maxlength="100"
-                       [value]="local_data.currentParentName"
-                       [(ngModel)]="local_data.currentParentName"
-                       [ngModelOptions]="{standalone: true}">
-            </mat-form-field>
-            -->
-
-                <mat-form-field class="name-autocomplete-full-width">
-                    <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxon.status.parent.editor.dialog.parent.taxon.label" | translate}}</mat-label>
-                    <!-- (keypress)="onKey($event)" -->
-                    <input *ngIf='kindOfName == "Scientific"' type="text"
-                           placeholder='{{"taxon.status.parent.editor.dialog.parent.taxon.placeholder" | translate}}'
-                           aria-label="String"
-                           matInput
-                           (keyup)="onKey($event)"
-                           [formControl]="nameControl"
-                           [matAutocomplete]="auto">
-                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-                        <mat-option *ngFor="let option of nameOptions" [value]="nameFor(option)">
-                            {{nameFor(option)}} <small>{{authorFor(option)}}</small>
-                        </mat-option>
-                    </mat-autocomplete>
-                </mat-form-field>
-        </form>
-</div>
 <div mat-dialog-actions>
-    <button mat-button (click)="doAction()">{{action}}</button>
     <button mat-button (click)="closeDialog()" mat-flat-button color="warn">{{'taxon.editor.dialog.cancel' | translate}}</button>
 </div>

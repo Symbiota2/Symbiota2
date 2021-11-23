@@ -59,7 +59,7 @@ export class TaxonStatusEditorComponent implements OnInit {
     private taxonID: string
     private idCounter = 0
     userID : number = null
-    userCanEdit: boolean = false
+    userCanEdit: boolean = true
     ranksIDtoName = new Map()
     rankName = ""
     statuses = []

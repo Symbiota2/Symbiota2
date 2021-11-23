@@ -1,3 +1,5 @@
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
 //#window {
 //    width: 50vw;
 //    min-height: 75vh;
@@ -18,4 +20,8 @@
 
 mat-form-field {
     width: 100%;
+}
+
+mat-button {
+    border: solid; background-color: #e7e7e7; color: black;
 }

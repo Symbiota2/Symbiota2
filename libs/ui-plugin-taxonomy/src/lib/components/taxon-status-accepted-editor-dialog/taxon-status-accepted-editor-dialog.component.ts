@@ -22,7 +22,6 @@ export class TaxonStatusAcceptedEditorDialogComponent {
     public local_data : any
     public element
     taxonomicAuthorityID
-    kindOfName = 'Scientific'
     nameControl = new FormControl()
     nameOptions: string[] = []
     hasAuthors = true
@@ -86,19 +85,19 @@ export class TaxonStatusAcceptedEditorDialogComponent {
     Reload the names as needed
      */
     loadNames(partialName) {
-        if (this.kindOfName == 'Scientific') {
-            this.loadScientificNames(partialName)
-        } else {
-            // An error, no common names suppported
-        }
+        this.loadScientificNames(partialName)
     }
 
-    doAction(){
+    doUpdateParentAction() {
         // Need to update the parent
-        console.log(" updated parent " + this.action)
         const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
         //this.moveTaxonToNewParent(this.local_data.currentParentName)
         this.dialogRef.close({event:this.action,data:sname})
+    }
+
+    doMakeAcceptedAction() {
+        // Make this one accepted
+        this.dialogRef.close({event:this.action,data:"foo"})
     }
 
     closeDialog(){
