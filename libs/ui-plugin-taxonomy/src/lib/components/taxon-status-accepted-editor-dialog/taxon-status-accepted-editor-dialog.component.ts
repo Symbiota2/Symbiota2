@@ -26,6 +26,7 @@ export class TaxonStatusAcceptedEditorDialogComponent {
     nameOptions: string[] = []
     hasAuthors = true
     taxonID
+    switchAcceptance = true
 
     constructor(
         private readonly taxaService: TaxonService,

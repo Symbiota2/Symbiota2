@@ -21,12 +21,14 @@ export class TaxonProfilePageComponent implements OnInit {
     image: ImageListItem
     images: ImageListItem[] = []
     taxon: TaxonListItem
+    taxonName = "unknown"
     taxonomicStatus: TaxonomicStatusListItem
     userID : number = null
     userCanEdit: boolean = false
 
     constructor(
         private readonly userService: UserService,
+        private readonly taxaService: TaxonService,
         private readonly taxonDescriptionBlockService: TaxonDescriptionBlockService,
         private readonly imageService: ImageService,
         private readonly taxonStatusService: TaxonomicStatusService,
@@ -41,6 +43,7 @@ export class TaxonProfilePageComponent implements OnInit {
     ngOnInit() {
         this.currentRoute.paramMap.subscribe(params => {
             this.taxonID = params.get('taxonID')
+
             // Load the profile
             this.loadProfile(parseInt(this.taxonID))
         })
@@ -57,6 +60,10 @@ export class TaxonProfilePageComponent implements OnInit {
     Load the taxon profile
      */
     loadProfile(taxonID: number) {
+        this.taxaService.findByID(taxonID).subscribe((taxon) => {
+            this.taxon = taxon
+            this.taxonName = taxon.scientificName
+        })
         this.taxonDescriptionBlockService.findBlocksByTaxonID(taxonID).subscribe((blocks) => {
             blocks.forEach((block) => {
                 if (block.descriptionStatements.length > 0) {

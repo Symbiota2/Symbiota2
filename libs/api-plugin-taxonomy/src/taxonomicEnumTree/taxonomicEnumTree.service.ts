@@ -187,47 +187,100 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
      * Modify the taxa enum tree by moving a taxon within the tree.
      * Delete from the tree the records for the taxon
      * Insert into the tree the records for where the taxon moved to
-     * @param params The TaxonomicEnumTreeMoveTaxonParams for the taxon to move
+     * Recursively move all of the children
+     * @param taxonID - the id of the taxon to move
+     * @param taxonAuthorityID - the id of the taxa authority
+     * @param parentTaxonID - the id of the taxon to move this taxon to
      * @return TaxaEnumTreeEntry One of the moved taxons or null (not found)
      * @see TaxaEnumTreeEntry
-     * @see TaxonomicEnumTreeMoveTaxonParams
      */
-    async moveTaxon(params: TaxonomicEnumTreeMoveTaxonParams): Promise<TaxaEnumTreeEntry> {
-        const { ...qParams } = params
+    async moveTaxon(taxonID, taxonAuthorityID, parentTaxonID): Promise<TaxaEnumTreeEntry> {
 
-        console.log("moving " + qParams.taxonAuthorityID + " " + params.taxonID + " " + params.parentTaxonID)
+        // [TODO wrap in a transaction ]
+        console.log("moving " + taxonAuthorityID + " " + taxonID + " " + parentTaxonID)
 
         // First find all of the new parent's taxaEnum tree entries
         const entries =
             await this.taxonomicEnumTrees.find({
                 where: {
-                    taxonAuthorityID: params.taxonAuthorityID,
-                    taxonID: params.parentTaxonID
+                    taxonAuthorityID: taxonAuthorityID,
+                    taxonID: parentTaxonID
                 }})
 
         // Sanity check, don't delete if entry not found!
         if (!entries) return null
 
+        // Next find all of the taxon to move's taxaEnum tree entries
+        const ancestors =
+            await this.taxonomicEnumTrees.find({
+                where: {
+                    taxonAuthorityID: taxonAuthorityID,
+                    taxonID: taxonID
+                }})
+
+        // Next get all of the descendant's of the current taxon
+        const descendants =
+            await this.taxonomicEnumTrees.find( {
+                where: {
+                    taxonAuthorityID: taxonAuthorityID,
+                    parentTaxonID: taxonID
+                }
+            })
+
         // Delete the taxonID's taxaEnum tree entries
+        console.log(" deleting where taxonID " + taxonID + " authority " + taxonAuthorityID)
         await this.taxonomicEnumTrees.delete({
-            taxonAuthorityID: params.taxonAuthorityID,
-            taxonID: params.taxonID
+            taxonAuthorityID: taxonAuthorityID,
+            taxonID: taxonID
         })
 
         // Update the enum tree pointing the taxonID to the new parent's ancestors
         entries.forEach((entry) => {
-            entry.taxonID = params.taxonID
+            entry.taxonID = taxonID
             entry.initialTimestamp = new Date()
+            console.log(" updating where taxonID " + taxonID + " authority " + entry.taxonAuthorityID + " parent " + entry.parentTaxonID)
             this.save(entry)
+        })
+
+        // For all of the descendants, delete their relevant taxaEnum tree entries
+        // and add the new ones
+        await descendants.forEach((descendant) => {
+            ancestors.forEach((ancestor) => {
+                console.log(" deleting desc where taxonID " + descendant.taxonID + " authority " + taxonAuthorityID + " parent " + ancestor.parentTaxonID)
+                this.taxonomicEnumTrees.delete( {
+                    taxonAuthorityID: taxonAuthorityID,
+                    taxonID: descendant.taxonID,
+                    parentTaxonID: ancestor.parentTaxonID
+                })
+            })
+        })
+
+        // Need to two loops to let the deletes finish before the inserts
+        await descendants.forEach((descendant) => {
+            entries.forEach((entry) => {
+                entry.taxonID = descendant.taxonID
+                entry.initialTimestamp = new Date()
+                console.log(" saving desc where taxonID " + descendant.taxonID + " authority " + entry.taxonAuthorityID + " parent " + entry.parentTaxonID)
+                this.save(entry)
+            })
+            // Add the entry for descendant with the new parent
+            const data = new TaxaEnumTreeEntry()
+            data.parentTaxonID = parentTaxonID
+            data.taxonID = descendant.taxonID
+            data.taxonAuthorityID = taxonAuthorityID
+            data.initialTimestamp = new Date()
+            console.log(" saving self desc where taxonID " + descendant.taxonID + " authority " + taxonAuthorityID + " parent " + parentTaxonID)
+            this.save(data)
         })
 
         // Add the entry for taxon with the new parent
         const data = new TaxaEnumTreeEntry()
-        data.parentTaxonID = params.parentTaxonID
-        data.taxonID = params.taxonID
-        data.taxonAuthorityID = params.taxonAuthorityID
+        data.parentTaxonID = parentTaxonID
+        data.taxonID = taxonID
+        data.taxonAuthorityID = taxonAuthorityID
         data.initialTimestamp = new Date()
-
+        console.log(" saving self where taxonID " + taxonID + " authority " + taxonAuthorityID + " parent " + parentTaxonID)
+        //return null
         return this.save(data)
     }
 

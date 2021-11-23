@@ -100,6 +100,7 @@
     "taxon.status.accepted.taxon.label": "Accepted Taxon",
     "taxon.status.accepted.editor.dialog.change.link": "Link to another Accepted Name",
     "taxon.status.accepted.editor.dialog.new.accepted": "Enter new accepted name",
+    "taxon.status.accepted.editor.dialog.switch.acceptance": "Switch Acceptance with Currently Accepted Name",
     "taxon.status.accepted.editor.dialog.sciname.placeholder": "Scientific name",
     "taxon.status.accepted.editor.dialog.add.link": "Add Link",
     "taxon.status.accepted.editor.dialog.change.status": "Change Status to Accepted",

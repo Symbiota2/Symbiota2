@@ -16,13 +16,16 @@
             </mat-autocomplete>
         </mat-form-field>
     </form>
-    <button mat-button (click)="doUpdateParentAction()">{{"taxon.status.accepted.editor.dialog.add.link" | translate}}</button>
+    <button mat-button mat-raised-button color="primary" (click)="doUpdateParentAction()">{{"taxon.status.accepted.editor.dialog.add.link" | translate}}</button>
 </symbiota2-expansion-panel>
 <p></p>
 <symbiota2-expansion-panel label='{{"taxon.status.accepted.editor.dialog.change.accepted" | translate}}'>
-    <button mat-button (click)="doMakeAcceptedAction()">{{"taxon.status.accepted.editor.dialog.change.status" | translate}}</button>
+    <mat-checkbox class="example-margin" [(ngModel)]='switchAcceptance'
+    >{{"taxon.status.accepted.editor.dialog.switch.acceptance" | translate}}</mat-checkbox>
+    <br/>
+    <button mat-button mat-raised-button color="primary" (click)="doMakeAcceptedAction()">{{"taxon.status.accepted.editor.dialog.change.status" | translate}}</button>
 </symbiota2-expansion-panel>
 
 <div mat-dialog-actions>
-    <button mat-button (click)="closeDialog()" mat-flat-button color="warn">{{'taxon.editor.dialog.cancel' | translate}}</button>
+    <button mat-button (click)="closeDialog()" mat-raised-button color="warn">{{'taxon.editor.dialog.cancel' | translate}}</button>
 </div>

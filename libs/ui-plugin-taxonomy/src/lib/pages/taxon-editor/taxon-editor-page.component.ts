@@ -21,6 +21,8 @@ import { MatDialog } from '@angular/material/dialog';
 
 export class TaxonEditorPageComponent implements OnInit {
     private taxonID: string
+    taxon
+    taxonName = "unknown"
     blocks: TaxonDescriptionBlockListItem[] =[]
 
     constructor(
@@ -55,6 +57,10 @@ export class TaxonEditorPageComponent implements OnInit {
     Load the taxon profile
     */
     loadProfile(taxonID: number) {
+        this.taxaService.findByID(taxonID).subscribe((taxon) => {
+            this.taxon = taxon
+            this.taxonName = taxon.scientificName
+        })
         this.taxonDescriptionBlockService.findBlocksByTaxonID(taxonID).subscribe((blocks) => {
             blocks.forEach((block) => {
                 if (block.descriptionStatements.length > 0) {
