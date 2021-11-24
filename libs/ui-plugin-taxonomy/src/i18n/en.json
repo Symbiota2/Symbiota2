@@ -107,6 +107,12 @@
     "taxon.status.accepted.editor.dialog.change.accepted": "Change to Accepted",
     "taxon.status.parent.editor.dialog.parent.taxon.label": "Enter Scientific Name of Parent Taxon",
     "taxon.status.parent.editor.dialog.parent.taxon.placeholder": "Scientific Name",
+    "taxon.status.editor.updated.move": "The Taxon was Moved",
+    "taxon.status.editor.updated.move.error": "Error in Moving the Taxon",
+    "taxon.status.editor.updated.ring": "The Taxon's status was Switched",
+    "taxon.status.editor.updated.ring.error": "Error in Switching the Status",
+    "taxon.status.editor.updated.change.accepted": "The Taxon's status was Changed",
+    "taxon.status.editor.updated.change.accepted.error": "Error in Changing the Status",
 
     "taxon.taxon.editor.securityStatus": "Security Status",
     "taxon.vernacular.editor.block.added": "Common name added",

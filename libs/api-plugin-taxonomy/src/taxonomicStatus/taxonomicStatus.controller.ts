@@ -138,7 +138,7 @@ export class TaxonomicStatusController {
         return dto
     }
 
-    @Patch(':id/:authorityID')
+    @Patch('updateToAccepted/:id/:authorityID')
     @ApiOperation({
         summary: "Update a taxonomic status record to accepted status using taxonID, taxon authority ID"
     })
@@ -165,7 +165,7 @@ export class TaxonomicStatusController {
         return status
     }
 
-    @Patch(':newTaxonId/:authorityId/:oldTaxonId')
+    @Patch('updateAcceptedRing/:newTaxonId/:authorityId/:oldTaxonId')
     @ApiOperation({
         summary: "Update a ring of taxonomic status record to a new accepted taxonID using a taxon authority ID and the old accepted taxonID"
     })

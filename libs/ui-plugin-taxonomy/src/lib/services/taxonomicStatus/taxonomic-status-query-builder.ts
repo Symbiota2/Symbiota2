@@ -90,13 +90,23 @@ class DeleteOneBuilder extends TaxonomicStatusQueryBuilder {
 }
 
 class UploadBuilder extends TaxonomicStatusQueryBuilder {
-    protected _id: number
+    protected _id: number = null
     protected _authorityId: number
     protected _acceptedId: number
 
     id(id: number): UploadBuilder {
         this._id = id
-        return this;
+        return this
+    }
+
+    acceptedRing(newTaxonID, taxonAuthorityID, oldTaxonID): UploadBuilder {
+        this.url.pathname += `/updateAcceptedRing/${newTaxonID}/${taxonAuthorityID}/${oldTaxonID}`
+        return this
+    }
+
+    toAccepted(taxonID, taxonAuthorityID): UploadBuilder {
+        this.url.pathname += `/updateToAccepted/${taxonID}/${taxonAuthorityID}`
+        return this
     }
 
     authorityId(id: number): UploadBuilder {
@@ -110,8 +120,10 @@ class UploadBuilder extends TaxonomicStatusQueryBuilder {
     }
 
     build(): string {
-        // Should have all of these to work
-        this.url.pathname += `/${this._id}/${this._authorityId}/${this._acceptedId}`
+        // If it doesn't have an ID, it is one of the special cases
+        if (this._id) {
+            this.url.pathname += `/${this._id}/${this._authorityId}/${this._acceptedId}`
+        }
         return super.build()
     }
 }

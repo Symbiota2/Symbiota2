@@ -211,7 +211,86 @@ export class TaxonomicStatusService {
                 )
             })
         )
+    }
 
+    /**
+     * sends request to api to change a taxon's status to accepted  (without making any other changes)
+     * @param taxonID - the taxonID of the newly accepted taxon
+     * @param taxonomicAuthorityID - the authority ID
+     * @returns Observable of response from api casted as `TaxonomicStatusOnlyListItem`
+     * will be the updated status of the newly accepted taxon
+     * @returns `of(null)` if status does not exist or does not have editing permission or api errors
+     */
+    updateToAccepted(taxonID, taxonomicAuthorityID): Observable<TaxonomicStatusOnlyListItem> {
+        const url = this.createUrlBuilder()
+            .upload()
+            .toAccepted(taxonID, taxonomicAuthorityID)
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .patch()
+                    .body([status])
+                    .addJwtAuth(token)
+                    .build()
+
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((blockJson) => {
+                        if (blockJson === null) {
+                            return null
+                        }
+                        return TaxonomicStatusOnlyListItem.fromJSON(blockJson);
+                    })
+                )
+            })
+        )
+    }
+
+    /**
+     * sends request to api to change a taxon status to accepted and the accepted to not accepted (also have to
+     * update all of the synonyms)
+     * @param newTaxonID - the taxonID of the newly accepted taxon
+     * @param taxonomicAuthorityID - the authority ID
+     * @param oldTaxonID - the taxonID of the previously accepted taxon
+     * @returns Observable of response from api casted as `TaxonomicStatusOnlyListItem`
+     * will be the updated status of the newly accepted taxon
+     * @returns `of(null)` if status does not exist or does not have editing permission or api errors
+     */
+    updateAcceptedRing(newTaxonID, taxonomicAuthorityID, oldTaxonID): Observable<TaxonomicStatusOnlyListItem> {
+        const url = this.createUrlBuilder()
+            .upload()
+            .acceptedRing(newTaxonID, taxonomicAuthorityID, oldTaxonID)
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .patch()
+                    .body([status])
+                    .addJwtAuth(token)
+                    .build()
+
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((blockJson) => {
+                        if (blockJson === null) {
+                            return null
+                        }
+                        return TaxonomicStatusOnlyListItem.fromJSON(blockJson);
+                    })
+                )
+            })
+        )
     }
 
     /**

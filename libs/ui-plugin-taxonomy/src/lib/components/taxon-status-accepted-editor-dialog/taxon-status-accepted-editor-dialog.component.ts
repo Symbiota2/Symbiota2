@@ -89,16 +89,21 @@ export class TaxonStatusAcceptedEditorDialogComponent {
         this.loadScientificNames(partialName)
     }
 
-    doUpdateParentAction() {
+    doAddLinkAction() {
         // Need to update the parent
-        const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
+        const sname =
+            this.hasAuthors?
+                this.nameControl.value?
+                    this.nameControl.value.split(' -')[0]
+                    : this.nameControl.value
+                : ""
         //this.moveTaxonToNewParent(this.local_data.currentParentName)
-        this.dialogRef.close({event:this.action,data:sname})
+        this.dialogRef.close({event:this.action,data: {action: "link", name: sname}})
     }
 
     doMakeAcceptedAction() {
         // Make this one accepted
-        this.dialogRef.close({event:this.action,data:"foo"})
+        this.dialogRef.close({event:this.action,data: {action: "make accepted", switch: this.switchAcceptance}})
     }
 
     closeDialog(){

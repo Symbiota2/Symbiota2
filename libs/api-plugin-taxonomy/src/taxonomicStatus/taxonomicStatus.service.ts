@@ -149,8 +149,8 @@ export class TaxonomicStatusService extends BaseService<TaxonomicStatus>{
      */
     async updateAcceptedRing(
         newTaxonID: number,
-        oldTaxonID,
-        taxonAuthorityID:number
+        taxonAuthorityID:number,
+        oldTaxonID: number
     ): Promise<TaxonomicStatus> {
 
         const ring = await this.myRepository.update(
