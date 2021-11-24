@@ -196,8 +196,8 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
      */
     async moveTaxon(taxonID, taxonAuthorityID, parentTaxonID): Promise<TaxaEnumTreeEntry> {
 
-        // [TODO wrap in a transaction ]
-        console.log("moving " + taxonAuthorityID + " " + taxonID + " " + parentTaxonID)
+        // [TODO wrap in a transaction? ]
+        //console.log("moving " + taxonAuthorityID + " " + taxonID + " " + parentTaxonID)
 
         // First find all of the new parent's taxaEnum tree entries
         const entries =
@@ -228,25 +228,28 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
             })
 
         // Delete the taxonID's taxaEnum tree entries
-        console.log(" deleting where taxonID " + taxonID + " authority " + taxonAuthorityID)
+        //console.log(" deleting where taxonID " + taxonID + " authority " + taxonAuthorityID)
         await this.taxonomicEnumTrees.delete({
             taxonAuthorityID: taxonAuthorityID,
             taxonID: taxonID
         })
 
         // Update the enum tree pointing the taxonID to the new parent's ancestors
-        entries.forEach((entry) => {
-            entry.taxonID = taxonID
-            entry.initialTimestamp = new Date()
-            console.log(" updating where taxonID " + taxonID + " authority " + entry.taxonAuthorityID + " parent " + entry.parentTaxonID)
-            this.save(entry)
+        await entries.forEach((entry) => {
+            const data = new TaxaEnumTreeEntry()
+            data.parentTaxonID = entry.parentTaxonID
+            data.taxonID = taxonID
+            data.taxonAuthorityID = entry.taxonAuthorityID
+            data.initialTimestamp = new Date()
+            //console.log(" updating where taxonID " + taxonID + " authority " + entry.taxonAuthorityID + " parent " + entry.parentTaxonID)
+            this.save(data)
         })
 
         // For all of the descendants, delete their relevant taxaEnum tree entries
         // and add the new ones
         await descendants.forEach((descendant) => {
             ancestors.forEach((ancestor) => {
-                console.log(" deleting desc where taxonID " + descendant.taxonID + " authority " + taxonAuthorityID + " parent " + ancestor.parentTaxonID)
+                //console.log(" deleting desc where taxonID " + descendant.taxonID + " authority " + taxonAuthorityID + " parent " + ancestor.parentTaxonID)
                 this.taxonomicEnumTrees.delete( {
                     taxonAuthorityID: taxonAuthorityID,
                     taxonID: descendant.taxonID,
@@ -255,13 +258,16 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
             })
         })
 
-        // Need to two loops to let the deletes finish before the inserts
+        // Need to do two loops to let the deletes finish before the inserts
         await descendants.forEach((descendant) => {
             entries.forEach((entry) => {
-                entry.taxonID = descendant.taxonID
-                entry.initialTimestamp = new Date()
-                console.log(" saving desc where taxonID " + descendant.taxonID + " authority " + entry.taxonAuthorityID + " parent " + entry.parentTaxonID)
-                this.save(entry)
+                const data = new TaxaEnumTreeEntry()
+                data.parentTaxonID = entry.parentTaxonID
+                data.taxonID = descendant.taxonID
+                data.taxonAuthorityID = entry.taxonAuthorityID
+                data.initialTimestamp = new Date()
+                //console.log(" saving desc where taxonID " + entry.taxonID + " authority " + entry.taxonAuthorityID + " parent " + entry.parentTaxonID)
+                this.save(data)
             })
             // Add the entry for descendant with the new parent
             const data = new TaxaEnumTreeEntry()
@@ -269,7 +275,7 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
             data.taxonID = descendant.taxonID
             data.taxonAuthorityID = taxonAuthorityID
             data.initialTimestamp = new Date()
-            console.log(" saving self desc where taxonID " + descendant.taxonID + " authority " + taxonAuthorityID + " parent " + parentTaxonID)
+            //console.log(" saving self desc where taxonID " + descendant.taxonID + " authority " + taxonAuthorityID + " parent " + parentTaxonID)
             this.save(data)
         })
 
@@ -279,10 +285,7 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
         data.taxonID = taxonID
         data.taxonAuthorityID = taxonAuthorityID
         data.initialTimestamp = new Date()
-        console.log(" saving self where taxonID " + taxonID + " authority " + taxonAuthorityID + " parent " + parentTaxonID)
-        //return null
+        //console.log(" saving self where taxonID " + taxonID + " authority " + taxonAuthorityID + " parent " + parentTaxonID)
         return this.save(data)
     }
-
-
 }

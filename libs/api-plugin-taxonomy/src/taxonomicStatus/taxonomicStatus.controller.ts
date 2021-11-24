@@ -138,6 +138,61 @@ export class TaxonomicStatusController {
         return dto
     }
 
+    @Patch(':id/:authorityID')
+    @ApiOperation({
+        summary: "Update a taxonomic status record to accepted status using taxonID, taxon authority ID"
+    })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({ status: HttpStatus.OK, type: Taxon })
+    @ApiBody({ type: TaxonomicStatusInputDto, isArray: true })
+    //@SerializeOptions({ groups: ['single'] })
+    async updateToAccepted(
+        @Req() request: AuthenticatedRequest,
+        @Param('id') id: number,
+        @Param('authorityID') authorityId: number
+    ): Promise<TaxonomicStatus> {
+
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const status = await this.taxanomicStatusService.updateToAccepted(id, authorityId)
+        if (!status) {
+            throw new NotFoundException()
+        }
+        return status
+    }
+
+    @Patch(':newTaxonId/:authorityId/:oldTaxonId')
+    @ApiOperation({
+        summary: "Update a ring of taxonomic status record to a new accepted taxonID using a taxon authority ID and the old accepted taxonID"
+    })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({ status: HttpStatus.OK, type: Taxon })
+    @ApiBody({ type: TaxonomicStatusInputDto, isArray: true })
+    //@SerializeOptions({ groups: ['single'] })
+    async updateAcceptedRing(
+        @Req() request: AuthenticatedRequest,
+        @Param('newTaxonId') newTaxonId: number,
+        @Param('authorityId') authorityId: number,
+        @Param('oldTaxonId') oldTaxonId: number
+    ): Promise<TaxonomicStatus> {
+
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const status = await this.taxanomicStatusService.updateAcceptedRing(newTaxonId, authorityId, oldTaxonId)
+        if (!status) {
+            throw new NotFoundException()
+        }
+        return status
+    }
+
     @Patch(':id/:authorityID/:tidAcceptedID')
     @ApiOperation({
         summary: "Update a taxonomic status recoord by taxonID, taxon authority ID, and tidAcceptedID"

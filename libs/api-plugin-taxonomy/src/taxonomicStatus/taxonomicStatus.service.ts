@@ -119,6 +119,51 @@ export class TaxonomicStatusService extends BaseService<TaxonomicStatus>{
     }
 
     /**
+     * Change taxonomic status to accepted for a taxon id and a taxon authority id.
+     * @param taxonID The id of the taxon to make accepted
+     * @param taxonAuthorityID The id of the taxonomic authority
+     * @return TaxonomicStatus The new taxon's status or null (not found or api error)
+     */
+    async updateToAccepted(
+        taxonID: number,
+        taxonAuthorityID:number
+    ): Promise<TaxonomicStatus> {
+
+        const status = await this.myRepository.update(
+            { taxonID: taxonID, taxonAuthorityID: taxonAuthorityID },
+            { taxonIDAccepted: taxonID }
+        )
+        if (status.affected > 0) {
+            return this.findOne(taxonID, taxonAuthorityID, taxonID)
+        }
+        return null
+    }
+
+    /**
+     * Change accepted status in a ring using a new taxon accepted id and and old taxon accepted
+     * and a taxon authority id.
+     * @param newTaxonID The id of the taxon to make accepted
+     * @param oldTaxonID The id of the taxon to make not accepted
+     * @param taxonAuthorityID The id of the taxonomic authority
+     * @return TaxonomicStatus The new taxon's status or null (not found or api error)
+     */
+    async updateAcceptedRing(
+        newTaxonID: number,
+        oldTaxonID,
+        taxonAuthorityID:number
+    ): Promise<TaxonomicStatus> {
+
+        const ring = await this.myRepository.update(
+            { taxonIDAccepted: oldTaxonID, taxonAuthorityID: taxonAuthorityID },
+            { taxonIDAccepted: newTaxonID }
+        )
+        if (ring.affected > 0) {
+            return this.findOne(newTaxonID, taxonAuthorityID, newTaxonID)
+        }
+        return null
+    }
+
+    /**
      * Update a taxon record using a taxon id and authority id.
      * @param taxonID The id of the taxon
      * @param taxonAuthorityID The id of the taxonomic authority
