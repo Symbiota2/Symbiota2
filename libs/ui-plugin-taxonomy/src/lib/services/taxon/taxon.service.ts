@@ -44,6 +44,20 @@ export class TaxonService {
             .pipe(map((o) => Taxon.fromJSON(o)))
     }
 
+    findByScientificName(sciname, authorityID?): Observable<TaxonListItem[]> {
+        const url = this.createQueryBuilder()
+            .findByScientificName()
+            .authorityID(authorityID)
+            .scientificName(sciname)
+            .build()
+        //const query = this.apiClient.queryBuilder(url).get().build()
+        //return this.apiClient.send<any, Record<string, unknown>>(query)
+        //    .pipe(map((o) => Taxon[].fromJSON(o)))
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, Taxon[]>(query)
+    }
+
     findAllScientificNames(partialName, authorityID?): Observable<string[]> {
         const qb = this.createQueryBuilder()
             .findAllScientificNames()

@@ -22,6 +22,10 @@ export class TaxonQueryBuilder {
         return new FindAllScientificNamesPlusAuthorsBuilder(this.baseUrl)
     }
 
+    findByScientificName() : FindByScientificNameBuilder {
+        return new FindByScientificNameBuilder(this.baseUrl)
+    }
+
     findScientificName() : FindScientificNameBuilder {
         return new FindScientificNameBuilder(this.baseUrl)
     }
@@ -99,6 +103,42 @@ class UploadBuilder extends TaxonQueryBuilder {
             this.url.pathname += `/${this._id}`;
         }
         return super.build();
+    }
+}
+
+class FindByScientificNameBuilder extends TaxonQueryBuilder {
+    protected _scientificName: string = null
+
+    constructor(apiBaseUrl: string) {
+        super(apiBaseUrl)
+        this.baseUrl = apiBaseUrl
+        this.url = new URL(`${apiBaseUrl}/taxon/byScientificName`)
+    }
+
+    scientificName(sciName: string): FindByScientificNameBuilder {
+        this._scientificName = sciName
+        return this
+    }
+
+    authorityID(authorityID : string): FindByScientificNameBuilder {
+        this._authorityID = authorityID
+        return this
+    }
+
+    partialName(name : string): FindByScientificNameBuilder {
+        this._partialName = name
+        return this
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/${this._scientificName}`
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
+        }
+        if (this._partialName) {
+            this.url.searchParams.append(Q_PARAM_PARTIALNAME, this._partialName)
+        }
+        return super.build()
     }
 }
 

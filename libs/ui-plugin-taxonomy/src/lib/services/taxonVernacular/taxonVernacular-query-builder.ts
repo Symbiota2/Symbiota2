@@ -16,6 +16,10 @@ export class TaxonVernacularQueryBuilder {
         return new FindCommonNameBuilder(this.baseUrl,name)
     }
 
+    findByCommonName(name: string) : FindByCommonNameBuilder {
+        return new FindByCommonNameBuilder(this.baseUrl,name)
+    }
+
     findByTaxonID(taxonID: number) : FindByTaxonIDBuilder {
         return new FindByTaxonIDBuilder(this.baseUrl,taxonID)
     }
@@ -100,6 +104,29 @@ class UploadBuilder extends TaxonVernacularQueryBuilder {
             this.url.pathname += `/${this._id}`;
         }
         return super.build();
+    }
+}
+
+class FindByCommonNameBuilder extends TaxonVernacularQueryBuilder {
+    protected _commonName: string = null
+    protected _authorityID: number
+
+    constructor(apiBaseUrl: string, name: string) {
+        super(apiBaseUrl)
+        this.baseUrl = apiBaseUrl
+        this.url = new URL(`${apiBaseUrl}/taxonVernacular/byCommonName/${name}`)
+    }
+
+    authorityID(authorityID: number): FindByCommonNameBuilder {
+        this._authorityID = authorityID
+        return this
+    }
+
+    build(): string {
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID.toString())
+        }
+        return super.build()
     }
 }
 

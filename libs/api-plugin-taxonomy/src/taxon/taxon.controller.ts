@@ -147,14 +147,36 @@ export class TaxonController {
     }
 
     // The scientificName controller finds using a scientific name
+    @Get('byScientificName/:scientificName')
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonDto })
+    @ApiOperation({
+        summary: "Retrieve the taxons that match a scientific name."
+    })
+    async findByScientificName(
+        @Param('scientificName') sciname: string,
+        @Query() findNamesParams: TaxonFindNamesParams
+    ): Promise<TaxonDto[]> {
+        const taxons = await this.taxa.findByScientificName(sciname, findNamesParams)
+        if (!taxons) {
+            throw new NotFoundException()
+        } else if (taxons.length == 0) {
+            throw new NotFoundException()
+        }
+        const dto = taxons.map((taxon) => new TaxonDto(taxon))
+        return dto
+    }
+
+    // The scientificName controller finds using a scientific name
     @Get('scientificName/:scientificName')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDto })
     @ApiOperation({
-        summary: "Retrieve a scientific name."
+        summary: "Retrieve a taxon that matches a scientific name, just get the first of the list of names."
     })
-    async findByScientificName(@Param('scientificName') sciname: string, @Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonDto> {
+    async findScientificName(@Param('scientificName') sciname: string, @Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonDto> {
         const taxons = await this.taxa.findByScientificName(sciname, findNamesParams)
         if (!taxons) {
+            throw new NotFoundException()
+        } else if (taxons.length == 0) {
             throw new NotFoundException()
         }
         const dto = new TaxonDto(taxons[0])
