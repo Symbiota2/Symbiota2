@@ -8,7 +8,7 @@ import {
 import { readXmlFile } from '@symbiota2/api-common';
 import csv from 'csv-parser';
 import { createReadStream, mkdtempSync } from 'fs';
-//import { rm } from 'fs/promises';
+import { rm } from 'fs/promises';
 
 export class DwCArchiveParser {
     static async *read(filepath: string, dwcType: string) {
@@ -55,7 +55,7 @@ export class DwCArchiveParser {
             }
         }
 
-        //await rm(tempdir, { recursive: true });
+        await rm(tempdir, { recursive: true });
     }
 
     private static parseFields(fields: IDwCAMetaFieldType[]) {
