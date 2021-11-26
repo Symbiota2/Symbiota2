@@ -98,9 +98,9 @@
         <mat-checkbox class="example-margin" [(ngModel)]='includeAuthors'>{{"taxonomy.viewer.label.checkbox.include.authors" | translate}}</mat-checkbox>
 
         <symbiota2-expansion-panel *ngIf='possibleTaxons.length > 1' label='{{"taxonomy.viewer.label.choose.taxon" | translate}}'>
-            <mat-selection-list #possibleTaxons [multiple]="false">
-                <mat-list-option *ngFor="let taxon of possibleTaxons" [value]="taxon">
-                    {{taxon.name}}
+            <mat-selection-list [multiple]="false">
+                <mat-list-option *ngFor="let txn of possibleTaxons" [value]="txn.taxonID">
+                    {{txn.name}}
                 </mat-list-option>
             </mat-selection-list>
         </symbiota2-expansion-panel>

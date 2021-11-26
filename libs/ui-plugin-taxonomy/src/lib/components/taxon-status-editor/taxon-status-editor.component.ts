@@ -61,10 +61,11 @@ export class TaxonStatusEditorComponent implements OnInit {
     private taxonID: string
     private idCounter = 0
     userID : number = null
-    userCanEdit: boolean = true
+    userCanEdit: boolean = false
     ranksIDtoName = new Map()
     rankName = ""
     statuses = []
+    synonymList = []
 
     constructor(
         private readonly userService: UserService,
@@ -188,10 +189,37 @@ export class TaxonStatusEditorComponent implements OnInit {
                             } else {
                                 // I am not a synonym, let's look to see if anyone is a synonym of me
                                 this.isAccepted.set(myStatus.taxonAuthorityID,true)
+                                console.log("synonomys ")
+                                this.taxonomicStatusService.findSynonyms(taxonID,this.currentAuthorityID)
+                                    .subscribe( (syn) => {
+                                        this.synonymList = []
+                                        console.log("syn " + syn.length)
+                                        syn.forEach(function(synonym) {
+                                            // Add the synonym to a list of synonyms
+
+                                            const synonymItem = {
+                                                name: synonym.taxon.scientificName,
+                                                taxonID: synonym.taxon.id
+                                            }
+
+                                            this.synonymList.push(synonymItem)
+                                        })
+                                        // Sort the list of synonyms
+                                        this.synonymList = this.synonymList.sort(function(a, b) {
+                                            return 0 - (a.name > b.name ? 1 : -1)
+                                        })
+                                    })
+                                /*
                                 // Find the name of the accepted taxon
                                 this.taxaService.findByIDWithSynonyms(taxonID)
                                     .subscribe((item) => {
+                                        const statuses = item.acceptedTaxonStatuses
+                                        statuses.forEach((status) => {
+                                            status.taxonID
+                                        })
+                                 */
                                         //this.taxon = item
+                                        /*
                                         const key = item.rankID + item.kingdomName
                                         //this.rankName = this.taxonomicUnitService.lookupRankName(item.rankID,item.kingdomName)
                                         this.ranksIDtoName = this.taxonomicUnitService.getRanksLookup()
@@ -206,7 +234,10 @@ export class TaxonStatusEditorComponent implements OnInit {
                                         } else {
                                             this.rankName = this.ranksIDtoName.has(key) ? this.ranksIDtoName.get(key) : 'unknown'
                                         }
-                                    })
+
+                                         */
+
+                                    //})
                                 // Trigger rebinding
                                 this.setCurrentAuthorityID(this.currentAuthorityID)
                             }

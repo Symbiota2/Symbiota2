@@ -33,5 +33,10 @@
     <div *ngIf='currentIsAccepted'>
         <!-- List of synonnyms
         -->
+        <mat-list role='list'>
+            <mat-list-item *ngFor="let syn of synonymList">
+                {{syn.name}}
+            </mat-list-item>
+        </mat-list>
     </div>
 </symbiota2-expansion-panel>

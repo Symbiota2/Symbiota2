@@ -57,7 +57,7 @@ export class TaxaViewerPageComponent implements OnInit {
     private taxon: TaxonListItem
     nameFound = false
     looking = false
-    possibleTaxons : TaxonNode[] = []
+    possibleTaxons  = []
 
     constructor(
         //private readonly userService: UserService,  // TODO: needed for species hiding
@@ -212,19 +212,26 @@ export class TaxaViewerPageComponent implements OnInit {
     /*
     Find the children and ancestors for the given sciname
      */
-    private buildTree(sciname: string) {
+    private buildTree(taxonID: number) {
         let children = []
         const childrenSynonyms = {}
 
         this.looking = true
         // Look up the scientific name first
-        this.taxaService.findScientificName(sciname.trim(),this.taxonomicAuthorityID)
+        this.taxaService.findByID(taxonID)
+        //this.taxaService.findScientificName(sciname.trim(),this.taxonomicAuthorityID)
             .subscribe((taxon) => {
                 if (taxon) {
-                    this.nameFound = true
                     this.taxon = taxon
                     let taxonID = taxon.id
-                    let baseNode: TaxonNode = { name: sciname, taxonID: taxonID, author: taxon.author, expanded: true, synonym: false, children: []}
+                    let baseNode: TaxonNode = {
+                        name: taxon.scientificName,
+                        taxonID: taxonID,
+                        author: taxon.author,
+                        expanded: true,
+                        synonym: false,
+                        children: []
+                    }
 
                     // Is this taxon a synonym?
                     this.taxonomicStatusService.findAll(
@@ -455,23 +462,51 @@ export class TaxaViewerPageComponent implements OnInit {
 
         // Look up the common name first
         this.taxonVernacularService
-            .findCommonName(name, this.taxonomicAuthorityID)
-            .subscribe((taxon) => {
-            if (taxon) {
-                // Found at least one
-                this.nameFound = true
-                const tid = taxon.taxonID
-
-                // lookup its name by tid
-                this.taxaService.findByID(tid, this.taxonomicAuthorityID)
-                    .subscribe((taxonRec) => {
-
-                        // Go find the ancestors for this name
-                        this.buildTree(taxonRec.scientificName)
+            .findByCommonName(name, this.taxonomicAuthorityID)
+            .subscribe((items) => {
+                if (items.length == 0) {
+                    this.nameFound = false
+                } else if (items.length > 2) {
+                    this.nameFound = true
+                    // Need to build a list of taxons to select
+                    // lookup its name by tid
+                    this.possibleTaxons = []
+                    items.forEach((item) => {
+                        this.taxaService.findByID(item.taxonID, this.taxonomicAuthorityID)
+                            .subscribe((taxon) => {
+                                // Found a synonym, add it to the list of synonyms
+                                const taxonItem: TaxonNode = {
+                                    name: taxon.scientificName,
+                                    taxonID: item.taxonID,
+                                    author: taxon.author,
+                                    expanded: false,
+                                    synonym: false,
+                                    children: []
+                                }
+                              this.possibleTaxons.push(taxonItem)
+                            })
                     })
-            } else {
-                this.nameFound = false
-            }
+                } else {
+                    // Found one
+                    const item = items[0]
+                    if (item) {
+                        this.nameFound = true
+                        const tid = item.taxonID
+
+                        // lookup its name by tid
+                        this.taxaService.findByID(tid, this.taxonomicAuthorityID)
+                            .subscribe((taxonRec) => {
+
+                                // Go find the ancestors for this name
+                                this.buildTree(taxonRec.id)
+                                // this.buildTree(taxonRec.scientificName)
+                            })
+                    } else {
+                        // Only if list has a null value, which is not possible?
+                        this.nameFound = false
+                    }
+                }
+
 
         })
     }
@@ -678,11 +713,55 @@ export class TaxaViewerPageComponent implements OnInit {
         this.dataSource.data = []
         if (this.kindOfName == 'Scientific') {
             const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
-            this.buildTree(sname)
+            //this.buildTree(sname)
+            this.nameListCheck(sname)
         } else {
             this.findCommonAncestors(this.nameControl.value)
         }
 
+    }
+
+    nameListCheck(sciname) {
+        this.looking = true
+        // Look up the scientific name first
+        this.taxaService.findByScientificName(sciname.trim(), this.taxonomicAuthorityID)
+            .subscribe((taxons) => {
+                if (!taxons) {
+                    // No name found
+                    this.nameFound = false
+                } else if (taxons.length > 1) {
+                    // Found several names
+                    this.nameFound = true
+                    // Need to build a list of taxons to select
+                    // lookup its name by tid
+                    this.possibleTaxons = []
+                    taxons.forEach((item) => {
+                        this.taxaService.findByID(item.id, this.taxonomicAuthorityID)
+                            .subscribe((taxon) => {
+                                // Found a synonym, add it to the list of synonyms
+                                const taxonItem: TaxonNode = {
+                                    name: taxon.scientificName,
+                                    taxonID: item.id,
+                                    author: taxon.author,
+                                    expanded: false,
+                                    synonym: false,
+                                    children: []
+                                }
+                                this.possibleTaxons.push(taxonItem)
+                            })
+                    })
+                } else {
+                    // Found one
+                    const taxon = taxons[0]
+                    if (taxon) {
+                        this.nameFound = true
+                        this.buildTree(+taxon.id)
+                    } else {
+                        // Should never get here
+                        this.nameFound = false
+                    }
+                }
+            })
     }
 
 }
