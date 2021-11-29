@@ -192,18 +192,22 @@ export class TaxonStatusEditorComponent implements OnInit {
                                 console.log("synonomys ")
                                 this.taxonomicStatusService.findSynonyms(taxonID,this.currentAuthorityID)
                                     .subscribe( (syn) => {
-                                        this.synonymList = []
-                                        console.log("syn " + syn.length)
+                                        const tempList = []
+                                        console.log("syn " + this.synonymList)
                                         syn.forEach(function(synonym) {
                                             // Add the synonym to a list of synonyms
 
+                                            console.log( "foo " + synonym)
+                                            console.log( "foo2 " + synonym.taxon.id)
                                             const synonymItem = {
                                                 name: synonym.taxon.scientificName,
                                                 taxonID: synonym.taxon.id
                                             }
 
-                                            this.synonymList.push(synonymItem)
+                                            console.log("syn2 " + tempList)
+                                            tempList.push(synonymItem)
                                         })
+                                        this.synonymList = tempList
                                         // Sort the list of synonyms
                                         this.synonymList = this.synonymList.sort(function(a, b) {
                                             return 0 - (a.name > b.name ? 1 : -1)

@@ -362,6 +362,14 @@ export class TaxonService extends BaseService<Taxon>{
     }
 
     /**
+     * Returns a list of the fields of the taxon entity
+     */
+    getFields(): string[] {
+        const entityColumns = this.taxonRepo.metadata.columns;
+        return entityColumns.map((c) => c.propertyName);
+    }
+
+    /**
      * Create a taxon record using a Partial Taxon record
      * @param data The data for the record to create
      * @return number The created data or null (not found)

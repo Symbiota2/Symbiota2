@@ -30,9 +30,10 @@
             <mat-icon color="primary" (click)="openDialog('Update Accepted',{})">edit</mat-icon>
         </button>
     </div>
-    <div *ngIf='currentIsAccepted'>
+    <div *ngIf='currentIsAccepted && synonymList.length > 0'>
         <!-- List of synonnyms
         -->
+        <b>{{"taxon.status.synonyms.label" | translate}}:</b>
         <mat-list role='list'>
             <mat-list-item *ngFor="let syn of synonymList">
                 {{syn.name}}

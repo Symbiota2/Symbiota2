@@ -219,6 +219,14 @@ export class TaxonController {
         return dto
     }
 
+    @Get('meta/fields')
+    @ApiOperation({
+        summary: 'Retrieve the list of fields for the taxon entity'
+    })
+    async getFields(): Promise<string[]> {
+        return this.taxa.getFields()
+    }
+
     private canEdit(request) {
         // SuperAdmins and TaxonProfileEditors have editing privileges
         const isSuperAdmin = TokenService.isSuperAdmin(request.user)
