@@ -44,25 +44,37 @@
                     ><mat-icon>description</mat-icon>Archive
                     Details</mat-card-title
                 >
-                <mat-card-content *ngIf="archiveInfo$ | async as archive">
-                    <p>
-                        <b>DwC-Archive File:</b>
-                        <ng-container>
-                            {{ archive.archive }}
-                        </ng-container>
-                    </p>
-                    <p>
-                        <b>Description:</b>
-                        Darwin Core Archive for {{ collection.collectionName }}
-                    </p>
-                    <p>
-                        <b>Size in bytes:</b>
-                        {{ archive.size }}
-                    </p>
-                    <p>
-                        <b>Last Update:</b>
-                        {{ archive.updatedAt.toString()}}
-                    </p>
+                <mat-card-content>
+                    <ng-container
+                        *ngIf="
+                            archiveInfo$ | async as archive;
+                            else elseTemplate
+                        "
+                    >
+                        <p>
+                            <b>DwC-Archive File: </b>
+                                <a (click)="onDownloadArchive()">{{ archive.archive }}</a>
+                        </p>
+                        <p>
+                            <b>Description:</b>
+                            Darwin Core Archive for
+                            {{ collection.collectionName }}
+                        </p>
+                        <p>
+                            <b>Size in bytes:</b>
+                            {{ archive.size }}
+                        </p>
+                        <p>
+                            <b>Last Update:</b>
+                            {{ archive.updatedAt.toString() }}
+                        </p>
+                    </ng-container>
+                    <ng-template #elseTemplate>
+                        <p>
+                            Looks like there are no DarwinCore-Archives
+                            published for this Collection yet
+                        </p>
+                    </ng-template>
                 </mat-card-content>
             </mat-card>
         </div>

@@ -8,8 +8,9 @@ import {
 } from '@symbiota2/ui-common';
 import { CollectionService } from '@symbiota2/ui-plugin-collection';
 import { HttpRequest } from 'aws-sdk';
-import { combineLatest, Observable, of } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { isInstance } from 'class-validator';
+import { combineLatest, Observable, of, throwError } from 'rxjs';
+import { catchError, map, switchMap, take } from 'rxjs/operators';
 import {
     CollectionArchive,
     PublishedCollection,
@@ -19,7 +20,7 @@ import {
 export class DarwinCoreArchiveService {
     private readonly DARWINCORE_BASE_URL = `${this.api.apiRoot()}/dwc`;
 
-    ArchiveList: Observable<CollectionArchive[]> = this.getArchiveList();
+    archiveList$: Observable<CollectionArchive[]> = this.getArchiveList();
 
     constructor(
         private readonly api: ApiClientService,
@@ -39,11 +40,19 @@ export class DarwinCoreArchiveService {
                     .build();
 
                 return this.api.sendFullResponse(req).pipe(
+                    take(1),
+                    catchError((err) => {
+                        console.log('error caught in service');
+                        console.error(err);
+
+                        //Handle the error here
+
+                        return of(null);
+                    }),
                     switchMap((dwc: HttpResponse<ResponseType>) => {
-                        if (dwc.ok) {
-                            return this.ArchiveList.pipe(
+                        if ( dwc != null && dwc.ok) {
+                            return this.archiveList$.pipe(
                                 map((archiveList) => {
-                                    archiveList[0].updatedAt.toDateString
                                     return archiveList.find(
                                         ({ collectionID }) =>
                                             collectionID === collection.id
@@ -51,12 +60,28 @@ export class DarwinCoreArchiveService {
                                 })
                             );
                         } else {
-                            return null;
+                            return of(null);
                         }
                     })
                 );
             })
         );
+    }
+
+    downloadCollectionArchive(collectionID: number): Observable<any> {
+
+        const req = this.api
+            .queryBuilder(`${this.DARWINCORE_BASE_URL}/collections/${collectionID}`)
+            .get()
+            .setResponseType("blob")
+            .build();
+
+        return this.api.send(req)
+            .pipe(
+                map((mReadableStream : any) => {
+                    return mReadableStream;
+                })
+            )
     }
 
     getArchiveList(): Observable<CollectionArchive[]> {
@@ -66,8 +91,10 @@ export class DarwinCoreArchiveService {
             .build();
 
         return this.api
-            .send(req)
-            .pipe(map((archiveList: CollectionArchive[]) => archiveList));
+            .send(req, {skipLoading: true})
+            .pipe(map((archiveList: CollectionArchive[]) => {
+                return archiveList;
+            }));
     }
 
     /**
