@@ -1,4 +1,8 @@
 // Add the index.ts for each module in src
+export * from './queues/taxonomy-upload-cleanup.processor'
+export * from './queues/taxonomy-upload-cleanup.queue'
+export * from './queues/taxonomy-upload.processor'
+export * from './queues/taxonomy-upload.queue'
 export * from './taxon/public-api'
 export * from './taxonomicAuthority/public-api'
 export * from './taxonomicUnit/public-api'

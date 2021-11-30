@@ -6,7 +6,7 @@ import { map, switchMap, take, tap } from 'rxjs/operators';
 import { combineLatest, merge } from 'rxjs';
 import { TaxonService } from '@symbiota2/ui-plugin-taxonomy';
 import { TaxonomyUploadService } from '../../services/taxonomyUpload/taxonomy-upload.service';
-import { ROUTE_UPLOAD_FIELD_MAP } from '../../routes';
+import { TAXA_UPLOADER_FIELD_MAP_ROUTE } from '../../routes';
 import { Q_PARAM_AUTHORITYID } from '../../../constants';
 
 @Component({
@@ -38,16 +38,17 @@ export class TaxonomyUploadPage implements OnInit {
             )
         ]).pipe(take(1)).subscribe(([beginUploadResponse]) => {
         //]).pipe(take(1)).subscribe(([authorityID, beginUploadResponse]) => {
+            console.log("starting upload " + beginUploadResponse)
             if (beginUploadResponse !== null) {
                 this.router.navigate(
-                    [ROUTE_UPLOAD_FIELD_MAP],
+                    [TAXA_UPLOADER_FIELD_MAP_ROUTE],
                     {
                         queryParams: {
                             //[Q_PARAM_AUTHORITYID]: authorityID,
                             uploadID: beginUploadResponse.id
                         }
                     }
-                );
+                )
             }
             else {
                 this.alerts.showError('Upload failed')

@@ -64,11 +64,15 @@ import { TaxonomyUploadService } from './services/taxonomyUpload/taxonomy-upload
 import { TaxaProfilerEntryPage } from './pages/taxa-profiler-entry/taxa-profiler-entry-page';
 import {
     TAXA_EDITOR_ROUTE,
-    TAXA_PROFILER_ROUTE, TAXA_UPLOADER_ROUTE,
+    TAXA_PROFILER_ROUTE,
+    TAXA_UPLOADER_FIELD_MAP_ROUTE,
+    TAXA_UPLOADER_ROUTE,
     TAXA_VIEWER_ROUTE,
     TAXON_EDITOR_ROUTE,
     TAXON_PROFILE_ROUTE
 } from './routes';
+import { ROUTE_UPLOAD_FIELD_MAP } from '../../../ui-plugin-occurrence/src/lib/routes';
+import { OccurrenceUploadFieldMapPage } from '../../../ui-plugin-occurrence/src/lib/pages/occurrence-upload/field-map/field-map.component';
 
 @NgModule({
   imports: [
@@ -190,7 +194,11 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
             {
                 path: TAXA_UPLOADER_ROUTE,
                 component: TaxonomyUploadPage
-            }
+            },
+            {
+                path: TAXA_UPLOADER_FIELD_MAP_ROUTE,
+                component: TaxonomyUploadFieldMapPage
+            },
         ];
     }
 

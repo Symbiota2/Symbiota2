@@ -31,6 +31,11 @@ import { TaxonProfilePublicationController } from './taxonProfilePublication/tax
 import { MulterModule } from '@nestjs/platform-express';
 import { promises as fsPromises } from 'fs';
 import { join as pathJoin } from 'path';
+import { TaxonomyUploadCleanupQueue } from './queues/taxonomy-upload-cleanup.queue';
+import { TaxonomyUploadQueue } from './queues/taxonomy-upload.queue';
+import { TaxonomyUploadCleanupProcessor } from './queues/taxonomy-upload-cleanup.processor';
+import { TaxonomyUploadProcessor } from './queues/taxonomy-upload.processor';
+import { StorageModule } from '@symbiota2/api-storage';
 
 @Module({
     imports: [
@@ -65,6 +70,9 @@ import { join as pathJoin } from 'path';
                 }
             },
         }),
+        TaxonomyUploadCleanupQueue,
+        TaxonomyUploadQueue,
+        StorageModule,
     ],
     providers: [
         TaxonService,
@@ -75,6 +83,8 @@ import { join as pathJoin } from 'path';
         TaxonomicEnumTreeService,
         TaxonDescriptionBlockService,
         TaxonDescriptionStatementService,
+        TaxonomyUploadCleanupProcessor,
+        TaxonomyUploadProcessor,
         TaxonLinkService,
         TaxonProfilePublicationService,
         TaxonProfilePublicationImageLinkService,

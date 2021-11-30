@@ -15,6 +15,22 @@
     "taxa.rare_species_reader_available_permission.rare_species_reader": "Can read Rare Species data for all taxa",
     "taxa.rare_species_reader_current_permission.rare_species_reader": "Can read Rare Species data for all taxa",
     "taxa.specimen_management_tab": "Specimen Management",
+
+    "taxonomy.editor.entry.title": "Select a Taxon to Edit",
+    "taxonomy.editor.entry.panel.label" : "Enter Name",
+    "taxonomy.editor.entry.button.label" : "Goto Editor",
+
+    "taxonomy.profiler.entry.title": "Select a Taxon to Profile",
+    "taxonomy.profiler.entry.panel.label" : "Enter Name",
+    "taxonomy.profiler.entry.button.label" : "Goto Profile",
+
+    "taxonomy.uploader.cancel.button" : "Cancel",
+    "taxonomy.uploader.confirm.button" : "Update",
+    "taxonomy.uploader.continue.uploading" : "Continue Uploading?",
+    "taxonomy.uploader.create.count" : "New Taxons will be Created",
+    "taxonomy.uploader.update.count" : "Existing Taxons will be Updated",
+    "taxonomy.uploader.skip.count" : "Records do not have a value for the selected unique field and will be skipped",
+
     "taxonomy.viewer.title": "Taxonomy Viewer",
     "taxonomy.viewer.option.scientific": "Use scientific names",
     "taxonomy.viewer.option.common": "Use vernacular names",
@@ -33,7 +49,9 @@
     "taxon.profile.no.image": "Image not yet available.",
     "taxon.profile.no.profile": "Profile not yet available.",
     "taxon.profile.no.description": "Description not yet available.",
+
     "taxon.editor.title": "Taxon Editor",
+    "taxon.editor.link.label": "Edit Taxon",
     "taxon.editor.description": "Description",
     "taxon.editor.descriptionBlock": "Description Block",
     "taxon.editor.images": "Images",
@@ -59,12 +77,7 @@
     "taxon.editor.added.error": "Error adding taxon",
     "taxon.editor.updated.error": "Error updating taxon",
     "taxon.editor.deleted.error": "Error deleting taxon",
-    "taxonomy.editor.entry.title": "Select a Taxon to Edit",
-    "taxonomy.editor.entry.panel.label" : "Enter Name",
-    "taxonomy.editor.entry.button.label" : "Goto Editor",
-    "taxonomy.profiler.entry.title": "Select a Taxon to Profile",
-    "taxonomy.profiler.entry.panel.label" : "Enter Name",
-    "taxonomy.profiler.entry.button.label" : "Goto Profile",
+
     "taxon.description.editor.block.added": "Description Block Added",
     "taxon.description.editor.block.updated": "Description Block Updated",
     "taxon.description.editor.block.deleted": "Description Block Deleted",
@@ -85,12 +98,13 @@
     "taxon.description.editor.displayLevel": "Display Level",
     "taxon.description.editor.statements": "Statement(s)",
     "taxon.description.editor.add.button.label": "Add a Description Block",
-    "taxon.editor.link.label": "Edit Taxon",
+
     "taxon.description.editor.statement.heading": "Heading",
     "taxon.description.editor.statement.displayHeader": "Display heading?",
     "taxon.description.editor.statement.statement": "Statement",
     "taxon.description.editor.statement.sortSequence": "Sort Sequence",
     "taxon.description.editor.add.statement.button.label": "Add Statement",
+
     "taxon.taxon.editor.kingdomName": "Kingdom Name",
     "taxon.taxon.editor.rankID": "Rank ID",
     "taxon.taxon.editor.rankName": "Rank",
@@ -104,6 +118,8 @@
     "taxon.taxon.editor.source": "Source",
     "taxon.taxon.editor.notes": "Notes",
     "taxon.taxon.editor.hybrid": "Hybrid",
+    "taxon.taxon.editor.securityStatus": "Security Status",
+
     "taxon.status.status.label": "Status",
     "taxon.status.placement.label": "Taxonomic Placement",
     "taxon.status.accepted": "Accepted",
@@ -127,8 +143,6 @@
     "taxon.status.editor.updated.change.accepted": "The Taxon's status was Changed",
     "taxon.status.editor.updated.change.accepted.error": "Error in Changing the Status",
 
-
-    "taxon.taxon.editor.securityStatus": "Security Status",
     "taxon.vernacular.editor.block.added": "Common name added",
     "taxon.vernacular.editor.block.updated": "Common name updated",
     "taxon.vernacular.editor.block.deleted": "Common name deleted",

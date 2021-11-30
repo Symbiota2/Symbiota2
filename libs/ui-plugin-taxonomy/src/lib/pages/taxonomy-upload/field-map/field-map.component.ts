@@ -92,6 +92,9 @@ export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
     ngOnInit(): void {
         const qParams = this.currentRoute.snapshot.queryParamMap;
 
+        console.log("starting field map")
+
+        /*
         if (!qParams.has(Q_PARAM_AUTHORITYID)) {
             this.alerts.showError('Authority not found')
             this.router.navigate([ROUTE_AUTHORITY_LIST])
@@ -101,9 +104,11 @@ export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
             this.alerts.showError('Invalid upload')
             this.router.navigate([ROUTE_AUTHORITY_LIST])
         }
+         */
 
-        let authorityID = parseInt(qParams.get(Q_PARAM_AUTHORITYID))
-        authorityID = Number.isInteger(authorityID) ? authorityID : null
+        //let authorityID = parseInt(qParams.get(Q_PARAM_AUTHORITYID))
+        //authorityID = Number.isInteger(authorityID) ? authorityID : null
+        const authorityID = 1
         this.taxonomicAuthorityService.setAuthorityID(authorityID)
 
         let uploadID = parseInt(qParams.get('uploadID'))

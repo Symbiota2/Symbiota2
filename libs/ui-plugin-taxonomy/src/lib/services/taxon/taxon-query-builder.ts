@@ -98,7 +98,7 @@ class UploadBuilder extends TaxonQueryBuilder {
     }
 
     build(): string {
-        this.url.pathname = `${this.url.pathname}`;
+        this.url.pathname = `${this.url.pathname}/upload`;
         if (this._id) {
             this.url.pathname += `/${this._id}`;
         }

@@ -4,23 +4,22 @@
         <div fxLayout='column' fxLayoutGap='1rem'>
             <ul>
                 <li>
-                    {{ data.newRecords | number }} new occurrences will be created
+                    {{ data.newRecords | number }}  {{"taxonomy.uploader.create.count" | translate}}
                 </li>
                 <li>
-                    {{ data.updatedRecords | number }} existing occurrences will be updated
+                    {{ data.updatedRecords | number }} {{"taxonomy.uploader.update.count" | translate}}
                 </li>
                 <li>
-                    {{ data.nullRecords | number }} records don't have a value for the
-                    unique ID column and will be skipped
+                    {{ data.nullRecords | number }} {{"taxonomy.uploader.skipped.count" | translate}}
                 </li>
             </ul>
             <div>
-                Continue uploading?
+                {{"taxonomy.uploader.continue.uploading" | translate}}
             </div>
         </div>
     </mat-dialog-content>
     <mat-dialog-actions>
-        <button mat-raised-button color='primary' (click)='onConfirm()'>Confirm</button>
-        <button mat-raised-button (click)='onCancel()'>Cancel</button>
+        <button mat-raised-button color='primary' (click)='onConfirm()'>{{"taxonomy.uploader.confirm.button" | translate}}</button>
+        <button mat-raised-button (click)='onCancel()'>{{"taxonomy.uploader.cancel.button" | translate}}</button>
     </mat-dialog-actions>
 </div>

@@ -1,9 +1,15 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Taxon, TaxonomicUnit } from '@symbiota2/api-database';
+import { OccurrenceUpload, OccurrenceUploadFieldMap, Taxon, TaxonomicUnit } from '@symbiota2/api-database';
 import { In, Like, Repository } from 'typeorm';
-import { BaseService } from '@symbiota2/api-common'
+import { BaseService, csvIterator } from '@symbiota2/api-common';
 import { DwCArchiveParser, dwcCoreID, getDwcField, isDwCID } from '@symbiota2/dwc';
 import { TaxonFindAllParams, TaxonFindNamesParams } from './dto/taxon-find-parms';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP } from '../queues/taxonomy-upload-cleanup.queue';
+import { TaxonomyUploadCleanupJob } from '../queues/taxonomy-upload-cleanup.processor';
+import { QUEUE_ID_TAXONOMY_UPLOAD } from '../queues/taxonomy-upload.queue';
+import { TaxonomyUploadJob } from '../queues/taxonomy-upload.processor';
 
 @Injectable()
 export class TaxonService extends BaseService<Taxon>{
@@ -11,8 +17,14 @@ export class TaxonService extends BaseService<Taxon>{
     private static readonly LOGGER = new Logger(TaxonService.name);
 
     constructor(
-        @Inject(Taxon.PROVIDER_ID) private readonly taxonRepo: Repository<Taxon>,
-        @Inject(TaxonomicUnit.PROVIDER_ID) private readonly rankRepo: Repository<TaxonomicUnit>) {
+        @Inject(Taxon.PROVIDER_ID)
+        private readonly taxonRepo: Repository<Taxon>,
+        @Inject(TaxonomicUnit.PROVIDER_ID)
+        private readonly rankRepo: Repository<TaxonomicUnit>,
+        @Inject(OccurrenceUpload.PROVIDER_ID)
+        private readonly uploadRepo: Repository<OccurrenceUpload>,
+        @InjectQueue(QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP) private readonly uploadCleanupQueue: Queue<TaxonomyUploadCleanupJob>,
+        @InjectQueue(QUEUE_ID_TAXONOMY_UPLOAD) private readonly uploadQueue: Queue<TaxonomyUploadJob>) {
         super(taxonRepo);
     }
 
@@ -391,6 +403,96 @@ export class TaxonService extends BaseService<Taxon>{
             return this.findByID(id)
         }
         return null
+    }
+
+    /**
+     * Creates a new upload in the database
+     * @param filePath The path to the file containing occurrences
+     * @param mimeType The mimeType of the file
+     * @param fieldMap Object describing how upload fields map to the occurrence database
+     */
+    async createUpload(filePath: string, mimeType: string, fieldMap: OccurrenceUploadFieldMap): Promise<OccurrenceUpload> {
+        let upload = this.uploadRepo.create({ filePath, mimeType, fieldMap, uniqueIDField: 'taxonID' });
+        upload = await this.uploadRepo.save(upload);
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        await this.uploadCleanupQueue.add({
+            id: upload.id,
+            deleteAfter: tomorrow,
+        });
+
+        return upload;
+    }
+
+    async patchUploadFieldMap(id: number, uniqueIDField: string, fieldMap: OccurrenceUploadFieldMap): Promise<OccurrenceUpload> {
+        const upload = await this.uploadRepo.findOne(id);
+        if (!upload) {
+            return null;
+        }
+        await this.uploadRepo.save({
+            ...upload,
+            uniqueIDField,
+            fieldMap
+        });
+        return upload;
+    }
+
+    async findUploadByID(id: number): Promise<OccurrenceUpload> {
+        return this.uploadRepo.findOne(id);
+    }
+
+    async deleteUploadByID(id: number): Promise<boolean> {
+        const upload = await this.uploadRepo.delete({ id });
+        return upload.affected > 0;
+    }
+
+    /**
+     * @return Object The value of uniqueField for each row in
+     * csvFile along with a count of the null values
+     */
+    async countCSVNonNull(csvFile: string, uniqueField: string): Promise<{ uniqueValues: any[], nulls: number }> {
+        const uniqueFieldValues = new Set();
+        let nulls = 0;
+
+        try {
+            for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
+                for (const row of batch) {
+                    const fieldVal = row[uniqueField];
+                    if (fieldVal) {
+                        uniqueFieldValues.add(fieldVal);
+                    }
+                    else {
+                        nulls += 1;
+                    }
+                }
+            }
+        } catch (e) {
+            throw new Error('Error parsing CSV');
+        }
+
+        return { uniqueValues: [...uniqueFieldValues], nulls };
+    }
+
+    async countTaxons(authorityID: number, field: string, isIn: any[]): Promise<number> {
+        if (isIn.length === 0) {
+            return 0;
+        }
+
+        const result = await this.taxonRepo.createQueryBuilder('o')
+            .select([`COUNT(DISTINCT o.${field}) as cnt`])
+            //.where(`o.collectionID = :collectionID`, { collectionID })
+            //.andWhere(`o.${field} IS NOT NULL`)
+            .where(`o.${field} IS NOT NULL`)
+            .andWhere(`o.${field} IN (:...isIn)`, { isIn })
+            .getRawOne<{ cnt: number }>();
+
+        return result.cnt;
+    }
+
+    async startUpload(uid: number, collectionID: number, uploadID: number): Promise<void> {
+        await this.uploadQueue.add({ uid, collectionID, uploadID });
     }
 
     /**
