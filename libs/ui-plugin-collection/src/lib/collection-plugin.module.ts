@@ -63,6 +63,7 @@ import { CollectionPermissionsConfirmDialogComponent } from './components/collec
 import { DarwinCoreArchivePublishingComponent } from './components/darwincore-archive-publishing/darwincore-archive-publishing.component';
 import { DarwinCoreArchiveService } from './services/darwin-core-archive.service';
 import { CollectionDwCPage } from './pages/collection-dw-cpage/collection-dw-cpage.component';
+import { DarwincoreArchiveTableComponent } from './components/darwincore-archive-table/darwincore-archive-table.component';
 
 @NgModule({
     declarations: [
@@ -88,6 +89,7 @@ import { CollectionDwCPage } from './pages/collection-dw-cpage/collection-dw-cpa
         CollectionPermissionsConfirmDialogComponent,
         DarwinCoreArchivePublishingComponent,
         CollectionDwCPage,
+        DarwincoreArchiveTableComponent,
     ],
     imports: [
         AppTranslationModule,
