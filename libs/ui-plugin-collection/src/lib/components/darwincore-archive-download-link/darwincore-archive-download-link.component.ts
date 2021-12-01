@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AlertService } from '@symbiota2/ui-common';
+import { CollectionArchive } from '@symbiota2/ui-plugin-collection';
 import { map } from 'rxjs/operators';
-import { CollectionArchive } from '../../dto/DwcCollection.dto';
 import { DarwinCoreArchiveService } from '../../services/darwin-core-archive.service';
 
 @Component({

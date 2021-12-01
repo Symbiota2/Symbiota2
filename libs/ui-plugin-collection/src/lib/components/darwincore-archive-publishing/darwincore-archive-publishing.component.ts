@@ -1,11 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertService } from '@symbiota2/ui-common';
-import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
+import { Collection, CollectionArchive, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { Observable } from 'rxjs';
-import {
-    CollectionArchive,
-} from '../../dto/DwcCollection.dto';
 import { DarwinCoreArchiveService } from '../../services/darwin-core-archive.service';
 
 @Component({

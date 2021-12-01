@@ -1,9 +1,9 @@
 import { DataSource } from '@angular/cdk/collections';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { CollectionArchive } from '@symbiota2/ui-plugin-collection';
 import { merge, observable, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { CollectionArchive } from '../../dto/DwcCollection.dto';
 import { DarwinCoreArchiveService } from '../../services/darwin-core-archive.service';
 
 interface DwcTableItem {}

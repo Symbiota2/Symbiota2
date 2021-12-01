@@ -2,7 +2,7 @@ import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTable, MatTableDataSource} from '@angular/material/table';
-import { CollectionArchive } from '../../dto/DwcCollection.dto';
+import { CollectionArchive } from '@symbiota2/ui-plugin-collection';
 import { DarwinCoreArchiveService } from '../../services/darwin-core-archive.service';
 import { DwcArchiveDataSource } from './dwc-archive-datasource';
 
