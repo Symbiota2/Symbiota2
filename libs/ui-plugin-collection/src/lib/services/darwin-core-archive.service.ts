@@ -1,20 +1,14 @@
-import { HttpHeaderResponse, HttpResponse } from '@angular/common/http';
+import { HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
     AlertService,
     ApiClientService,
-    ApiQueryBuilder,
     UserService,
 } from '@symbiota2/ui-common';
-import { CollectionService } from '@symbiota2/ui-plugin-collection';
-import { HttpRequest } from 'aws-sdk';
-import { isInstance } from 'class-validator';
-import { combineLatest, Observable, of, throwError } from 'rxjs';
+import { CollectionArchive, CollectionService } from '@symbiota2/ui-plugin-collection';
+import { combineLatest, Observable, of } from 'rxjs';
 import { catchError, map, switchMap, take } from 'rxjs/operators';
-import {
-    CollectionArchive,
-    PublishedCollection,
-} from '../dto/DwcCollection.dto';
+
 
 @Injectable()
 export class DarwinCoreArchiveService {
