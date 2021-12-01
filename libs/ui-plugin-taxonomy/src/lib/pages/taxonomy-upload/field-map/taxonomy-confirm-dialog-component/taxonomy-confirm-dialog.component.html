@@ -1,0 +1,25 @@
+<!-- TODO: i18n -->
+<div id='container'>
+    <mat-dialog-content>
+        <div fxLayout='column' fxLayoutGap='1rem'>
+            <ul>
+                <li>
+                    {{ data.newRecords | number }}  {{"taxonomy.uploader.create.count" | translate}}
+                </li>
+                <li>
+                    {{ data.updatedRecords | number }} {{"taxonomy.uploader.update.count" | translate}}
+                </li>
+                <li>
+                    {{ data.nullRecords | number }} {{"taxonomy.uploader.skipped.count" | translate}}
+                </li>
+            </ul>
+            <div>
+                {{"taxonomy.uploader.continue.uploading" | translate}}
+            </div>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-raised-button color='primary' (click)='onConfirm()'>{{"taxonomy.uploader.confirm.button" | translate}}</button>
+        <button mat-raised-button (click)='onCancel()'>{{"taxonomy.uploader.cancel.button" | translate}}</button>
+    </mat-dialog-actions>
+</div>

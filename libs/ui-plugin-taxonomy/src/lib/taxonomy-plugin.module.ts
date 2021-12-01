@@ -9,7 +9,6 @@ import {
 
 import { TaxaViewerPageComponent } from "./pages/taxa-viewer/taxa-viewer-page.component";
 import { Route, RouterModule } from "@angular/router";
-import { TaxaSearchPage } from "./pages/search-taxa/taxa-search-page.component";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatCardModule } from "@angular/material/card";
 import { CommonModule } from "@angular/common";
@@ -51,11 +50,29 @@ import {
     TaxonDescriptionStatementDialogComponent,
     TaxonTaxonEditorComponent,
     TaxonTaxonDialogComponent,
-    TaxonStatusEditorComponent
+    TaxonStatusEditorComponent, TaxonStatusAcceptedEditorDialogComponent,
 } from './components';
-import { TaxonEditorPageComponent } from './pages'
+import { TaxonEditorPageComponent, TaxonomyUploadPage, TaxaEditorEntryPage } from './pages'
 import { MatGridListModule } from '@angular/material/grid-list';
 import { TaxonStatusParentEditorDialogComponent } from './components/taxon-status-parent-editor-dialog/taxon-status-parent-editor-dialog.component';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { TaxonomyUploadFieldMapPage } from './pages/taxonomy-upload/field-map/field-map.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { TaxonomyFieldMapSelectComponent } from './pages/taxonomy-upload/field-map/taxonomy-field-map-select-component/taxonomy-field-map-select.component';
+import { TaxonomyConfirmDialogComponent } from './pages/taxonomy-upload/field-map/taxonomy-confirm-dialog-component/taxonomy-confirm-dialog.component';
+import { TaxonomyUploadService } from './services/taxonomyUpload/taxonomy-upload.service';
+import { TaxaProfilerEntryPage } from './pages/taxa-profiler-entry/taxa-profiler-entry-page';
+import {
+    TAXA_EDITOR_ROUTE,
+    TAXA_PROFILER_ROUTE,
+    TAXA_UPLOADER_FIELD_MAP_ROUTE,
+    TAXA_UPLOADER_ROUTE,
+    TAXA_VIEWER_ROUTE,
+    TAXON_EDITOR_ROUTE,
+    TAXON_PROFILE_ROUTE
+} from './routes';
+import { ROUTE_UPLOAD_FIELD_MAP } from '../../../ui-plugin-occurrence/src/lib/routes';
+import { OccurrenceUploadFieldMapPage } from '../../../ui-plugin-occurrence/src/lib/pages/occurrence-upload/field-map/field-map.component';
 
 @NgModule({
   imports: [
@@ -87,13 +104,20 @@ import { TaxonStatusParentEditorDialogComponent } from './components/taxon-statu
     ScrollingModule,
     MatTabsModule,
     MatTableModule,
-    MatGridListModule
+    MatGridListModule,
+    MatExpansionModule,
+    MatPaginatorModule
   ],
     declarations: [
-        TaxaSearchPage,
+        TaxonomyUploadPage,
+        TaxaProfilerEntryPage,
+        TaxaEditorEntryPage,
         TaxaViewerPageComponent,
         TaxonProfilePageComponent,
+        TaxonomyFieldMapSelectComponent,
+        TaxonomyConfirmDialogComponent,
         TaxonEditorPageComponent,
+        TaxonomyUploadFieldMapPage,
         TaxonEditorDialogComponent,
         TaxonVernacularEditorComponent,
         TaxonDescriptionDialogComponent,
@@ -101,6 +125,7 @@ import { TaxonStatusParentEditorDialogComponent } from './components/taxon-statu
         TaxonDescriptionStatementDialogComponent,
         TaxonTaxonEditorComponent,
         TaxonTaxonDialogComponent,
+        TaxonStatusAcceptedEditorDialogComponent,
         TaxonStatusEditorComponent,
         TaxonStatusParentEditorDialogComponent
     ],
@@ -112,13 +137,19 @@ import { TaxonStatusParentEditorDialogComponent } from './components/taxon-statu
         TaxonDescriptionBlockService,
         TaxonDescriptionStatementService,
         TaxonomicAuthorityService,
-        TaxonomicUnitService
+        TaxonomicUnitService,
+        TaxonomyUploadService
     ],
     entryComponents: [
-        TaxaSearchPage,
+        TaxaEditorEntryPage,
+        TaxaProfilerEntryPage,
+        TaxonomyUploadPage,
         TaxonProfilePageComponent,
         TaxaViewerPageComponent,
         TaxonEditorPageComponent,
+        TaxonomyUploadFieldMapPage,
+        TaxonomyFieldMapSelectComponent,
+        TaxonomyConfirmDialogComponent,
         TaxonEditorDialogComponent,
         TaxonVernacularEditorComponent,
         TaxonDescriptionDialogComponent,
@@ -126,17 +157,13 @@ import { TaxonStatusParentEditorDialogComponent } from './components/taxon-statu
         TaxonDescriptionStatementDialogComponent,
         TaxonTaxonEditorComponent,
         TaxonTaxonDialogComponent,
+        TaxonStatusAcceptedEditorDialogComponent,
         TaxonStatusEditorComponent,
         TaxonStatusParentEditorDialogComponent
     ]
 })
 export class TaxonomyPlugin extends SymbiotaUiPlugin {
     static readonly PLUGIN_NAME = 'plugins.taxa.name';
-
-    private static SEARCH_TAXA_ROUTE = "taxonomy/search"
-    private static TAXA_VIEWER_ROUTE = "taxonomy/viewer"
-    private static TAXON_EDITOR_ROUTE = "taxon/editor/:taxonID"
-    private static TAXON_PROFILE_ROUTE = "taxon/profile/:taxonID"
 
     constructor() {
         super();
@@ -145,30 +172,54 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
     static routes(): Route[] {
         return [
             {
-                path: TaxonomyPlugin.SEARCH_TAXA_ROUTE,
-                component: TaxaSearchPage
-            },
-            {
-                path: TaxonomyPlugin.TAXON_PROFILE_ROUTE,
+                path: TAXON_PROFILE_ROUTE,
                 component: TaxonProfilePageComponent
             },
             {
-                path: TaxonomyPlugin.TAXA_VIEWER_ROUTE,
+                path: TAXA_VIEWER_ROUTE,
                 component: TaxaViewerPageComponent
             },
             {
-                path: TaxonomyPlugin.TAXON_EDITOR_ROUTE,
+                path: TAXON_EDITOR_ROUTE,
                 component: TaxonEditorPageComponent
-            }
+            },
+            {
+                path: TAXA_EDITOR_ROUTE,
+                component: TaxaEditorEntryPage
+            },
+            {
+                path: TAXA_PROFILER_ROUTE,
+                component: TaxaProfilerEntryPage
+            },
+            {
+                path: TAXA_UPLOADER_ROUTE,
+                component: TaxonomyUploadPage
+            },
+            {
+                path: TAXA_UPLOADER_FIELD_MAP_ROUTE,
+                component: TaxonomyUploadFieldMapPage
+            },
         ];
     }
 
     static navBarLinks(): NavBarLink[] {
         return [
             {
-                url: `/${TaxonomyPlugin.TAXA_VIEWER_ROUTE}`,
+                url: `/${TAXA_VIEWER_ROUTE}`,
                 name: "core.layout.header.topnav.taxonomy.viewer.link"
-            }
+            },
+            {
+                url: `/${TAXA_EDITOR_ROUTE}`,
+                name: "core.layout.header.topnav.taxonomy.editor.link"
+            },
+            {
+                url: `/${TAXA_PROFILER_ROUTE}`,
+                name: "core.layout.header.topnav.taxonomy.profiler.link"
+            },
+            {
+                url: `/${TAXA_UPLOADER_ROUTE}`,
+                name: "core.layout.header.topnav.taxonomy.uploader.link"
+            },
         ]
     }
 

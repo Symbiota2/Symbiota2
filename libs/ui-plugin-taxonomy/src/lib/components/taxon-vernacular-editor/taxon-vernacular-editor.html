@@ -50,10 +50,10 @@
             <mat-cell *matCellDef="let element">
                 <div *ngIf='userCanEdit'>
                     <button mat-icon-button>
-                        <mat-icon color="warn" (click)="openDialog('Delete',element)">delete</mat-icon>
+                        <mat-icon color="primary" (click)="openDialog('Update',element)">edit</mat-icon>
                     </button>
                     <button mat-icon-button>
-                        <mat-icon color="primary" (click)="openDialog('Update',element)">edit</mat-icon>
+                        <mat-icon color="warn" (click)="openDialog('Delete',element)">delete</mat-icon>
                     </button>
                 </div>
             </mat-cell>

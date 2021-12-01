@@ -11,25 +11,33 @@
     </mat-form-field>
 
     <div><b>{{"taxon.status.status.label" | translate}}</b>:
-        <span *ngIf='currentIsAccepted'>{{"taxon.status.accepted" | translate}}</span>
+        <span style="color:blue" *ngIf='currentIsAccepted'>{{"taxon.status.accepted" | translate}}</span>
         <span style="color:#ff0000" *ngIf='!currentIsAccepted'>{{"taxon.status.not.accepted" | translate}}</span>
     </div>
 
     <div>
-        <b>{{"taxon.status.parent.taxon.label" | translate}}</b>: {{currentParentName}}
+        <b>{{"taxon.status.parent.taxon.label" | translate}}</b>:
+        <a [routerLink]="['/taxon/editor', currentParentID]" target="_blank" class='taxonlink'>{{currentParentName}}</a>
         <button *ngIf='userCanEdit' mat-icon-button>
             <mat-icon color="primary" (click)="openDialog('Update Parent',{})">edit</mat-icon>
         </button>
     </div>
 
     <div *ngIf='!currentIsAccepted'>
-        <b>{{"taxon.status.accepted.taxon.label" | translate}}</b>: {{currentAcceptedName}}
+        <b>{{"taxon.status.accepted.taxon.label" | translate}}</b>:
+        <a [routerLink]="['/taxon/editor', currentAcceptedID]" target="_blank" class='taxonlink'>{{currentAcceptedName}}</a>
         <button *ngIf='userCanEdit' mat-icon-button>
             <mat-icon color="primary" (click)="openDialog('Update Accepted',{})">edit</mat-icon>
         </button>
     </div>
-    <div *ngIf='currentIsAccepted'>
+    <div *ngIf='currentIsAccepted && synonymList.length > 0'>
         <!-- List of synonnyms
         -->
+        <b>{{"taxon.status.synonyms.label" | translate}}:</b>
+        <mat-list role='list'>
+            <mat-list-item *ngFor="let syn of synonymList">
+                {{syn.name}}
+            </mat-list-item>
+        </mat-list>
     </div>
 </symbiota2-expansion-panel>

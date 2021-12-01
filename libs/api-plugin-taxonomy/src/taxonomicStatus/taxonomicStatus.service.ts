@@ -94,15 +94,16 @@ export class TaxonomicStatusService extends BaseService<TaxonomicStatus>{
      * Find one taxonomic status using a taxon id and a taxa authority id
      * @param taxonid - the taxon id
      * @param taxonomicAuthorityID - the authority id
+     * @param acceptedID - the id of the accepted taxon
      * @returns Observable of response from api casted as `TaxonomicStatus`
      * will be the found status
      * @returns `of(null)` if api errors or not found
      * @see TaxonomicStatus
      */
-    async findOne(taxonid: number, taxonomicAuthorityID: number): Promise<TaxonomicStatus> {
+    async findOne(taxonid: number, taxonomicAuthorityID: number, acceptedID: number): Promise<TaxonomicStatus> {
         const status = await this.myRepository.findOne({
             relations: ["taxon"],
-            where: {taxonID: taxonid, taxonAuthorityID: taxonomicAuthorityID}
+            where: {taxonID: taxonid, taxonAuthorityID: taxonomicAuthorityID, taxonIDAccepted: acceptedID}
         })
         return status
     }
@@ -118,16 +119,82 @@ export class TaxonomicStatusService extends BaseService<TaxonomicStatus>{
     }
 
     /**
+     * Change taxonomic status to accepted for a taxon id and a taxon authority id.
+     * @param taxonID The id of the taxon to make accepted
+     * @param taxonAuthorityID The id of the taxonomic authority
+     * @return TaxonomicStatus The new taxon's status or null (not found or api error)
+     */
+    async updateToAccepted(
+        taxonID: number,
+        taxonAuthorityID:number
+    ): Promise<TaxonomicStatus> {
+
+        const status = await this.myRepository.update(
+            { taxonID: taxonID, taxonAuthorityID: taxonAuthorityID },
+            { taxonIDAccepted: taxonID }
+        )
+        if (status.affected > 0) {
+            return this.findOne(taxonID, taxonAuthorityID, taxonID)
+        }
+        return null
+    }
+
+    /**
+     * Change accepted status in a ring using a new taxon accepted id and and old taxon accepted
+     * and a taxon authority id.
+     * @param newTaxonID The id of the taxon to make accepted
+     * @param oldTaxonID The id of the taxon to make not accepted
+     * @param taxonAuthorityID The id of the taxonomic authority
+     * @return TaxonomicStatus The new taxon's status or null (not found or api error)
+     */
+    async updateAcceptedRing(
+        newTaxonID: number,
+        taxonAuthorityID:number,
+        oldTaxonID: number
+    ): Promise<TaxonomicStatus> {
+
+        const ring = await this.myRepository.update(
+            { taxonIDAccepted: oldTaxonID, taxonAuthorityID: taxonAuthorityID },
+            { taxonIDAccepted: newTaxonID }
+        )
+        if (ring.affected > 0) {
+            return this.findOne(newTaxonID, taxonAuthorityID, newTaxonID)
+        }
+        return null
+    }
+
+    /**
      * Update a taxon record using a taxon id and authority id.
      * @param taxonID The id of the taxon
      * @param taxonAuthorityID The id of the taxonomic authority
+     * @param acceptedID The id of the accepted id
      * @param data The data to update
      * @return TaxonomicStatus The updated data or null (not found or api error)
      */
-    async updateByID(taxonID: number, taxonAuthorityID:number, data: Partial<TaxonomicStatus>): Promise<TaxonomicStatus> {
-        const updateResult = await this.myRepository.update({ taxonID, taxonAuthorityID }, data);
+    async updateByKey(taxonID: number, taxonAuthorityID:number, acceptedID: number, data: Partial<TaxonomicStatus>): Promise<TaxonomicStatus> {
+        const updateResult = await this.myRepository.update({
+            taxonID : taxonID, taxonAuthorityID: taxonAuthorityID, taxonIDAccepted: acceptedID
+        }, data)
         if (updateResult.affected > 0) {
-            return this.findOne(taxonID, taxonAuthorityID)
+            return this.findOne(taxonID, taxonAuthorityID, acceptedID)
+        }
+        return null
+    }
+
+    /**
+     * Delete a taxon record using a taxon id, authority id, and accepted id (key of table)
+     * @param taxonID The id of the taxon
+     * @param taxonAuthorityID The id of the taxonomic authority
+     * @param acceptedID The id of the accepted taxon
+     * @return TaxonomicStatus A fake taxonomic status if good else null (not found or api error)
+     */
+    async deleteByKey(taxonID: number, taxonAuthorityID:number, acceptedID: number): Promise<TaxonomicStatus> {
+        const deleteResult = await this.myRepository.delete({
+            taxonID : taxonID, taxonAuthorityID: taxonAuthorityID, taxonIDAccepted: acceptedID
+        })
+        if (deleteResult.affected > 0) {
+            // return an empty taxonomic status
+            return new TaxonomicStatus()
         }
         return null
     }

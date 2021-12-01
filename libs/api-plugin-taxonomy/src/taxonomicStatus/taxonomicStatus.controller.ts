@@ -47,13 +47,17 @@ export class TaxonomicStatusController {
         return Promise.all(dtos)
     }
 
-    @Get(':taxonid')
+    @Get(':taxonID/:authorityID/:acceptedID')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonomicStatusDto })
     @ApiOperation({
-        summary: "Find a taxonomic status record for a given taxon id."
+        summary: "Find a taxonomic status record for a given taxon id, authority id, and accepted id (the key of the table)"
     })
-    async findByID(@Param('taxonid') taxonid: number): Promise<TaxonomicStatusDto> {
-        const taxonomicStatus = await this.taxanomicStatusService.findByID(taxonid)
+    async findByID(
+        @Param('taxonID') taxonID: number,
+        @Param('authorityID') authorityID: number,
+        @Param('acceptedID') acceptedID: number
+    ): Promise<TaxonomicStatusDto> {
+        const taxonomicStatus = await this.taxanomicStatusService.findOne(taxonID, authorityID, acceptedID)
         const dto = new TaxonomicStatusDto(taxonomicStatus)
         const taxon = await taxonomicStatus.taxon
         dto.taxon = new TaxonDto(taxon)
@@ -69,7 +73,6 @@ export class TaxonomicStatusController {
         summary: "Get the synonyms for the given taxon id, optionally limit it to a specific taxonomic authority"
     })
     async findSynonyms(@Param('taxonid') taxonid: number, @Query() findAllParams: TaxonomicStatusFindAllParams): Promise<TaxonomicStatusDto[]> {
-        console.log("taxon id is " + taxonid)
         const taxonomicStatii = await this.taxanomicStatusService.findSynonyms(taxonid, findAllParams)
         const taxonDtos = taxonomicStatii.map(async (c) => {
             const taxonomicStatus = new TaxonomicStatusDto(c)
@@ -135,9 +138,64 @@ export class TaxonomicStatusController {
         return dto
     }
 
-    @Patch(':id/:authorityID')
+    @Patch('updateToAccepted/:id/:authorityID')
     @ApiOperation({
-        summary: "Update a taxonomic status recoord by taxonID and taxon authority ID"
+        summary: "Update a taxonomic status record to accepted status using taxonID, taxon authority ID"
+    })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({ status: HttpStatus.OK, type: Taxon })
+    @ApiBody({ type: TaxonomicStatusInputDto, isArray: true })
+    //@SerializeOptions({ groups: ['single'] })
+    async updateToAccepted(
+        @Req() request: AuthenticatedRequest,
+        @Param('id') id: number,
+        @Param('authorityID') authorityId: number
+    ): Promise<TaxonomicStatus> {
+
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const status = await this.taxanomicStatusService.updateToAccepted(id, authorityId)
+        if (!status) {
+            throw new NotFoundException()
+        }
+        return status
+    }
+
+    @Patch('updateAcceptedRing/:newTaxonId/:authorityId/:oldTaxonId')
+    @ApiOperation({
+        summary: "Update a ring of taxonomic status record to a new accepted taxonID using a taxon authority ID and the old accepted taxonID"
+    })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({ status: HttpStatus.OK, type: Taxon })
+    @ApiBody({ type: TaxonomicStatusInputDto, isArray: true })
+    //@SerializeOptions({ groups: ['single'] })
+    async updateAcceptedRing(
+        @Req() request: AuthenticatedRequest,
+        @Param('newTaxonId') newTaxonId: number,
+        @Param('authorityId') authorityId: number,
+        @Param('oldTaxonId') oldTaxonId: number
+    ): Promise<TaxonomicStatus> {
+
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const status = await this.taxanomicStatusService.updateAcceptedRing(newTaxonId, authorityId, oldTaxonId)
+        if (!status) {
+            throw new NotFoundException()
+        }
+        return status
+    }
+
+    @Patch(':id/:authorityID/:tidAcceptedID')
+    @ApiOperation({
+        summary: "Update a taxonomic status recoord by taxonID, taxon authority ID, and tidAcceptedID"
     })
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
@@ -148,21 +206,23 @@ export class TaxonomicStatusController {
     async updateByID(
         @Req() request: AuthenticatedRequest,
         @Param('id') id: number,
-        @Param('authorityId') authorityId: number,
+        @Param('authorityID') authorityId: number,
+        @Param('tidAcceptedID') acceptedId: number,
         @Body(new ParseArrayPipe({ items: TaxonomicStatusInputDto })) data: TaxonomicStatus[]
     ): Promise<TaxonomicStatus> {
+
         if (!this.canEdit(request)) {
             throw new ForbiddenException()
         }
 
-        const statement = await this.taxanomicStatusService.updateByID(id, authorityId, data[0])
+        const statement = await this.taxanomicStatusService.updateByKey(id, authorityId, acceptedId, data[0])
         if (!statement) {
             throw new NotFoundException()
         }
         return statement
     }
 
-    @Delete(':id')
+    @Delete(':id/:authorityID:tidAcceptedID')
     @ApiOperation({
         summary: "Delete a taxon by ID"
     })
@@ -170,13 +230,18 @@ export class TaxonomicStatusController {
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @ApiResponse({ status: HttpStatus.NO_CONTENT })
-    async deleteByID(@Req() request: AuthenticatedRequest, @Param('id') id: number): Promise<void> {
+    async deleteByID(
+        @Req() request: AuthenticatedRequest,
+        @Param('id') id: number,
+        @Param('authorityID') authorityId: number,
+        @Param('tidAcceptedID') acceptedId: number,
+    ): Promise<void> {
         if (!this.canEdit(request)) {
             throw new ForbiddenException()
         }
 
-        const block = await this.taxanomicStatusService.deleteByID(id);
-        if (!block) {
+        const status = await this.taxanomicStatusService.deleteByKey(id, authorityId,acceptedId)
+        if (!status) {
             throw new NotFoundException();
         }
     }

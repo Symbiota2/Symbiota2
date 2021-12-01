@@ -12,7 +12,7 @@ import {
 } from '../../services';
 
 @Component({
-    selector: 'taxon-taxon-dialog-box',
+    selector: 'taxon-status-parent-editor-dialog',
     templateUrl: './taxon-status-parent-editor-dialog.component.html',
     styleUrls: ['./taxon-status-parent-editor-dialog.component.scss']
 })

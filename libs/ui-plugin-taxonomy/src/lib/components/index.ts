@@ -4,6 +4,7 @@ export * from './taxon-description-statement-dialog/taxon-description-statement-
 export * from './taxon-editor-dialog/taxon-editor-dialog.component'
 export * from './taxon-status-editor/taxon-status-editor.component'
 export * from './taxon-taxon-dialog/taxon-taxon-dialog.component'
+export * from './taxon-status-accepted-editor-dialog/taxon-status-accepted-editor-dialog.component'
 export * from './taxon-status-editor/taxon-status-editor.component'
 export * from './taxon-status-parent-editor-dialog/taxon-status-parent-editor-dialog.component'
 export * from './taxon-taxon-editor/taxon-taxon-editor.component'

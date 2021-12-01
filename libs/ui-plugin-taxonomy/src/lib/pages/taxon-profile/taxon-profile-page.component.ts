@@ -8,6 +8,7 @@ import {
 import { ImageListItem, ImageService } from '@symbiota2/ui-plugin-image';
 import { filter } from 'rxjs/operators';
 import { UserService } from '@symbiota2/ui-common';
+import { TAXON_EDITOR_ROUTE_PREFIX, TAXON_PROFILE_ROUTE_PREFIX } from '../../routes';
 
 @Component({
     selector: 'taxon-profile',
@@ -21,12 +22,14 @@ export class TaxonProfilePageComponent implements OnInit {
     image: ImageListItem
     images: ImageListItem[] = []
     taxon: TaxonListItem
+    taxonName = "unknown"
     taxonomicStatus: TaxonomicStatusListItem
     userID : number = null
     userCanEdit: boolean = false
 
     constructor(
         private readonly userService: UserService,
+        private readonly taxaService: TaxonService,
         private readonly taxonDescriptionBlockService: TaxonDescriptionBlockService,
         private readonly imageService: ImageService,
         private readonly taxonStatusService: TaxonomicStatusService,
@@ -41,6 +44,7 @@ export class TaxonProfilePageComponent implements OnInit {
     ngOnInit() {
         this.currentRoute.paramMap.subscribe(params => {
             this.taxonID = params.get('taxonID')
+
             // Load the profile
             this.loadProfile(parseInt(this.taxonID))
         })
@@ -57,6 +61,10 @@ export class TaxonProfilePageComponent implements OnInit {
     Load the taxon profile
      */
     loadProfile(taxonID: number) {
+        this.taxaService.findByID(taxonID).subscribe((taxon) => {
+            this.taxon = taxon
+            this.taxonName = taxon.scientificName
+        })
         this.taxonDescriptionBlockService.findBlocksByTaxonID(taxonID).subscribe((blocks) => {
             blocks.forEach((block) => {
                 if (block.descriptionStatements.length > 0) {
@@ -68,8 +76,6 @@ export class TaxonProfilePageComponent implements OnInit {
         this.imageService.findByTaxonIDs([taxonID]).subscribe((images) => {
             this.image = images.shift()
             this.images = images
-            //images.forEach((image) => {
-            //})
         })
         this.taxonStatusService.findAll({taxonIDs : [taxonID], taxonomicAuthorityID: 1}).subscribe((taxonomicStatuses) => {
             let authoritySet = false
@@ -87,10 +93,10 @@ export class TaxonProfilePageComponent implements OnInit {
     }
 
     goToLink(url: string){
-        window.open("taxon/editor/" + url, "_blank")
+        window.open(TAXON_EDITOR_ROUTE_PREFIX + "/" + url, "_blank")
     }
 
     goToParent(url: string){
-        window.open("taxon/profile/" + url)
+        window.open(TAXON_PROFILE_ROUTE_PREFIX + "/" + url)
     }
 }

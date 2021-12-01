@@ -1,5 +1,5 @@
 <div>
-    <h1>{{"taxon.profile.title" | translate}}</h1>
+    <h1>{{"taxon.profile.title" | translate}} - {{taxonName}}</h1>
 </div>
 <div *ngIf='taxonomicStatus'>
     <div>
@@ -18,7 +18,7 @@
 </button>
 <!-- <button appearance='fill' (click)="goToLink(taxonID)">{{"taxon.editor.link.label" | translate}}</button> -->
 <mat-tab-group *ngIf="blocks.length > 0" mat-align-tabs="start">
-    <mat-tab *ngFor='let block of blocks' label='{{block.caption}}'>
+    <mat-tab color="primary" *ngFor='let block of blocks' label='{{block.caption}}'>
         <symbiota2-expansion-panel label='{{block.taxon.scientificName}}'>
             <table>
                 <tr>

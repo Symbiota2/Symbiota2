@@ -13,10 +13,10 @@
             <div><b>{{"taxon.description.editor.displayLevel" | translate}}</b>: {{block.displayLevel}}</div>
             <div *ngIf='userCanEdit'>
                 <button mat-icon-button>
-                    <mat-icon color="warn" (click)="openDialog('Delete',block)">delete</mat-icon>
+                    <mat-icon color="primary" (click)="openDialog('Update',block)">edit</mat-icon>
                 </button>
                 <button mat-icon-button>
-                    <mat-icon color="primary" (click)="openDialog('Update',block)">edit</mat-icon>
+                    <mat-icon color="warn" (click)="openDialog('Delete',block)">delete</mat-icon>
                 </button>
             </div>
             <symbiota2-expansion-panel label='{{"taxon.description.editor.statements" | translate}}'>
@@ -36,10 +36,10 @@
                     </div>
                     <div *ngIf='userCanEdit'>
                         <button mat-icon-button>
-                            <mat-icon color="warn" (click)="openStatementDialog('Delete',statement)">delete</mat-icon>
+                            <mat-icon color="primary" (click)="openStatementDialog('Update',statement)">edit</mat-icon>
                         </button>
                         <button mat-icon-button>
-                            <mat-icon color="primary" (click)="openStatementDialog('Update',statement)">edit</mat-icon>
+                            <mat-icon color="warn" (click)="openStatementDialog('Delete',statement)">delete</mat-icon>
                         </button>
                     </div>
                     <hr/>

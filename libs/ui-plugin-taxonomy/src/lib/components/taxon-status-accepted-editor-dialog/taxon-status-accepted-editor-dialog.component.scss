@@ -1,0 +1,23 @@
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
+//#window {
+//    width: 50vw;
+//    min-height: 75vh;
+//
+//    @media only screen and (max-height: 600px) {
+//        width: 100vw;
+//        min-height: 100vh;
+//    }
+//}
+
+#editor {
+    margin-top: 2rem;
+}
+
+#closeBtn {
+    margin-left: auto;
+}
+
+mat-form-field {
+    width: 100%;
+}

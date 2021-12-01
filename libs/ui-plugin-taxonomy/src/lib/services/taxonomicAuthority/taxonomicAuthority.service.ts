@@ -12,6 +12,8 @@ interface FindAllParams {
 
 @Injectable()
 export class TaxonomicAuthorityService {
+    currentAuthorityID = null
+
     constructor(
         private readonly apiClient: ApiClientService,
         private readonly appConfig: AppConfigService) { }
@@ -22,10 +24,17 @@ export class TaxonomicAuthorityService {
 
     public getUrl() {
         const apiBaseUrl = this.appConfig.apiUri()
-        const x = new URL(`${apiBaseUrl}/taxonVernacular`)
+        const x = new URL(`${apiBaseUrl}/taxonomicAuthority`)
         return this.apiClient.apiRoot()
     }
 
+    setAuthorityID(id) {
+        this.currentAuthorityID = id
+    }
+
+    getAuthorityID() {
+        return this.currentAuthorityID
+    }
 
     findAll(params?: FindAllParams): Observable<TaxonomicAuthorityListItem[]> {
         const url = this.createQueryBuilder()

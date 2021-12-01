@@ -10,6 +10,10 @@ This project was uses [Nx](https://nx.dev), [Angular](https://angular.io), and [
 
 [Nest Documentation](https://docs.nestjs.com/)
 
+[API Tutorial](./tutorials/simpleWebService.md)
+
+[UI Tutorial](./tutorials/simpleWebPage.md)
+
 ## Environment
 
 Any variable without a default is required for the Symbiota2 API to run. 

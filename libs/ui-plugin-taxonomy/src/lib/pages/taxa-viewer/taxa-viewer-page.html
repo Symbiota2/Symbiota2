@@ -29,10 +29,7 @@
             </mat-form-field>
             </div>
 
-            <!-- <div>Using {{kindOfName}} names</div> -->
             <div *ngIf='kindOfName == "Scientific"'>
-                <!-- <mat-checkbox class="example-margin" [(ngModel)]='hasAuthors' (change)='loadScientificNames()'
-                >{{"taxonomy.viewer.label.checkbox.authors" | translate}}</mat-checkbox>-->
                 <mat-checkbox class="example-margin" [(ngModel)]='hasAuthors'
                 >{{"taxonomy.viewer.label.checkbox.authors" | translate}}</mat-checkbox>
                 <!--
@@ -93,10 +90,22 @@
                         </mat-option>
                     </mat-autocomplete>
                 </mat-form-field>
+                <mat-label *ngIf="looking && !nameFound" style='color:red'>
+                    <b>{{"taxonomy.viewer.name.error" | translate}}</b>
+                    <br/>
+                </mat-label>
                 <button class="button" type="submit">{{"taxonomy.viewer.label.taxonomy" | translate}}</button>
             </form>
         <br/>
         <mat-checkbox class="example-margin" [(ngModel)]='includeAuthors'>{{"taxonomy.viewer.label.checkbox.include.authors" | translate}}</mat-checkbox>
+
+        <symbiota2-expansion-panel *ngIf='possibleTaxons.length > 1' label='{{"taxonomy.viewer.label.choose.taxon" | translate}}'>
+            <mat-selection-list [multiple]="false">
+                <mat-list-option *ngFor="let txn of possibleTaxons" [value]="txn.taxonID">
+                    {{txn.name}}
+                </mat-list-option>
+            </mat-selection-list>
+        </symbiota2-expansion-panel>
 
         <mat-tree #tree [dataSource]="dataSource" [treeControl]="treeControl" class="example-tree">
             <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
@@ -142,25 +151,6 @@
                     </ul>
                 </li>
             </mat-nested-tree-node>
-
-            <!--
-            <mat-nested-tree-node matTreeNodePadding [matTreeNodePaddingIndent]="10" *matTreeNodeDef="let node; when: hasNestedChild">
-                <li>
-                    <div class="mat-tree-node">
-                        <button mat-icon-button matTreeNodeToggle
-                                [attr.aria-label]="'toggle ' + node.name">
-                            <mat-icon class="mat-icon-rtl-mirror">
-                                {{treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right'}}
-                            </mat-icon>
-                        </button>
-                        {{node.name}}
-                    </div>
-                    <ul >
-                        <ng-container matTreeNodeOutlet></ng-container>
-                    </ul>
-                </li>
-            </mat-nested-tree-node>
-            -->
         </mat-tree>
     </symbiota2-expansion-panel>
  </div>

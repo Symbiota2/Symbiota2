@@ -148,7 +148,7 @@ export class TaxonomicEnumTreeController {
     @ApiResponse({ status: HttpStatus.OK, type: TaxonomicEnumTreeDto })
     //@SerializeOptions({ groups: ['single'] })
     async moveTaxon(@Query() myParams: TaxonomicEnumTreeMoveTaxonParams): Promise<TaxonomicEnumTreeDto> {
-        const enumTree = await this.myService.moveTaxon(myParams);
+        const enumTree = await this.myService.moveTaxon(myParams.taxonID, myParams.taxonAuthorityID, myParams.parentTaxonID);
         if (!enumTree) {
             throw new NotFoundException()
         }
