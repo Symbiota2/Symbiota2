@@ -1,13 +1,11 @@
 import {
     ApiCollectionArchive,
-    ApiPublishedCollection,
 } from '@symbiota2/data-access';
 
 export class CollectionArchive implements ApiCollectionArchive {
     constructor(data: Record<string, unknown>) {
         Object.assign(this, data);
 
-        this.updatedAt = new Date(this.updatedAt);
     }
 
     collectionID: number;

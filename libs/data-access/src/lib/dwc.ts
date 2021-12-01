@@ -1,7 +1,3 @@
-export interface ApiPublishedCollection {
-    collectionID: number;
-    archive: string;
-}
 
 export interface ApiCollectionArchive {
 
