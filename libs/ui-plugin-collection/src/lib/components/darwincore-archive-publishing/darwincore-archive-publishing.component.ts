@@ -1,13 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { AlertService } from '@symbiota2/ui-common';
 import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
-import { combineLatest, Observable } from 'rxjs';
-import { map, mergeAll, switchMap, take } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import {
     CollectionArchive,
-    PublishedCollection,
 } from '../../dto/DwcCollection.dto';
 import { DarwinCoreArchiveService } from '../../services/darwin-core-archive.service';
 
@@ -29,7 +26,6 @@ export class DarwinCoreArchivePublishingComponent implements OnInit {
         private readonly collectionService: CollectionService,
         private readonly dwcService: DarwinCoreArchiveService,
         private readonly fb: FormBuilder,
-        private dialog: MatDialog,
         private readonly alerts: AlertService
     ) {}
 
@@ -54,25 +50,5 @@ export class DarwinCoreArchivePublishingComponent implements OnInit {
                     }
                 });
         });
-    }
-
-    onDownloadArchive(): void {
-        this.alerts.showMessage('Downloading Archive...');
-        combineLatest([this.archiveInfo$, this.collection$]).pipe(
-            switchMap(([archive, collection]) => {
-                return this.dwcService.downloadCollectionArchive(collection.id).pipe(
-                    map((stream) => {
-                        var blob = new Blob([stream]);
-                        var url = window.URL.createObjectURL(blob);
-                        var link = document.createElement('a');
-                        link.download = archive.archive;
-                        link.href = url;
-                        link.click();
-                        link.parentNode.removeChild(link);
-                        window.URL.revokeObjectURL(url);
-                    })
-                );
-            })
-        ).subscribe();
     }
 }

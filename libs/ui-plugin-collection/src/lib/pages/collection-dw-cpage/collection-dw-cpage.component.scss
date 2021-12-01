@@ -1,0 +1,28 @@
+@import "/apps/ui/src/styles/theme.import.scss";
+
+#main{
+    box-shadow: inset 0px 150px 0 0 $primaryColor;
+    -webkit-box-shadow: inset 0px 150px 0 0 $primaryColor;
+}
+
+.col-header{
+    margin-top: 65px;
+}
+
+#title {
+    max-width: 600px;
+    color: white;
+    font-size: 48px;
+    margin-top: 0;
+    margin-bottom: 0rem;
+    margin-right: 1rem;
+    line-height: 110%;
+}
+
+#body{
+    width: 70vw;
+}
+
+#table{
+    margin: 1rem 2rem;
+}

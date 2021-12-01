@@ -299,6 +299,20 @@ export class CollectionService {
         )
     }
 
+    getCollection(id: number): Observable<Collection>{
+        const url = `${this.COLLECTION_BASE_URL}/${id}`;
+        const req = this.api.queryBuilder(url).get().build();
+
+        return this.api.send(req).pipe(
+            map((collection: ApiCollectionOutput) => {
+                if (collection === null) {
+                    return null;
+                }
+                return new Collection(collection);
+            })
+        );
+    }
+
     /**
      * refreshes categories in Observable `currentCategories` with latest from api
      */

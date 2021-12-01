@@ -23,6 +23,10 @@ export class DwcArchiveDataSource implements DataSource<DwcTableItem> {
             switchMap((list) => {
                 this.paginator.length = list.length;
 
+                list.forEach((collection)=>{
+                    collection.updatedAt = new Date(collection.updatedAt);
+                })
+
                 return merge(...dataMutations).pipe(map(() => {
                     return this.getPagedData(this.getSortedData([...list]));
                   }));
@@ -47,6 +51,10 @@ export class DwcArchiveDataSource implements DataSource<DwcTableItem> {
                     return compare(a.archive, b.archive, isAsc);
                 case 'date':
                     return compare(a.updatedAt, b.updatedAt, isAsc);
+                case 'size':
+                    return compare(+a.updatedAt, +b.updatedAt, isAsc);
+                case 'id':
+                    return compare(+a.collectionID, +b.collectionID, isAsc);
                 default:
                     return 0;
             }

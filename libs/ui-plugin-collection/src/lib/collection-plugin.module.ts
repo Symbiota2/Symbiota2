@@ -35,6 +35,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
 import {
     ROUTE_COLLECTION_LIST,
     ROUTE_COLLECTION_PROFILE,
@@ -64,6 +66,8 @@ import { DarwinCoreArchivePublishingComponent } from './components/darwincore-ar
 import { DarwinCoreArchiveService } from './services/darwin-core-archive.service';
 import { CollectionDwCPage } from './pages/collection-dw-cpage/collection-dw-cpage.component';
 import { DarwincoreArchiveTableComponent } from './components/darwincore-archive-table/darwincore-archive-table.component';
+import { DarwincoreArchiveDownloadLinkComponent } from './components/darwincore-archive-download-link/darwincore-archive-download-link.component';
+
 
 @NgModule({
     declarations: [
@@ -90,6 +94,7 @@ import { DarwincoreArchiveTableComponent } from './components/darwincore-archive
         DarwinCoreArchivePublishingComponent,
         CollectionDwCPage,
         DarwincoreArchiveTableComponent,
+        DarwincoreArchiveDownloadLinkComponent,
     ],
     imports: [
         AppTranslationModule,
@@ -117,6 +122,8 @@ import { DarwincoreArchiveTableComponent } from './components/darwincore-archive
         MatListModule,
         MatRadioModule,
         MatAutocompleteModule,
+        MatTableModule,
+        MatSortModule
     ],
     entryComponents: [CollectionEditorComponent],
     providers: [

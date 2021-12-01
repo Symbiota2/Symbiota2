@@ -15,6 +15,8 @@ export class PublishedCollection implements ApiPublishedCollection {
 export class CollectionArchive implements ApiCollectionArchive {
     constructor(data: Record<string, unknown>) {
         Object.assign(this, data);
+
+        this.updatedAt = new Date(this.updatedAt);
     }
 
     collectionID: number;

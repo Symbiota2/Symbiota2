@@ -1,0 +1,14 @@
+@import "/apps/ui/src/styles/theme.import.scss";
+
+.full-width-table {
+    width: 100%;
+  }
+
+#id{
+    padding-top: .2rem;
+    padding-bottom: .4rem;
+}
+
+#link{
+    color: $primaryColor;
+}
