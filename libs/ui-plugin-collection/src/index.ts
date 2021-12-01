@@ -11,4 +11,5 @@ export * from "./lib/components/collection-logo/collection-logo.component";
 export * from "./lib/collection-plugin.module";
 export * from './lib/dto/Category.output.dto';
 export * from './lib/dto/Collection.output.dto';
+export * from './lib/dto/DwcCollection.dto';
 export * from './lib/routes';
