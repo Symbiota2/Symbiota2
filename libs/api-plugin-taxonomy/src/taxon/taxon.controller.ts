@@ -27,7 +27,7 @@ import {
     SuperAdminGuard,
     TokenService
 } from '@symbiota2/api-auth';
-import { Occurrence, OccurrenceUpload, Taxon } from '@symbiota2/api-database';
+import { Occurrence, Taxon, TaxonomyUpload } from '@symbiota2/api-database';
 import { TaxonInputDto } from './dto/TaxonInputDto';
 import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -233,6 +233,14 @@ export class TaxonController {
         return this.taxa.getFields()
     }
 
+    @Get('meta/relatedFields')
+    @ApiOperation({
+        summary: 'Retrieve the list of fields for the taxon entity plus associated entites (status, vernacular, rank)'
+    })
+    async getRelatedFields(): Promise<string[]> {
+        return this.taxa.getAllTaxonomicUploadFields()
+    }
+
     private canEdit(request) {
         // SuperAdmins and TaxonProfileEditors have editing privileges
         const isSuperAdmin = TokenService.isSuperAdmin(request.user)
@@ -319,8 +327,8 @@ export class TaxonController {
         summary: "Upload a CSV file containing a taxonomy"
     })
     @ApiFileInput('file')
-    async uploadTaxonomyFile(@UploadedFile() file: File): Promise<OccurrenceUpload> {
-        let upload: OccurrenceUpload
+    async uploadTaxonomyFile(@UploadedFile() file: File): Promise<TaxonomyUpload> {
+        let upload: TaxonomyUpload
 
         if (!file) {
             throw new BadRequestException('File not specified');
@@ -352,7 +360,7 @@ export class TaxonController {
 
     @Get('upload/:id')
     @ApiOperation({ summary: 'Retrieve an upload by its ID' })
-    async getUploadByID(@Param('id') id: number): Promise<OccurrenceUpload> {
+    async getUploadByID(@Param('id') id: number): Promise<TaxonomyUpload> {
         return this.taxa.findUploadByID(id);
     }
 

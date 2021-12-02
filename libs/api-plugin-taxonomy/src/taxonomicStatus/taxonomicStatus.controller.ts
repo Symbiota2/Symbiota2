@@ -27,7 +27,7 @@ import { TaxonomicStatusInputDto } from './dto/TaxonomicStatusInputDto';
 @ApiTags('TaxonomicStatus')
 @Controller('taxonomicStatus')
 export class TaxonomicStatusController {
-    constructor(private readonly taxanomicStatusService: TaxonomicStatusService) { }
+    constructor(private readonly taxonomicStatusService: TaxonomicStatusService) { }
 
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: TaxonomicStatus, isArray: true })
@@ -35,7 +35,7 @@ export class TaxonomicStatusController {
         summary: "Find all of the taxonomic status records."
     })
     async findAll(@Query() findAllParams: TaxonomicStatusFindAllParams): Promise<TaxonomicStatusDto[]> {
-        const taxonomicStatii = await this.taxanomicStatusService.findAll(findAllParams)
+        const taxonomicStatii = await this.taxonomicStatusService.findAll(findAllParams)
         const dtos = taxonomicStatii.map(async (c) => {
             const taxonomicStatus = new TaxonomicStatusDto(c)
             const taxon = await c.taxon
@@ -57,7 +57,7 @@ export class TaxonomicStatusController {
         @Param('authorityID') authorityID: number,
         @Param('acceptedID') acceptedID: number
     ): Promise<TaxonomicStatusDto> {
-        const taxonomicStatus = await this.taxanomicStatusService.findOne(taxonID, authorityID, acceptedID)
+        const taxonomicStatus = await this.taxonomicStatusService.findOne(taxonID, authorityID, acceptedID)
         const dto = new TaxonomicStatusDto(taxonomicStatus)
         const taxon = await taxonomicStatus.taxon
         dto.taxon = new TaxonDto(taxon)
@@ -73,7 +73,7 @@ export class TaxonomicStatusController {
         summary: "Get the synonyms for the given taxon id, optionally limit it to a specific taxonomic authority"
     })
     async findSynonyms(@Param('taxonid') taxonid: number, @Query() findAllParams: TaxonomicStatusFindAllParams): Promise<TaxonomicStatusDto[]> {
-        const taxonomicStatii = await this.taxanomicStatusService.findSynonyms(taxonid, findAllParams)
+        const taxonomicStatii = await this.taxonomicStatusService.findSynonyms(taxonid, findAllParams)
         const taxonDtos = taxonomicStatii.map(async (c) => {
             const taxonomicStatus = new TaxonomicStatusDto(c)
             const taxon = await c.taxon
@@ -92,7 +92,7 @@ export class TaxonomicStatusController {
         summary: "Get the children for the given taxon id, optionally limit it to a specific taxonomic authority"
     })
     async findChildren(@Param('taxonid') taxonid: number, @Query() findAllParams: TaxonomicStatusFindAllParams): Promise<TaxonomicStatusDto[]> {
-        const taxonomicStatii = await this.taxanomicStatusService.findChildren(taxonid, findAllParams)
+        const taxonomicStatii = await this.taxonomicStatusService.findChildren(taxonid, findAllParams)
         const taxonDtos = taxonomicStatii.map(async (c) => {
             const taxonomicStatus = new TaxonomicStatusDto(c)
             const taxon = await c.taxon
@@ -103,6 +103,14 @@ export class TaxonomicStatusController {
             return taxonomicStatus
         });
         return Promise.all(taxonDtos)
+    }
+
+    @Get('meta/fields')
+    @ApiOperation({
+        summary: 'Retrieve the list of fields for the taxonomic status entity'
+    })
+    async getFields(): Promise<string[]> {
+        return this.taxonomicStatusService.getFields()
     }
 
     private canEdit(request) {
@@ -133,7 +141,7 @@ export class TaxonomicStatusController {
             throw new ForbiddenException()
         }
 
-        const status = await this.taxanomicStatusService.create(data[0])
+        const status = await this.taxonomicStatusService.create(data[0])
         const dto = new TaxonomicStatusDto(status)
         return dto
     }
@@ -158,7 +166,7 @@ export class TaxonomicStatusController {
             throw new ForbiddenException()
         }
 
-        const status = await this.taxanomicStatusService.updateToAccepted(id, authorityId)
+        const status = await this.taxonomicStatusService.updateToAccepted(id, authorityId)
         if (!status) {
             throw new NotFoundException()
         }
@@ -186,7 +194,7 @@ export class TaxonomicStatusController {
             throw new ForbiddenException()
         }
 
-        const status = await this.taxanomicStatusService.updateAcceptedRing(newTaxonId, authorityId, oldTaxonId)
+        const status = await this.taxonomicStatusService.updateAcceptedRing(newTaxonId, authorityId, oldTaxonId)
         if (!status) {
             throw new NotFoundException()
         }
@@ -215,7 +223,7 @@ export class TaxonomicStatusController {
             throw new ForbiddenException()
         }
 
-        const statement = await this.taxanomicStatusService.updateByKey(id, authorityId, acceptedId, data[0])
+        const statement = await this.taxonomicStatusService.updateByKey(id, authorityId, acceptedId, data[0])
         if (!statement) {
             throw new NotFoundException()
         }
@@ -240,7 +248,7 @@ export class TaxonomicStatusController {
             throw new ForbiddenException()
         }
 
-        const status = await this.taxanomicStatusService.deleteByKey(id, authorityId,acceptedId)
+        const status = await this.taxonomicStatusService.deleteByKey(id, authorityId,acceptedId)
         if (!status) {
             throw new NotFoundException();
         }

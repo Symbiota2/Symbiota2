@@ -92,8 +92,6 @@ export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
     ngOnInit(): void {
         const qParams = this.currentRoute.snapshot.queryParamMap;
 
-        console.log("starting field map")
-
         /*
         if (!qParams.has(Q_PARAM_AUTHORITYID)) {
             this.alerts.showError('Authority not found')

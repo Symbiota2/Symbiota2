@@ -31,22 +31,22 @@ export class TaxonomyUploadService {
     private readonly _currentUpload = new BehaviorSubject<ApiTaxonomyUpload>(null);
 
     /**
-     * List of fields for the backend taxonomy entity
+     * List of fields for the backend taxon entity and related entities
      */
-    readonly taxonomyFieldList: Observable<string[]> = of(`${this.appConfig.apiUri()}/taxon/meta/fields`).pipe(
+    readonly taxonomyFieldList: Observable<string[]> = of(`${this.appConfig.apiUri()}/taxon/meta/relatedFields`).pipe(
         switchMap((url) => {
-            const req = this.api.queryBuilder(url).get().build();
+            const req = this.api.queryBuilder(url).get().build()
 
             return this.api.send(req).pipe(
                 catchError((e) => {
-                    this.alerts.showError(JSON.stringify(e));
-                    return [];
+                    this.alerts.showError(JSON.stringify(e))
+                    return []
                 })
-            );
+            )
         }),
         distinctUntilChanged(),
         shareReplay(1)
-    );
+    )
 
     readonly currentUpload = this._currentUpload.asObservable();
 

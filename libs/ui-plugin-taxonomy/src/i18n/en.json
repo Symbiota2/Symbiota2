@@ -24,11 +24,14 @@
     "taxonomy.profiler.entry.panel.label" : "Enter Name",
     "taxonomy.profiler.entry.button.label" : "Goto Profile",
 
+    "taxonomy.uploader.title" : "Taxonomy Upload",
+    "taxonomy.uploader.upload.button" : "Upload",
+    "taxonomy.uploader.lacks.edit.permission" : "Not logged in or insufficient privileges to upload taxonomy",
     "taxonomy.uploader.cancel.button" : "Cancel",
     "taxonomy.uploader.confirm.button" : "Update",
     "taxonomy.uploader.continue.uploading" : "Continue Uploading?",
-    "taxonomy.uploader.create.count" : "New Taxons will be Created",
-    "taxonomy.uploader.update.count" : "Existing Taxons will be Updated",
+    "taxonomy.uploader.create.count" : "New Taxons and Statuses will be Created",
+    "taxonomy.uploader.update.count" : "Existing Taxons and Statuses will be Updated",
     "taxonomy.uploader.skip.count" : "Records do not have a value for the selected unique field and will be skipped",
 
     "taxonomy.viewer.title": "Taxonomy Viewer",
@@ -143,10 +146,10 @@
     "taxon.status.editor.updated.change.accepted": "The Taxon's status was Changed",
     "taxon.status.editor.updated.change.accepted.error": "Error in Changing the Status",
 
-    "taxon.vernacular.editor.block.added": "Common name added",
-    "taxon.vernacular.editor.block.updated": "Common name updated",
-    "taxon.vernacular.editor.block.deleted": "Common name deleted",
-    "taxon.vernacular.editor.block.added.error": "Error adding a common name",
-    "taxon.vernacular.editor.block.updated.error": "Error updating a common name",
-    "taxon.vernacular.editor.block.deleted.error": "Error deleting a common name"
+    "taxon.vernacular.editor.added": "Common name added",
+    "taxon.vernacular.editor.updated": "Common name updated",
+    "taxon.vernacular.editor.deleted": "Common name deleted",
+    "taxon.vernacular.editor.added.error": "Error adding a common name",
+    "taxon.vernacular.editor.updated.error": "Error updating a common name",
+    "taxon.vernacular.editor.deleted.error": "Error deleting a common name"
 }

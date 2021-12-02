@@ -161,6 +161,14 @@ The commonName controller finds using a common name
         return dto
     }
 
+    @Get('meta/fields')
+    @ApiOperation({
+        summary: 'Retrieve the list of fields for the taxon vernacular entity'
+    })
+    async getFields(): Promise<string[]> {
+        return this.myService.getFields()
+    }
+
     private canEdit(request) {
         // SuperAdmins and TaxonProfileEditors have editing privileges
         const isSuperAdmin = TokenService.isSuperAdmin(request.user)
