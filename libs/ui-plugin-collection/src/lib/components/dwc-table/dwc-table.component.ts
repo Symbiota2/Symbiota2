@@ -2,29 +2,29 @@ import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTable, MatTableDataSource} from '@angular/material/table';
-import { CollectionArchive } from '@symbiota2/ui-plugin-collection';
-import { DarwinCoreArchiveService } from '../../services/darwin-core-archive.service';
-import { DwcArchiveDataSource } from './dwc-archive-datasource';
+import { DwcArchive } from '@symbiota2/ui-plugin-collection';
+import { DwcService } from '../../services/dwc.service';
+import { DwcTableDataSource } from './dwc-table-datasource';
 
 @Component({
-  selector: 'symbiota2-darwincore-archive-table',
-  templateUrl: './darwincore-archive-table.component.html',
-  styleUrls: ['./darwincore-archive-table.component.scss']
+  selector: 'symbiota2-dwc-table',
+  templateUrl: './dwc-table.component.html',
+  styleUrls: ['./dwc-table.component.scss']
 })
-export class DarwincoreArchiveTableComponent implements OnInit {
+export class DwcTableComponent implements OnInit {
 
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: false}) sort: MatSort;
-  @ViewChild(MatTable, {static: false}) table: MatTable<CollectionArchive>;
-  dataSource: DwcArchiveDataSource;
+  @ViewChild(MatTable, {static: false}) table: MatTable<DwcArchive>;
+  dataSource: DwcTableDataSource;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = ['id', 'name', 'date', 'size'];
 
-  constructor(private readonly dwcService: DarwinCoreArchiveService){}
+  constructor(private readonly dwcService: DwcService){}
 
   ngOnInit() {
-    this.dataSource = new DwcArchiveDataSource(this.dwcService);
+    this.dataSource = new DwcTableDataSource(this.dwcService);
   }
 
   ngAfterViewInit() {

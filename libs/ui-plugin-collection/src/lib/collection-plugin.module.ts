@@ -62,11 +62,11 @@ import { CollectionToolsPage } from './pages/collection-tools-page/collection-to
 import { CollectionPermissionsComponent } from './components/collection-permissions/collection-permissions.component';
 import { UserSearchableSelectComponent } from './components/user-searchable-select/user-searchable-select.component';
 import { CollectionPermissionsConfirmDialogComponent } from './components/collection-permissions-confirm-dialog/collection-permissions-confirm-dialog.component';
-import { DarwinCoreArchivePublishingComponent } from './components/darwincore-archive-publishing/darwincore-archive-publishing.component';
-import { DarwinCoreArchiveService } from './services/darwin-core-archive.service';
-import { CollectionDwCPage } from './pages/collection-dw-cpage/collection-dw-cpage.component';
-import { DarwincoreArchiveTableComponent } from './components/darwincore-archive-table/darwincore-archive-table.component';
-import { DarwincoreArchiveDownloadLinkComponent } from './components/darwincore-archive-download-link/darwincore-archive-download-link.component';
+import { DwcPublishingComponent } from './components/dwc-publishing/dwc-publishing.component';
+import { DwcService } from './services/dwc.service';
+import { CollectionDwcPage } from './pages/collection-dwc-page/collection-dwc-page.component';
+import { DwcTableComponent } from './components/dwc-table/dwc-table.component';
+import { DwcDownloadLinkComponent } from './components/dwc-download-link/dwc-download-link.component';
 
 
 @NgModule({
@@ -91,10 +91,10 @@ import { DarwincoreArchiveDownloadLinkComponent } from './components/darwincore-
         CollectionPermissionsComponent,
         UserSearchableSelectComponent,
         CollectionPermissionsConfirmDialogComponent,
-        DarwinCoreArchivePublishingComponent,
-        CollectionDwCPage,
-        DarwincoreArchiveTableComponent,
-        DarwincoreArchiveDownloadLinkComponent,
+        DwcPublishingComponent,
+        CollectionDwcPage,
+        DwcTableComponent,
+        DwcDownloadLinkComponent,
     ],
     imports: [
         AppTranslationModule,
@@ -131,7 +131,7 @@ import { DarwincoreArchiveDownloadLinkComponent } from './components/darwincore-
         CollectionProfileService,
         InstitutionService,
         CommentService,
-        DarwinCoreArchiveService,
+        DwcService,
     ],
     exports: [CollectionCheckboxSelectorComponent, CollectionLogoComponent],
 })
@@ -150,7 +150,7 @@ export class CollectionPlugin extends SymbiotaUiPlugin {
             { path: ROUTE_COLLECTION_TOOLS, component: CollectionToolsPage },
             {
                 path: ROUTE_COLLECTION_DWCARCHIVES,
-                component: CollectionDwCPage,
+                component: CollectionDwcPage,
             },
         ];
     }

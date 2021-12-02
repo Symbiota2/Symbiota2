@@ -1,21 +1,21 @@
 import { DataSource } from '@angular/cdk/collections';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { CollectionArchive } from '@symbiota2/ui-plugin-collection';
+import { DwcArchive } from '@symbiota2/ui-plugin-collection';
 import { merge, observable, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { DarwinCoreArchiveService } from '../../services/darwin-core-archive.service';
+import { DwcService } from '../../services/dwc.service';
 
 interface DwcTableItem {}
 
-export class DwcArchiveDataSource implements DataSource<DwcTableItem> {
+export class DwcTableDataSource implements DataSource<DwcTableItem> {
     paginator: MatPaginator;
     sort: MatSort;
-    data: Observable<CollectionArchive[]> = this.dwcService.archiveList$;
+    data: Observable<DwcArchive[]> = this.dwcService.archiveList$;
 
-    constructor(private readonly dwcService: DarwinCoreArchiveService) {}
+    constructor(private readonly dwcService: DwcService) {}
 
-    connect(): Observable<CollectionArchive[]> {
+    connect(): Observable<DwcArchive[]> {
         
         const dataMutations = [this.data, this.paginator.page, this.sort.sortChange];
 
@@ -34,12 +34,12 @@ export class DwcArchiveDataSource implements DataSource<DwcTableItem> {
         );
     }
 
-    private getPagedData(data: CollectionArchive[]) {
+    private getPagedData(data: DwcArchive[]) {
         const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
         return data.splice(startIndex, this.paginator.pageSize);
     }
 
-    private getSortedData(data: CollectionArchive[]) {
+    private getSortedData(data: DwcArchive[]) {
         if (!this.sort.active || this.sort.direction === '') {
             return data;
         }

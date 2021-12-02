@@ -2,7 +2,7 @@ import {
     ApiCollectionArchive,
 } from '@symbiota2/data-access';
 
-export class CollectionArchive implements ApiCollectionArchive {
+export class DwcArchive implements ApiCollectionArchive {
     constructor(data: Record<string, unknown>) {
         Object.assign(this, data);
 

@@ -5,16 +5,16 @@ import {
     ApiClientService,
     UserService,
 } from '@symbiota2/ui-common';
-import { CollectionArchive, CollectionService } from '@symbiota2/ui-plugin-collection';
+import { DwcArchive, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { combineLatest, Observable, of } from 'rxjs';
 import { catchError, map, switchMap, take } from 'rxjs/operators';
 
 
 @Injectable()
-export class DarwinCoreArchiveService {
+export class DwcService {
     private readonly DARWINCORE_BASE_URL = `${this.api.apiRoot()}/dwc`;
 
-    archiveList$: Observable<CollectionArchive[]> = this.getArchiveList();
+    archiveList$: Observable<DwcArchive[]> = this.getArchiveList();
 
     constructor(
         private readonly api: ApiClientService,
@@ -23,7 +23,7 @@ export class DarwinCoreArchiveService {
         private readonly alertService: AlertService
     ) {}
 
-    getCurrentCollectionArchiveInfo(): Observable<CollectionArchive> {
+    getCurrentCollectionArchiveInfo(): Observable<DwcArchive> {
         return this.collectionService.currentCollection.pipe(
             switchMap((collection) => {
                 var req = this.api
@@ -78,7 +78,7 @@ export class DarwinCoreArchiveService {
             )
     }
 
-    getArchiveList(): Observable<CollectionArchive[]> {
+    getArchiveList(): Observable<DwcArchive[]> {
         const req = this.api
             .queryBuilder(`${this.DARWINCORE_BASE_URL}/collections`)
             .get()
@@ -86,7 +86,7 @@ export class DarwinCoreArchiveService {
 
         return this.api
             .send(req, {skipLoading: true})
-            .pipe(map((archiveList: CollectionArchive[]) => {
+            .pipe(map((archiveList: DwcArchive[]) => {
                 return archiveList;
             }));
     }

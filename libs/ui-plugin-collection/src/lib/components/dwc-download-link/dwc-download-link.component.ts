@@ -1,19 +1,19 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AlertService } from '@symbiota2/ui-common';
-import { CollectionArchive } from '@symbiota2/ui-plugin-collection';
+import { DwcArchive } from '@symbiota2/ui-plugin-collection';
 import { map } from 'rxjs/operators';
-import { DarwinCoreArchiveService } from '../../services/darwin-core-archive.service';
+import { DwcService } from '../../services/dwc.service';
 
 @Component({
-    selector: 'symbiota2-darwincore-archive-download-link',
-    templateUrl: './darwincore-archive-download-link.component.html',
-    styleUrls: ['./darwincore-archive-download-link.component.scss'],
+    selector: 'symbiota2-dwc-download-link',
+    templateUrl: './dwc-download-link.component.html',
+    styleUrls: ['./dwc-download-link.component.scss'],
 })
-export class DarwincoreArchiveDownloadLinkComponent implements OnInit {
-    @Input() archive: CollectionArchive;
+export class DwcDownloadLinkComponent implements OnInit {
+    @Input() archive: DwcArchive;
 
     constructor(
-        private readonly dwcService: DarwinCoreArchiveService,
+        private readonly dwcService: DwcService,
         private readonly alerts: AlertService
     ) {}
 

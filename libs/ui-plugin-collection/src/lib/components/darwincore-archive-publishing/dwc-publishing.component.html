@@ -53,7 +53,7 @@
                     >
                         <p>
                             <b>DwC-Archive File: </b>
-                                <symbiota2-darwincore-archive-download-link [archive]=archive></symbiota2-darwincore-archive-download-link>
+                                <symbiota2-dwc-download-link [archive]=archive></symbiota2-dwc-download-link>
                         </p>
                         <p>
                             <b>Description:</b>
@@ -61,12 +61,12 @@
                             {{ collection.collectionName }}
                         </p>
                         <p>
-                            <b>Size in bytes:</b>
-                            {{ archive.size }}
+                            <b>File Size:</b>
+                            {{ formatBytes(archive.size, 2) }}
                         </p>
                         <p>
                             <b>Last Update:</b>
-                            {{ archive.updatedAt.toString() }}
+                            {{ lastUpdate.toDateString() }}
                         </p>
                     </ng-container>
                     <ng-template #elseTemplate>

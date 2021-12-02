@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { CollectionEditorComponent } from '../../components/collection-editor/collection-editor.component';
 import { CollectionPermissionsComponent } from '../../components/collection-permissions/collection-permissions.component';
-import { DarwinCoreArchivePublishingComponent } from '../../components/darwincore-archive-publishing/darwincore-archive-publishing.component';
+import { DwcPublishingComponent } from '../../components/dwc-publishing/dwc-publishing.component';
 
 @Component({
     selector: 'symbiota2-collection-tools-page',
@@ -22,7 +22,7 @@ export class CollectionToolsPage implements OnInit {
     static collectionTools: Map<string, Component> = new Map()
         .set('Edit Collection', CollectionEditorComponent)
         .set('User Permissions', CollectionPermissionsComponent)
-        .set('DarwinCore Archive Publishing', DarwinCoreArchivePublishingComponent);
+        .set('DarwinCore Archive Publishing', DwcPublishingComponent);
 
     readonly collectionToolsKeys: String[] = Array.from(
         CollectionToolsPage.collectionTools.keys()

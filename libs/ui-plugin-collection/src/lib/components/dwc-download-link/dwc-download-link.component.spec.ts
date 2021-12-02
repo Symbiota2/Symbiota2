@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CollectionDwCPageComponent } from './collection-dw-cpage.component';
+import { DwcDownloadLinkComponent } from './dwc-download-link.component';
 
-describe('CollectionDwCPageComponent', () => {
-  let component: CollectionDwCPageComponent;
-  let fixture: ComponentFixture<CollectionDwCPageComponent>;
+describe('DwcDownloadLinkComponent', () => {
+  let component: DwcDownloadLinkComponent;
+  let fixture: ComponentFixture<DwcDownloadLinkComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CollectionDwCPageComponent ]
+      declarations: [ DwcDownloadLinkComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CollectionDwCPageComponent);
+    fixture = TestBed.createComponent(DwcDownloadLinkComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

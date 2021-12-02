@@ -1,18 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertService } from '@symbiota2/ui-common';
-import { Collection, CollectionArchive, CollectionService } from '@symbiota2/ui-plugin-collection';
+import { Collection, DwcArchive, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { Observable } from 'rxjs';
-import { DarwinCoreArchiveService } from '../../services/darwin-core-archive.service';
+import { DwcService } from '../../services/dwc.service';
 
 @Component({
-    selector: 'symbiota2-darwincore-archive-publishing',
-    templateUrl: './darwincore-archive-publishing.component.html',
-    styleUrls: ['./darwincore-archive-publishing.component.scss'],
+    selector: 'symbiota2-dwc-publishing',
+    templateUrl: './dwc-publishing.component.html',
+    styleUrls: ['./dwc-publishing.component.scss'],
 })
-export class DarwinCoreArchivePublishingComponent implements OnInit {
+export class DwcPublishingComponent implements OnInit {
     collection$: Observable<Collection>;
-    archiveInfo$: Observable<CollectionArchive>;
+    archiveInfo$: Observable<DwcArchive>;
+
+    /** To create new Date from date string in archiveInfo.updateAt */
+    lastUpdate: Date;
 
     publishArchiveForm: FormGroup = this.fb.group({
         includeImageURLs: [false, Validators.required],
@@ -21,7 +24,7 @@ export class DarwinCoreArchivePublishingComponent implements OnInit {
 
     constructor(
         private readonly collectionService: CollectionService,
-        private readonly dwcService: DarwinCoreArchiveService,
+        private readonly dwcService: DwcService,
         private readonly fb: FormBuilder,
         private readonly alerts: AlertService
     ) {}
@@ -29,6 +32,9 @@ export class DarwinCoreArchivePublishingComponent implements OnInit {
     ngOnInit(): void {
         this.collection$ = this.collectionService.currentCollection;
         this.archiveInfo$ = this.dwcService.getCurrentCollectionArchiveInfo();
+        this.archiveInfo$.subscribe((archive)=> {
+            this.lastUpdate = new Date(archive.updatedAt);
+        })
     }
 
     onPublishArchive(): void {
@@ -48,4 +54,16 @@ export class DarwinCoreArchivePublishingComponent implements OnInit {
                 });
         });
     }
+
+    formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+      
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+      
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+      
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+      }
 }
