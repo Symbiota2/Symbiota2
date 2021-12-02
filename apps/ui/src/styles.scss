@@ -23,7 +23,53 @@ $app-theme: mat-light-theme((
 ));
 
 @include angular-material-theme($app-theme);
-// -----
+
+/////SYMBIOTA2 CUSTOM STYLES/////
+
+.symbiota2-info-mat-card{
+    padding-top: 12px;
+    color: #6C6C6C;
+    min-height: 150px;
+
+    mat-card-title{
+        color: $accentColor;
+        font-size: 18px;
+        font-weight: 400;
+        margin-bottom: 1rem;
+
+        mat-icon{
+            padding-right: .5rem;
+        }
+    }
+
+    mat-card-content{
+        padding-left: 1rem;
+        font-weight: 300;
+    }
+}
+
+.symbiota2-primary-info-mat-card{
+    padding-top: 12px;
+    color: white;
+    min-height: 150px;
+    background-color: $primaryColor;
+
+    mat-card-title{
+        color: white;
+        font-size: 18px;
+        font-weight: 400;
+        margin-bottom: 1rem;
+
+        mat-icon{
+            padding-right: .5rem;
+        }
+    }
+
+    mat-card-content{
+        padding-left: 1rem;
+        font-weight: 400;
+    }
+}
 
 * {
     font-family: $font;

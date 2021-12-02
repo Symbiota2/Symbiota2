@@ -55,14 +55,16 @@
                 <a
                     mat-stroked-button
                     id="collectionLink"
-                    [ngClass]="{'primaryLink': link.text == 'Back to collections'}"
+                    [ngClass]="{
+                        primaryLink: link.text == 'Back to collections'
+                    }"
                     [routerLink]="link.routerLink"
                     [queryParams]="link.queryParams"
                     >{{ link.text }}</a
                 >
             </ng-container>
         </div>
-        <mat-card class="collection-mat-card" id="collectionDescription">
+        <mat-card class="symbiota2-info-mat-card" id="collectionDescription">
             <mat-card-title> Overview </mat-card-title>
             <mat-card-content>
                 {{ collection.fullDescription }}
@@ -71,7 +73,7 @@
         <div fxLayout="row" fxLayoutAlign="center start" fxLayoutGap="1rem">
             <mat-card
                 id="collectionInfo"
-                class="collection-mat-card"
+                class="symbiota2-info-mat-card"
                 fxFlex="60"
             >
                 <mat-card-title fxLayoutAlign="start end">
@@ -114,7 +116,7 @@
                 </mat-card-content>
             </mat-card>
             <mat-card
-                class="collection-mat-card"
+                class="symbiota2-primary-mat-card"
                 id="collectionStats"
                 fxFlex="40"
             >
@@ -158,8 +160,8 @@
                         {{
                             collection.collectionStats.lastModifiedTimestamp
                                 | date: 'medium'
-                        }}</small
-                    >
+                        }}
+                    </small>
                 </mat-card-content>
             </mat-card>
         </div>
