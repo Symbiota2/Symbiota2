@@ -83,6 +83,30 @@ export class TaxonService extends BaseService<Taxon>{
     }
 
     /**
+     * Service to find all of the taxons for a given rank possibly using a taxonomic authority ID
+     * @param rankID - the rankID
+     * @param authorityID - the authorityID (optional)
+     * @returns Observable of response from api casted as `Taxon[]`
+     * will be the found statements
+     * @returns `of(null)` if api errors
+     * @see Taxon
+     */
+    async findAllAtRank(rankID: number, authorityID?: number): Promise<Taxon[]> {
+
+        // Have to use query builder since filter on nested relations does not work
+        const qb = this.taxonRepo.createQueryBuilder('o')
+            .innerJoin('o.taxonStatuses', 'c')
+            .where('o.rankID = :rankID', { rankID: rankID })
+
+        // If there is an authority limit to the authority
+        if (authorityID) {
+            qb.andWhere('c.taxonAuthorityID = :authorityID', {authorityID: authorityID})
+        }
+
+        return qb.getMany()
+    }
+
+    /**
      * Find all of the taxons possibly using an array of ids and
      * a taxonomic authority ID, and include the authors with the result
      * Can also limit the number fetched and use an offset.
