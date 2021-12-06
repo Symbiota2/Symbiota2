@@ -140,6 +140,14 @@ export class TaxonomicStatusService extends BaseService<TaxonomicStatus>{
     }
 
     /**
+     * Returns a list of the fields of the taxon status entity
+     */
+    getFields(): string[] {
+        const entityColumns = this.myRepository.metadata.columns;
+        return entityColumns.map((c) => c.propertyName);
+    }
+
+    /**
      * Change accepted status in a ring using a new taxon accepted id and and old taxon accepted
      * and a taxon authority id.
      * @param newTaxonID The id of the taxon to make accepted

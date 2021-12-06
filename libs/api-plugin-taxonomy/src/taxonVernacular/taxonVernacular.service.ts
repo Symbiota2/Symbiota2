@@ -187,6 +187,14 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
         return await this.myRepository.findOne({where: {id: id}})
     }
 
+    /**
+     * Returns a list of the fields of the vernacular entity
+     */
+    getFields(): string[] {
+        const entityColumns = this.myRepository.metadata.columns;
+        return entityColumns.map((c) => c.propertyName);
+    }
+
     async create(data: Partial<TaxonVernacular>): Promise<TaxonVernacular> {
         const taxon = this.myRepository.create(data);
         return this.myRepository.save(taxon);

@@ -4,8 +4,8 @@ import { Job } from 'bull';
 import { Inject, Logger } from '@nestjs/common';
 import { promises as fsPromises } from 'fs';
 import { fileExists } from '@symbiota2/api-common';
-import { OccurrenceUpload } from '@symbiota2/api-database';
 import { Repository } from 'typeorm';
+import { TaxonomyUpload } from '../../../api-database/src/entities/upload/TaxonomyUpload.entity';
 
 export interface TaxonomyUploadCleanupJob {
     id: number;
@@ -15,8 +15,8 @@ export interface TaxonomyUploadCleanupJob {
 @Processor(QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP)
 export class TaxonomyUploadCleanupProcessor {
     constructor(
-        @Inject(OccurrenceUpload.PROVIDER_ID)
-        private readonly uploads: Repository<OccurrenceUpload>) { }
+        @Inject(TaxonomyUpload.PROVIDER_ID)
+        private readonly uploads: Repository<TaxonomyUpload>) { }
 
     private readonly logger = new Logger(TaxonomyUploadCleanupProcessor.name);
 

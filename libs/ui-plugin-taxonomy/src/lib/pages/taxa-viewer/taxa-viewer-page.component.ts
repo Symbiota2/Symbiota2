@@ -11,6 +11,7 @@ import {
 import { TaxonomicEnumTreeService } from '@symbiota2/ui-plugin-taxonomy'
 import { BehaviorSubject } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
+import { MatListOption } from '@angular/material/list';
 
 /**
  * Taxonomic data with nested structure.
@@ -35,6 +36,7 @@ interface TaxonNode {
 
 export class TaxaViewerPageComponent implements OnInit {
     nameControl = new FormControl()
+    nameListModel
     nameOptions: string[] = []
     hasAuthors = false
     includeAuthors = false
@@ -710,6 +712,7 @@ export class TaxaViewerPageComponent implements OnInit {
     Called when the taxon is chosen to display
      */
     onSubmit(): void {
+        this.nameFound = true
         this.dataSource.data = []
         if (this.kindOfName == 'Scientific') {
             const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
@@ -719,6 +722,10 @@ export class TaxaViewerPageComponent implements OnInit {
             this.findCommonAncestors(this.nameControl.value)
         }
 
+    }
+
+    nameListChange(options: MatListOption[]) {
+        this.buildTree(+options.map(o => o.value))
     }
 
     nameListCheck(sciname) {

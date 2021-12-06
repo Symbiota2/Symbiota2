@@ -1,5 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { OccurrenceUpload, OccurrenceUploadFieldMap, Taxon, TaxonomicUnit } from '@symbiota2/api-database';
+import {
+    Taxon, TaxonomicStatus,
+    TaxonomicUnit, TaxonomyUpload, TaxonomyUploadFieldMap,
+    TaxonVernacular
+} from '@symbiota2/api-database';
 import { In, Like, Repository } from 'typeorm';
 import { BaseService, csvIterator } from '@symbiota2/api-common';
 import { DwCArchiveParser, dwcCoreID, getDwcField, isDwCID } from '@symbiota2/dwc';
@@ -21,10 +25,16 @@ export class TaxonService extends BaseService<Taxon>{
         private readonly taxonRepo: Repository<Taxon>,
         @Inject(TaxonomicUnit.PROVIDER_ID)
         private readonly rankRepo: Repository<TaxonomicUnit>,
-        @Inject(OccurrenceUpload.PROVIDER_ID)
-        private readonly uploadRepo: Repository<OccurrenceUpload>,
-        @InjectQueue(QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP) private readonly uploadCleanupQueue: Queue<TaxonomyUploadCleanupJob>,
-        @InjectQueue(QUEUE_ID_TAXONOMY_UPLOAD) private readonly uploadQueue: Queue<TaxonomyUploadJob>) {
+        @Inject(TaxonVernacular.PROVIDER_ID)
+        private readonly vernacularRepo: Repository<TaxonVernacular>,
+        @Inject(TaxonomicStatus.PROVIDER_ID)
+        private readonly statusRepo: Repository<TaxonomicStatus>,
+        @Inject(TaxonomyUpload.PROVIDER_ID)
+        private readonly uploadRepo: Repository<TaxonomyUpload>,
+        @InjectQueue(QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP)
+        private readonly uploadCleanupQueue: Queue<TaxonomyUploadCleanupJob>,
+        @InjectQueue(QUEUE_ID_TAXONOMY_UPLOAD)
+        private readonly uploadQueue: Queue<TaxonomyUploadJob>) {
         super(taxonRepo);
     }
 
@@ -70,6 +80,30 @@ export class TaxonService extends BaseService<Taxon>{
                     take: limit,
                     skip: offset })
         }
+    }
+
+    /**
+     * Service to find all of the taxons for a given rank possibly using a taxonomic authority ID
+     * @param rankID - the rankID
+     * @param authorityID - the authorityID (optional)
+     * @returns Observable of response from api casted as `Taxon[]`
+     * will be the found statements
+     * @returns `of(null)` if api errors
+     * @see Taxon
+     */
+    async findAllAtRank(rankID: number, authorityID?: number): Promise<Taxon[]> {
+
+        // Have to use query builder since filter on nested relations does not work
+        const qb = this.taxonRepo.createQueryBuilder('o')
+            .innerJoin('o.taxonStatuses', 'c')
+            .where('o.rankID = :rankID', { rankID: rankID })
+
+        // If there is an authority limit to the authority
+        if (authorityID) {
+            qb.andWhere('c.taxonAuthorityID = :authorityID', {authorityID: authorityID})
+        }
+
+        return qb.getMany()
     }
 
     /**
@@ -381,6 +415,26 @@ export class TaxonService extends BaseService<Taxon>{
         return entityColumns.map((c) => c.propertyName);
     }
 
+    private eliminateDuplicates(data) {
+        return data.filter((value, index) => data.indexOf(value) === index)
+    }
+
+    /**
+     * Returns a list of the fields of the taxon entity plus any related entities for upload purposes
+     */
+    getAllTaxonomicUploadFields(): string[] {
+        const entityColumns = this.taxonRepo.metadata.columns
+        const statusColumns = this.statusRepo.metadata.columns
+        const vernacularColumns = this.vernacularRepo.metadata.columns
+        const rankColumns = this.rankRepo.metadata.columns
+        const artificialColumns = ["AcceptedTaxonName", "ParentTaxonName", "RankName"]
+        const allColumns = entityColumns
+            .concat(statusColumns)
+            .concat(vernacularColumns)
+            .concat(rankColumns)
+        return this.eliminateDuplicates(allColumns.map((c) => c.propertyName).concat(artificialColumns))
+    }
+
     /**
      * Create a taxon record using a Partial Taxon record
      * @param data The data for the record to create
@@ -411,7 +465,7 @@ export class TaxonService extends BaseService<Taxon>{
      * @param mimeType The mimeType of the file
      * @param fieldMap Object describing how upload fields map to the occurrence database
      */
-    async createUpload(filePath: string, mimeType: string, fieldMap: OccurrenceUploadFieldMap): Promise<OccurrenceUpload> {
+    async createUpload(filePath: string, mimeType: string, fieldMap: TaxonomyUploadFieldMap): Promise<TaxonomyUpload> {
         let upload = this.uploadRepo.create({ filePath, mimeType, fieldMap, uniqueIDField: 'taxonID' });
         upload = await this.uploadRepo.save(upload);
 
@@ -426,7 +480,7 @@ export class TaxonService extends BaseService<Taxon>{
         return upload;
     }
 
-    async patchUploadFieldMap(id: number, uniqueIDField: string, fieldMap: OccurrenceUploadFieldMap): Promise<OccurrenceUpload> {
+    async patchUploadFieldMap(id: number, uniqueIDField: string, fieldMap: TaxonomyUploadFieldMap): Promise<TaxonomyUpload> {
         const upload = await this.uploadRepo.findOne(id);
         if (!upload) {
             return null;
@@ -439,8 +493,8 @@ export class TaxonService extends BaseService<Taxon>{
         return upload;
     }
 
-    async findUploadByID(id: number): Promise<OccurrenceUpload> {
-        return this.uploadRepo.findOne(id);
+    async findUploadByID(id: number): Promise<TaxonomyUpload> {
+        return this.uploadRepo.findOne(id)
     }
 
     async deleteUploadByID(id: number): Promise<boolean> {
@@ -491,8 +545,8 @@ export class TaxonService extends BaseService<Taxon>{
         return result.cnt;
     }
 
-    async startUpload(uid: number, collectionID: number, uploadID: number): Promise<void> {
-        await this.uploadQueue.add({ uid, collectionID, uploadID });
+    async startUpload(uid: number, authorityID: number, uploadID: number): Promise<void> {
+        await this.uploadQueue.add({ uid, authorityID, uploadID });
     }
 
     /**
@@ -514,7 +568,7 @@ export class TaxonService extends BaseService<Taxon>{
                 scientificName,
                 rankID: taxonRank.rankID
             }
-        });
+        })
         return taxon ? taxon.id : -1;
     }
 
