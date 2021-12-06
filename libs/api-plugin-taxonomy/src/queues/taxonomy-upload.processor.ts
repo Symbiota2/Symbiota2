@@ -96,18 +96,24 @@ export class TaxonomyUploadProcessor {
         const allTaxonUpdates = []
         const allStatusUpdates = []
 
+        // Build a list of all the potential field names
         const entityColumns = this.taxonRepo.metadata.columns
         const statusColumns = this.statusRepo.metadata.columns
+        // For now, we do not care about common names
         //const vernacularColumns = this.vernacularRepo.metadata.columns
+        // Do not believe we need anything from the taxon units table
         //const rankColumns = this.rankRepo.metadata.columns
         const artificialColumns = ["AcceptedTaxonName", "ParentTaxonName", "RankName"]
 
+        // Get all of the potential ranks
         const allRanks = await this.rankRepo.find({})
         const rankIDToNameMap: Map<number, string> = new Map()
+        const rankIDToKingdomMap: Map<number, string> = new Map()
+        const rankAndKingdomToIDMap: Map<string, number> = new Map()
         const rankNameToIDMap: Map<string, number> = new Map()
         allRanks.forEach((rank) => {
             rankIDToNameMap.set(rank.rankID, rank.rankName)
-            rankNameToIDMap.set(rank.rankName, rank.rankID)
+            rankAndKingdomToIDMap.set(rank.rankName + ":" + rank.kingdomName, rank.rankID)
         })
 
         const fieldToTable: Map<string, string> = new Map()
@@ -124,13 +130,6 @@ export class TaxonomyUploadProcessor {
                 fieldToTable.set(field, "artificial")
             }
         })
-        /*
-        statusColumns.forEach((field) => {
-            if (!fieldToTable.has(field.propertyName)) {
-                fieldToTable.set(field.propertyName, "vernacular")
-            }
-        })
-         */
 
         // Process the taxon info first
         for (const row of batch) {
