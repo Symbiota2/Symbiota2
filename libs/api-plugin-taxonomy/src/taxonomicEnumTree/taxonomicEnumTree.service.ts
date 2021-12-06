@@ -13,6 +13,8 @@ import { formatWithOptions } from 'util';
 
 @Injectable()
 export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
+    count = 0
+
     constructor(
         @Inject(TaxaEnumTreeEntry.PROVIDER_ID)
         private readonly enumTreeRepository: Repository<TaxaEnumTreeEntry>,
@@ -22,8 +24,10 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
         private readonly taxonRepository: Repository<Taxon>,
         private readonly taxonService: TaxonService,
         @Inject(TaxonomicStatus.PROVIDER_ID)
-        private readonly statusRepository: Repository<TaxonomicStatus>) {
+        private readonly statusRepository: Repository<TaxonomicStatus>)
+    {
         super(enumTreeRepository)
+        this.count = 0
     }
 
     /**
@@ -298,19 +302,25 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
      * @param rankID - the id of the rank
      * @param taxonAuthorityID - the id of the taxa authority
      */
-    private async processRank(rankID, taxonAuthorityID) {
-
+    private async processRank(rankID, kingdomName, taxonAuthorityID) {
         // Fetch the statuses at this rank
-        const statuses = await this.statusRepository.find({
-            where: {
-                taxon: {rankID: rankID},
-                taxonAuthorityID: taxonAuthorityID
-            },
-            relations: ["taxon"]
-        })
-
-        // Sanity check, skip rank if nothing found!
-        if (!statuses) return
+        const statuses = (kingdomName) ?
+            await this.statusRepository.find({
+                where: {
+                    taxon: {rankID: rankID, kingdomName: kingdomName},
+                    // taxon: {rankID: rankID},
+                    taxonAuthorityID: taxonAuthorityID
+                    },
+                relations: ["taxon"]
+            })
+            : await this.statusRepository.find({
+                where: {
+                    //taxon: {rankID: rankID, kingdomName: kingdomName},
+                    taxon: {rankID: rankID},
+                    taxonAuthorityID: taxonAuthorityID
+                },
+                relations: ["taxon"]
+            })
 
         // Add to the enum tree
         await statuses.forEach((status) => {
@@ -318,14 +328,13 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
             const data = new TaxaEnumTreeEntry()
             data.parentTaxonID = status.parentTaxonID
             data.taxonID = status.taxonID
-            data.taxonAuthorityID = taxonAuthorityID
+            data.taxonAuthorityID = 12 // taxonAuthorityID
             data.initialTimestamp = new Date()
             this.save(data)
 
             // Add in the ancestors of the parent to this taxon's enum tree records
             this.processAncestors(status.taxonID, status.parentTaxonID, taxonAuthorityID)
         })
-
     }
 
     /**
@@ -336,6 +345,7 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
      * @param taxonAuthorityID - the id of the taxa authority
      */
     private async processAncestors(taxonID, parentTaxonID, taxonAuthorityID) {
+
         // Next find all of the taxon to move's taxaEnum tree entries
         const ancestors =
             await this.enumTreeRepository.find({
@@ -343,14 +353,15 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
                     taxonAuthorityID: taxonAuthorityID,
                     taxonID: parentTaxonID
                 }})
+
         await ancestors.forEach((ancestor) => {
             // Add the entry for taxonID with ancestor
             const data = new TaxaEnumTreeEntry()
             data.parentTaxonID = ancestor.parentTaxonID
             data.taxonID = taxonID
-            data.taxonAuthorityID = taxonAuthorityID
+            data.taxonAuthorityID = 12 // taxonAuthorityID
             data.initialTimestamp = new Date()
-            return this.save(data)
+            this.save(data)
         })
     }
 
@@ -362,18 +373,25 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
      * @return TaxaEnumTreeEntry One of the new enum records or null (not found)
      * @see TaxaEnumTreeEntry
      */
-    async rebuildTaxonEnumTree(taxonAuthorityID): Promise<TaxaEnumTreeEntry> {
+    async rebuildTaxonEnumTree(taxonAuthorityID: number): Promise<TaxaEnumTreeEntry> {
 
         // [TODO wrap in a transaction? ]
-        //console.log("moving " + taxonAuthorityID + " " + taxonID + " " + parentTaxonID)
 
         // First let's load the taxonomic units
-        const units : TaxonomicUnit[] = await this.taxonomicUnitRepository.find({
-            where: {
-                taxonAuthorityID: taxonAuthorityID
-            }})
+        /* If the taxon unit table is fine, use this one [TODO if taxonunits fk actually works]
+        const units : TaxonomicUnit[] = await this.taxonomicUnitRepository.find({})
+         */
+        const units = await this.taxonRepository.createQueryBuilder('s')
+            .select('s.rankID as rank')
+            .distinct(true)
+            .getRawMany()
+
+        units.sort((i,j) => {
+            return i.rank - j.rank
+        })
 
         // Sort the units based on the kingdom name and the unit it
+        /* [TODO if taxonunits fk actually works]
         units.sort((i,j) => {
             if (i.kingdomName > j.kingdomName) {
                 return 1
@@ -384,28 +402,21 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
                 return i.rankID - j.rankID
             }
         })
+         */
 
         // Drop everything in the taxaenumtree table for this authorityID
         await this.enumTreeRepository.delete({
             taxonAuthorityID: taxonAuthorityID
         })
 
-        //const statuses : [TaxonomicStatus[]?] = await
         // Now iterate through the ranks, adding all for a given rank to the table
         await units.forEach((unit) => {
-            this.processRank(unit.rankID, taxonAuthorityID)
-            // Get all of the taxons at this rank
-            /*
-            const tax = this.statusRepository.find({
-                where: {
-                    taxon: {rankID: unit.rankID},
-                    taxonAuthorityID: taxonAuthorityID
-                },
-                relations: ["taxon"]
-            })
-             */
-        })
+            // [TODO if taxon units foreign key works]
+            //this.processRank(unit.rankID, unit.kingdomName, taxonAuthorityID)
 
+            this.processRank(unit.rank,null, taxonAuthorityID)
+        })
         return new TaxaEnumTreeEntry()
     }
+
 }

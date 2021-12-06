@@ -155,4 +155,19 @@ export class TaxonomicEnumTreeController {
         return new TaxonomicEnumTreeDto(enumTree)
     }
 
+    @Patch('rebuildTree/:taxonomicAuthorityID')
+    @ApiOperation({
+        summary: "Move taxon to a new parent in the enum tree."
+    })
+    //@ProtectCollection('taxonomicAuthorityID')
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonomicEnumTreeDto })
+    //@SerializeOptions({ groups: ['single'] })
+    async rebuildTaxonEnumTree(@Param('taxonomicAuthorityID') taxonomicAuthorityID: number): Promise<TaxonomicEnumTreeDto> {
+        const enumTree = await this.myService.rebuildTaxonEnumTree(taxonomicAuthorityID);
+        if (!enumTree) {
+            throw new NotFoundException()
+        }
+        return new TaxonomicEnumTreeDto(enumTree)
+    }
+
 }
