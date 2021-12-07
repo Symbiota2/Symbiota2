@@ -704,9 +704,9 @@ export class TaxonService extends BaseService<Taxon>{
         }
 
         const parentTaxon = await this.taxonRepo.findOne({
-            kingdomName: taxon.kingdomName,
             rankID: parentRank.rankID,
-            scientificName: parentSciName
+            kingdomName: Raw(alias => `LOWER(${alias}) = LOWER('${taxon.kingdomName}')`),
+            scientificName: Raw(alias => `LOWER(${alias}) = LOWER('${parentSciName}')`),
         });
 
         if (!parentTaxon) {
