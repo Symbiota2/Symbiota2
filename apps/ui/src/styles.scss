@@ -54,6 +54,11 @@ $app-theme: mat-light-theme((
     min-height: 150px;
     background-color: $primaryColor;
 
+    a:link{
+        color: white;
+        text-decoration: underline;
+    }
+
     mat-card-title{
         color: white;
         font-size: 18px;
