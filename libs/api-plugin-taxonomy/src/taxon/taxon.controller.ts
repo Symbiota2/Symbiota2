@@ -431,7 +431,7 @@ export class TaxonController {
     // @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: "Upload a CSV or DwCA file containing taxa" })
     @ApiFileInput('file')
-    @UseGuards(SuperAdminGuard)
+    // @UseGuards(SuperAdminGuard)
     async uploadTaxaDwcA(@UploadedFile() file: File) {
         if (!file.mimetype.startsWith('application/zip')) {
             throw new BadRequestException('Invalid DwCA');

@@ -99,7 +99,7 @@ export class TaxonomicEnumTreeController {
     @ApiOperation({
         summary: "Get the descendent enum tree records for a given taxon ID (and optional taxonomic authority id)."
     })
-    async findDescendants(@Param('taxonID') taxonid: string, @Query() findAllParams: TaxonomicEnumTreeFindAllParams): Promise<TaxonomicEnumTreeDto[]> {
+    async findDescendants(@Param('taxonID') taxonid: number, @Query() findAllParams: TaxonomicEnumTreeFindAllParams): Promise<TaxonomicEnumTreeDto[]> {
         const taxons = await this.myService.findDescendants(taxonid, findAllParams)
         const taxonDtos = taxons.map(async (c) => {
             const taxon = new TaxonomicEnumTreeDto(c)

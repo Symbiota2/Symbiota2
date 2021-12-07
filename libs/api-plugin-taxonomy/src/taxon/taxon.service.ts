@@ -1,10 +1,14 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
-    Taxon, TaxonomicStatus,
-    TaxonomicUnit, TaxonomyUpload, TaxonomyUploadFieldMap,
+    TaxaEnumTreeEntry,
+    Taxon,
+    TaxonomicStatus,
+    TaxonomicUnit,
+    TaxonomyUpload,
+    TaxonomyUploadFieldMap,
     TaxonVernacular
 } from '@symbiota2/api-database';
-import { In, Like, Repository } from 'typeorm';
+import { In, Like, Repository, Raw } from 'typeorm';
 import { BaseService, csvIterator } from '@symbiota2/api-common';
 import { DwCArchiveParser, dwcCoreID, getDwcField, isDwCID } from '@symbiota2/dwc';
 import { TaxonFindAllParams, TaxonFindNamesParams } from './dto/taxon-find-parms';
@@ -31,6 +35,8 @@ export class TaxonService extends BaseService<Taxon>{
         private readonly statusRepo: Repository<TaxonomicStatus>,
         @Inject(TaxonomyUpload.PROVIDER_ID)
         private readonly uploadRepo: Repository<TaxonomyUpload>,
+        @Inject(TaxaEnumTreeEntry.PROVIDER_ID)
+        private readonly treeRepo: Repository<TaxaEnumTreeEntry>,
         @InjectQueue(QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP)
         private readonly uploadCleanupQueue: Queue<TaxonomyUploadCleanupJob>,
         @InjectQueue(QUEUE_ID_TAXONOMY_UPLOAD)
@@ -555,8 +561,11 @@ export class TaxonService extends BaseService<Taxon>{
      * @param scientificName The scientificName for the taxon
      * @return number The taxonID if it exists, otherwise -1
      */
-    async taxonExists(kingdomName: string, rankName: string, scientificName: string): Promise<number> {
-        const taxonRank = await this.rankRepo.findOne({ kingdomName, rankName });
+    async findTaxonID(kingdomName: string, rankName: string, scientificName: string): Promise<number> {
+        const taxonRank = await this.rankRepo.findOne({
+            kingdomName: Raw((kn) => `LOWER(${kn}) = LOWER('${kingdomName}')`),
+            rankName: Raw((rn) => `LOWER(${rn}) = LOWER('${rankName}')`)
+        });
 
         if (!taxonRank) {
             return -1;
@@ -594,9 +603,9 @@ export class TaxonService extends BaseService<Taxon>{
             if (author) {
                 // Thanks to
                 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
-                // For the replace regex
+                // For the regex to escape all regex special characters
                 const authorRegexpClean = author.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const authorRegexp = new RegExp(`\\s*(${authorRegexpClean})\\s*`)
+                const authorRegexp = new RegExp(`\\s*(${authorRegexpClean})\\s*`);
                 sciName = sciName.replace(authorRegexp, '');
             }
 
@@ -618,7 +627,7 @@ export class TaxonService extends BaseService<Taxon>{
             taxon.author = author;
 
             // Avoid duplicate uploads
-            const taxonID = await this.taxonExists(kingdomName, rankName, sciName);
+            const taxonID = await this.findTaxonID(kingdomName, rankName, sciName);
             if (taxonID !== -1) {
                 taxon.id = taxonID;
             }
@@ -664,5 +673,68 @@ export class TaxonService extends BaseService<Taxon>{
         }
 
         await this.taxonRepo.save(taxonBuffer);
+    }
+
+    async findAncestorTaxonIDs(taxonID: number): Promise<number[]> {
+        const treeEntries = await this.treeRepo.find({
+            select: ['parentTaxonID'],
+            where: { taxonID }
+        });
+        return treeEntries.map((te) => te.parentTaxonID);
+    }
+
+    async linkTaxonToAncestors(taxon: Taxon, parentRankName: string, parentSciName: string): Promise<void> {
+        // Don't want to link to ourselves
+        if (parentRankName === await taxon.rankName()) {
+            return;
+        }
+
+        const parentRank = await this.rankRepo.findOne({
+            select: ['rankID'],
+            where: {
+                kingdomName: Raw(alias => `LOWER(${alias}) = LOWER('${taxon.kingdomName}')`),
+                rankName: Raw(alias => `LOWER(${alias}) = LOWER('${parentRankName}')`)
+            }
+        });
+
+        if (!parentRank) {
+            let err = `Parent rank '${parentRankName}' not found in kingdom `;
+            err += `'${taxon.kingdomName}'`;
+            throw new Error(err);
+        }
+
+        const parentTaxon = await this.taxonRepo.findOne({
+            kingdomName: taxon.kingdomName,
+            rankID: parentRank.rankID,
+            scientificName: parentSciName
+        });
+
+        if (!parentTaxon) {
+            let err = `Parent taxon '${parentSciName}' not found in kingdom `;
+            err += `'${taxon.kingdomName}'`;
+            throw new Error(err);
+        }
+
+        // TODO: Get rid of taxonomic authorities?
+        const directParentTreeEntry = this.treeRepo.create({
+            taxonAuthorityID: 1,
+            taxonID: taxon.id,
+            parentTaxonID: parentTaxon.id
+        });
+        await this.treeRepo.save(directParentTreeEntry);
+
+        const ancestorSaves = [];
+        const ancestorIDs = await this.findAncestorTaxonIDs(parentTaxon.id);
+        for (const ancestorID of ancestorIDs) {
+            const ancestorEntry = this.treeRepo.create({
+                taxonAuthorityID: 1,
+                taxonID: taxon.id,
+                parentTaxonID: ancestorID
+            });
+            const savePromise = this.treeRepo.save(ancestorEntry);
+            ancestorSaves.push(savePromise);
+        }
+
+        await Promise.all(ancestorSaves);
     }
 }

@@ -312,7 +312,7 @@ export class Taxon extends EntityProvider {
     async getRank(): Promise<TaxonomicUnit> {
         const db = getConnection();
         const taxonUnitRepo = db.getRepository(TaxonomicUnit);
-        return taxonUnitRepo.findOne({
+        return await taxonUnitRepo.findOne({
             kingdomName: this.kingdomName,
             rankID: this.rankID
         });
@@ -337,7 +337,10 @@ export class Taxon extends EntityProvider {
     @DwCField('http://rs.tdwg.org/dwc/terms/taxonRank')
     async rankName(): Promise<string> {
         const rank = await this.getRank();
-        return rank !== null ? rank.rankName : null;
+        if (!rank) {
+            return null;
+        }
+        return rank.rankName;
     }
 
     @DwCField('http://rs.tdwg.org/dwc/terms/kingdom')

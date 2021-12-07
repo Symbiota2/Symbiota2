@@ -89,7 +89,7 @@ import { StorageModule } from '@symbiota2/api-storage';
         TaxonProfilePublicationService,
         TaxonProfilePublicationImageLinkService,
         TaxonProfilePublicationDescriptionLinkService,
-        TaxonResourceLinkService
+        TaxonResourceLinkService,
     ],
     controllers: [
         TaxonController,
