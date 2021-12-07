@@ -102,7 +102,7 @@ export class TaxonomyUploadProcessor {
      */
     private async onCSVBatch(job: Job<TaxonomyUploadJob>, upload: TaxonomyUpload, batch: DeepPartial<Taxon>[]) {
         // list of all the updates to do to taxon records
-        const allTaxonUpdates = []
+        const taxonUpdates = []
         const skippedTaxons = []
 
         // list of all the updates to do to status records
@@ -148,9 +148,14 @@ export class TaxonomyUploadProcessor {
             }
         })
 
+        // Map the "good" taxon update row number to the batch row number
+        let batchRowNumber = -1
+        let taxonRowNumber = 0
+        const taxonRowToBatchRow : Map<number,number> = new Map()
 
         // Process the taxon info first
         for (const row of batch) {
+            batchRowNumber += 1
             const taxonData = {}
 
             // Flag to keep track if we skip this row
@@ -286,23 +291,64 @@ export class TaxonomyUploadProcessor {
                             dbTaxon[k] = v;
                         }
                     }
-                    allTaxonUpdates.push(dbTaxon);
+                    taxonUpdates.push(dbTaxon)
+                    taxonRowToBatchRow.set(taxonRowNumber++, batchRowNumber)
                 }
                 // Insert
                 else {
                     const taxon = this.taxonRepo.create(taxonData)
-                    allTaxonUpdates.push(taxon)
+                    taxonUpdates.push(taxon)
+                    taxonRowToBatchRow.set(taxonRowNumber++, batchRowNumber)
                 }
             }
 
         }
 
-        await this.taxonRepo.save(allTaxonUpdates)
-        this.processed += allTaxonUpdates.length
+        // Save all of the taxons
+        await this.taxonRepo.save(taxonUpdates)
+        this.processed += taxonUpdates.length
 
-        // Now do the taxonomic status
-        for (const row of batch) {
+        // Now do the taxonomic status, iterating through the taxonUpdates
+        for (let taxonRowNumber = 0; taxonRowNumber < taxonUpdates.length; taxonRowNumber++) {
             const statusData = {}
+            const taxonData = taxonUpdates[taxonRowNumber]
+
+            // Flag to keep track if we skip this row
+            let skip= false
+
+            let taxons = []
+
+            // Does it have an id
+            if (taxonData["id"]) {
+                taxons = await this.taxonRepo.find({
+                    where: {  id: taxonData["id"] }
+                })
+            } else {
+                // First, let's load the taxon record to get the taxon id
+                const whereClause = {scientificName: taxonData["scientificName"]}
+
+                // Does it have a kingdom name?
+                if (taxonData["kingdomName"]) {
+                    whereClause["kingdomName"] = taxonData["kingdomName"]
+                }
+                // Does it have an author?
+                if (taxonData["author"]) {
+                    whereClause["author"] = taxonData["author"]
+                }
+
+                taxons = await this.taxonRepo.find({
+                    where: whereClause
+                })
+            }
+
+            // Did we find a taxon?
+            if (taxons.length != 1) {
+                // Found zero or several
+                skip = true
+            }
+
+            const taxon = taxons[0]
+            const row = upload[taxonRowToBatchRow.get(taxonRowNumber)]
 
             for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
                 if (!dbField) {
@@ -311,56 +357,54 @@ export class TaxonomyUploadProcessor {
                 if (!fieldToTable.has(dbField)) {
                     continue
                 }
+
+                let csvValue = row[csvField]
+
+                if (fieldToTable.get(dbField) == "artificial") {
+                    // "AcceptedTaxonName", "ParentTaxonName",
+                    if (dbField == "ParentTaxonName" || dbField == "AcceptedTaxonName") {
+                        // Map taxon name to taxon ID
+                        const taxons = await this.taxonRepo.find({ where: { scientificName: csvValue } })
+                        if (taxons.length == 0) {
+                            // Not found, skip
+                            skip = true
+                            this.logger.warn(`Parent or accepted taxon name does not have a matching taxon! Skipping...`)
+                            continue
+                        } else if (taxons.length == 1) {
+                            // Found one match
+                            csvValue = taxons[0].id
+                        } else {
+                            // Found more than one match
+                            skip = true
+                            this.logger.warn(`Parent or accepted taxon name has multiple matching taxons! Skipping...`)
+                            continue
+                        }
+                    }
+                    if (dbField == "ParentTaxonName") {
+                        statusData["parentTaxonID"] = csvValue == '' ? null : csvValue
+                    } else /*if (dbField == "AcceptedTaxonName") */ {
+                        statusData["taxonIDAccepted"] = csvValue == '' ? null : csvValue
+                    }
+                }
                 if (!(fieldToTable.get(dbField) == "status")) {
                     continue
                 }
-                let csvValue = row[csvField]
-                if (fieldToTable.get(dbField) == "artificial") {
-                    // "AcceptedTaxonName", "ParentTaxonName",
-                    if (dbField == "ParentTaxonName") {
-                        // Map taxon name to taxon ID
-                        const taxon = await this.taxonRepo.findOne({ scientificName: csvValue })
-                        if (taxon) {
-                            // Found the name use the ID
-                            csvValue = taxon.id
-                        } else {
-                            this.logger.warn(`Parent taxon name does not have a matching taxon! Skipping...`)
-                            continue
-                        }
-                        statusData["parentTaxonID"] = csvValue == '' ? null : csvValue
-                    } else if (dbField == "AcceptedTaxonName") {
-                        // Map taxon name to taxon ID
-                        const taxon = await this.taxonRepo.findOne({ scientificName: csvValue })
-                        if (taxon) {
-                            // Found the name use the ID
-                            csvValue = taxon.id
-                        } else {
-                            this.logger.warn(`Parent taxon name does not have a matching taxon! Skipping...`)
-                            continue
-                        }
-                        statusData["taxonIDAccepted"] = csvValue == '' ? null : csvValue
-                    } else {
-                        continue
+
+                const statuses = await this.statusRepo.find({
+                    where: {
+                        id: taxon.id
                     }
+                })
+
+                if (statuses.length == 0) {
+                    // No status yet, add it
+                } else if (statuses.length == 1) {
+                    // Update the found status
                 } else {
-                    statusData[dbField] = csvValue === '' ? null : csvValue
+                    // Found more than one status
+                    skip = true
                 }
-
-                const dbIDField = upload.fieldMap[upload.uniqueIDField]
-                const uniqueValue = statusData[dbIDField]
-
-                // Without a unique value for the row, skip it
-                if (!uniqueValue) {
-                    continue;
-                }
-
-                // Hard code based on job's collection ID
-                //taxonData['collectionID'] = job.data.collectionID;
-
-                const dbTaxon = await this.statusRepo.findOne({
-                    [dbIDField]: uniqueValue
-                });
-
+/*
                 // We need to get rid of this; If it's already in the db, then
                 // dbTaxon has it; If it's not, we'll generate a new one
                 delete statusData['id']
@@ -379,6 +423,7 @@ export class TaxonomyUploadProcessor {
                     const taxon = this.statusRepo.create(statusData)
                     allStatusUpdates.push(taxon)
                 }
+ */
             }
 
             let logMsg = `Processing uploads for taxa authority ID ${job.data.authorityID} `
