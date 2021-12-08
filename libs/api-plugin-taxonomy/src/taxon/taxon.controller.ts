@@ -39,6 +39,7 @@ import fs, { createReadStream } from 'fs';
 import { ProtectCollection } from '@symbiota2/api-plugin-collection';
 import { CollectionIDQueryParam } from '../../../api-plugin-occurrence/src/occurrence/dto/collection-id-query-param';
 import { OccurrenceHeaderMapBody } from '../../../api-plugin-occurrence/src/occurrence/dto/occurrence-header-map.input.dto';
+import { TaxonHeaderMapBody } from './dto/taxon-header-map.input.dto';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -373,23 +374,23 @@ export class TaxonController {
     async mapTaxonUpload(
         //@Query() query: CollectionIDQueryParam,
         @Param('id') id: number,
-        @Body() body: OccurrenceHeaderMapBody): Promise<{ newRecords: number, updatedRecords: number, nullRecords: number }> {
+        @Body() body: TaxonHeaderMapBody): Promise<{ newRecords: number, updatedRecords: number, nullRecords: number }> {
 
         const upload = await this.taxa.patchUploadFieldMap(
-            //id,
-            1, // [TODO fix taxonomic authority id]
+            id,
+            //1, // [TODO fix taxonomic authority id]
             body.uniqueIDField,
             body.fieldMap as Record<string, keyof Occurrence>
-        );
+        )
 
         if (!upload) {
-            throw new NotFoundException();
+            throw new NotFoundException()
         }
 
         const csvUniqueIDs = await this.taxa.countCSVNonNull(
             upload.filePath,
             body.uniqueIDField
-        );
+        )
 
         const dbUniqueIDField = body.fieldMap[body.uniqueIDField];
         const dbUniqueIDs = await this.taxa.countTaxons(
@@ -399,28 +400,32 @@ export class TaxonController {
             csvUniqueIDs.uniqueValues
         );
 
-        const newOccurrenceCount = csvUniqueIDs.uniqueValues.length - dbUniqueIDs;
+        const newTaxonCount = csvUniqueIDs.uniqueValues.length - dbUniqueIDs;
         return {
-            newRecords: newOccurrenceCount,
+            newRecords: newTaxonCount,
             updatedRecords: dbUniqueIDs,
             nullRecords: csvUniqueIDs.nulls
         };
     }
 
-    @Post('upload/:id/start')
+    @Post('upload/:id/:authorityID/start')
     @HttpCode(HttpStatus.NO_CONTENT)
-    @ProtectCollection('collectionID', { isInQuery: true })
+    //@ProtectCollection('collectionID', { isInQuery: true })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @ApiOperation({
-        summary: 'Starts a pre-configured upload of a CSV or DwCA'
+        summary: 'Starts a pre-configured upload of a taxonomy CSV'
     })
     async startUpload(
         @Param('id') uploadID: number,
-        @Query() query: CollectionIDQueryParam,
+        @Param('authorityID') authorityID: number,
+        //@Query() query: CollectionIDQueryParam,
         @Req() request: AuthenticatedRequest) {
 
         await this.taxa.startUpload(
             request.user.uid,
-            query.collectionID,
+            authorityID,
+            //query.collectionID,
             uploadID
         );
     }

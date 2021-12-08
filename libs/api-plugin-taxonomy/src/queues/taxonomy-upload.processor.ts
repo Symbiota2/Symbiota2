@@ -28,7 +28,7 @@ export class TaxonomyUploadProcessor {
     private readonly logger = new Logger(TaxonomyUploadProcessor.name);
 
     constructor(
-        @Inject(TaxonUpload.PROVIDER_ID)
+        @Inject(TaxonomyUpload.PROVIDER_ID)
         private readonly uploads: Repository<TaxonomyUpload>,
         @Inject(UserNotification.PROVIDER_ID)
         private readonly notifications: Repository<UserNotification>,
@@ -101,13 +101,20 @@ export class TaxonomyUploadProcessor {
      * @return nothing
      */
     private async onCSVBatch(job: Job<TaxonomyUploadJob>, upload: TaxonomyUpload, batch: DeepPartial<Taxon>[]) {
+        console.log(" Starting upload " + job.id)
+
         // list of all the updates to do to taxon records
         const taxonUpdates = []
-        const skippedTaxons = []
+        const skippedTaxonsDueToMulitpleMatch = []
+        const skippedTaxonsDueToMismatchRank = []
+        const skippedTaxonsDueToMissingName = []
 
         // list of all the updates to do to status records
-        const allStatusUpdates = []
-        const skippedStatuses = []
+        const statusUpdates = []
+        const skippedStatusesDueToMultipleMatch = []
+        const skippedStatusesDueToAcceptedMismatch = []
+        const skippedStatusesDueToParentMismatch = []
+        const skippedStatusesDueToTaxonMismatch = []
 
         // Build a list of all the potential field names
         const entityColumns = this.taxonRepo.metadata.columns
@@ -142,6 +149,8 @@ export class TaxonomyUploadProcessor {
                 fieldToTable.set(field.propertyName, "status")
             }
         })
+
+        // There are also some artificial (not present in database) fields
         artificialColumns.forEach((field) => {
             if (!fieldToTable.has(field)) {
                 fieldToTable.set(field, "artificial")
@@ -153,13 +162,30 @@ export class TaxonomyUploadProcessor {
         let taxonRowNumber = 0
         const taxonRowToBatchRow : Map<number,number> = new Map()
 
+        // We first need the kingdomName
+        // foreach field
+        let kingdomInRowName = null
+        for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
+            if (dbField == "kingdomName") {
+                kingdomInRowName = csvField
+            }
+        }
+
+        // Must have a kingdomName field
+        if (!kingdomInRowName) {
+            this.logger.warn(`Mapping is missing a field for kingdom name! Exiting...`)
+            return // [TODO should throw error]
+        }
+
         // Process the taxon info first
         for (const row of batch) {
             batchRowNumber += 1
             const taxonData = {}
+            console.log(" Processing row " + batchRowNumber)
 
             // Flag to keep track if we skip this row
             let skip= false
+
 
             // foreach field
             for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
@@ -175,10 +201,12 @@ export class TaxonomyUploadProcessor {
 
                 let csvValue = row[csvField]
 
+                // Check if field is an introduced one
                 if (fieldToTable.get(dbField) == "artificial") {
 
+                    // For taxons we are interested in mapping the rankname to an id
                     if (dbField == "RankName") {
-                        const kingdomName = row["Kingdom"]
+                        const kingdomName = row[kingdomInRowName]
                         const value = csvValue + rankSeparator + kingdomName
                         // Map rank name to rank ID
                         if (rankAndKingdomToIDMap.has(value)) {
@@ -186,17 +214,19 @@ export class TaxonomyUploadProcessor {
                             csvValue = rankAndKingdomToIDMap.get(value)
                         } else {
                             skip = true
-                            this.logger.warn(`Taxon does not have a matching rank! Skipping...`)
+                            skippedTaxonsDueToMismatchRank.push(row)
+                            this.logger.warn(`Taxon does not have a matching rank! Skipping...` + value)
                             continue
                         }
                         taxonData["rankID"] = csvValue == '' ? null : csvValue
+                    } else {
+                        // Skip this field
                     }
                 } else {
                     // Skip if the field is not a taxon table field
                     if (!(fieldToTable.get(dbField) == "taxon")) {
                         continue
                     }
-
                     taxonData[dbField] = csvValue === '' ? null : csvValue
                 }
             }
@@ -204,34 +234,26 @@ export class TaxonomyUploadProcessor {
             // Check that the required fields are present
             // Taxon needs a scientific name
             if (!taxonData["scientificName"]) {
+                skippedTaxonsDueToMissingName.push(row)
+                this.logger.warn(`Taxon is missing a scientific name! Skipping...`)
                 skip = true
+                continue
             }
             // Taxon needs a rank id
             if (!taxonData["rankID"]) {
+                skippedTaxonsDueToMismatchRank.push(row)
+                this.logger.warn(`Taxon lacks a rank ID (no match in the database to rank name if present)! Skipping...`)
                 skip = true
+                continue
             }
 
-            /*
-            const dbIDField = upload.fieldMap[upload.uniqueIDField]
-            const uniqueValue = taxonData[dbIDField]
-
-            // Without a unique value for the row, skip it
-            if (!uniqueValue) {
-                continue;
-            }
-             */
 
             // Let's try to match the taxon with information about the taxon to
             // things in the database
             // If we have a taxon id then let's use that
             let dbTaxon = null
-            if (taxonData["id"]) {
-                /*
-                const dbTaxon = await this.taxonRepo.findOne({
-                    [dbIDField]: uniqueValue
-                })
-                 */
 
+            if (taxonData["id"]) {
                 // Look for the taxon with this id
                 dbTaxon = await this.taxonRepo.findOne({
                     id: taxonData["id"]
@@ -243,12 +265,15 @@ export class TaxonomyUploadProcessor {
                     where: {scientificName: taxonData["scientificName"]}
                 })
 
+                // See how many things we got back
                 if (testTaxons.length == 0) {
                     // A new scientific name, we'll insert
                 } else if (testTaxons.length == 1) {
                     // An existing unique name, we'll update
                     dbTaxon = testTaxons[0]
                 } else {
+
+                    // Expand the match to include kingdom name and author if present
                     const whereClause = {scientificName: taxonData["scientificName"]}
 
                     // Does it have a kingdom name?
@@ -260,10 +285,12 @@ export class TaxonomyUploadProcessor {
                         whereClause["author"] = taxonData["author"]
                     }
 
+                    // Fetch the expanded search
                     const moreTestTaxons = await this.taxonRepo.find({
                         where: whereClause
                     })
 
+                    // See how many we got
                     if (moreTestTaxons.length == 0) {
                         // A new scientific name, we'll insert
                     } else if (moreTestTaxons.length == 1) {
@@ -271,6 +298,7 @@ export class TaxonomyUploadProcessor {
                         dbTaxon = testTaxons[0]
                     } else {
                         // Still ambiguous
+                        skippedTaxonsDueToMulitpleMatch.push(row)
                         skip = true
                     }
                 }
@@ -282,9 +310,22 @@ export class TaxonomyUploadProcessor {
             // delete taxonData['id']
 
             if (skip) {
-                skippedTaxons.push(taxonData)
+                // Should already be pushed into a skipped list
             } else {
-                // Update
+                // Do we need to insert?
+                if (!dbTaxon) {
+                    // Need to insert, create a new one
+                    dbTaxon = this.taxonRepo.create(taxonData)
+                }
+                // Update with taxonData information
+                for (const [k, v] of Object.entries(taxonData)) {
+                    if (k in dbTaxon) {
+                        dbTaxon[k] = v;
+                    }
+                }
+                taxonUpdates.push(dbTaxon)
+                taxonRowToBatchRow.set(taxonRowNumber++, batchRowNumber)
+                /*
                 if (dbTaxon) {
                     for (const [k, v] of Object.entries(taxonData)) {
                         if (k in dbTaxon) {
@@ -300,10 +341,15 @@ export class TaxonomyUploadProcessor {
                     taxonUpdates.push(taxon)
                     taxonRowToBatchRow.set(taxonRowNumber++, batchRowNumber)
                 }
+                 */
             }
 
         }
 
+        console.log(" number of taxon updates " + taxonUpdates.length)
+        console.log(" number of skipped due to multiple match " + skippedTaxonsDueToMulitpleMatch.length)
+        console.log(" number of skipped due to mismatch rank " + skippedTaxonsDueToMismatchRank.length)
+        console.log(" number of skipped due to missing name " + skippedTaxonsDueToMissingName.length)
         // Save all of the taxons
         await this.taxonRepo.save(taxonUpdates)
         this.processed += taxonUpdates.length
@@ -312,6 +358,7 @@ export class TaxonomyUploadProcessor {
         for (let taxonRowNumber = 0; taxonRowNumber < taxonUpdates.length; taxonRowNumber++) {
             const statusData = {}
             const taxonData = taxonUpdates[taxonRowNumber]
+            const row = upload[taxonRowToBatchRow.get(taxonRowNumber)]
             let dbStatus = null
 
             // Flag to keep track if we skip this row
@@ -319,10 +366,11 @@ export class TaxonomyUploadProcessor {
 
             let taxons = []
 
+            console.log(" Taxon data id and sciname " + taxonData.id + taxonData.sciname + taxonData.scientificName + taxonData.tid)
             // Does it have an id
-            if (taxonData["id"]) {
+            if (taxonData.id) {
                 taxons = await this.taxonRepo.find({
-                    where: {  id: taxonData["id"] }
+                    where: {  id: taxonData.id }
                 })
             } else {
                 // First, let's load the taxon record to get the taxon id
@@ -345,31 +393,60 @@ export class TaxonomyUploadProcessor {
             // Did we find a taxon?
             if (taxons.length != 1) {
                 // Found zero or several
+                skippedStatusesDueToTaxonMismatch.push(row)
+                this.logger.warn(`Taxon status check, taxon has multiple matches or no match in the database! Skipping...`)
                 skip = true
+                continue
             }
 
+            console.log("taxon has a match")
+            // Have a taxon match, let's get it
             const taxon = taxons[0]
-            const row = upload[taxonRowToBatchRow.get(taxonRowNumber)]
 
+            // Go through the fields in the row
             for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
+                console.log(" csvfield is " + csvField)
+            }
+
+            // Go through the fields in the row
+            for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
+                console.log(" csvfield is " + csvField)
                 if (!dbField) {
                     continue
                 }
+                console.log(" csvfield2 is " + row)
                 if (!fieldToTable.has(dbField)) {
                     continue
                 }
+                console.log(" csvfield3 is " + taxonRowToBatchRow.get(taxonRowNumber))
 
                 let csvValue = row[csvField]
 
+                console.log("checking if artificial ")
                 if (fieldToTable.get(dbField) == "artificial") {
                     // "AcceptedTaxonName", "ParentTaxonName",
                     if (dbField == "ParentTaxonName" || dbField == "AcceptedTaxonName") {
                         // Map taxon name to taxon ID
-                        const taxons = await this.taxonRepo.find({ where: { scientificName: csvValue } })
+                        const whereClause = {scientificName: taxonData["scientificName"]}
+
+                        // Does it have a kingdom name?  Use it if it does
+                        if (taxonData["kingdomName"]) {
+                            whereClause["kingdomName"] = taxonData["kingdomName"]
+                        }
+
+                        const taxons = await this.taxonRepo.find({
+                            where: whereClause
+                        })
                         if (taxons.length == 0) {
                             // Not found, skip
                             skip = true
-                            this.logger.warn(`Parent or accepted taxon name does not have a matching taxon! Skipping...`)
+                            if (dbField == "ParentTaxonName") {
+                                skippedStatusesDueToParentMismatch.push(row)
+                                this.logger.warn(`Parent taxon name does not have a matching taxon! Skipping...`)
+                            } else {
+                                skippedStatusesDueToAcceptedMismatch.push(row)
+                                this.logger.warn(`Accepted taxon name does not have a matching taxon! Skipping...`)
+                            }
                             continue
                         } else if (taxons.length == 1) {
                             // Found one match
@@ -377,7 +454,13 @@ export class TaxonomyUploadProcessor {
                         } else {
                             // Found more than one match
                             skip = true
-                            this.logger.warn(`Parent or accepted taxon name has multiple matching taxons! Skipping...`)
+                            if (dbField == "ParentTaxonName") {
+                                skippedStatusesDueToParentMismatch.push(row)
+                                this.logger.warn(`Parent taxon name has more than one matching taxon! Skipping...`)
+                            } else {
+                                skippedStatusesDueToAcceptedMismatch.push(row)
+                                this.logger.warn(`Accepted taxon has more than one matching taxon! Skipping...`)
+                            }
                             continue
                         }
                     }
@@ -387,55 +470,89 @@ export class TaxonomyUploadProcessor {
                         statusData["taxonIDAccepted"] = csvValue == '' ? null : csvValue
                     }
                 }
+
+                console.log(" checking if status")
                 if (!(fieldToTable.get(dbField) == "status")) {
                     continue
                 }
 
-                const statuses = await this.statusRepo.find({
-                    where: {
-                        id: taxon.id
-                    }
-                })
-
-                if (statuses.length == 0) {
-                    // No status yet, add it
-                } else if (statuses.length == 1) {
-                    // Update the found status
-                    dbStatus = statuses[0]
-                } else {
-                    // Found more than one status
-                    skip = true
-                    continue
-                }
-
-                // We need to get rid of this; If it's already in the db, then
-                // dbTaxon has it; If it's not, we'll generate a new one
-                // delete statusData['id']
-
-                // Update
-                if (skip) {
-                    skippedStatuses.push(statusData)
-                } else {
-                    if (dbStatus) {
-                        for (const [k, v] of Object.entries(statusData)) {
-                            if (k in dbStatus) {
-                                dbStatus[k] = v
-                            }
-                        }
-                        allStatusUpdates.push(dbStatus)
-                    }
-                    // Insert
-                    else {
-                        const status = this.statusRepo.create(statusData)
-                        allStatusUpdates.push(status)
-                    }
-                }
+                console.log(" asssigning ")
+                // Copy this field it is part of the status data
+                statusData[dbField] = csvValue === '' ? null : csvValue
             }
 
-            let logMsg = `Processing uploads for taxa authority ID ${job.data.authorityID} `
-            logMsg += `(${new Intl.NumberFormat().format(this.processed)} processed)...`
-            this.logger.log(logMsg)
+            console.log(" All done with field mapping, checking statuses ")
+            // Look for the statuses for this taxon
+            const statuses = await this.statusRepo.find({
+                where: {
+                    id: taxon.id
+                }
+            })
+
+            console.log(" Statues found " + statuses.length)
+
+            if (statuses.length == 0) {
+                // No status yet, add it
+            } else if (statuses.length == 1) {
+                // Update the found status
+                dbStatus = statuses[0]
+            } else {
+                // Found more than one status
+                skip = true
+                skippedStatusesDueToMultipleMatch.push(row)
+                this.logger.warn(`Taxon is in conflict, has multiple statuses, need to resolve! Skipping...`)
+                continue
+            }
+
+            // We need to get rid of this; If it's already in the db, then
+            // dbTaxon has it; If it's not, we'll generate a new one
+            // delete statusData['id']
+
+            // Update
+            if (skip) {
+                // skippedStatuses.push(statusData)
+            } else {
+                if (!dbStatus) {
+                    // Create
+                    dbStatus = this.statusRepo.create(statusData)
+                }
+                for (const [k, v] of Object.entries(statusData)) {
+                    if (k in dbStatus) {
+                        dbStatus[k] = v
+                    }
+                }
+                statusUpdates.push(dbStatus)
+                /*
+                if (dbStatus) {
+                    for (const [k, v] of Object.entries(statusData)) {
+                        if (k in dbStatus) {
+                            dbStatus[k] = v
+                        }
+                    }
+                    allStatusUpdates.push(dbStatus)
+                }
+                // Insert
+                else {
+                    const status = this.statusRepo.create(statusData)
+                    allStatusUpdates.push(status)
+                }
+                 */
+            }
         }
+        // Save all of the statuses
+        await this.statusRepo.save(statusUpdates)
+        this.processed += statusUpdates.length
+
+        console.log(" number of status updates " + statusUpdates.length)
+        console.log(" number of skipped due to accepted mismatch " + skippedStatusesDueToAcceptedMismatch.length)
+        console.log(" number of skipped due to multiple match " + skippedStatusesDueToMultipleMatch.length)
+        console.log(" number of skipped due to parent mismatch " + skippedStatusesDueToParentMismatch.length)
+        console.log(" number of skipped due to taxon mismatch " + skippedStatusesDueToTaxonMismatch.length)
+
+        let logMsg = `Processing uploads for taxa authority ID ${job.data.authorityID} `
+        logMsg += `(${new Intl.NumberFormat().format(taxonUpdates.length)} taxons processed and`
+        logMsg += `${new Intl.NumberFormat().format(statusUpdates.length)} statuses processed)...`
+        this.logger.log(logMsg)
     }
 
     private async onCSVComplete(uid: number, authorityID: number) {

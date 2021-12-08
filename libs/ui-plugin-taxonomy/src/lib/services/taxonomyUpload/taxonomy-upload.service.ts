@@ -27,7 +27,7 @@ export class TaxonomyUploadService {
 
     private readonly jwtToken = this.user.currentUser.pipe(
         map((user) => user.token)
-    );
+    )
     private readonly _currentUpload = new BehaviorSubject<ApiTaxonomyUpload>(null);
 
     /**
@@ -181,10 +181,12 @@ export class TaxonomyUploadService {
                 let url = this.createUrlBuilder()
                     .upload()
                     .id(upload.id)
-                    .build();
+                    .authorityID(this.taxonomicAuthorityID)
+                    .build()
                 // TODO: Clean this up
                 url += '/start';
 
+                console.log(" url is " + url)
                 const query = this.api.queryBuilder(url)
                     .post()
                     //.queryParam('collectionID', collectionID)

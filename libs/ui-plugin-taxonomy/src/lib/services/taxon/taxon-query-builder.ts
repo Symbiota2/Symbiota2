@@ -91,9 +91,15 @@ class DeleteOneBuilder extends TaxonQueryBuilder {
 
 class UploadBuilder extends TaxonQueryBuilder {
     private _id: number = null;
+    private _authID: number = null
 
     id(id: number): UploadBuilder {
         this._id = id;
+        return this;
+    }
+
+    authorityID(id: number): UploadBuilder {
+        this._authID = id;
         return this;
     }
 
@@ -101,6 +107,9 @@ class UploadBuilder extends TaxonQueryBuilder {
         this.url.pathname = `${this.url.pathname}/upload`;
         if (this._id) {
             this.url.pathname += `/${this._id}`;
+        }
+        if (this._authID) {
+            this.url.pathname += `/${this._authID}`;
         }
         return super.build();
     }

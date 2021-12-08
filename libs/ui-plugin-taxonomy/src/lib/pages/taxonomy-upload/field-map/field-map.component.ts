@@ -141,7 +141,7 @@ export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
             confirmDialog.afterClosed().subscribe((shouldContinue) => {
                 if (shouldContinue) {
                     combineLatest([
-                        this.taxonomicAuthorityService.getAuthorityID().pipe(filter((c) => c !== null)),
+                        //this.taxonomicAuthorityService.getAuthorityID().pipe(filter((c) => c !== null)),
                         this.uploads.startUpload()
                     ]).pipe(
                         take(1)
