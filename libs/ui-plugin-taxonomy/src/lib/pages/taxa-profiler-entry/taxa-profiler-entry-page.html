@@ -13,6 +13,8 @@
             <mat-radio-button value="Scientific">{{"taxonomy.viewer.option.scientific" | translate}}</mat-radio-button>&nbsp;&nbsp;
             <mat-radio-button value="Common">{{"taxonomy.viewer.option.common" | translate}}</mat-radio-button>
 
+
+            <!--
             <div>
                 <br/>
             <mat-form-field appearance="fill">
@@ -26,6 +28,7 @@
                 </mat-select>
             </mat-form-field>
             </div>
+            -->
 
             <div *ngIf='kindOfName == "Scientific"'>
                 <mat-checkbox class="example-margin" [(ngModel)]='hasAuthors'

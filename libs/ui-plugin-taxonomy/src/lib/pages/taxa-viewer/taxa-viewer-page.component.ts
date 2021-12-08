@@ -36,7 +36,6 @@ interface TaxonNode {
 
 export class TaxaViewerPageComponent implements OnInit {
     nameControl = new FormControl()
-    nameListModel
     nameOptions: string[] = []
     hasAuthors = false
     includeAuthors = false

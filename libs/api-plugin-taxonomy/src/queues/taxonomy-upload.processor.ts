@@ -312,6 +312,7 @@ export class TaxonomyUploadProcessor {
         for (let taxonRowNumber = 0; taxonRowNumber < taxonUpdates.length; taxonRowNumber++) {
             const statusData = {}
             const taxonData = taxonUpdates[taxonRowNumber]
+            let dbStatus = null
 
             // Flag to keep track if we skip this row
             let skip= false
@@ -400,30 +401,35 @@ export class TaxonomyUploadProcessor {
                     // No status yet, add it
                 } else if (statuses.length == 1) {
                     // Update the found status
+                    dbStatus = statuses[0]
                 } else {
                     // Found more than one status
                     skip = true
+                    continue
                 }
-/*
+
                 // We need to get rid of this; If it's already in the db, then
                 // dbTaxon has it; If it's not, we'll generate a new one
-                delete statusData['id']
+                // delete statusData['id']
 
                 // Update
-                if (dbTaxon) {
-                    for (const [k, v] of Object.entries(statusData)) {
-                        if (k in dbTaxon) {
-                            dbTaxon[k] = v
+                if (skip) {
+                    skippedStatuses.push(statusData)
+                } else {
+                    if (dbStatus) {
+                        for (const [k, v] of Object.entries(statusData)) {
+                            if (k in dbStatus) {
+                                dbStatus[k] = v
+                            }
                         }
+                        allStatusUpdates.push(dbStatus)
                     }
-                    allStatusUpdates.push(dbTaxon)
+                    // Insert
+                    else {
+                        const status = this.statusRepo.create(statusData)
+                        allStatusUpdates.push(status)
+                    }
                 }
-                // Insert
-                else {
-                    const taxon = this.statusRepo.create(statusData)
-                    allStatusUpdates.push(taxon)
-                }
- */
             }
 
             let logMsg = `Processing uploads for taxa authority ID ${job.data.authorityID} `
