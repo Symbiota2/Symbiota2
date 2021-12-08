@@ -643,18 +643,13 @@ export class TaxonService extends BaseService<Taxon>{
             let extraTaxonFields = this.taxonRepo.manager.connection
                 .getMetadata(Taxon)
                 .columns
-                .map((c) => c.propertyName);
+                .map((c) => c.propertyName)
+                .filter((prop) => !setFields.includes(prop));
 
             const csvFields = Object.keys(csvTaxon);
 
             for (const field of extraTaxonFields) {
                 const dwcFieldUri = getDwcField(Taxon, field);
-                const isAlreadySet = setFields.includes(dwcFieldUri);
-
-                if (isAlreadySet) {
-                    continue;
-                }
-
                 if (dwcFieldUri && csvFields.includes(dwcFieldUri)) {
                     taxon[field] = csvTaxon[dwcFieldUri];
                     setFields.push(dwcFieldUri);
