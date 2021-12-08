@@ -643,18 +643,13 @@ export class TaxonService extends BaseService<Taxon>{
             let extraTaxonFields = this.taxonRepo.manager.connection
                 .getMetadata(Taxon)
                 .columns
-                .map((c) => c.propertyName);
+                .map((c) => c.propertyName)
+                .filter((prop) => !setFields.includes(prop));
 
             const csvFields = Object.keys(csvTaxon);
 
             for (const field of extraTaxonFields) {
                 const dwcFieldUri = getDwcField(Taxon, field);
-                const isAlreadySet = setFields.includes(dwcFieldUri);
-
-                if (isAlreadySet) {
-                    continue;
-                }
-
                 if (dwcFieldUri && csvFields.includes(dwcFieldUri)) {
                     taxon[field] = csvTaxon[dwcFieldUri];
                     setFields.push(dwcFieldUri);
@@ -683,48 +678,19 @@ export class TaxonService extends BaseService<Taxon>{
         return treeEntries.map((te) => te.parentTaxonID);
     }
 
-    async linkTaxonToAncestors(taxon: Taxon, parentRankName: string, parentSciName: string): Promise<void> {
-        // Don't want to link to ourselves
-        if (parentRankName === await taxon.rankName()) {
-            return;
-        }
-
-        const parentRank = await this.rankRepo.findOne({
-            select: ['rankID'],
-            where: {
-                kingdomName: Raw(alias => `LOWER(${alias}) = LOWER('${taxon.kingdomName}')`),
-                rankName: Raw(alias => `LOWER(${alias}) = LOWER('${parentRankName}')`)
-            }
-        });
-
-        if (!parentRank) {
-            let err = `Parent rank '${parentRankName}' not found in kingdom `;
-            err += `'${taxon.kingdomName}'`;
-            throw new Error(err);
-        }
-
-        const parentTaxon = await this.taxonRepo.findOne({
-            rankID: parentRank.rankID,
-            kingdomName: Raw(alias => `LOWER(${alias}) = LOWER('${taxon.kingdomName}')`),
-            scientificName: Raw(alias => `LOWER(${alias}) = LOWER('${parentSciName}')`),
-        });
-
-        if (!parentTaxon) {
-            let err = `Parent taxon '${parentSciName}' not found in kingdom `;
-            err += `'${taxon.kingdomName}'`;
-            throw new Error(err);
-        }
-
+    async linkTaxonToAncestors(taxon: Taxon, directParentTaxon: Taxon): Promise<void> {
         // TODO: Get rid of taxonomic authorities?
         const directParentTreeEntry = this.treeRepo.create({
             taxonAuthorityID: 1,
             taxonID: taxon.id,
-            parentTaxonID: parentTaxon.id
+            parentTaxonID: directParentTaxon.id
         });
         await this.treeRepo.save(directParentTreeEntry);
 
         const ancestorSaves = [];
-        const ancestorIDs = await this.findAncestorTaxonIDs(parentTaxon.id);
+        const ancestorIDs = await this.findAncestorTaxonIDs(
+            directParentTreeEntry.parentTaxonID
+        );
         for (const ancestorID of ancestorIDs) {
             const ancestorEntry = this.treeRepo.create({
                 taxonAuthorityID: 1,
