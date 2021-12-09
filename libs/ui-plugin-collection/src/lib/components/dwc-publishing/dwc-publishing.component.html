@@ -1,0 +1,82 @@
+<mat-card id="main" *ngIf="collection$ | async as collection">
+    <mat-card-title id="title" fxLayoutAlign="start center"
+        ><mat-icon color="primary">unarchive</mat-icon>Darwin Core Archive
+        Publishing</mat-card-title
+    >
+    <mat-card-content fxLayout="column" fxLayoutGap="1rem">
+        <mat-card id="tool-info" fxLayout="row" fxLayoutGap="8px">
+            <mat-icon>info</mat-icon>
+            <p>
+                Use the controls below to publish occurrence data within this
+                collection as a Darwin Core Archive (DwC-A) file. A DwC-A file
+                is a single compressed ZIP file that contains one to several
+                data files along with a meta.xml document that describes the
+                content. The occurrence data file is required, but
+                identifications (determinations) and image metadata are
+                optional. Fields within the occurrences.csv file are defined by
+                the Darwin Core exchange standard.
+            </p>
+        </mat-card>
+        <div fxLayout="row" fxLayoutGap="1rem">
+            <mat-card class="symbiota2-info-mat-card" fxFlex="40">
+                <mat-card-title>Publish DwC-A File</mat-card-title>
+                <form fxLayout="column" [formGroup]="publishArchiveForm">
+                    <!-- TODO: <mat-checkbox>Include Determination History</mat-checkbox> -->
+                    <mat-checkbox formControlName="includeImageURLs"
+                        >Include Image URLs</mat-checkbox
+                    >
+                    <mat-checkbox formControlName="redactSensitiveLocalities"
+                        >Redact Sensitive Localities</mat-checkbox
+                    >
+                    <button
+                        mat-raised-button
+                        id="publish-btn"
+                        color="primary"
+                        [disabled]="!publishArchiveForm.valid"
+                        (click)="onPublishArchive()"
+                    >
+                        Publish DwC-A File
+                    </button>
+                </form>
+            </mat-card>
+            <mat-card class="symbiota2-primary-info-mat-card" fxFlex="60">
+                <mat-card-title fxLayoutAlign="start end"
+                    ><mat-icon>description</mat-icon>Archive
+                    Details</mat-card-title
+                >
+                <mat-card-content>
+                    <ng-container
+                        *ngIf="
+                            archiveInfo$ | async as archive;
+                            else elseTemplate
+                        "
+                    >
+                        <p>
+                            <b>DwC-Archive File: </b>
+                                <symbiota2-dwc-download-link [archive]=archive></symbiota2-dwc-download-link>
+                        </p>
+                        <p>
+                            <b>Description:</b>
+                            Darwin Core Archive for
+                            {{ collection.collectionName }}
+                        </p>
+                        <p>
+                            <b>File Size:</b>
+                            {{ formatBytes(archive.size, 2) }}
+                        </p>
+                        <p>
+                            <b>Last Update:</b>
+                            {{ lastUpdate.toDateString() }}
+                        </p>
+                    </ng-container>
+                    <ng-template #elseTemplate>
+                        <p>
+                            Looks like there are no DarwinCore-Archives
+                            published for this Collection yet
+                        </p>
+                    </ng-template>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </mat-card-content>
+</mat-card>

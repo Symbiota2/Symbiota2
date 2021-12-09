@@ -60,7 +60,7 @@ export class DwCController {
         }
     })
     async getArchiveByID(@Param() params: CollectionIDParam, @Res() res: Response): Promise<void> {
-        const archiveStream = await this.dwc.getCollectionArchive(params.collectionID);
+        const archiveStream: NodeJS.ReadableStream = await this.dwc.getCollectionArchive(params.collectionID);
         if (!archiveStream) {
             throw new NotFoundException();
         }

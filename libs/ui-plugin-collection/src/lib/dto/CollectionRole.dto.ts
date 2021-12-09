@@ -1,4 +1,3 @@
-import { NumberSymbol } from "@angular/common";
 import { ApiCollectionRoleInput, ApiCollectionRoleOutput, ApiCollectionRoleUser, ApiUserRoleName} from "@symbiota2/data-access";
 
 export class CollectionRoleOutput implements ApiCollectionRoleOutput {

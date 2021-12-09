@@ -116,7 +116,7 @@ export class DwCService {
                     objectKey: k.key,
                     collectionID: -1,
                     isPublic: false,
-                    updatedAt: k.updatedAt,
+                    updatedAt: new Date(k.updatedAt),
                     size: k.size
                 };
                 const tagNames = Object.keys(archiveTags);

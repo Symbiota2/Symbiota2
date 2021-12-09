@@ -24,9 +24,10 @@ import {
     shareReplay,
     switchMap,
     take,
+    tap,
 } from 'rxjs/operators';
 import { Collection, CollectionListItem } from '../dto/Collection.output.dto';
-import { Injectable, IterableDiffers } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { CollectionInputDto } from '../dto/Collection.input.dto';
 import {
     ApiCollectionCategoryOutput,
@@ -38,7 +39,6 @@ import {
     CollectionRoleInput,
     CollectionRoleOutput,
 } from '../dto/CollectionRole.dto';
-import * as e from 'express';
 
 interface FindAllParams {
     id?: number | number[];
@@ -105,6 +105,7 @@ export class CollectionService {
                             collectionData
                         );
                     }),
+                    map(collection => {console.log(collection.id)}),
                     catchError((e) => {
                         this.alertService.showError(
                             `Cannot update collection: ${e.message}`
@@ -281,26 +282,33 @@ export class CollectionService {
      * @see {@link updateCollectionData}
      * @see {@link currentCollection}
      */
-    updateCurrentCollection(collectionData: Partial<CollectionInputDto>) {
-        this.userService.currentUser.pipe(
-            map((user) => {
-                if (user!!) {
-                    this.currentCollection.pipe(
-                        map((collection) => {
-                            if (user.canEditCollection(collection.id)) {
-                                this.updateCollectionData.next(collectionData);
-                            } else {
-                                this.alertService.showError(
-                                    'User does not have permission to edit Collection'
-                                );
-                            }
-                        })
-                    );
+    updateCurrentCollection(collectionData: Partial<CollectionInputDto>): Observable<Boolean> {
+        return combineLatest([this.userService.currentUser, this.currentCollection]).pipe(
+            take(1),
+            map(([user, collection]) => {
+                if (!!user && !!collection && user.canEditCollection(collection.id)){
+                    this.updateCollectionData.next(collectionData);
+                    return true;
                 } else {
                     this.alertService.showError(
-                        'User must be logged in to edit collections'
+                        'User does not have permission to edit collection'
                     );
+                    return false;
                 }
+            })
+        )
+    }
+
+    getCollection(id: number): Observable<Collection>{
+        const url = `${this.COLLECTION_BASE_URL}/${id}`;
+        const req = this.api.queryBuilder(url).get().build();
+
+        return this.api.send(req).pipe(
+            map((collection: ApiCollectionOutput) => {
+                if (collection === null) {
+                    return null;
+                }
+                return new Collection(collection);
             })
         );
     }

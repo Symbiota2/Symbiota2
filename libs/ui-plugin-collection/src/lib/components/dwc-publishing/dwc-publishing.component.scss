@@ -1,0 +1,70 @@
+@import "apps/ui/src/styles.scss";
+
+#main{
+    box-shadow: none;
+}
+
+#title{
+    color: #7D7D7D;
+    margin-bottom: 1rem;
+    mat-icon{
+        font-size: xx-large;
+        padding-right: 1rem;
+    }
+}
+
+#tool-info{
+    color: $accentColor;
+    box-shadow: none;
+    outline: $accentColor solid 1px ;
+
+}
+
+#publish-btn{
+    margin-top: 1rem;
+}
+
+.collection-mat-card{
+    padding-top: 12px;
+    color: #6C6C6C;
+    min-height: 150px;
+
+    mat-card-title{
+        color: $accentColor;
+        font-size: 18px;
+        font-weight: 400;
+        margin-bottom: 1rem;
+
+        mat-icon{
+            padding-right: .5rem;
+        }
+    }
+
+    mat-card-content{
+        padding-left: 1rem;
+        font-weight: 300;
+    }
+}
+
+.collection-primary-mat-card{
+    padding-top: 12px;
+    color: white;
+    min-height: 150px;
+    background-color: $primaryColor;
+
+    mat-card-title{
+        color: white;
+        font-size: 18px;
+        font-weight: 400;
+        margin-bottom: 1rem;
+
+        mat-icon{
+            padding-right: .5rem;
+        }
+    }
+
+    mat-card-content{
+        padding-left: 1rem;
+        font-weight: 400;
+    }
+}

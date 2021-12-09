@@ -1,0 +1,39 @@
+<div class="mat-elevation-z8">
+    <table mat-table class="full-width-table" matSort aria-label="Elements">
+        <!-- Id Column -->
+        <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Collection</th>
+            <td id="id" mat-cell *matCellDef="let row"><symbiota2-collection-logo [collectionID]=row.collectionID ></symbiota2-collection-logo></td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+            <td mat-cell id="link" *matCellDef="let row"><symbiota2-dwc-download-link [archive]=row></symbiota2-dwc-download-link></td>
+        </ng-container>
+
+        <!-- Date Column -->
+        <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Update</th>
+            <td mat-cell *matCellDef="let row">{{ row.updatedAt.toDateString() }}</td>
+        </ng-container>
+
+        <!-- Size Column -->
+        <ng-container matColumnDef="size">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Size</th>
+            <td mat-cell *matCellDef="let row">{{ formatBytes(row.size, 2) }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <mat-paginator
+        #paginator
+        [length]="dataSource?.data.length"
+        [pageIndex]="0"
+        [pageSize]="50"
+        [pageSizeOptions]="[25, 50, 100, 250]"
+    >
+    </mat-paginator>
+</div>

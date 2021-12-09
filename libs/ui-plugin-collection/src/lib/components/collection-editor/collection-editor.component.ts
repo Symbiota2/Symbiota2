@@ -30,12 +30,12 @@ export class CollectionEditorComponent implements OnInit {
         collectionName: [
             '',
             Validators.required,
-            CollectionAsyncValidators.nameTaken(this.collections, true),
+            CollectionAsyncValidators.nameTaken(this.collectionService, true),
         ],
         collectionCode: [
             '',
             Validators.required,
-            CollectionAsyncValidators.codeTaken(this.collections, true),
+            CollectionAsyncValidators.codeTaken(this.collectionService, true),
         ],
         institutionID: ['0', Validators.required],
         fullDescription: [''],
@@ -58,29 +58,30 @@ export class CollectionEditorComponent implements OnInit {
         icon: [''],
         type: ['', Validators.required],
         managementType: ['', Validators.required],
-    }, {asyncValidators: CollectionAsyncValidators.valuesChanged(this.collections.currentCollection)}
+    }, {asyncValidators: CollectionAsyncValidators.valuesChanged(this.collectionService.currentCollection)}
     );
     
 
     constructor(
         private fb: FormBuilder,
-        private readonly collections: CollectionService,
-        private readonly institutions: InstitutionService,
+        private readonly collectionService: CollectionService,
+        private readonly institutionService: InstitutionService,
         private readonly dialog: MatDialog,
         private readonly alerts: AlertService
     ) {}
 
     ngOnInit() {
-        this.collections.currentCollection.subscribe((collection) => {
-            this.categories$ = this.collections.categories;
-            this.inst$ = this.institutions.getInstitutions();
+        this.collectionService.currentCollection.subscribe((collection) => {
+            this.categories$ = this.collectionService.categories;
+            this.inst$ = this.institutionService.getInstitutions();
             this.patchForm(collection);
         })
     }
 
     onApplyChanges(): void {
         var updatedCollection: Partial<CollectionInputDto> = new CollectionInputDto(this.editCollectionForm.value);
-        this.collections.updateCurrentCollection(updatedCollection);
+        this.collectionService.updateCurrentCollection(updatedCollection).subscribe();
+        console.log("onApplyChanges");
     }
 
     patchForm(collection: Collection): void {
@@ -119,7 +120,7 @@ export class CollectionEditorComponent implements OnInit {
         });
         dialog.afterClosed().subscribe((inst: Institution) => {
             if (inst !== null) {
-                this.inst$ = this.institutions.getInstitutions();
+                this.inst$ = this.institutionService.getInstitutions();
                 this.editCollectionForm
                     .get('institutionID')
                     .setValue(String(inst.id));

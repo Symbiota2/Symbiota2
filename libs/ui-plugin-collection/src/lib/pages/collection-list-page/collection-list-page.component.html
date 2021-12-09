@@ -1,24 +1,27 @@
-<div id='btns'>
-    <button *ngIf="isAdmin()" mat-raised-button color='accent' [routerLink]="'/' + ROUTE_COLLECTION_NEW" >
-        Create New
-    </button>
-    <button mat-raised-button color='primary' (click)='onExpandCollapse(true)'>
-        Expand all
-    </button>
-    <button mat-raised-button color='primary' (click)='onExpandCollapse(false)'>
-        Collapse all
-    </button>
-</div>
-<symbiota2-expansion-panel
-    class='collectionCategory'
-    *ngFor='let category of (categories | async)'
-    [label]='category.category'
-    [expanded]='expandAll'
->
-    <div fxLayout='row wrap'>
-        <symbiota2-collection-card
-            *ngFor='let collection of category.collections'
-            [collection]='collection'>
-        </symbiota2-collection-card>
+<div id="main">
+    <div id='btns'>
+        <button *ngIf="isAdmin()" mat-raised-button color='accent' [routerLink]="'/' + ROUTE_COLLECTION_NEW" >
+            Create New
+        </button>
+        <button mat-raised-button color='primary' (click)='onExpandCollapse(true)'>
+            Expand all
+        </button>
+        <button mat-raised-button color='primary' (click)='onExpandCollapse(false)'>
+            Collapse all
+        </button>
     </div>
-</symbiota2-expansion-panel>
+    <symbiota2-expansion-panel
+        class='collectionCategory'
+        *ngFor='let category of (categories | async)'
+        [label]='category.category'
+        [expanded]='expandAll'
+    >
+        <div fxLayout='row wrap'>
+            <symbiota2-collection-card
+                *ngFor='let collection of category.collections'
+                [collection]='collection'>
+            </symbiota2-collection-card>
+        </div>
+    </symbiota2-expansion-panel>
+</div>
+

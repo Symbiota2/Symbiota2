@@ -1,9 +1,13 @@
 import { HttpHeaders, HttpParams, HttpRequest } from '@angular/common/http';
+import { response } from 'express';
+
+
 
 export class ApiQueryBuilder<T> {
     private readonly url: string;
-    private method: "GET" | "PUT" | "PATCH" | "POST" | "DELETE";
+    private method: "GET" | "PUT" | "PATCH" | "POST" | "DELETE" | "HEAD";
     private _body: T = null;
+    private responseType: "json" | "arraybuffer" | "blob" | "text" = "json";
 
     private withCredentials = false;
     private headers = new HttpHeaders({
@@ -25,6 +29,11 @@ export class ApiQueryBuilder<T> {
         return this;
     }
 
+    head(): ApiQueryBuilder<T> {
+        this.method = "HEAD";
+        return this;
+    }
+
     patch(): ApiQueryBuilder<T> {
         this.method = "PATCH";
         return this;
@@ -37,6 +46,11 @@ export class ApiQueryBuilder<T> {
 
     put(): ApiQueryBuilder<T> {
         this.method = "PUT";
+        return this;
+    }
+
+    setResponseType(responseType: "json" | "arraybuffer" | "blob" | "text"){
+        this.responseType = responseType;
         return this;
     }
 
@@ -82,7 +96,7 @@ export class ApiQueryBuilder<T> {
             {
                 withCredentials: this.withCredentials,
                 headers: this.headers,
-                responseType: "json",
+                responseType: this.responseType,
                 params: this.queryParams
             }
         );

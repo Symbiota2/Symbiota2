@@ -7,15 +7,12 @@ import {
     CollectionProfileLink,
     CollectionProfileService,
 } from '../../services/collection-profile.service';
-import { MatDialog } from '@angular/material/dialog';
 import { AlertService, UserService } from '@symbiota2/ui-common';
-import { DomSanitizer } from '@angular/platform-browser';
 import {
     ROUTE_COLLECTION_LIST,
     ROUTE_COLLECTION_COMMENTS,
     ROUTE_COLLECTION_TOOLS,
 } from '../../routes';
-import { CollectionEditorDialogComponent } from '../../components/collection-editor-dialog/collection-editor-dialog.component';
 import { Collection } from '@symbiota2/ui-plugin-collection';
 
 @Component({
@@ -33,18 +30,13 @@ export class CollectionPage implements OnInit {
 
     public collection: Collection;
 
-    private collectionID: number;
-
     private comments_link: CollectionProfileLink;
 
     public links$: Observable<CollectionProfileLink[]>;
 
-    //TODO: make observable
-    public userCanEdit: boolean;
+    public geoReferencedPercent: number;
 
-    public collectionHomePage: string;
-
-    public geoReferencedPercent;
+    public isColAdmin: boolean = false;
 
     constructor(
         private readonly userService: UserService,
@@ -56,11 +48,8 @@ export class CollectionPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-
-        //TODO: rework this into html (let collection from async for variables)
         this.getCollection().subscribe((collection) => {
             this.collection = collection;
-            this.collectionHomePage = collection.homePage;
             this.geoReferencedPercent =
                 collection.collectionStats != null && collection.collectionStats.recordCount > 0
                     ? Math.round(
@@ -69,17 +58,18 @@ export class CollectionPage implements OnInit {
                               100
                       )
                     : 0;
-            this.collectionID = collection.id;
-            this.canUserEdit();
             this.comments_link = {
-                text: 'view comments',
+                text: 'View comments',
                 requiresLogin: false,
                 routerLink: `/${ROUTE_COLLECTION_COMMENTS.replace(
                     ':collectionID',
-                    this.collectionID.toString()
+                    this.collection.id.toString()
                 )}`,
             };
+
             this.links$ = this.getLinks();
+            
+            this.canUserEdit().subscribe(bool => this.isColAdmin = bool);
         });
     }
 
@@ -94,6 +84,7 @@ export class CollectionPage implements OnInit {
                         : -1;
                 }),
                 switchMap((collectionID) => {
+                    console.log("getCollection: Collection ID: ", collectionID);
                     this.collections.setCollectionID(collectionID);
 
                     return this.collections.currentCollection;
@@ -123,45 +114,30 @@ export class CollectionPage implements OnInit {
             );
     }
 
-    canUserEdit() {
-        combineLatest([
+    canUserEdit(): Observable<boolean>{
+        return combineLatest([
             this.userService.currentUser,
             this.collections.currentCollection,
         ])
             .pipe(
                 map(([user, collection]) => {
+                    console.error("canUserEditCollection: Collection ID: ", collection.id);
                     return (
                         !!user &&
                         !!collection &&
                         user.canEditCollection(collection.id)
                     );
                 })
-            )
-            .subscribe((b) => (this.userCanEdit = b));
-    }
-
-    isUserEditor(): Promise<boolean> {
-        return this.userService.currentUser
-            .pipe(
-                map((user) => {
-                    return user.canEditCollection(this.collectionID);
-                }),
-                take(1)
-            )
-            .toPromise();
+            );
     }
 
     openCollectionTools(): void {
         var route: string = `/${ROUTE_COLLECTION_TOOLS.replace(
             ':collectionID',
-            this.collectionID.toString()
+            this.collection.id.toString()
         )}`;
 
-        console.log(route);
-        this.isUserEditor().then((bool) => {
-            if (bool) {
-                this.router.navigate([route]);
-            }
-        });
+        this.router.navigate([route]);
+
     }
 }

@@ -9,6 +9,7 @@ import { LoadingService } from '../alert';
 
 interface SendOpts {
     skipLoading?: boolean;
+    returnFullResponse?: boolean;
 }
 
 @Injectable({
@@ -44,4 +45,22 @@ export class ApiClientService {
             })
         );
     }
+
+    sendFullResponse<RequestType, ResponseType>(query: HttpRequest<RequestType>, opts?: SendOpts): Observable<HttpResponse<ResponseType>> {
+        const skipLoading = opts && opts.skipLoading === true;
+
+        if (!skipLoading) {
+            this.loading.start()
+        }
+        return this.http.request<ResponseType>(query).pipe(
+            filter((httpEvent) => httpEvent.type === HttpEventType.Response),
+            map((httpResponse) => (httpResponse as HttpResponse<ResponseType>)),
+            finalize(() => {
+                if (!skipLoading) {
+                    this.loading.end()
+                }
+            })
+        );
+    }
+
 }
