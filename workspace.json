@@ -113,7 +113,8 @@
           },
           "configurations": {
             "production": {
-              "browserTarget": "ui:build:production"
+              "browserTarget": "ui:build:production",
+              "liveReload": false
             }
           }
         },

@@ -1,14 +1,9 @@
+<!-- Navbar -->
+<symbiota2-navbar id="navbar" [ngClass]="navbarSticky?'sticky':'noSticky'"></symbiota2-navbar>
 <mat-card id="app">
     <mat-card-content fxLayout="column" fxLayoutAlign="start stretch">
-        <!-- Banner w/ logo -->
-        <div id="site-banner" fxHide.xs>
-            <app-banner></app-banner>
-        </div>
 
-        <!-- Navbar -->
-        <div id="navbar">
-            <symbiota2-navbar></symbiota2-navbar>
-        </div>
+
 
         <!-- Page display area -->
         <div id="router-outlet" fxFlex="1 1">

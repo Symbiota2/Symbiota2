@@ -1,13 +1,16 @@
-<div fxLayout='row' fxLayoutAlign='start center'>
-    <symbiota2-collection-logo [src]='collectionLogo | async'>
-    </symbiota2-collection-logo>
-    <h1 id='collectionName'>{{ collectionName | async }}</h1>
+<div id="main">
+    <div fxLayout='row' fxLayoutAlign='start center'>
+        <symbiota2-collection-logo [src]='collectionLogo | async'>
+        </symbiota2-collection-logo>
+        <h1 id='collectionName'>{{ collectionName | async }}</h1>
+    </div>
+    <div fxLayout='row'>
+        <symbiota2-occurrence-editor (formChanged)='onFormChanged($event)'>
+        </symbiota2-occurrence-editor>
+    </div>
+    <div fxLayout='row'>
+        <button mat-flat-button color='primary' (click)='onSubmit()'>Submit</button>
+    </div>
 </div>
-<div fxLayout='row'>
-    <symbiota2-occurrence-editor (formChanged)='onFormChanged($event)'>
-    </symbiota2-occurrence-editor>
-</div>
-<div fxLayout='row'>
-    <button mat-flat-button color='primary' (click)='onSubmit()'>Submit</button>
-</div>
+
 

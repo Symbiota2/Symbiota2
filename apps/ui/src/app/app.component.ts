@@ -1,8 +1,9 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, HostListener, OnInit } from "@angular/core";
 import {
     LoadingService,
     UserService
 } from "@symbiota2/ui-common";
+import * as e from "express";
 
 /**
  * The main app component. Contains the site header & navbar, along with a
@@ -16,9 +17,19 @@ import {
 export class AppComponent implements OnInit {
     isLoading = false;
 
+    navbarSticky:boolean = true;
+
+    @HostListener('window:scroll',['$event']) onScroll(){
+        if(window.scrollY > 150){
+            this.navbarSticky = true;
+        } else {
+            this.navbarSticky = false;
+        }
+    }
+
     constructor(
         private readonly loadingService: LoadingService,
-        private readonly userService: UserService) { }
+        private readonly userService: UserService ) { }
 
     ngOnInit() {
         // Show loading screen when loading

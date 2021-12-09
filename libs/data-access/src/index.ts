@@ -4,3 +4,4 @@ export * from './lib/occurrence';
 export * from './lib/user';
 export * from './lib/collection-category';
 export * from './lib/geography';
+export * from './lib/dwc';

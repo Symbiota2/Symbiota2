@@ -1,4 +1,9 @@
 @import "../../../styles/mixins.import";
+@import "../../../styles/theme.import.scss";
+
+#footer{
+
+}
 
 #footer-logo, #footer-text {
     @include mx(0.5rem);

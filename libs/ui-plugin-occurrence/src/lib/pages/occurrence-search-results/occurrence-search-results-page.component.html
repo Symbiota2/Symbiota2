@@ -1,52 +1,63 @@
-<h1>Search results</h1>
-<div *ngIf='(occurrences | async) as occurrences' class='mat-elevation-z1'>
-    <mat-paginator
-        [length]='occurrences.count'
-        [pageSize]='limit'
-        [pageSizeOptions]='[25, 50, 100]'
-        (page)='onPageChanged($event)'
-    >
-    </mat-paginator>
-    <table mat-table [dataSource]='occurrences.data'>
-        <ng-container matColumnDef="occurrenceID">
-            <th mat-header-cell *matHeaderCellDef>Symbiota ID</th>
-            <td mat-cell *matCellDef="let occurrence">{{ occurrence.id }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="catalogNumber">
-            <th mat-header-cell *matHeaderCellDef>Catalog number</th>
-            <td mat-cell *matCellDef="let occurrence">{{ occurrence.catalogNumber }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="collection">
-            <th mat-header-cell *matHeaderCellDef>Collection</th>
-            <td mat-cell *matCellDef="let occurrence">
-                {{ occurrence.collection.collectionName }}
-            </td>
-        </ng-container>
-
-        <ng-container matColumnDef="scientificName">
-            <th mat-header-cell *matHeaderCellDef>Scientific Name</th>
-            <td mat-cell *matCellDef="let occurrence">{{ occurrence.scientificName }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="latitude">
-            <th mat-header-cell *matHeaderCellDef>Latitude</th>
-            <td mat-cell *matCellDef="let occurrence">{{ occurrence.latitude | number: "2.1-1" }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="longitude">
-            <th mat-header-cell *matHeaderCellDef>Longitude</th>
-            <td mat-cell *matCellDef="let occurrence">{{ occurrence.longitude | number: "2.1-1" }}</td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="SHOW_COLUMNS"></tr>
-        <tr
-            mat-row
-            class='table-row'
-            *matRowDef="let occurrence; columns: SHOW_COLUMNS;"
-            (click)='onOccurrenceSelected(occurrence)'
+<div id="main">
+    <h1>Search results</h1>
+    <div *ngIf="occurrences | async as occurrences" class="mat-elevation-z1">
+        <mat-paginator
+            [length]="occurrences.count"
+            [pageSize]="limit"
+            [pageSizeOptions]="[25, 50, 100]"
+            (page)="onPageChanged($event)"
         >
-        </tr>
-    </table>
+        </mat-paginator>
+        <table mat-table [dataSource]="occurrences.data">
+            <ng-container matColumnDef="occurrenceID">
+                <th mat-header-cell *matHeaderCellDef>Symbiota ID</th>
+                <td mat-cell *matCellDef="let occurrence">
+                    {{ occurrence.id }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="catalogNumber">
+                <th mat-header-cell *matHeaderCellDef>Catalog number</th>
+                <td mat-cell *matCellDef="let occurrence">
+                    {{ occurrence.catalogNumber }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="collection">
+                <th mat-header-cell *matHeaderCellDef>Collection</th>
+                <td mat-cell *matCellDef="let occurrence">
+                    {{ occurrence.collection.collectionName }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="scientificName">
+                <th mat-header-cell *matHeaderCellDef>Scientific Name</th>
+                <td mat-cell *matCellDef="let occurrence">
+                    {{ occurrence.scientificName }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="latitude">
+                <th mat-header-cell *matHeaderCellDef>Latitude</th>
+                <td mat-cell *matCellDef="let occurrence">
+                    {{ occurrence.latitude | number: '2.1-1' }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="longitude">
+                <th mat-header-cell *matHeaderCellDef>Longitude</th>
+                <td mat-cell *matCellDef="let occurrence">
+                    {{ occurrence.longitude | number: '2.1-1' }}
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="SHOW_COLUMNS"></tr>
+            <tr
+                mat-row
+                class="table-row"
+                *matRowDef="let occurrence; columns: SHOW_COLUMNS"
+                (click)="onOccurrenceSelected(occurrence)"
+            ></tr>
+        </table>
+    </div>
 </div>

@@ -103,7 +103,6 @@ export class CollectionAsyncValidators {
                         updatedCollection.type === col.type &&
                         updatedCollection.managementType === col.managementType
                     ) {
-                        console.log('valuesChanged: no changes');
                         return { noChanges: true };
                     } else {
                         return null;
