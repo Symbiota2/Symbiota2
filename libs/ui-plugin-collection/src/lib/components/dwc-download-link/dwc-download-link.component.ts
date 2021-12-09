@@ -31,7 +31,6 @@ export class DwcDownloadLinkComponent implements OnInit {
                     link.download = this.archive.archive;
                     link.href = url;
                     link.click();
-                    link.parentNode.removeChild(link);
                     window.URL.revokeObjectURL(url);
                 })
             )

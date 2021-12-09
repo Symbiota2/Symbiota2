@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertService } from '@symbiota2/ui-common';
 import { Collection, DwcArchive, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { DwcService } from '../../services/dwc.service';
 
 @Component({
@@ -52,7 +53,7 @@ export class DwcPublishingComponent implements OnInit {
                         );
                     }
                 });
-        });
+        }).unsubscribe();
     }
 
     formatBytes(bytes, decimals = 2) {
@@ -66,4 +67,5 @@ export class DwcPublishingComponent implements OnInit {
       
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
       }
+
 }
