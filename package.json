@@ -28,7 +28,7 @@
     "nx": "nx",
     "postinstall": "ngcc --properties es2015 browser module main",
     "sql": "cross-env TS_NODE_PROJECT=apps/api/tsconfig.app.json node -r ts-node/register -r tsconfig-paths/register -r typeorm --require glob bin/run-sql.ts",
-    "start": "cross-env NODE_ENV=production nx run-many --target=serve --projects=api,ui --parallel --watch=false",
+    "start": "cross-env NODE_ENV=production nx run-many --target=serve --projects=api,ui --parallel --prod --watch=false",
     "start:dev": "cross-env NODE_ENV=development nx run-many --target=serve --projects=api,ui --parallel",
     "start:dev:ui": "nx serve ui",
     "start:dev:api": "nx serve api",
