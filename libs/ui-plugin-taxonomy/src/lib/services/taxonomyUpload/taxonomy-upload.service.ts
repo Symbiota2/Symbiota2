@@ -23,7 +23,7 @@ export interface ApiTaxonomyUpload {
 
 @Injectable()
 export class TaxonomyUploadService {
-    taxonomicAuthorityID = 27
+    taxonomicAuthorityID = 1 // [TODO Fetch isPrimary taxanomic authority
 
     private readonly jwtToken = this.user.currentUser.pipe(
         map((user) => user.token)

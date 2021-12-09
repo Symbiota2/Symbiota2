@@ -10,3 +10,5 @@ export const TAXA_UPLOADER_ROUTE = "taxonomy/upload"
 export const TAXA_UPLOADER_FIELD_MAP_ROUTE = "taxonomy/upload/field-map"
 export const TAXA_EDITOR_ROUTE = "taxonomy/edit"
 export const TAXA_PROFILER_ROUTE = "taxonomy/profile"
+
+export const TAXA_UPLOAD_COMPLETE_ROUTE = "taxonomy/uploadComplete"

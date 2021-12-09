@@ -19,7 +19,11 @@ import { TaxonomyConfirmDialogComponent } from './taxonomy-confirm-dialog-compon
 import { TaxonomicAuthorityService, TaxonService } from '../../../services';
 import { TaxonomyUploadService } from '../../../services/taxonomyUpload/taxonomy-upload.service';
 import { Q_PARAM_AUTHORITYID } from '../../../../constants';
-import { ROUTE_AUTHORITY_LIST, ROUTE_AUTHORITY_PROFILE } from '../../../routes';
+import {
+    ROUTE_AUTHORITY_LIST,
+    ROUTE_AUTHORITY_PROFILE,
+    TAXA_UPLOAD_COMPLETE_ROUTE
+} from '../../../routes';
 
 interface TableRow {
     fieldName: string;
@@ -147,7 +151,7 @@ export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
                         take(1)
                     ).subscribe(([authority,]) => {
                         this.router.navigate(
-                            [ROUTE_AUTHORITY_PROFILE.replace(':authorityID', authority.toString())]
+                            [TAXA_UPLOAD_COMPLETE_ROUTE]
                         )
                     })
                 }

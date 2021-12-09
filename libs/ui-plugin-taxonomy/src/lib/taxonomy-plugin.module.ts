@@ -38,7 +38,7 @@ import {
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
-import { TaxonProfilePageComponent } from './pages';
+import { TaxonomyUploadCompletePage, TaxonProfilePageComponent } from './pages';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
@@ -64,7 +64,7 @@ import { TaxonomyUploadService } from './services/taxonomyUpload/taxonomy-upload
 import { TaxaProfilerEntryPage } from './pages/taxa-profiler-entry/taxa-profiler-entry-page';
 import {
     TAXA_EDITOR_ROUTE,
-    TAXA_PROFILER_ROUTE,
+    TAXA_PROFILER_ROUTE, TAXA_UPLOAD_COMPLETE_ROUTE,
     TAXA_UPLOADER_FIELD_MAP_ROUTE,
     TAXA_UPLOADER_ROUTE,
     TAXA_VIEWER_ROUTE,
@@ -110,6 +110,7 @@ import { OccurrenceUploadFieldMapPage } from '../../../ui-plugin-occurrence/src/
   ],
     declarations: [
         TaxonomyUploadPage,
+        TaxonomyUploadCompletePage,
         TaxaProfilerEntryPage,
         TaxaEditorEntryPage,
         TaxaViewerPageComponent,
@@ -144,6 +145,7 @@ import { OccurrenceUploadFieldMapPage } from '../../../ui-plugin-occurrence/src/
         TaxaEditorEntryPage,
         TaxaProfilerEntryPage,
         TaxonomyUploadPage,
+        TaxonomyUploadCompletePage,
         TaxonProfilePageComponent,
         TaxaViewerPageComponent,
         TaxonEditorPageComponent,
@@ -198,6 +200,10 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
             {
                 path: TAXA_UPLOADER_FIELD_MAP_ROUTE,
                 component: TaxonomyUploadFieldMapPage
+            },
+            {
+                path: TAXA_UPLOAD_COMPLETE_ROUTE,
+                component: TaxonomyUploadCompletePage
             },
         ];
     }

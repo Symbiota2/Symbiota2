@@ -15,6 +15,7 @@ import { DeepPartial, Repository } from 'typeorm';
 import { QUEUE_ID_TAXONOMY_UPLOAD } from './taxonomy-upload.queue';
 import { csvIterator } from '@symbiota2/api-common';
 import { TaxonService } from '../taxon/taxon.service';
+import { TaxonomicEnumTreeService } from '../taxonomicEnumTree/taxonomicEnumTree.service';
 
 export interface TaxonomyUploadJob {
     uid: number;
@@ -41,7 +42,8 @@ export class TaxonomyUploadProcessor {
         @Inject(TaxonomicStatus.PROVIDER_ID)
         private readonly statusRepo: Repository<TaxonomicStatus>,
         @Inject(TaxaEnumTreeEntry.PROVIDER_ID)
-        private readonly taxaEnumTree: Repository<TaxaEnumTreeEntry>) { }
+        private readonly taxaEnumTree: Repository<TaxaEnumTreeEntry>,
+        private readonly taxaEnumTreeService: TaxonomicEnumTreeService) { }
 
     // TODO: Wrap in a transaction? Right now each chunk goes straight to the database until a failure occurs
     @Process()
@@ -101,16 +103,15 @@ export class TaxonomyUploadProcessor {
      * @return nothing
      */
     private async onCSVBatch(job: Job<TaxonomyUploadJob>, upload: TaxonomyUpload, batch: DeepPartial<Taxon>[]) {
-        console.log(" Starting upload " + job.id)
 
         // list of all the updates to do to taxon records
-        const taxonUpdates = []
+        const taxonUpdates : Taxon[] = []
         const skippedTaxonsDueToMulitpleMatch = []
         const skippedTaxonsDueToMismatchRank = []
         const skippedTaxonsDueToMissingName = []
 
         // list of all the updates to do to status records
-        const statusUpdates = []
+        const statusUpdates : TaxonomicStatus[] = []
         const skippedStatusesDueToMultipleMatch = []
         const skippedStatusesDueToAcceptedMismatch = []
         const skippedStatusesDueToParentMismatch = []
@@ -181,7 +182,6 @@ export class TaxonomyUploadProcessor {
         for (const row of batch) {
             batchRowNumber += 1
             const taxonData = {}
-            console.log(" Processing row " + batchRowNumber)
 
             // Flag to keep track if we skip this row
             let skip= false
@@ -247,7 +247,6 @@ export class TaxonomyUploadProcessor {
                 continue
             }
 
-
             // Let's try to match the taxon with information about the taxon to
             // things in the database
             // If we have a taxon id then let's use that
@@ -304,11 +303,6 @@ export class TaxonomyUploadProcessor {
                 }
             }
 
-            // We need to get rid of this; If it's already in the db, then
-            // dbTaxon has it; If it's not, we'll generate a new one
-            // Don't need to delete
-            // delete taxonData['id']
-
             if (skip) {
                 // Should already be pushed into a skipped list
             } else {
@@ -325,40 +319,27 @@ export class TaxonomyUploadProcessor {
                 }
                 taxonUpdates.push(dbTaxon)
                 taxonRowToBatchRow.set(taxonRowNumber++, batchRowNumber)
-                /*
-                if (dbTaxon) {
-                    for (const [k, v] of Object.entries(taxonData)) {
-                        if (k in dbTaxon) {
-                            dbTaxon[k] = v;
-                        }
-                    }
-                    taxonUpdates.push(dbTaxon)
-                    taxonRowToBatchRow.set(taxonRowNumber++, batchRowNumber)
-                }
-                // Insert
-                else {
-                    const taxon = this.taxonRepo.create(taxonData)
-                    taxonUpdates.push(taxon)
-                    taxonRowToBatchRow.set(taxonRowNumber++, batchRowNumber)
-                }
-                 */
             }
 
         }
 
+        /*
         console.log(" number of taxon updates " + taxonUpdates.length)
         console.log(" number of skipped due to multiple match " + skippedTaxonsDueToMulitpleMatch.length)
         console.log(" number of skipped due to mismatch rank " + skippedTaxonsDueToMismatchRank.length)
         console.log(" number of skipped due to missing name " + skippedTaxonsDueToMissingName.length)
+         */
+
         // Save all of the taxons
         await this.taxonRepo.save(taxonUpdates)
         this.processed += taxonUpdates.length
 
         // Now do the taxonomic status, iterating through the taxonUpdates
+        const statusRankMap = new Map()
         for (let taxonRowNumber = 0; taxonRowNumber < taxonUpdates.length; taxonRowNumber++) {
-            const statusData = {}
             const taxonData = taxonUpdates[taxonRowNumber]
-            const row = upload[taxonRowToBatchRow.get(taxonRowNumber)]
+            const statusData = {}
+            const row = batch[taxonRowToBatchRow.get(taxonRowNumber)]
             let dbStatus = null
 
             // Flag to keep track if we skip this row
@@ -366,7 +347,6 @@ export class TaxonomyUploadProcessor {
 
             let taxons = []
 
-            console.log(" Taxon data id and sciname " + taxonData.id + taxonData.sciname + taxonData.scientificName + taxonData.tid)
             // Does it have an id
             if (taxonData.id) {
                 taxons = await this.taxonRepo.find({
@@ -399,30 +379,23 @@ export class TaxonomyUploadProcessor {
                 continue
             }
 
-            console.log("taxon has a match")
             // Have a taxon match, let's get it
             const taxon = taxons[0]
 
             // Go through the fields in the row
             for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
-                console.log(" csvfield is " + csvField)
-            }
 
-            // Go through the fields in the row
-            for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
-                console.log(" csvfield is " + csvField)
                 if (!dbField) {
                     continue
                 }
-                console.log(" csvfield2 is " + row)
+
                 if (!fieldToTable.has(dbField)) {
                     continue
                 }
-                console.log(" csvfield3 is " + taxonRowToBatchRow.get(taxonRowNumber))
 
                 let csvValue = row[csvField]
 
-                console.log("checking if artificial ")
+
                 if (fieldToTable.get(dbField) == "artificial") {
                     // "AcceptedTaxonName", "ParentTaxonName",
                     if (dbField == "ParentTaxonName" || dbField == "AcceptedTaxonName") {
@@ -471,25 +444,26 @@ export class TaxonomyUploadProcessor {
                     }
                 }
 
-                console.log(" checking if status")
                 if (!(fieldToTable.get(dbField) == "status")) {
                     continue
                 }
 
-                console.log(" asssigning ")
                 // Copy this field it is part of the status data
                 statusData[dbField] = csvValue === '' ? null : csvValue
             }
 
-            console.log(" All done with field mapping, checking statuses ")
+            //console.log(" All done with field mapping, checking statuses " + taxon.id)
             // Look for the statuses for this taxon
-            const statuses = await this.statusRepo.find({
+            let statuses = []
+
+            statuses = await this.statusRepo.find({
                 where: {
-                    id: taxon.id
+                    taxonID: taxon.id,
+                    taxonAuthorityID: job.data.authorityID
                 }
             })
 
-            console.log(" Statues found " + statuses.length)
+            //console.log(" Statues found " + statuses.length)
 
             if (statuses.length == 0) {
                 // No status yet, add it
@@ -504,50 +478,65 @@ export class TaxonomyUploadProcessor {
                 continue
             }
 
-            // We need to get rid of this; If it's already in the db, then
-            // dbTaxon has it; If it's not, we'll generate a new one
-            // delete statusData['id']
-
             // Update
             if (skip) {
-                // skippedStatuses.push(statusData)
+                // Skipped, it is already in one of the skipped queues
             } else {
                 if (!dbStatus) {
                     // Create
                     dbStatus = this.statusRepo.create(statusData)
                 }
+
+                // Set the taxon id explicitly
+                dbStatus.taxonID = taxon.id
+
+                // Set the taxonomic authority explicitly
+                dbStatus.taxonAuthorityID = job.data.authorityID
+
                 for (const [k, v] of Object.entries(statusData)) {
                     if (k in dbStatus) {
                         dbStatus[k] = v
                     }
                 }
-                statusUpdates.push(dbStatus)
+
                 /*
-                if (dbStatus) {
-                    for (const [k, v] of Object.entries(statusData)) {
-                        if (k in dbStatus) {
-                            dbStatus[k] = v
-                        }
-                    }
-                    allStatusUpdates.push(dbStatus)
-                }
-                // Insert
-                else {
-                    const status = this.statusRepo.create(statusData)
-                    allStatusUpdates.push(status)
+                console.log("updating status")
+                for (const [k, v] of Object.entries(dbStatus)) {
+                    console.log(" status field " + k + " = " + v)
                 }
                  */
+
+                statusUpdates.push(dbStatus)
+                // Figure out the rank for this status update
+                if (!statusRankMap.has(taxon.rankID)) {
+                    statusRankMap.set(taxon.rankID,[])
+                }
+                statusRankMap.get(taxon.rankID).push(dbStatus)
             }
         }
         // Save all of the statuses
+
         await this.statusRepo.save(statusUpdates)
         this.processed += statusUpdates.length
 
+        // Now move the taxons in order by rank from top to bottom
+        const keys = []
+        for (const [k, v] of Object.entries(statusRankMap)) {
+            keys.push(k)
+        }
+        keys.sort((a,b) => { return a-b }).forEach((key) => {
+          statusRankMap.get(key).forEach((status) => {
+              this.taxaEnumTreeService.moveTaxon(status.taxonID,status.taxonAuthorityID,status.parentTaxonID)
+          })
+        })
+
+        /*
         console.log(" number of status updates " + statusUpdates.length)
         console.log(" number of skipped due to accepted mismatch " + skippedStatusesDueToAcceptedMismatch.length)
         console.log(" number of skipped due to multiple match " + skippedStatusesDueToMultipleMatch.length)
         console.log(" number of skipped due to parent mismatch " + skippedStatusesDueToParentMismatch.length)
         console.log(" number of skipped due to taxon mismatch " + skippedStatusesDueToTaxonMismatch.length)
+         */
 
         let logMsg = `Processing uploads for taxa authority ID ${job.data.authorityID} `
         logMsg += `(${new Intl.NumberFormat().format(taxonUpdates.length)} taxons processed and`
