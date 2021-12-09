@@ -106,17 +106,17 @@
     "@angular/language-service": "^11.2.0",
     "@nestjs/schematics": "^7.0.0",
     "@nestjs/testing": "^7.0.0",
-    "@nrwl/angular": "12.0.0",
-    "@nrwl/cli": "12.0.0",
-    "@nrwl/cypress": "12.0.0",
-    "@nrwl/devkit": "12.0.0",
-    "@nrwl/eslint-plugin-nx": "12.0.0",
-    "@nrwl/jest": "12.0.0",
-    "@nrwl/linter": "12.0.0",
-    "@nrwl/nest": "12.0.0",
-    "@nrwl/node": "12.0.0",
-    "@nrwl/tao": "12.0.0",
-    "@nrwl/workspace": "12.0.0",
+    "@nrwl/angular": "12.0.8",
+    "@nrwl/cli": "12.0.8",
+    "@nrwl/cypress": "12.0.8",
+    "@nrwl/devkit": "12.0.8",
+    "@nrwl/eslint-plugin-nx": "12.0.8",
+    "@nrwl/jest": "12.0.8",
+    "@nrwl/linter": "12.0.8",
+    "@nrwl/nest": "12.0.8",
+    "@nrwl/node": "12.0.8",
+    "@nrwl/tao": "12.0.8",
+    "@nrwl/workspace": "12.0.8",
     "@types/archiver": "^5.1.1",
     "@types/bull": "^3.15.2",
     "@types/express": "~4.17.3",
@@ -152,3 +152,4 @@
     "typescript": "~4.1.2"
   }
 }
+
