@@ -122,6 +122,7 @@ export class DwcService {
                         .build();
 
                     return this.api.sendFullResponse(req).pipe(
+                        take(1),
                         map((res: HttpResponse<ResponseType>) => {
                             console.log(res);
                             return res.ok;
@@ -133,7 +134,8 @@ export class DwcService {
                     );
                     return of(false);
                 }
-            })
+            }),
+            take(1)
         );
     }
 }
