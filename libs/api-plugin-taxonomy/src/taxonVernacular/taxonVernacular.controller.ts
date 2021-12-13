@@ -113,14 +113,14 @@ export class TaxonVernacularController {
     }
 
     /*
-The commonName controller finds using a common name
- */
+    The commonName controller finds using a common name
+    */
     @Get('commonName/:commonName')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonVernacularOutputDto })
     @ApiOperation({
         summary: "Use a common name to get a list of taxon vernacular records, also using an authority ID"
     })
-    async findByCommonName(@Param('byCommonName') commonName: string, @Query() findParams: TaxonVernacularFindParams): Promise<TaxonVernacularOutputDto[]> {
+    async findByCommonName(@Param('commonName') commonName: string, @Query() findParams: TaxonVernacularFindParams): Promise<TaxonVernacularOutputDto[]> {
         const names = await this.myService.findByCommonName(commonName, findParams)
         if (!names) {
             throw new NotFoundException()

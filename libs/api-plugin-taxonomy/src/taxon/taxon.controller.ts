@@ -378,9 +378,8 @@ export class TaxonController {
 
         const upload = await this.taxa.patchUploadFieldMap(
             id,
-            //1, // [TODO fix taxonomic authority id]
             body.uniqueIDField,
-            body.fieldMap as Record<string, keyof Occurrence>
+            body.fieldMap as Record<string, /*keyof Occurrence*/ string>
         )
 
         if (!upload) {

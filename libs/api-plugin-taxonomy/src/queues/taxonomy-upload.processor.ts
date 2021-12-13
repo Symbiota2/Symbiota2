@@ -18,9 +18,20 @@ import { TaxonService } from '../taxon/taxon.service';
 import { TaxonomicEnumTreeService } from '../taxonomicEnumTree/taxonomicEnumTree.service';
 
 export interface TaxonomyUploadJob {
-    uid: number;
-    authorityID: number;
-    uploadID: number;
+    uid: number
+    authorityID: number
+    uploadID: number
+    taxonUpdates : Taxon[]
+    skippedTaxonsDueToMulitpleMatch
+    skippedTaxonsDueToMismatchRank
+    skippedTaxonsDueToMissingName
+
+    // list of all the updates to do to status records
+    statusUpdates : TaxonomicStatus[]
+    skippedStatusesDueToMultipleMatch
+    skippedStatusesDueToAcceptedMismatch
+    skippedStatusesDueToParentMismatch
+    skippedStatusesDueToTaxonMismatch
 }
 
 @Processor(QUEUE_ID_TAXONOMY_UPLOAD)
@@ -49,6 +60,10 @@ export class TaxonomyUploadProcessor {
     @Process()
     async upload(job: Job<TaxonomyUploadJob>): Promise<void> {
         this.processed = 0;
+
+        // wait fsPromises.writeFile(metaPath, metaXML);
+        // import { promises as fsPromises } from 'fs';
+        // await fsPromises.writeFile(metaPath, metaXML);
 
         const upload = await this.uploads.findOne(job.data.uploadID);
         if (!upload) {
@@ -105,17 +120,17 @@ export class TaxonomyUploadProcessor {
     private async onCSVBatch(job: Job<TaxonomyUploadJob>, upload: TaxonomyUpload, batch: DeepPartial<Taxon>[]) {
 
         // list of all the updates to do to taxon records
-        const taxonUpdates : Taxon[] = []
-        const skippedTaxonsDueToMulitpleMatch = []
-        const skippedTaxonsDueToMismatchRank = []
-        const skippedTaxonsDueToMissingName = []
+        const taxonUpdates : Taxon[] = job.data.taxonUpdates
+        const skippedTaxonsDueToMulitpleMatch = job.data.skippedTaxonsDueToMulitpleMatch
+        const skippedTaxonsDueToMismatchRank = job.data.skippedTaxonsDueToMismatchRank
+        const skippedTaxonsDueToMissingName = job.data.skippedTaxonsDueToMissingName
 
         // list of all the updates to do to status records
-        const statusUpdates : TaxonomicStatus[] = []
-        const skippedStatusesDueToMultipleMatch = []
-        const skippedStatusesDueToAcceptedMismatch = []
-        const skippedStatusesDueToParentMismatch = []
-        const skippedStatusesDueToTaxonMismatch = []
+        const statusUpdates : TaxonomicStatus[] = job.data.statusUpdates
+        const skippedStatusesDueToMultipleMatch = job.data.skippedStatusesDueToMultipleMatch
+        const skippedStatusesDueToAcceptedMismatch = job.data.skippedStatusesDueToAcceptedMismatch
+        const skippedStatusesDueToParentMismatch = job.data.skippedStatusesDueToParentMismatch
+        const skippedStatusesDueToTaxonMismatch = job.data.skippedStatusesDueToTaxonMismatch
 
         // Build a list of all the potential field names
         const entityColumns = this.taxonRepo.metadata.columns
@@ -282,6 +297,10 @@ export class TaxonomyUploadProcessor {
                     // Does it have an author?
                     if (taxonData["author"]) {
                         whereClause["author"] = taxonData["author"]
+                    }
+                    // Does it have a rankID?
+                    if (taxonData["rankID"]) {
+                        whereClause["rankID"] = taxonData["rankID"]
                     }
 
                     // Fetch the expanded search
@@ -511,21 +530,31 @@ export class TaxonomyUploadProcessor {
                 if (!statusRankMap.has(taxon.rankID)) {
                     statusRankMap.set(taxon.rankID,[])
                 }
-                statusRankMap.get(taxon.rankID).push(dbStatus)
+                const rankList = statusRankMap.get(taxon.rankID)
+                rankList.push(dbStatus)
+                statusRankMap.set(taxon.rankID,rankList)
             }
         }
         // Save all of the statuses
 
-        await this.statusRepo.save(statusUpdates)
+        //console.log("status updates are " + statusUpdates.length)
+        //await this.statusRepo.save(statusUpdates)
+        //await this.statusRepo.upsert(statusUpdates, ["taxonID", "taxonIDAccepted", "taxonAuthorityID"])
         this.processed += statusUpdates.length
 
         // Now move the taxons in order by rank from top to bottom
-        const keys = []
+        let keys =[ ...statusRankMap.keys() ]
+        /*
+        let keys = []
         for (const [k, v] of Object.entries(statusRankMap)) {
+            this.logger.log(" pushing " + k)
             keys.push(k)
         }
+         */
+        this.logger.log(" size is " + keys.length)
         keys.sort((a,b) => { return a-b }).forEach((key) => {
           statusRankMap.get(key).forEach((status) => {
+              this.logger.log(" Moving " + status.taxonID + " " + status.parentTaxonID + " " + status.taxonAuthorityID)
               this.taxaEnumTreeService.moveTaxon(status.taxonID,status.taxonAuthorityID,status.parentTaxonID)
           })
         })

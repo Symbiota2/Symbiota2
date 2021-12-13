@@ -431,13 +431,13 @@ export class TaxonService extends BaseService<Taxon>{
     getAllTaxonomicUploadFields(): string[] {
         const entityColumns = this.taxonRepo.metadata.columns
         const statusColumns = this.statusRepo.metadata.columns
-        const vernacularColumns = this.vernacularRepo.metadata.columns
-        const rankColumns = this.rankRepo.metadata.columns
+        //const vernacularColumns = this.vernacularRepo.metadata.columns
+        //const rankColumns = this.rankRepo.metadata.columns
         const artificialColumns = ["AcceptedTaxonName", "ParentTaxonName", "RankName"]
         const allColumns = entityColumns
             .concat(statusColumns)
-            .concat(vernacularColumns)
-            .concat(rankColumns)
+            //.concat(vernacularColumns)
+            //.concat(rankColumns)
         return this.eliminateDuplicates(allColumns.map((c) => c.propertyName).concat(artificialColumns))
     }
 
@@ -552,7 +552,20 @@ export class TaxonService extends BaseService<Taxon>{
     }
 
     async startUpload(uid: number, authorityID: number, uploadID: number): Promise<void> {
-        await this.uploadQueue.add({ uid, authorityID, uploadID });
+        await this.uploadQueue.add({
+            uid: uid,
+            authorityID: authorityID,
+            uploadID: uploadID,
+            taxonUpdates : [],
+            skippedTaxonsDueToMulitpleMatch: [],
+            skippedTaxonsDueToMismatchRank: [],
+            skippedTaxonsDueToMissingName: [],
+            statusUpdates : [],
+            skippedStatusesDueToMultipleMatch: [],
+            skippedStatusesDueToAcceptedMismatch: [],
+            skippedStatusesDueToParentMismatch: [],
+            skippedStatusesDueToTaxonMismatch: []
+            })
     }
 
     /**
