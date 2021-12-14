@@ -16,6 +16,7 @@ import { QUEUE_ID_TAXONOMY_UPLOAD } from './taxonomy-upload.queue';
 import { csvIterator } from '@symbiota2/api-common';
 import { TaxonService } from '../taxon/taxon.service';
 import { TaxonomicEnumTreeService } from '../taxonomicEnumTree/taxonomicEnumTree.service';
+import * as fs from 'fs';
 
 export interface TaxonomyUploadJob {
     uid: number
@@ -36,8 +37,9 @@ export interface TaxonomyUploadJob {
 
 @Processor(QUEUE_ID_TAXONOMY_UPLOAD)
 export class TaxonomyUploadProcessor {
-    private processed = 0;
-    private readonly logger = new Logger(TaxonomyUploadProcessor.name);
+    private processed = 0
+    private readonly logger = new Logger(TaxonomyUploadProcessor.name)
+    separator = ":"
 
     constructor(
         @Inject(TaxonomyUpload.PROVIDER_ID)
@@ -57,8 +59,10 @@ export class TaxonomyUploadProcessor {
         private readonly taxaEnumTreeService: TaxonomicEnumTreeService) { }
 
     // TODO: Wrap in a transaction? Right now each chunk goes straight to the database until a failure occurs
+
+    /*
     @Process()
-    async upload(job: Job<TaxonomyUploadJob>): Promise<void> {
+    async uploadOld(job: Job<TaxonomyUploadJob>): Promise<void> {
         this.processed = 0;
 
         // wait fsPromises.writeFile(metaPath, metaXML);
@@ -92,6 +96,81 @@ export class TaxonomyUploadProcessor {
             }
         }
     }
+     */
+
+    @Process()
+    async upload(job: Job<TaxonomyUploadJob>): Promise<void> {
+        // wait fsPromises.writeFile(metaPath, metaXML);
+        // import { promises as fsPromises } from 'fs';
+        // await fsPromises.writeFile(metaPath, metaXML);
+
+        // Get the upload info
+        const upload = await this.uploads.findOne(job.data.uploadID)
+        if (!upload) {
+            return
+        }
+        this.logger.log(`Upload of '${upload.filePath}' started...`)
+
+        // Get all of the potential ranks
+        const allRanks = await this.rankRepo.find({})
+        const kingdomAndRankToIDMap: Map<string, number> = new Map()
+        allRanks.forEach((rank) => {
+            kingdomAndRankToIDMap.set(rank.kingdomName + this.separator + rank.rankName, rank.rankID)
+        })
+
+        // Process the csv file splitting it into batches that will be processed by rank
+        let error: Error = null
+        const fileMap = new Map()
+        for await (const batch of csvIterator<DeepPartial<Taxon>>(upload.filePath)) {
+            try {
+                await this.splitBatchByRank(kingdomAndRankToIDMap, fileMap, upload, batch);
+            } catch (e) {
+                error = e;
+                break;
+            }
+        }
+
+
+        // Now close all the streams
+        const keys =[ ...fileMap.keys() ].sort((a,b) => {return a-b})
+        keys.forEach((key) => {
+            fileMap.get(key).end()
+        })
+
+        // Now let's process all the ranks
+        if (error) {
+            await job.moveToFailed(error)
+        } else {
+            for (const key in keys) {
+                error = await this.processRankFile(key, job, upload)
+            }
+            if (error) {
+                await job.moveToFailed(error)
+            }
+        }
+
+        if (error) {
+            await job.moveToFailed(error)
+        }
+        else {
+            try {
+                await this.onCSVComplete(job.data.uid, job.data.authorityID);
+            } catch (e) {
+                await job.moveToFailed(e);
+            }
+        }
+    }
+
+    private async processRankFile(key, job, upload) {
+        for await (const batch of csvIterator<DeepPartial<Taxon>>("./taxon" + key)) {
+            try {
+                await this.onCSVBatch(job, upload, batch);
+            } catch (e) {
+                return e
+            }
+        }
+        return null
+    }
 
     @OnQueueCompleted()
     async queueCompletedHandler(job: Job) {
@@ -110,6 +189,80 @@ export class TaxonomyUploadProcessor {
     }
 
     /**
+     * Write each row to a new file based on the rank id
+     * @param job - the job to process (with the file information
+     * @parmm upload - the upload process
+     * @param batch - batch of taxon records
+     * @return nothing
+     */
+    private async splitBatchByRank(rankMap: Map<string, number>, fileMap : Map<number, any>,  upload: TaxonomyUpload, batch: DeepPartial<Taxon>[]) {
+        // We first need the kingdomName and the rankName fields
+        let kingdomInRowName = null
+        let rankInRowName = null
+        for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
+            if (dbField == "kingdomName") {
+                kingdomInRowName = csvField
+            }
+            if (dbField == "RankName") {
+                rankInRowName = csvField
+            }
+        }
+
+        // Must have a kingdomName field
+        if (!kingdomInRowName) {
+            this.logger.error(`Mapping is missing a field for kingdom name! Exiting...`)
+            throw new Error('Missing kingdom name field')
+        }
+        // Must have a rankName field
+        if (!rankInRowName) {
+            this.logger.error(`Mapping is missing a field for rank name! Exiting...`)
+            throw new Error('Missing rank name field')
+        }
+
+        //const fileMap = new Map()
+        // Process each row in batch
+        for (const row of batch) {
+            this.logger.error(`Mapping row`)
+            const rankValue = row[rankInRowName]
+            const kingdomValue = row[kingdomInRowName]
+            const key = kingdomValue + this.separator + rankValue
+
+            if (!rankMap.has(key)) {
+                // Error no rank for this row
+                this.logger.error(`Row is missing a matching rank and kingdom ${key} skipping...`)
+                throw new Error('No matching rank and kingdom name')
+            }
+            // Open the file if it does not exist
+            const file = rankMap.get(key)
+            this.logger.error(`File ` + file)
+            try {
+                if (!fileMap.has(file)) {
+                    this.logger.error(`opeening stream ` + file)
+                    let writeStream = fs.createWriteStream("./data/taxa/taxon" + file)
+                    /*
+                    fs.open('./key','w', (err,fd) => {
+                        if (err) {
+                            this.logger.error("Could not open " + key)
+                        } else {
+                            fileMap.set(key, fd)
+                        }
+                    })
+                     */
+                    fileMap.set(file,writeStream)
+                }
+                this.logger.error(`writing row`)
+                const writeStream = fileMap.get(file)
+                writeStream.write(row)
+            } catch (e) {
+                this.logger.error('Error writing to file' + e)
+                throw new Error('Error writing to file')
+            }
+
+        }
+
+    }
+
+        /**
      * Process a taxonomy CSV file
      * Read through all the records updating taxonomy-related tables as needed
      * @param job - the job to process (with the file information
@@ -147,10 +300,9 @@ export class TaxonomyUploadProcessor {
         const rankIDToKingdomMap: Map<number, string> = new Map()
         const rankAndKingdomToIDMap: Map<string, number> = new Map()
         const rankNameToIDMap: Map<string, number> = new Map()
-        const rankSeparator = ':'
         allRanks.forEach((rank) => {
             rankIDToNameMap.set(rank.rankID, rank.rankName)
-            rankAndKingdomToIDMap.set(rank.rankName + rankSeparator + rank.kingdomName, rank.rankID)
+            rankAndKingdomToIDMap.set(rank.rankName + this.separator + rank.kingdomName, rank.rankID)
         })
 
         // Map field names to tables
@@ -221,7 +373,7 @@ export class TaxonomyUploadProcessor {
                     // For taxons we are interested in mapping the rankname to an id
                     if (dbField == "RankName") {
                         const kingdomName = row[kingdomInRowName]
-                        const value = csvValue + rankSeparator + kingdomName
+                        const value = csvValue + this.separator + kingdomName
                         // Map rank name to rank ID
                         if (rankAndKingdomToIDMap.has(value)) {
                             // Found the name use the ID
