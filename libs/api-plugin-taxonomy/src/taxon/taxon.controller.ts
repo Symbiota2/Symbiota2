@@ -374,7 +374,19 @@ export class TaxonController {
     async mapTaxonUpload(
         //@Query() query: CollectionIDQueryParam,
         @Param('id') id: number,
-        @Body() body: TaxonHeaderMapBody): Promise<{ newRecords: number, updatedRecords: number, nullRecords: number }> {
+        @Body() body: TaxonHeaderMapBody
+    ): Promise<{
+        problemScinames: string[],
+        problemAcceptedNames: string[],
+        problemParentNames: string[],
+        problemRanks: string[],
+        nullSciNames: number,
+        nullParentNames: number,
+        nullKingdomNames: number,
+        nullAcceptedNames: number,
+        nullRankNames: number,
+        totalRecords: number
+    }> {
 
         const upload = await this.taxa.patchUploadFieldMap(
             id,
@@ -386,6 +398,17 @@ export class TaxonController {
             throw new NotFoundException()
         }
 
+        const problemsFound = await this.taxa.taxonCheck(
+            upload.filePath,
+            body.fieldMap["scientificName"],
+            body.fieldMap["ParentTaxonName"],
+            body.fieldMap["AcceptedTaxonName"],
+            body.fieldMap["kingdomName"],
+            body.fieldMap["RankName"])
+
+        return problemsFound
+
+        /*
         const csvUniqueIDs = await this.taxa.countCSVNonNull(
             upload.filePath,
             body.uniqueIDField
@@ -405,6 +428,7 @@ export class TaxonController {
             updatedRecords: dbUniqueIDs,
             nullRecords: csvUniqueIDs.nulls
         };
+         */
     }
 
     @Post('upload/:id/:authorityID/start')

@@ -131,14 +131,32 @@ export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
     }
 
     onSubmit() {
-        this.uploads.patchFieldMap(this.uniqueIDField.value).subscribe(({ newRecords, updatedRecords, nullRecords }) => {
+        this.uploads.patchFieldMap(this.uniqueIDField.value).subscribe(({
+                                                                            problemScinames,
+                                                                            problemAcceptedNames,
+                                                                            problemParentNames,
+                                                                            problemRanks,
+                                                                            nullSciNames,
+                                                                            nullParentNames,
+                                                                            nullKingdomNames,
+                                                                            nullAcceptedNames,
+                                                                            nullRankNames,
+                                                                            totalRecords
+        }) => {
             const confirmDialog = this.dialog.open(
                 TaxonomyConfirmDialogComponent,
                 {
                     data: {
-                        newRecords,
-                        updatedRecords,
-                        nullRecords
+                        problemScinames,
+                        problemAcceptedNames,
+                        problemParentNames,
+                        problemRanks,
+                        nullSciNames,
+                        nullParentNames,
+                        nullKingdomNames,
+                        nullAcceptedNames,
+                        nullRankNames,
+                        totalRecords
                     }
                 }
             );

@@ -4,13 +4,39 @@
         <div fxLayout='column' fxLayoutGap='1rem'>
             <ul>
                 <li>
-                    {{ data.newRecords | number }}  {{"taxonomy.uploader.create.count" | translate}}
+                    {{ data.totalRecords | number }}  {{"taxonomy.uploader.total.count" | translate}}
                 </li>
-                <li>
-                    {{ data.updatedRecords | number }} {{"taxonomy.uploader.update.count" | translate}}
+                <li> {{"taxonomy.uploader.null.count.warning" | translate}}
+                    <ul>
+                        <li>
+                            {{ data.nullSciNames | number }} {{"taxonomy.uploader.null.scientific.name.count" | translate}}
+                        </li>
+                        <li>
+                            {{ data.nullSciNames | number }} {{"taxonomy.uploader.null.parent.name.count" | translate}}
+                        </li>
+                        <li>
+                            {{ data.nullSciNames | number }} {{"taxonomy.uploader.null.accepted.name.count" | translate}}
+                        </li>
+                        <li>
+                            {{ data.nullSciNames | number }} {{"taxonomy.uploader.null.kingdom.name.count" | translate}}
+                        </li>
+                        <li>
+                            {{ data.nullSciNames | number }} {{"taxonomy.uploader.null.rank.name.count" | translate}}
+                        </li>
+                    </ul>
                 </li>
-                <li>
-                    {{ data.nullRecords | number }} {{"taxonomy.uploader.skip.count" | translate}}
+                <li> {{"taxonomy.uploader.name.warning" | translate}}
+                    <ul>
+                        <li>
+                            {{ data.problemParentNames.length | number }} {{"taxonomy.uploader.problem.parent.name.count" | translate}}
+                        </li>
+                        <li>
+                            {{ data.nullSciNames | number }} {{"taxonomy.uploader.problem.accepted.name.count" | translate}}
+                        </li>
+                        <li>
+                            {{ data.nullSciNames | number }} {{"taxonomy.uploader.problem.rank.name.count" | translate}}
+                        </li>
+                    </ul>
                 </li>
             </ul>
             <div>

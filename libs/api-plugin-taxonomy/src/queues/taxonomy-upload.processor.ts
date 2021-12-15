@@ -13,7 +13,7 @@ import {
 } from '@symbiota2/api-database';
 import { DeepPartial, IsNull, Repository } from 'typeorm';
 import { QUEUE_ID_TAXONOMY_UPLOAD } from './taxonomy-upload.queue';
-import { csvIterator } from '@symbiota2/api-common';
+import { csvIterator, objectIterator } from '@symbiota2/api-common';
 import { TaxonService } from '../taxon/taxon.service';
 import { TaxonomicEnumTreeService } from '../taxonomicEnumTree/taxonomicEnumTree.service';
 import * as fs from 'fs';
@@ -40,6 +40,7 @@ export class TaxonomyUploadProcessor {
     private processed = 0
     private readonly logger = new Logger(TaxonomyUploadProcessor.name)
     separator = ":"
+    taxonFilesPath = "./data/uploads/taxa/taxon"
 
     constructor(
         @Inject(TaxonomyUpload.PROVIDER_ID)
@@ -100,10 +101,6 @@ export class TaxonomyUploadProcessor {
 
     @Process()
     async upload(job: Job<TaxonomyUploadJob>): Promise<void> {
-        // wait fsPromises.writeFile(metaPath, metaXML);
-        // import { promises as fsPromises } from 'fs';
-        // await fsPromises.writeFile(metaPath, metaXML);
-
         // Get the upload info
         const upload = await this.uploads.findOne(job.data.uploadID)
         if (!upload) {
@@ -130,9 +127,8 @@ export class TaxonomyUploadProcessor {
             }
         }
 
-
         // Now close all the streams
-        const keys =[ ...fileMap.keys() ].sort((a,b) => {return a-b})
+        const keys =[ ...fileMap.keys() ].sort((a,b) => a-b)
         keys.forEach((key) => {
             fileMap.get(key).end()
         })
@@ -141,7 +137,7 @@ export class TaxonomyUploadProcessor {
         if (error) {
             await job.moveToFailed(error)
         } else {
-            for (const key in keys) {
+            for (let key of keys) {
                 error = await this.processRankFile(key, job, upload)
             }
             if (error) {
@@ -162,7 +158,8 @@ export class TaxonomyUploadProcessor {
     }
 
     private async processRankFile(key, job, upload) {
-        for await (const batch of csvIterator<DeepPartial<Taxon>>("./taxon" + key)) {
+
+        for await (const batch of objectIterator<DeepPartial<Taxon>>(this.taxonFilesPath + key)) {
             try {
                 await this.onCSVBatch(job, upload, batch);
             } catch (e) {
@@ -222,7 +219,6 @@ export class TaxonomyUploadProcessor {
         //const fileMap = new Map()
         // Process each row in batch
         for (const row of batch) {
-            this.logger.error(`Mapping row`)
             const rankValue = row[rankInRowName]
             const kingdomValue = row[kingdomInRowName]
             const key = kingdomValue + this.separator + rankValue
@@ -234,11 +230,9 @@ export class TaxonomyUploadProcessor {
             }
             // Open the file if it does not exist
             const file = rankMap.get(key)
-            this.logger.error(`File ` + file)
             try {
                 if (!fileMap.has(file)) {
-                    this.logger.error(`opeening stream ` + file)
-                    let writeStream = fs.createWriteStream("./data/taxa/taxon" + file)
+                    let writeStream = fs.createWriteStream(this.taxonFilesPath + file)
                     /*
                     fs.open('./key','w', (err,fd) => {
                         if (err) {
@@ -250,16 +244,13 @@ export class TaxonomyUploadProcessor {
                      */
                     fileMap.set(file,writeStream)
                 }
-                this.logger.error(`writing row`)
                 const writeStream = fileMap.get(file)
-                writeStream.write(row)
+                writeStream.write(JSON.stringify(row))
             } catch (e) {
                 this.logger.error('Error writing to file' + e)
                 throw new Error('Error writing to file')
             }
-
         }
-
     }
 
         /**
