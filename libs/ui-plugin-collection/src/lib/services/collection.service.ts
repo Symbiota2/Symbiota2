@@ -21,6 +21,7 @@ import {
     distinctUntilChanged,
     filter,
     map,
+    mergeMap,
     shareReplay,
     switchMap,
     take,
@@ -39,6 +40,8 @@ import {
     CollectionRoleInput,
     CollectionRoleOutput,
 } from '../dto/CollectionRole.dto';
+import { log } from 'console';
+import { copyFile } from 'fs';
 
 interface FindAllParams {
     id?: number | number[];
@@ -115,7 +118,7 @@ export class CollectionService {
                     filter((collection) => collection !== null)
                 );
             })
-        )
+        ),
     ).pipe(shareReplay(1));
 
     /** Observable of a list of `collectionsListItem` pulled from api fulfilling `collectionQueryParams`
@@ -286,6 +289,7 @@ export class CollectionService {
         return combineLatest([this.userService.currentUser, this.currentCollection]).pipe(
             take(1),
             map(([user, collection]) => {
+                console.log("updateCurrentCollection currentCollection: ", collection);
                 if (!!user && !!collection && user.canEditCollection(collection.id)){
                     this.updateCollectionData.next(collectionData);
                     return true;
@@ -332,6 +336,7 @@ export class CollectionService {
                 this.currentCategories.next(categories);
             });
     }
+
 
     /**
      * checks if Collection Name is already in use in existing collections
@@ -683,3 +688,4 @@ export class CollectionService {
         );
     }
 }
+
