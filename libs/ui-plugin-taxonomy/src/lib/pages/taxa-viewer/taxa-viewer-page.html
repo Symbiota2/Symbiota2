@@ -6,7 +6,7 @@
 
 <!-- Configure name list -->
 <div class="expansion-panel">
-    <symbiota2-expansion-panel label='{{"taxonomy.viewer.configure.label" | translate}}'>
+    <symbiota2-expansion-panel expanded=false label='{{"taxonomy.viewer.configure.label" | translate}}'>
         <mat-radio-group
             aria-labelledby="configure-radio-group-label"
             class="configure-radio-group"
@@ -15,7 +15,7 @@
             <mat-radio-button value="Scientific">{{"taxonomy.viewer.option.scientific" | translate}}</mat-radio-button>&nbsp;&nbsp;
             <mat-radio-button value="Common">{{"taxonomy.viewer.option.common" | translate}}</mat-radio-button>
 
-            <!-- <div>
+            <div>
                 <br/>
             <mat-form-field appearance="fill">
                 <mat-label>{{"taxonomy.viewer.label.authority" | translate}}</mat-label>
@@ -28,7 +28,6 @@
                 </mat-select>
             </mat-form-field>
             </div>
-            -->
 
             <div *ngIf='kindOfName == "Scientific"'>
                 <mat-checkbox class="example-margin" [(ngModel)]='hasAuthors'

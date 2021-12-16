@@ -43,7 +43,7 @@ export class TaxaViewerPageComponent implements OnInit {
     kindOfName = "Scientific"
     languageList = []
     taxonomicAuthorityList = []
-    taxonomicAuthorityID = 1 // Set the default taxa authority id
+    taxonomicAuthorityID = 1 // Default taxa authority is set in constructor/init
     treeControl = new NestedTreeControl<TaxonNode>((node) => node.children);
     dataSource = new MatTreeNestedDataSource<TaxonNode>()
     dataChange = new BehaviorSubject<TaxonNode[]>([])
@@ -61,7 +61,6 @@ export class TaxaViewerPageComponent implements OnInit {
     possibleTaxons  = []
 
     constructor(
-        //private readonly userService: UserService,  // TODO: needed for species hiding
         private readonly taxaService: TaxonService,
         private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
         private readonly taxonomicStatusService: TaxonomicStatusService,
@@ -151,6 +150,11 @@ export class TaxaViewerPageComponent implements OnInit {
         })
         this.taxonomicAuthorityList.sort(function (a, b) {
             return (a.id > b.id ? 1 : -1)
+        })
+        this.taxonomicAuthorityList.forEach((authority) => {
+            if (authority.isPrimay) {
+                this.taxonomicAuthorityID = authority.id
+            }
         })
     }
 
@@ -540,7 +544,6 @@ export class TaxaViewerPageComponent implements OnInit {
                 this.taxonomicAuthorityID).subscribe((taxonStatus) => {
 
                 // For each one found, add its list of taxon ids to the children list
-                // TODO: should this be just one, due to taxa authority id?
                 taxonStatus.forEach(function(rec) {
                     childrenTids = childrenTids.concat(rec.taxonID.toString())
                 })
@@ -563,11 +566,6 @@ export class TaxaViewerPageComponent implements OnInit {
                 this.taxaService
                     .findAll(this.taxonomicAuthorityID,{ taxonIDs: childrenTids })
                     .subscribe((t) => {
-                        /*
-                    t.forEach(function(r) {
-                        children.push(r.scientificName)
-                    })
-                         */
                         children = t
 
                     // Sort and format the children as tree nodes
@@ -608,7 +606,6 @@ export class TaxaViewerPageComponent implements OnInit {
             this.taxonomicEnumTreeService.findDescendants(taxon.id, this.taxonomicAuthorityID).subscribe((taxonET) => {
 
                 // For each one found, add its list of taxon ids to the children list
-                // TODO: should this be just one, due to taxa authority id?
                 taxonET.forEach(function(rec) {
                     descTids = descTids.concat(rec.taxonID.toString())
                 })

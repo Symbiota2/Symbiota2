@@ -110,8 +110,8 @@ export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
 
         //let authorityID = parseInt(qParams.get(Q_PARAM_AUTHORITYID))
         //authorityID = Number.isInteger(authorityID) ? authorityID : null
-        const authorityID = 1
-        this.taxonomicAuthorityService.setAuthorityID(authorityID)
+        //const authorityID = 1
+        //this.taxonomicAuthorityService.setAuthorityID(authorityID)
 
         let uploadID = parseInt(qParams.get('uploadID'))
         uploadID = Number.isInteger(uploadID) ? uploadID : null

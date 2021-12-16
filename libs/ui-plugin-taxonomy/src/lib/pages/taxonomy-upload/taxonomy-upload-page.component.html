@@ -1,16 +1,18 @@
-<div id='header' fxLayoutAlign='start center' fxLayoutGap='1rem'>
-    <h1>{{"taxonomy.uploader.title" | translate}}</h1>
-</div>
-<div *ngIf="userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
-    <symbiota2-file-upload-field [formControl]='fileInput'></symbiota2-file-upload-field>
-    <button
-        mat-flat-button color='primary'
-        (click)='onUpload()'
-        [disabled]='!fileInput.value'
-    >
-        {{"taxonomy.uploader.upload.button" | translate}}
-    </button>
-</div>
-<div *ngIf="!userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
-    {{"taxonomy.uploader.lacks.edit.permission" | translate}}
+<div id='main'>
+    <div id='header' fxLayoutAlign='start center' fxLayoutGap='1rem'>
+        <h1>{{"taxonomy.uploader.title" | translate}}</h1>
+    </div>
+    <div *ngIf="userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
+        <symbiota2-file-upload-field [formControl]='fileInput'></symbiota2-file-upload-field>
+        <button
+            mat-flat-button color='primary'
+            (click)='onUpload()'
+            [disabled]='!fileInput.value'
+        >
+            {{"taxonomy.uploader.upload.button" | translate}}
+        </button>
+    </div>
+    <div *ngIf="!userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
+        {{"taxonomy.uploader.lacks.edit.permission" | translate}}
+    </div>
 </div>

@@ -43,7 +43,7 @@ export class TaxaEditorEntryPage implements OnInit {
     kindOfName = "Scientific"
     languageList = []
     taxonomicAuthorityList = []
-    taxonomicAuthorityID = 1 // Set the default taxa authority id
+    taxonomicAuthorityID = 1 // Default set in nginit
     treeControl = new NestedTreeControl<TaxonNode>((node) => node.children);
     dataSource = new MatTreeNestedDataSource<TaxonNode>()
     dataChange = new BehaviorSubject<TaxonNode[]>([])
@@ -152,6 +152,11 @@ export class TaxaEditorEntryPage implements OnInit {
         })
         this.taxonomicAuthorityList.sort(function (a, b) {
             return (a.id > b.id ? 1 : -1)
+        })
+        this.taxonomicAuthorityList.forEach((authority) => {
+            if (authority.isPrimay) {
+                this.taxonomicAuthorityID = authority.id
+            }
         })
     }
 

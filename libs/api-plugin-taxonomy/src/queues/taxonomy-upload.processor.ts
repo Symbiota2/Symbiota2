@@ -41,6 +41,9 @@ export class TaxonomyUploadProcessor {
     private readonly logger = new Logger(TaxonomyUploadProcessor.name)
     separator = ":"
     taxonFilesPath = "./data/uploads/taxa/taxon"
+    assestsFolderPath = "./apps/ui/src/assests/taxa"
+    problemParentNamesPath = this.assestsFolderPath + "/problemParentNames"
+    problemAcceptedNamesPath = this.assestsFolderPath + "/problemAcceptedNames"
 
     constructor(
         @Inject(TaxonomyUpload.PROVIDER_ID)
@@ -60,45 +63,6 @@ export class TaxonomyUploadProcessor {
         private readonly taxaEnumTreeService: TaxonomicEnumTreeService) { }
 
     // TODO: Wrap in a transaction? Right now each chunk goes straight to the database until a failure occurs
-
-    /*
-    @Process()
-    async uploadOld(job: Job<TaxonomyUploadJob>): Promise<void> {
-        this.processed = 0;
-
-        // wait fsPromises.writeFile(metaPath, metaXML);
-        // import { promises as fsPromises } from 'fs';
-        // await fsPromises.writeFile(metaPath, metaXML);
-
-        const upload = await this.uploads.findOne(job.data.uploadID);
-        if (!upload) {
-            return;
-        }
-        this.logger.log(`Upload of '${upload.filePath}' started...`);
-
-        let error: Error = null;
-        for await (const batch of csvIterator<DeepPartial<Taxon>>(upload.filePath)) {
-            try {
-                await this.onCSVBatch(job, upload, batch);
-            } catch (e) {
-                error = e;
-                break;
-            }
-        }
-
-        if (error) {
-            await job.moveToFailed(error)
-        }
-        else {
-            try {
-                await this.onCSVComplete(job.data.uid, job.data.authorityID);
-            } catch (e) {
-                await job.moveToFailed(e);
-            }
-        }
-    }
-     */
-
     @Process()
     async upload(job: Job<TaxonomyUploadJob>): Promise<void> {
         // Get the upload info
@@ -133,6 +97,10 @@ export class TaxonomyUploadProcessor {
             fileMap.get(key).end()
         })
 
+        // Update the job status
+        upload.uniqueIDField = "started"
+        await this.uploads.save(upload)
+
         // Now let's process all the ranks
         if (error) {
             await job.moveToFailed(error)
@@ -150,7 +118,10 @@ export class TaxonomyUploadProcessor {
         }
         else {
             try {
-                await this.onCSVComplete(job.data.uid, job.data.authorityID);
+                await this.onCSVComplete(job.data.uid, job.data.authorityID)
+                // Update the job status
+                upload.uniqueIDField = "done"
+                await this.uploads.save(upload)
             } catch (e) {
                 await job.moveToFailed(e);
             }
@@ -216,7 +187,6 @@ export class TaxonomyUploadProcessor {
             throw new Error('Missing rank name field')
         }
 
-        //const fileMap = new Map()
         // Process each row in batch
         for (const row of batch) {
             const rankValue = row[rankInRowName]
@@ -253,7 +223,7 @@ export class TaxonomyUploadProcessor {
         }
     }
 
-        /**
+    /**
      * Process a taxonomy CSV file
      * Read through all the records updating taxonomy-related tables as needed
      * @param job - the job to process (with the file information
