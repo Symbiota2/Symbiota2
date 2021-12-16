@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { Observable } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, take, tap } from 'rxjs/operators';
 import { CollectionEditorComponent } from '../../components/collection-editor/collection-editor.component';
 import { CollectionPermissionsComponent } from '../../components/collection-permissions/collection-permissions.component';
 import { DwcPublishingComponent } from '../../components/dwc-publishing/dwc-publishing.component';
@@ -17,7 +17,6 @@ import { DwcPublishingComponent } from '../../components/dwc-publishing/dwc-publ
 export class CollectionToolsPage implements OnInit {
     private static readonly ROUTE_PARAM_COLLID = 'collectionID';
 
-    @ViewChild('sidenav') sidenav : MatSidenav;
 
     static collectionTools: Map<string, Component> = new Map()
         .set('Edit Collection', CollectionEditorComponent)
@@ -51,12 +50,8 @@ export class CollectionToolsPage implements OnInit {
             }
         });
 
-        this.sidenav.position = 'end';
     }
 
-    ngAfterViewInit() {
-        console.log(this.sidenav.fixedBottomGap);
-      }
 
     setContentView(key: string): void {
         this.selectedContent = CollectionToolsPage.collectionTools.get(key);
@@ -64,6 +59,7 @@ export class CollectionToolsPage implements OnInit {
 
     private validateCollection(): Observable<Collection> {
         return this.currentRoute.paramMap.pipe(
+            take(1),
             map((params) => {
                 //confirm collection id in url is valid
                 return params.has(CollectionToolsPage.ROUTE_PARAM_COLLID)
@@ -75,8 +71,8 @@ export class CollectionToolsPage implements OnInit {
             switchMap((collectionID) => {
                 //grab collection$ based on id
                 this.collections.setCollectionID(collectionID);
-
-                return this.collections.currentCollection;
+        
+                return this.collections.currentCollection.pipe(take(1));
             }),
             tap((collection) => {
                 //confirm collection exists if not send user to root

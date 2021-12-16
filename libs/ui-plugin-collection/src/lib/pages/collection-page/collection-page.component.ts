@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, filter, map, switchMap, take, tap } from 'rxjs/operators';
-import { combineLatest, Observable, of, throwError } from 'rxjs';
+import { catchError, filter, first, map, switchMap, take, tap } from 'rxjs/operators';
+import { combineLatest, Observable, of, Subscription, throwError } from 'rxjs';
 import { CollectionService } from '../../services/collection.service';
 import {
     CollectionProfileLink,
@@ -28,7 +28,9 @@ export class CollectionPage implements OnInit {
         routerLink: `/${ROUTE_COLLECTION_LIST}`,
     };
 
-    public collection: Collection;
+    public collection$: Observable<Collection>;
+
+    private subscriptions: Subscription[] = [];
 
     private comments_link: CollectionProfileLink;
 
@@ -44,100 +46,115 @@ export class CollectionPage implements OnInit {
         private readonly router: Router,
         private readonly alerts: AlertService,
         private readonly currentRoute: ActivatedRoute,
-        private readonly profileService: CollectionProfileService,
+        private readonly profileService: CollectionProfileService
     ) {}
 
     ngOnInit(): void {
-        this.getCollection().subscribe((collection) => {
-            this.collection = collection;
-            this.geoReferencedPercent =
-                collection.collectionStats != null && collection.collectionStats.recordCount > 0
-                    ? Math.round(
-                          (collection.collectionStats.georeferencedCount /
-                              collection.collectionStats.recordCount) *
-                              100
-                      )
-                    : 0;
-            this.comments_link = {
-                text: 'View comments',
-                requiresLogin: false,
-                routerLink: `/${ROUTE_COLLECTION_COMMENTS.replace(
-                    ':collectionID',
-                    this.collection.id.toString()
-                )}`,
-            };
+        this.collection$ = this.getCollection();
 
-            this.links$ = this.getLinks();
-            
-            this.canUserEdit().subscribe(bool => this.isColAdmin = bool);
-        });
+        this.subscriptions.push(
+            this.collection$.subscribe((collection) => {
+                this.geoReferencedPercent =
+                    collection.collectionStats != null &&
+                    collection.collectionStats.recordCount > 0
+                        ? Math.round(
+                              (collection.collectionStats.georeferencedCount /
+                                  collection.collectionStats.recordCount) *
+                                  100
+                          )
+                        : 0;
+
+                //TODO: replace this comment link
+                this.comments_link = {
+                    text: 'View comments',
+                    requiresLogin: false,
+                    routerLink: `/${ROUTE_COLLECTION_COMMENTS.replace(
+                        ':collectionID',
+                        collection.id.toString()
+                    )}`,
+                };
+
+                this.links$ = this.getLinks();
+
+                this.canUserEdit()
+                    .subscribe((bool) => (this.isColAdmin = bool))
+                    .unsubscribe();
+            })
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.forEach(sub => sub.unsubscribe());
     }
 
     getCollection(): Observable<Collection> {
-        return this.currentRoute.paramMap
-            .pipe(
-                map((params) => {
-                    return params.has(CollectionPage.ROUTE_PARAM_COLLID)
-                        ? parseInt(
-                              params.get(CollectionPage.ROUTE_PARAM_COLLID)
-                          )
-                        : -1;
-                }),
-                switchMap((collectionID) => {
-                    console.log("getCollection: Collection ID: ", collectionID);
-                    this.collections.setCollectionID(collectionID);
+        return this.currentRoute.paramMap.pipe(
+            map((params) => {
+                return params.has(CollectionPage.ROUTE_PARAM_COLLID)
+                    ? parseInt(params.get(CollectionPage.ROUTE_PARAM_COLLID))
+                    : -1;
+            }),
+            switchMap((collectionID) => {
+                console.log('getCollection: Collection ID: ', collectionID);
+                this.collections.setCollectionID(collectionID);
 
-                    return this.collections.currentCollection;
-                }),
-                tap((collection) => {
-                    if (collection === null) {
-                        this.router.navigate(['']);
-                        this.alerts.showError('Collection not found');
-                    }
-                }),
-            );
+                return this.collections.currentCollection;
+            }),
+            tap((collection) => {
+                if (collection === null) {
+                    this.router.navigate(['']);
+                    this.alerts.showError('Collection not found');
+                }
+            })
+        );
     }
 
     getLinks(): Observable<CollectionProfileLink[]> {
-        return this.collections.currentCollection
-            .pipe(
-                switchMap((collection) => {
-                    return this.profileService.links(collection.id);
-                }),
-                map((links) => {
-                    return [
-                        CollectionPage.USER_COLLECTIONS_LINK,
-                        ...links,
-                        this.comments_link,
-                    ];
-                })
-            );
+        return this.collections.currentCollection.pipe(
+            take(1),
+            switchMap((collection) => {
+                return this.profileService.links(collection.id);
+            }),
+            map((links) => {
+                return [
+                    CollectionPage.USER_COLLECTIONS_LINK,
+                    ...links,
+                    this.comments_link,
+                ];
+            })
+        );
     }
 
-    canUserEdit(): Observable<boolean>{
+    canUserEdit(): Observable<boolean> {
         return combineLatest([
             this.userService.currentUser,
             this.collections.currentCollection,
-        ])
-            .pipe(
-                map(([user, collection]) => {
-                    console.error("canUserEditCollection: Collection ID: ", collection.id);
-                    return (
-                        !!user &&
-                        !!collection &&
-                        user.canEditCollection(collection.id)
-                    );
-                })
-            );
+        ]).pipe(
+            first(),
+            map(([user, collection]) => {
+                console.error(
+                    'canUserEditCollection: Collection ID: ',
+                    collection.id
+                );
+                return (
+                    !!user &&
+                    !!collection &&
+                    user.canEditCollection(collection.id)
+                );
+            }),
+        );
     }
 
     openCollectionTools(): void {
-        var route: string = `/${ROUTE_COLLECTION_TOOLS.replace(
-            ':collectionID',
-            this.collection.id.toString()
-        )}`;
+        this.collection$
+            .subscribe((collection) => {
+                var route: string = `/${ROUTE_COLLECTION_TOOLS.replace(
+                    ':collectionID',
+                    collection.id.toString()
+                )}`;
 
-        this.router.navigate([route]);
-
+                this.router.navigate([route]);
+            })
+            .unsubscribe();
     }
 }

@@ -15,6 +15,7 @@ import { Institution } from '@symbiota2/api-database';
 import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 import { InstitutionNewDialogComponent } from '../institution-new-dialog/institution-new-dialog.component';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
+import { take } from 'rxjs/operators';
 
 @Component({
     selector: 'symbiota2-collection-editor',
@@ -58,7 +59,7 @@ export class CollectionEditorComponent implements OnInit {
         icon: [''],
         type: ['', Validators.required],
         managementType: ['', Validators.required],
-    }, {asyncValidators: CollectionAsyncValidators.valuesChanged(this.collectionService.currentCollection)}
+    }, {asyncValidators: CollectionAsyncValidators.valuesChanged(this.collectionService.currentCollection.pipe(take(1)))}
     );
     
 
@@ -72,15 +73,21 @@ export class CollectionEditorComponent implements OnInit {
 
     ngOnInit() {
         this.collectionService.currentCollection.subscribe((collection) => {
-            this.categories$ = this.collectionService.categories;
-            this.inst$ = this.institutionService.getInstitutions();
-            this.patchForm(collection);
+                this.categories$ = this.collectionService.categories;
+                this.inst$ = this.institutionService.getInstitutions();
+                this.patchForm(collection);
         })
+    }
+
+    ngOnDestroy(): void {
+        //Called once, before the instance is destroyed.
+        //Add 'implements OnDestroy' to the class.
+        
     }
 
     onApplyChanges(): void {
         var updatedCollection: Partial<CollectionInputDto> = new CollectionInputDto(this.editCollectionForm.value);
-        this.collectionService.updateCurrentCollection(updatedCollection).subscribe();
+        this.collectionService.updateCurrentCollection(updatedCollection).subscribe().unsubscribe();
         console.log("onApplyChanges");
     }
 
