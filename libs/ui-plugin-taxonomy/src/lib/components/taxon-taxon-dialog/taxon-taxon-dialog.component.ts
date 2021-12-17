@@ -1,4 +1,3 @@
-//dialog-box.component.ts
 import { Component, Inject, Optional } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { TaxonInfo } from '../taxon-taxon-editor/taxon-taxon-editor.component';

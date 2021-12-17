@@ -5,7 +5,7 @@ import {
     TaxonDescriptionBlockInputDto,
     TaxonListItem, TaxonomicUnitService,
     TaxonService,
-    TaxonTaxonDialogComponent
+    TaxonTaxonDialogComponent, TaxonVernacularInputDto
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TranslateService } from '@ngx-translate/core'
 import { MatDialog } from '@angular/material/dialog';
@@ -152,6 +152,11 @@ export class TaxonTaxonEditorComponent implements OnInit {
         this.taxon.hybrid = obj.hybrid
         this.taxon.securityStatus = obj.securityStatus
         // Construct a new taxon
+        let a = obj as unknown as Record<PropertyKey, unknown>
+        a.id = this.taxonID
+        a.initialTimestamp = new Date()
+        const newTaxon = new TaxonInputDto(a)
+        /*
         const data = {
             id: this.taxonID,
             scientificName: obj.scientificName,
@@ -170,8 +175,10 @@ export class TaxonTaxonEditorComponent implements OnInit {
             initialTimestamp: new Date()
         }
         const newTaxon = new TaxonInputDto(data)
+
+         */
         this.taxaService
-            .update(new TaxonInputDto(data))
+            .update(newTaxon)
             .subscribe((taxon)=> {
                 if (taxon) {
                     // It has been updated in the database

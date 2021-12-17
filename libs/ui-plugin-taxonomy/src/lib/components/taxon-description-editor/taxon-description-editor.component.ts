@@ -4,17 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
     TaxonDescriptionBlockListItem,
     TaxonDescriptionBlockService,
-    TaxonListItem,
-    TaxonomicAuthorityService,
-    TaxonomicStatusService,
-    TaxonService,
-    TaxonVernacularListItem,
-    TaxonVernacularService,
-    TaxonomicEnumTreeService,
     TaxonDescriptionDialogComponent,
-    TaxonDescriptionStatementListItem,
     TaxonDescriptionStatementDialogComponent,
-    TaxonDescriptionBlockInputDto, TaxonDescriptionStatementService
+    TaxonDescriptionBlockInputDto, TaxonDescriptionStatementService, TaxonInputDto
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TranslateService } from '@ngx-translate/core'
 import { MatTableDataSource } from '@angular/material/table';
@@ -61,14 +53,8 @@ export class TaxonDescriptionEditorComponent implements OnInit {
         private readonly taxonBlockService: TaxonDescriptionBlockService,
         private readonly taxonDescriptionStatementService: TaxonDescriptionStatementService,
         private readonly alertService: AlertService,
-        //private readonly taxaService: TaxonService,
-        //private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
-        //private readonly taxonomicStatusService: TaxonomicStatusService,
-        //private readonly taxonVernacularService: TaxonVernacularService,
-        //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
         private router: Router,
         private formBuilder: FormBuilder,
-
         private currentRoute: ActivatedRoute,
         private readonly translate: TranslateService,
         public dialog: MatDialog ) { }
@@ -111,7 +97,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
         this.maxDisplayLevel += 1
         const data = {
             taxonID: +this.taxonID,
-            creatorUID: +1, //this.userID,
+            creatorUID: this.userID,
             displayLevel: this.maxDisplayLevel,
             initialTimestamp: new Date()
         }
@@ -206,7 +192,16 @@ export class TaxonDescriptionEditorComponent implements OnInit {
                         statement.heading = row_obj.heading
                         statement.statement = row_obj.statement
                         statement.displayHeader = row_obj.displayHeader
+
                         // Construct a new statement
+                        let a = statement as unknown as Record<PropertyKey, unknown>
+                        a.id = row_obj.id
+                        a.taxonID = this.taxonID
+                        a.creatorUID = this.userID
+                        a.initialTimestamp = new Date()
+                        const newStatement = new TaxonDescriptionStatementInputDto(a)
+
+                        /*
                         const data = {
                             id: row_obj.id,
                             taxonID: this.taxonID,
@@ -219,6 +214,7 @@ export class TaxonDescriptionEditorComponent implements OnInit {
                             initialTimestamp: new Date()
                         }
                         const newStatement = new TaxonDescriptionStatementInputDto(data)
+                         */
                         this.taxonDescriptionStatementService
                             .update(newStatement)
                             .subscribe((statement)=> {
@@ -274,7 +270,15 @@ export class TaxonDescriptionEditorComponent implements OnInit {
                 value.sourceUrl = row_obj.sourceUrl
                 value.notes = row_obj.notes
                 value.displayLevel = row_obj.displayLevel
+
                 // Construct a new block
+                let a = value as unknown as Record<PropertyKey, unknown>
+                a.id = row_obj.id
+                a.taxonID = this.taxonID
+                a.creatorUID = this.userID
+                a.initialTimestamp = new Date()
+                const newBlock = new TaxonDescriptionBlockInputDto(a)
+                /*
                 const data = {
                     id: row_obj.id,
                     taxonID: this.taxonID,
@@ -288,8 +292,9 @@ export class TaxonDescriptionEditorComponent implements OnInit {
                     initialTimestamp: new Date()
                 }
                 const newBlock = new TaxonDescriptionBlockInputDto(data)
+                 */
                 this.taxonBlockService
-                    .update(new TaxonDescriptionBlockInputDto(data))
+                    .update(newBlock)
                     .subscribe((block)=> {
                         if (block) {
                             // It has been updated in the database

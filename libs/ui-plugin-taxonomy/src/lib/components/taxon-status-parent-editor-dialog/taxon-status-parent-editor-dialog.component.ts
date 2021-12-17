@@ -1,4 +1,3 @@
-//dialog-box.component.ts
 import { Component, Inject, Optional } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { TaxonInfo } from '../taxon-taxon-editor/taxon-taxon-editor.component';
@@ -27,15 +26,9 @@ export class TaxonStatusParentEditorDialogComponent {
     nameOptions: string[] = []
     hasAuthors = true
     taxonID
-    //public currentParentName
 
     constructor(
         private readonly taxaService: TaxonService,
-        //private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
-        //private readonly taxonomicStatusService: TaxonomicStatusService,
-        //private readonly taxonVernacularService: TaxonVernacularService,
-        //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
-        //private readonly taxonomicUnitService: TaxonomicUnitService,
         public dialogRef: MatDialogRef<TaxonStatusParentEditorDialogComponent>,
         //@Optional() is used to prevent error if no data is passed
         @Optional() @Inject(MAT_DIALOG_DATA) public data
@@ -44,7 +37,6 @@ export class TaxonStatusParentEditorDialogComponent {
         this.action = this.local_data.action
         this.taxonomicAuthorityID = this.local_data.taxonomicAuthorityID
         this.taxonID = this.local_data.taxonID
-        //this.currentParentName = this.local_data.currentParentName
     }
 
     nameFor(option) {
@@ -73,19 +65,6 @@ export class TaxonStatusParentEditorDialogComponent {
         }
     }
 
-    /* Called when the taxon is chosen to display */
-    /*
-    onSubmit(): void {
-        if (this.kindOfName == 'Scientific') {
-            const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
-            this.moveTaxonToNewParent(sname)
-        } else {
-            // Not this one
-        }
-
-    }
-     */
-
     /*
     Reload the names as a user types
     */
@@ -103,15 +82,13 @@ export class TaxonStatusParentEditorDialogComponent {
         if (this.kindOfName == 'Scientific') {
             this.loadScientificNames(partialName)
         } else {
-            // An error, no common names suppported
+            // An error, no common names suppported, should never get here
         }
     }
 
     doAction(){
         // Need to update the parent
-        console.log(" updated parent " + this.action)
         const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
-        //this.moveTaxonToNewParent(this.local_data.currentParentName)
         this.dialogRef.close({event:this.action,data:sname})
     }
 

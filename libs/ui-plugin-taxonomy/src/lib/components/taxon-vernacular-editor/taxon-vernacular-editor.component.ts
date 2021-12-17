@@ -155,6 +155,9 @@ export class TaxonVernacularEditorComponent implements OnInit {
                 value.notes = row_obj.notes
                 value.language = row_obj.language
                 // Construct a new name
+                let a = value as unknown as Record<PropertyKey, unknown>
+                const newName = new TaxonVernacularInputDto(a)
+                /*
                 const data = {
                     id: value.id,
                     taxonID: value.taxonID,
@@ -170,6 +173,7 @@ export class TaxonVernacularEditorComponent implements OnInit {
                 }
 
                 const newName = new TaxonVernacularInputDto(data)
+                 */
                 this.taxonVernacularService
                     .update(newName)
                     .subscribe((name)=> {
