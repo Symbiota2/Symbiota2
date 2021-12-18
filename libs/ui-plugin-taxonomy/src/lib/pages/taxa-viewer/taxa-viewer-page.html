@@ -72,11 +72,14 @@
                            (keyup)="onKey($event)"
                            [formControl]="nameControl"
                            [matAutocomplete]="auto">
+
                     <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
                         <mat-option *ngFor="let option of nameOptions" [value]="nameFor(option)">
                             {{nameFor(option)}} <small>{{authorFor(option)}}</small>
                         </mat-option>
+
                     </mat-autocomplete>
+
                 </mat-form-field>
                 <mat-label *ngIf="looking && !nameFound" style='color:red'>
                     <b>{{"taxonomy.viewer.name.error" | translate}}</b>

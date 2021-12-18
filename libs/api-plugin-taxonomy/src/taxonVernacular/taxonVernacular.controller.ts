@@ -123,10 +123,11 @@ export class TaxonVernacularController {
     async findByCommonName(@Param('commonName') commonName: string, @Query() findParams: TaxonVernacularFindParams): Promise<TaxonVernacularOutputDto[]> {
         const names = await this.myService.findByCommonName(commonName, findParams)
         if (!names) {
+            return [] // Returns empty list if not found
+            //throw new NotFoundException()
+        } /* else if (names.length == 0) {
             throw new NotFoundException()
-        } else if (names.length == 0) {
-            throw new NotFoundException()
-        }
+        } */
         const dto = names.map((name) => new TaxonVernacularOutputDto(name))
         return dto
     }
@@ -134,6 +135,7 @@ export class TaxonVernacularController {
     /*
     The commonName controller finds using a common name
      */
+    /*
     @Get('commonName/:commonName')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonVernacularOutputDto })
     @ApiOperation({
@@ -149,6 +151,7 @@ export class TaxonVernacularController {
         const dto = new TaxonVernacularOutputDto(name[0])
         return dto
     }
+     */
 
     @Get(':id')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonVernacularOutputDto })

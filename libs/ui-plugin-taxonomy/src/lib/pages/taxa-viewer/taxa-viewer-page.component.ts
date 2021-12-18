@@ -349,6 +349,7 @@ export class TaxaViewerPageComponent implements OnInit {
                         })
                 } else {
                     // No taxon found, show error message
+                    console.log("no taxon found")
                     this.nameFound = false
                 }
 

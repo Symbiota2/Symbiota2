@@ -165,10 +165,12 @@ export class TaxonController {
     ): Promise<TaxonDto[]> {
         const taxons = await this.taxa.findByScientificName(sciname, findNamesParams)
         if (!taxons) {
-            throw new NotFoundException()
-        } else if (taxons.length == 0) {
-            throw new NotFoundException()
+            //throw new NotFoundException()
+            return []  // returns emptylist if not found
+        } /*else if (taxons.length == 0) {
+            //throw new NotFoundException()
         }
+        */
         const dto = taxons.map((taxon) => new TaxonDto(taxon))
         return dto
     }
