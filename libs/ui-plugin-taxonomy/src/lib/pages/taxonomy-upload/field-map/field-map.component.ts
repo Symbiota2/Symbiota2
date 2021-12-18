@@ -38,12 +38,18 @@ interface TableRow {
 })
 export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
     @ViewChild(MatPaginator) paginator: MatPaginator;
+    requiredFieldsMapped = false
+    kingdomNameMapped = false
+    scientificNameMapped = false
+    rankNameMapped = false
+    acceptedTaxonNameMapped = false
 
     //hidePageSize
     //hidePageOptions
 
-    uniqueIDField = new FormControl('', [Validators.required]);
+    //uniqueIDField = new FormControl('', [Validators.required]);
 
+    /*
     uniqueIDOptions = this.uploads.currentUpload.pipe(
         map((upload) => {
             if (!upload) {
@@ -52,6 +58,7 @@ export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
             return Object.keys(upload.fieldMap)
         })
     );
+     */
 
     fieldMap = this.uploads.currentUpload.pipe(
         filter((upload) => upload !== null),
@@ -127,11 +134,17 @@ export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
     }
 
     setFieldMapValue(key: string, value: string) {
+        if (key = "kingdomName") this.kingdomNameMapped = true
+        if (key = "AcceptedTaxonName") this.acceptedTaxonNameMapped = true
+        if (key = "scientificName") this.scientificNameMapped = true
+        if (key = "RankName") this.rankNameMapped = true
         this.uploads.setFieldMap(key, value)
+        this.requiredFieldsMapped =
+            this.kingdomNameMapped && this.scientificNameMapped && this.rankNameMapped && this.acceptedTaxonNameMapped
     }
 
     onSubmit() {
-        this.uploads.patchFieldMap(this.uniqueIDField.value).subscribe(({
+        this.uploads.patchFieldMap(/*this.uniqueIDField.value*/).subscribe(({
                                                                             problemScinames,
                                                                             problemAcceptedNames,
                                                                             problemParentNames,

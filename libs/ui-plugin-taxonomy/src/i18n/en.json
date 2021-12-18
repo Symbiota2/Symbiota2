@@ -42,7 +42,12 @@
     "taxonomy.uploader.problem.accepted.name.count" : "Accepted taxon names are unable to be matched",
     "taxonomy.uploader.problem.parent.name.count" : "Parent taxon names unable to be matched",
     "taxonomy.uploader.problem.rank.name.count" : "Kingdom and rank names are unable to be matched",
-    "taxonomy.upload.complete.title" : "Taxonomy upload started, please check the log for problems and a notification will be sent when the process completes.",
+    "taxonomy.uploader.complete.title" : "Taxonomy upload started, please check the log for problems and a notification will be sent when the process completes.",
+    "taxonomy.uploader.field.map.title" : "Taxonomy Upload: Field Mapping",
+    "taxonomy.uploader.field.map.instructions" : "Please map the fields in your upload to Symbiota2 fields.",
+    "taxonomy.uploader.field.map.data.field" : "Upload Data Field",
+    "taxonomy.uploader.field.map.symbiota2.field" : "Symbiota2 Field",
+    "taxonomy.uploader.field.map.begin.upload.button" : "Begin Upload",
 
     "taxonomy.viewer.title": "Taxonomy Viewer",
     "taxonomy.viewer.option.scientific": "Use scientific names",

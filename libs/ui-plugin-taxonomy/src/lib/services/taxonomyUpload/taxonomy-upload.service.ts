@@ -135,7 +135,7 @@ export class TaxonomyUploadService {
         )
     }
 
-    patchFieldMap(uniqueIDField: string) {
+    patchFieldMap(/*uniqueIDField: string*/) {
         return combineLatest([
             //this.taxonomicAuthorityID,
             this.jwtToken,
@@ -156,7 +156,7 @@ export class TaxonomyUploadService {
                     //.queryParam('taxonomicAuthorityID', authorityID)
                     .addJwtAuth(token)
                     .body({
-                        uniqueIDField: uniqueIDField,
+                        //uniqueIDField: uniqueIDField,
                         fieldMap: upload.fieldMap
                     })
                     .build();

@@ -13,7 +13,7 @@ import {
 } from '@symbiota2/api-database';
 import { DeepPartial, IsNull, Repository } from 'typeorm';
 import { QUEUE_ID_TAXONOMY_UPLOAD } from './taxonomy-upload.queue';
-import { csvIterator, objectIterator } from '@symbiota2/api-common';
+import { csvIteratorWithTrimValues, objectIterator } from '@symbiota2/api-common';
 import { TaxonService } from '../taxon/taxon.service';
 import { TaxonomicEnumTreeService } from '../taxonomicEnumTree/taxonomicEnumTree.service';
 import * as fs from 'fs';
@@ -82,7 +82,7 @@ export class TaxonomyUploadProcessor {
         // Process the csv file splitting it into batches that will be processed by rank
         let error: Error = null
         const fileMap = new Map()
-        for await (const batch of csvIterator<DeepPartial<Taxon>>(upload.filePath)) {
+        for await (const batch of csvIteratorWithTrimValues<DeepPartial<Taxon>>(upload.filePath)) {
             try {
                 await this.splitBatchByRank(kingdomAndRankToIDMap, fileMap, upload, batch);
             } catch (e) {
@@ -109,6 +109,7 @@ export class TaxonomyUploadProcessor {
                 error = await this.processRankFile(key, job, upload)
             }
             if (error) {
+                this.logger.error(" Error detected in processing rank file")
                 await job.moveToFailed(error)
             }
         }
@@ -132,8 +133,9 @@ export class TaxonomyUploadProcessor {
 
         for await (const batch of objectIterator<DeepPartial<Taxon>>(this.taxonFilesPath + key)) {
             try {
-                await this.onCSVBatch(job, upload, batch);
+                await this.onJSONBatch(job, upload, batch);
             } catch (e) {
+                this.logger.error(`Error processing rank file: ${JSON.stringify(e)}`)
                 return e
             }
         }
@@ -231,16 +233,16 @@ export class TaxonomyUploadProcessor {
      * @param batch - batch of taxon records
      * @return nothing
      */
-    private async onCSVBatch(job: Job<TaxonomyUploadJob>, upload: TaxonomyUpload, batch: DeepPartial<Taxon>[]) {
+    private async onJSONBatch(job: Job<TaxonomyUploadJob>, upload: TaxonomyUpload, batch: DeepPartial<Taxon>[]) {
 
         // list of all the updates to do to taxon records
-        const taxonUpdates : Taxon[] = job.data.taxonUpdates
+        const taxonUpdates : Taxon[] = []
         const skippedTaxonsDueToMulitpleMatch = job.data.skippedTaxonsDueToMulitpleMatch
         const skippedTaxonsDueToMismatchRank = job.data.skippedTaxonsDueToMismatchRank
         const skippedTaxonsDueToMissingName = job.data.skippedTaxonsDueToMissingName
 
         // list of all the updates to do to status records
-        const statusUpdates : TaxonomicStatus[] = job.data.statusUpdates
+        const statusUpdates : TaxonomicStatus[] = []
         const skippedStatusesDueToMultipleMatch = job.data.skippedStatusesDueToMultipleMatch
         const skippedStatusesDueToAcceptedMismatch = job.data.skippedStatusesDueToAcceptedMismatch
         const skippedStatusesDueToParentMismatch = job.data.skippedStatusesDueToParentMismatch
@@ -312,7 +314,7 @@ export class TaxonomyUploadProcessor {
             const taxonData = {}
 
             // Flag to keep track if we skip this row
-            let skip= false
+            let skip = false
 
             // foreach field
             for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
@@ -356,8 +358,8 @@ export class TaxonomyUploadProcessor {
                     }
                     taxonData[dbField] = csvValue === '' ? null : csvValue
                 }
-            }
 
+            }
             // Check that the required fields are present
             // Taxon needs a scientific name
             if (!taxonData["scientificName"]) {
@@ -388,7 +390,7 @@ export class TaxonomyUploadProcessor {
                 // Meed to match
                 // First let's try to match just on scientific name
                 const testTaxons = await this.taxonRepo.find({
-                    where: {scientificName: taxonData["scientificName"]}
+                    where: { scientificName: taxonData["scientificName"] }
                 })
 
                 // See how many things we got back
@@ -400,7 +402,7 @@ export class TaxonomyUploadProcessor {
                 } else {
 
                     // Expand the match to include kingdom name and author if present
-                    const whereClause = {scientificName: taxonData["scientificName"]}
+                    const whereClause = { scientificName: taxonData["scientificName"] }
 
                     // Does it have a kingdom name?
                     if (taxonData["kingdomName"]) {
@@ -467,18 +469,18 @@ export class TaxonomyUploadProcessor {
             let dbStatus = null
 
             // Flag to keep track if we skip this row
-            let skip= false
+            let skip = false
 
             let taxons = []
 
             // Does it have an id
             if (taxonData.id) {
                 taxons = await this.taxonRepo.find({
-                    where: {  id: taxonData.id }
+                    where: { id: taxonData.id }
                 })
             } else {
                 // First, let's load the taxon record to get the taxon id
-                const whereClause = {scientificName: taxonData["scientificName"]}
+                const whereClause = { scientificName: taxonData["scientificName"] }
 
                 // Does it have a kingdom name?
                 if (taxonData["kingdomName"]) {
@@ -525,7 +527,7 @@ export class TaxonomyUploadProcessor {
                     if (dbField == "ParentTaxonName" || dbField == "AcceptedTaxonName") {
 
                         // Map taxon name to taxon ID
-                        const whereClause = {scientificName: csvValue}
+                        const whereClause = { scientificName: csvValue }
 
                         // Does it have a kingdom name?  Use it if it does
                         if (taxonData["kingdomName"]) {
@@ -538,7 +540,7 @@ export class TaxonomyUploadProcessor {
                         if (taxons.length == 0) {
                             // Not found, try again without the kingdome name
                             taxons = await this.taxonRepo.find({
-                                where: { scientificName: csvValue /*, kingdomName: IsNull()*/}
+                                where: { scientificName: csvValue /*, kingdomName: IsNull()*/ }
                             })
                         }
                         if (taxons.length == 0) {
@@ -583,7 +585,6 @@ export class TaxonomyUploadProcessor {
                 statusData[dbField] = csvValue === '' ? null : csvValue
             }
 
-            //console.log(" All done with field mapping, checking statuses " + taxon.id)
             // Look for the statuses for this taxon
             let statuses = []
 
@@ -593,8 +594,6 @@ export class TaxonomyUploadProcessor {
                     taxonAuthorityID: job.data.authorityID
                 }
             })
-
-            //console.log(" Statues found " + statuses.length)
 
             if (statuses.length == 0) {
                 // No status yet, add it
@@ -636,57 +635,39 @@ export class TaxonomyUploadProcessor {
                     }
                 }
 
-                /*
-                console.log("updating status")
-                for (const [k, v] of Object.entries(dbStatus)) {
-                    console.log(" status field " + k + " = " + v)
-                }
-                 */
-
                 statusUpdates.push(dbStatus)
                 // Figure out the rank for this status update
                 if (!statusRankMap.has(taxon.rankID)) {
-                    statusRankMap.set(taxon.rankID,[])
+                    statusRankMap.set(taxon.rankID, [])
                 }
                 const rankList = statusRankMap.get(taxon.rankID)
                 rankList.push(dbStatus)
-                statusRankMap.set(taxon.rankID,rankList)
+                statusRankMap.set(taxon.rankID, rankList)
             }
         }
-        // Save all of the statuses
 
-        //console.log("status updates are " + statusUpdates.length)
+        // Save all of the statuses
         await this.statusRepo.save(statusUpdates)
         //await this.statusRepo.upsert(statusUpdates, ["taxonID", "taxonIDAccepted", "taxonAuthorityID"])
         this.processed += statusUpdates.length
 
         // Now move the taxons in order by rank from top to bottom
-        let keys =[ ...statusRankMap.keys() ]
-        /*
-        let keys = []
-        for (const [k, v] of Object.entries(statusRankMap)) {
-            this.logger.log(" pushing " + k)
-            keys.push(k)
-        }
-         */
-        this.logger.log(" size is " + keys.length)
-        await keys.sort((a,b) => { return a-b }).forEach((key) => {
-          statusRankMap.get(key).forEach((status) => {
-              this.logger.log(" Moving " + status.taxonID + " " + status.parentTaxonID + " " + status.taxonAuthorityID)
-              this.moveTaxon(status.taxonID,status.taxonAuthorityID,status.parentTaxonID)
-          })
+        let keys = [...statusRankMap.keys()]
+        const toDo = []
+        keys.sort((a, b) => {
+            return a - b
+        }).forEach((key) => {
+            statusRankMap.get(key).forEach((status) => {
+                toDo.push(status)
+            })
         })
 
-        /*
-        console.log(" number of status updates " + statusUpdates.length)
-        console.log(" number of skipped due to accepted mismatch " + skippedStatusesDueToAcceptedMismatch.length)
-        console.log(" number of skipped due to multiple match " + skippedStatusesDueToMultipleMatch.length)
-        console.log(" number of skipped due to parent mismatch " + skippedStatusesDueToParentMismatch.length)
-        console.log(" number of skipped due to taxon mismatch " + skippedStatusesDueToTaxonMismatch.length)
-         */
+        for (let status of toDo) {
+            this.moveTaxon(status.taxonID,status.taxonAuthorityID,status.parentTaxonID)
+        }
 
         let logMsg = `Processing uploads for taxa authority ID ${job.data.authorityID} `
-        logMsg += `(${new Intl.NumberFormat().format(taxonUpdates.length)} taxons processed and`
+        logMsg += `(${new Intl.NumberFormat().format(taxonUpdates.length)} taxons processed and `
         logMsg += `${new Intl.NumberFormat().format(statusUpdates.length)} statuses processed)...`
         this.logger.log(logMsg)
     }

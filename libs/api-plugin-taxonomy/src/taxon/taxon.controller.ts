@@ -392,7 +392,7 @@ export class TaxonController {
 
         const upload = await this.taxa.patchUploadFieldMap(
             id,
-            body.uniqueIDField,
+            //body.uniqueIDField,
             body.fieldMap as Record<string, /*keyof Occurrence*/ string>
         )
 

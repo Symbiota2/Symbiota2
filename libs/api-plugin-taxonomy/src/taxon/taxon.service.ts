@@ -486,14 +486,14 @@ export class TaxonService extends BaseService<Taxon>{
         return upload;
     }
 
-    async patchUploadFieldMap(id: number, uniqueIDField: string, fieldMap: TaxonomyUploadFieldMap): Promise<TaxonomyUpload> {
+    async patchUploadFieldMap(id: number, /*uniqueIDField: string,*/ fieldMap: TaxonomyUploadFieldMap): Promise<TaxonomyUpload> {
         const upload = await this.uploadRepo.findOne(id);
         if (!upload) {
             return null;
         }
         await this.uploadRepo.save({
             ...upload,
-            uniqueIDField,
+            //uniqueIDField,
             fieldMap
         });
         return upload;

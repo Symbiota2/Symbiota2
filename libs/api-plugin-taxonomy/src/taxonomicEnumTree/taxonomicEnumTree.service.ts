@@ -306,7 +306,8 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
 
         // Save the updates
         buffer.unshift(data)
-        return await this.enumTreeRepository.save(buffer)[0]
+        await this.enumTreeRepository.save(buffer)
+        return data
     }
 
     /**
