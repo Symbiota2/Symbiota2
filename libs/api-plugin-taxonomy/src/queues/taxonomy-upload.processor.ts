@@ -23,7 +23,7 @@ export interface TaxonomyUploadJob {
     authorityID: number
     uploadID: number
     taxonUpdates : Taxon[]
-    skippedTaxonsDueToMulitpleMatch
+    skippedTaxonsDueToMultipleMatch
     skippedTaxonsDueToMismatchRank
     skippedTaxonsDueToMissingName
 
@@ -38,12 +38,13 @@ export interface TaxonomyUploadJob {
 @Processor(QUEUE_ID_TAXONOMY_UPLOAD)
 export class TaxonomyUploadProcessor {
     private processed = 0
+    private static MAX_SKIPPED_BUFFER_SIZE = 1000 // Limit of how many skipped records of any type we want to keep
     private readonly logger = new Logger(TaxonomyUploadProcessor.name)
     separator = ":"
     taxonFilesPath = "./data/uploads/taxa/taxon"
-    assestsFolderPath = "./apps/ui/src/assests/taxa"
-    problemParentNamesPath = this.assestsFolderPath + "/problemParentNames"
-    problemAcceptedNamesPath = this.assestsFolderPath + "/problemAcceptedNames"
+    assetsFolderPath = "./apps/ui/src/assets/taxa"
+    problemParentNamesPath = this.assetsFolderPath + "/problemParentNames"
+    problemAcceptedNamesPath = this.assetsFolderPath + "/problemAcceptedNames"
 
     constructor(
         @Inject(TaxonomyUpload.PROVIDER_ID)
@@ -130,7 +131,6 @@ export class TaxonomyUploadProcessor {
     }
 
     private async processRankFile(key, job, upload) {
-
         for await (const batch of objectIterator<DeepPartial<Taxon>>(this.taxonFilesPath + key)) {
             try {
                 await this.onJSONBatch(job, upload, batch);
@@ -237,7 +237,7 @@ export class TaxonomyUploadProcessor {
 
         // list of all the updates to do to taxon records
         const taxonUpdates : Taxon[] = []
-        const skippedTaxonsDueToMulitpleMatch = job.data.skippedTaxonsDueToMulitpleMatch
+        const skippedTaxonsDueToMultipleMatch = job.data.skippedTaxonsDueToMultipleMatch
         const skippedTaxonsDueToMismatchRank = job.data.skippedTaxonsDueToMismatchRank
         const skippedTaxonsDueToMissingName = job.data.skippedTaxonsDueToMissingName
 
@@ -343,7 +343,9 @@ export class TaxonomyUploadProcessor {
                             csvValue = rankAndKingdomToIDMap.get(value)
                         } else {
                             skip = true
-                            skippedTaxonsDueToMismatchRank.push(row)
+                            if (skippedTaxonsDueToMismatchRank.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                                skippedTaxonsDueToMismatchRank.push(row)
+                            }
                             this.logger.warn(`Taxon does not have a matching rank! Skipping...` + value)
                             continue
                         }
@@ -363,14 +365,18 @@ export class TaxonomyUploadProcessor {
             // Check that the required fields are present
             // Taxon needs a scientific name
             if (!taxonData["scientificName"]) {
-                skippedTaxonsDueToMissingName.push(row)
+                if (skippedTaxonsDueToMissingName.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                    skippedTaxonsDueToMissingName.push(row)
+                }
                 this.logger.warn(`Taxon is missing a scientific name! Skipping...`)
                 skip = true
                 continue
             }
             // Taxon needs a rank id
             if (!taxonData["rankID"]) {
-                skippedTaxonsDueToMismatchRank.push(row)
+                if (skippedTaxonsDueToMismatchRank.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                    skippedTaxonsDueToMismatchRank.push(row)
+                }
                 this.logger.warn(`Taxon lacks a rank ID (no match in the database to rank name if present)! Skipping...`)
                 skip = true
                 continue
@@ -430,7 +436,9 @@ export class TaxonomyUploadProcessor {
                         dbTaxon = testTaxons[0]
                     } else {
                         // Still ambiguous
-                        skippedTaxonsDueToMulitpleMatch.push(row)
+                        if (skippedTaxonsDueToMultipleMatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                            skippedTaxonsDueToMultipleMatch.push(row)
+                        }
                         skip = true
                     }
                 }
@@ -499,7 +507,9 @@ export class TaxonomyUploadProcessor {
             // Did we find a taxon?
             if (taxons.length != 1) {
                 // Found zero or several
-                skippedStatusesDueToTaxonMismatch.push(row)
+                if (skippedStatusesDueToTaxonMismatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                    skippedStatusesDueToTaxonMismatch.push(row)
+                }
                 this.logger.warn(`Taxon status check, taxon has multiple matches or no match in the database! Skipping...`)
                 skip = true
                 continue
@@ -547,10 +557,14 @@ export class TaxonomyUploadProcessor {
                             // nothing found skip
                             skip = true
                             if (dbField == "ParentTaxonName") {
-                                skippedStatusesDueToParentMismatch.push(row)
+                                if (skippedStatusesDueToParentMismatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                                    skippedStatusesDueToParentMismatch.push(row)
+                                }
                                 this.logger.warn(`Parent taxon name does not have a matching taxon! Skipping...`)
                             } else {
-                                skippedStatusesDueToAcceptedMismatch.push(row)
+                                if (skippedStatusesDueToAcceptedMismatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                                    skippedStatusesDueToAcceptedMismatch.push(row)
+                                }
                                 this.logger.warn(`Accepted taxon name does not have a matching taxon! Skipping...`)
                             }
                             continue
@@ -561,10 +575,14 @@ export class TaxonomyUploadProcessor {
                             // Found more than one match
                             skip = true
                             if (dbField == "ParentTaxonName") {
-                                skippedStatusesDueToParentMismatch.push(row)
+                                if (skippedStatusesDueToParentMismatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                                    skippedStatusesDueToParentMismatch.push(row)
+                                }
                                 this.logger.warn(`Parent taxon name has more than one matching taxon! Skipping...`)
                             } else {
-                                skippedStatusesDueToAcceptedMismatch.push(row)
+                                if (skippedStatusesDueToAcceptedMismatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                                    skippedStatusesDueToAcceptedMismatch.push(row)
+                                }
                                 this.logger.warn(`Accepted taxon has more than one matching taxon! Skipping...`)
                             }
                             continue
@@ -603,7 +621,9 @@ export class TaxonomyUploadProcessor {
             } else {
                 // Found more than one status
                 skip = true
-                skippedStatusesDueToMultipleMatch.push(row)
+                if (skippedStatusesDueToMultipleMatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                    skippedStatusesDueToMultipleMatch.push(row)
+                }
                 this.logger.warn(`Taxon is in conflict, has multiple statuses, need to resolve! Skipping...`)
                 continue
             }

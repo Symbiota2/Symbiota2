@@ -38,7 +38,7 @@ import {
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
-import { TaxonomyUploadCompletePage, TaxonProfilePageComponent } from './pages';
+import { TaxonomyUploadCompletePage, TaxonomyUploadProblemAcceptedNamesPage, TaxonProfilePageComponent } from './pages';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
@@ -64,7 +64,9 @@ import { TaxonomyUploadService } from './services/taxonomyUpload/taxonomy-upload
 import { TaxaProfilerEntryPage } from './pages/taxa-profiler-entry/taxa-profiler-entry-page';
 import {
     TAXA_EDITOR_ROUTE,
-    TAXA_PROFILER_ROUTE, TAXA_UPLOAD_COMPLETE_ROUTE,
+    TAXA_PROFILER_ROUTE,
+    TAXA_UPLOAD_COMPLETE_ROUTE,
+    TAXA_UPLOAD_PROBLEM_ACCEPTED_NAMES_ROUTE, TAXA_UPLOAD_PROBLEM_PARENT_NAMES_ROUTE, TAXA_UPLOAD_PROBLEM_RANKS_ROUTE,
     TAXA_UPLOADER_FIELD_MAP_ROUTE,
     TAXA_UPLOADER_ROUTE,
     TAXA_VIEWER_ROUTE,
@@ -73,6 +75,8 @@ import {
 } from './routes';
 import { ROUTE_UPLOAD_FIELD_MAP } from '../../../ui-plugin-occurrence/src/lib/routes';
 import { OccurrenceUploadFieldMapPage } from '../../../ui-plugin-occurrence/src/lib/pages/occurrence-upload/field-map/field-map.component';
+import { TaxonomyUploadProblemRanksPage } from './pages/taxonomy-upload/taxonomy-upload-problem-ranks/taxonomy-upload-problem-ranks-page';
+import { TaxonomyUploadProblemParentNamesPage } from './pages/taxonomy-upload/taxonomy-upload-problem-parent-names/taxonomy-upload-problem-parent-names-page';
 
 @NgModule({
   imports: [
@@ -111,6 +115,9 @@ import { OccurrenceUploadFieldMapPage } from '../../../ui-plugin-occurrence/src/
     declarations: [
         TaxonomyUploadPage,
         TaxonomyUploadCompletePage,
+        TaxonomyUploadProblemAcceptedNamesPage,
+        TaxonomyUploadProblemParentNamesPage,
+        TaxonomyUploadProblemRanksPage,
         TaxaProfilerEntryPage,
         TaxaEditorEntryPage,
         TaxaViewerPageComponent,
@@ -146,6 +153,9 @@ import { OccurrenceUploadFieldMapPage } from '../../../ui-plugin-occurrence/src/
         TaxaProfilerEntryPage,
         TaxonomyUploadPage,
         TaxonomyUploadCompletePage,
+        TaxonomyUploadProblemAcceptedNamesPage,
+        TaxonomyUploadProblemParentNamesPage,
+        TaxonomyUploadProblemRanksPage,
         TaxonProfilePageComponent,
         TaxaViewerPageComponent,
         TaxonEditorPageComponent,
@@ -196,6 +206,18 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
             {
                 path: TAXA_UPLOADER_ROUTE,
                 component: TaxonomyUploadPage
+            },
+            {
+                path: TAXA_UPLOAD_PROBLEM_ACCEPTED_NAMES_ROUTE,
+                component: TaxonomyUploadProblemAcceptedNamesPage
+            },
+            {
+                path: TAXA_UPLOAD_PROBLEM_PARENT_NAMES_ROUTE,
+                component: TaxonomyUploadProblemParentNamesPage
+            },
+            {
+                path: TAXA_UPLOAD_PROBLEM_RANKS_ROUTE,
+                component: TaxonomyUploadProblemRanksPage
             },
             {
                 path: TAXA_UPLOADER_FIELD_MAP_ROUTE,

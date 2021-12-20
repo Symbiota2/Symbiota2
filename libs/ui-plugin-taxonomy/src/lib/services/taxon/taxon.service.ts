@@ -141,6 +141,33 @@ export class TaxonService {
 
     }
 
+    getProblemAcceptedNames(): Observable<string[]> {
+        const url = this.createQueryBuilder()
+            .problemAcceptedNames()
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, string[]>(query)
+    }
+
+    getProblemParentNames(): Observable<string[]> {
+        const url = this.createQueryBuilder()
+            .problemParentNames()
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, string[]>(query)
+    }
+
+    getProblemRanks(): Observable<string[]> {
+        const url = this.createQueryBuilder()
+            .problemRanks()
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, string[]>(query)
+    }
+
     /**
      * sends request to api to create a taxon record
      * @param taxon - the taxon to create

@@ -361,6 +361,33 @@ export class TaxonController {
         return upload;
     }
 
+    @Get('upload/stream')
+    @ApiOperation({ summary: 'Retrieve the problem accepted names from the most recent upload' })
+    async getStream() : Promise<string> {
+      const dataFolderPath = "taxon/data/uploads/taxa"
+      const key = dataFolderPath + "/problemParentNames"
+        return JSON.stringify(await this.taxa.getStream(key))
+        //return (await this.taxa.getStream(key)).toString()
+    }
+
+    @Get('upload/problemAcceptedNames')
+    @ApiOperation({ summary: 'Retrieve the problem accepted names from the most recent upload' })
+    async getUploadProblemAcceptedNames(): Promise<string[]> {
+        return this.taxa.getProblemAcceptedNames()
+    }
+
+    @Get('upload/problemParentNames')
+    @ApiOperation({ summary: 'Retrieve the problem parent names from the most recent upload' })
+    async getUploadProblemParentNames(): Promise<string[]> {
+        return this.taxa.getProblemParentNames()
+    }
+
+    @Get('upload/problemAcceptedNames')
+    @ApiOperation({ summary: 'Retrieve the problem ranks from the most recent upload' })
+    async getUploadProblemRanks(): Promise<string[]> {
+        return this.taxa.getProblemRanks()
+    }
+
     @Get('upload/:id')
     @ApiOperation({ summary: 'Retrieve an upload by its ID' })
     async getUploadByID(@Param('id') id: number): Promise<TaxonomyUpload> {
@@ -378,10 +405,10 @@ export class TaxonController {
         @Param('id') id: number,
         @Body() body: TaxonHeaderMapBody
     ): Promise<{
-        problemScinames: string[],
-        problemAcceptedNames: string[],
-        problemParentNames: string[],
-        problemRanks: string[],
+        problemScinames: number,
+        problemAcceptedNames: number,
+        problemParentNames: number,
+        problemRanks: number,
         nullSciNames: number,
         nullParentNames: number,
         nullKingdomNames: number,

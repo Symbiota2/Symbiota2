@@ -27,14 +27,20 @@
                 </li>
                 <li> {{"taxonomy.uploader.name.warning" | translate}}
                     <ul>
-                        <li>
-                            {{ data.problemParentNames.length | number }} {{"taxonomy.uploader.problem.parent.name.count" | translate}}
+                        <li >
+                            {{ data.problemParentNames | number }} {{"taxonomy.uploader.problem.parent.name.count" | translate}}
+                            <br *ngIf='data.problemParentNames > 0'/>
+                            <a *ngIf='data.problemParentNames > 0' href="{{problemParentRoute}}" target="_blank">{{"taxonomy.uploader.problem.parent.name.visit" | translate}}</a>
                         </li>
-                        <li>
-                            {{ data.nullSciNames | number }} {{"taxonomy.uploader.problem.accepted.name.count" | translate}}
+                        <li >
+                            {{ data.problemAcceptedNames | number }} {{"taxonomy.uploader.problem.accepted.name.count" | translate}}
+                            <br *ngIf='data.problemAcceptedNames > 0'/>
+                            <a *ngIf='data.problemAcceptedNames > 0' href="{{problemAcceptedRoute}}" target="_blank">{{"taxonomy.uploader.problem.accepted.name.visit" | translate}}</a>
                         </li>
-                        <li>
-                            {{ data.nullSciNames | number }} {{"taxonomy.uploader.problem.rank.name.count" | translate}}
+                        <li >
+                            {{ data.problemRanks | number }} {{"taxonomy.uploader.problem.rank.name.count" | translate}}
+                            <br *ngIf='data.problemRanks > 0' />
+                            <a *ngIf='data.problemRanks > 0' href="{{problemRanksRoute}}" target="_blank">{{"taxonomy.uploader.problem.ranks.visit" | translate}}</a>
                         </li>
                     </ul>
                 </li>
