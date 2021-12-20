@@ -177,7 +177,7 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
                 name: commonName})
                 //.andWhere('o.vernacularName = :commonName', { commonName: commonName} )
 
-            return qb.getMany()
+            return await qb.getMany()
         } else {
             return await this.myRepository.find({where: {vernacularName: commonName}})
         }

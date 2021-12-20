@@ -45,7 +45,7 @@ export class TaxonStatusEditorComponent implements OnInit {
     synonyms = new Map<number,string[]>()
 
     // Binding cannot happen with Maps, so have to set up a current state
-    currentAuthorityID = 1  // [TODO set up a default value somewhere]
+    currentAuthorityID = 1  // Will be set by nginit
     currentParentName = "unknown parent"
     currentParentID = null
     currentIsAccepted = false
@@ -91,6 +91,8 @@ export class TaxonStatusEditorComponent implements OnInit {
      */
     ngOnInit() {
 
+        this.loadAuthorities()
+
         // Set up default case
         this.isAccepted.set(this.currentAuthorityID, false)
         this.acceptedName.set(this.currentAuthorityID, 'unknown')
@@ -98,8 +100,6 @@ export class TaxonStatusEditorComponent implements OnInit {
         this.synonyms.set(this.currentAuthorityID, [])
         this.parentName.set(this.currentAuthorityID, 'unknown')
         this.parentID.set(this.currentAuthorityID, null)
-
-        this.loadAuthorities()
 
         this.currentRoute.paramMap.subscribe(params => {
             this.taxonID = params.get('taxonID')
@@ -123,7 +123,11 @@ export class TaxonStatusEditorComponent implements OnInit {
             .subscribe((authorities) => {
                 this.allTaxonomicAuthorityList = authorities
             })
-
+        this.taxonomicAuthorityList.forEach((authority) => {
+            if (authority.isPrimay) {
+                this.currentAuthorityID = authority.id
+            }
+        })
     }
 
     /*
@@ -178,7 +182,6 @@ export class TaxonStatusEditorComponent implements OnInit {
                             this.acceptedName.set(myStatus.taxonAuthorityID,acceptedTaxon.scientificName)
                             this.acceptedID.set(myStatus.taxonAuthorityID, acceptedTaxon.id)
                             this.parentName.set(myStatus.taxonAuthorityID,myStatus.parent.scientificName)
-                            console.log(" name is " + myStatus.parentTaxonID)
                             this.parentID.set(myStatus.taxonAuthorityID, myStatus.parentTaxonID)
                             if (taxonID != myStatus.taxonIDAccepted) {
                                 // I am a synonym, let's look for the accepted id taxon
@@ -189,22 +192,15 @@ export class TaxonStatusEditorComponent implements OnInit {
                             } else {
                                 // I am not a synonym, let's look to see if anyone is a synonym of me
                                 this.isAccepted.set(myStatus.taxonAuthorityID,true)
-                                console.log("synonomys ")
                                 this.taxonomicStatusService.findSynonyms(taxonID,this.currentAuthorityID)
                                     .subscribe( (syn) => {
                                         const tempList = []
-                                        console.log("syn " + this.synonymList)
                                         syn.forEach(function(synonym) {
                                             // Add the synonym to a list of synonyms
-
-                                            console.log( "foo " + synonym)
-                                            console.log( "foo2 " + synonym.taxon.id)
                                             const synonymItem = {
                                                 name: synonym.taxon.scientificName,
                                                 taxonID: synonym.taxon.id
                                             }
-
-                                            console.log("syn2 " + tempList)
                                             tempList.push(synonymItem)
                                         })
                                         this.synonymList = tempList
@@ -213,35 +209,6 @@ export class TaxonStatusEditorComponent implements OnInit {
                                             return 0 - (a.name > b.name ? 1 : -1)
                                         })
                                     })
-                                /*
-                                // Find the name of the accepted taxon
-                                this.taxaService.findByIDWithSynonyms(taxonID)
-                                    .subscribe((item) => {
-                                        const statuses = item.acceptedTaxonStatuses
-                                        statuses.forEach((status) => {
-                                            status.taxonID
-                                        })
-                                 */
-                                        //this.taxon = item
-                                        /*
-                                        const key = item.rankID + item.kingdomName
-                                        //this.rankName = this.taxonomicUnitService.lookupRankName(item.rankID,item.kingdomName)
-                                        this.ranksIDtoName = this.taxonomicUnitService.getRanksLookup()
-                                        if (this.ranksIDtoName == null) {
-                                            // First load the names of the ranks
-                                            this.taxonomicUnitService.findAll().subscribe((ranks) => {
-                                                ranks.forEach((rank) => {
-                                                    this.ranksIDtoName.set(rank.rankID, rank.rankName)
-                                                })
-                                            })
-                                            this.rankName = this.ranksIDtoName.has(key) ? this.ranksIDtoName.get(key) : 'unknown'
-                                        } else {
-                                            this.rankName = this.ranksIDtoName.has(key) ? this.ranksIDtoName.get(key) : 'unknown'
-                                        }
-
-                                         */
-
-                                    //})
                                 // Trigger rebinding
                                 this.setCurrentAuthorityID(this.currentAuthorityID)
                             }
@@ -287,10 +254,8 @@ export class TaxonStatusEditorComponent implements OnInit {
             if (result.event == 'Update Parent') {
                 this.moveTaxonToNewParent(result.data)
             } else if (result.event == 'Update Accepted') {
-                console.log(" event is " + result.event)
                 if (result.data.action == "link") {
                     // Add the link
-                    console.log(" adding link")
                 } else if (result.data.action == "make accepted") {
                     if (result.data.switch) {
                         // Make this one accepted in a ring

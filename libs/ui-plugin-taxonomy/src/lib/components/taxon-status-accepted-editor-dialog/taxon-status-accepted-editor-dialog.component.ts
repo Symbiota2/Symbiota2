@@ -1,4 +1,3 @@
-//dialog-box.component.ts
 import { Component, Inject, Optional } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { TaxonInfo } from '../taxon-taxon-editor/taxon-taxon-editor.component';
@@ -30,11 +29,6 @@ export class TaxonStatusAcceptedEditorDialogComponent {
 
     constructor(
         private readonly taxaService: TaxonService,
-        //private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
-        //private readonly taxonomicStatusService: TaxonomicStatusService,
-        //private readonly taxonVernacularService: TaxonVernacularService,
-        //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
-        //private readonly taxonomicUnitService: TaxonomicUnitService,
         public dialogRef: MatDialogRef<TaxonStatusAcceptedEditorDialogComponent>,
         //@Optional() is used to prevent error if no data is passed
         @Optional() @Inject(MAT_DIALOG_DATA) public data
@@ -42,8 +36,7 @@ export class TaxonStatusAcceptedEditorDialogComponent {
         this.local_data = {...data}
         this.action = this.local_data.action
         this.taxonomicAuthorityID = this.local_data.taxonomicAuthorityID
-        this.taxonID = this.local_data.taxonID
-        //this.currentParentName = this.local_data.currentParentName
+        this.taxonID = this.local_data.taxon
     }
 
     nameFor(option) {
@@ -97,7 +90,6 @@ export class TaxonStatusAcceptedEditorDialogComponent {
                     this.nameControl.value.split(' -')[0]
                     : this.nameControl.value
                 : ""
-        //this.moveTaxonToNewParent(this.local_data.currentParentName)
         this.dialogRef.close({event:this.action,data: {action: "link", name: sname}})
     }
 

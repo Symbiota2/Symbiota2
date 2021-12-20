@@ -2,9 +2,16 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 interface DialogData {
-    newRecords: number;
-    updatedRecords: number;
-    nullRecords: number;
+    problemScinames: string[],
+    problemAcceptedNames: string[],
+    problemParentNames: string[],
+    problemRanks: string[],
+    nullSciNames: number,
+    nullParentNames: number,
+    nullKingdomNames: number,
+    nullAcceptedNames: number,
+    nullRankNames: number,
+    totalRecords: number
 }
 
 @Component({

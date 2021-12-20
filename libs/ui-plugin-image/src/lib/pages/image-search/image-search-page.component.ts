@@ -145,19 +145,28 @@ export class ImageSearchPageComponent implements OnInit {
         this.imageService.findPhotographerNames()
             .subscribe((names) => {
                 this.photographerNameOptions = names
+                this.photographerNameOptions.sort(function (a, b) {
+                    return (a > b ? 1 : -1)
+                })
             })
-
     }
 
     /*
     Load the taxa authorities
-     */
+    */
     public loadAuthorities() {
         this.taxonomicAuthorityService.findAll()
             .subscribe((authorities) => {
                 this.taxonomicAuthorityList = authorities
+                this.taxonomicAuthorityList.sort(function (a, b) {
+                    return (a.id > b.id ? 1 : -1)
+                })
+                this.taxonomicAuthorityList.forEach((authority) => {
+                    if (authority.isPrimay) {
+                        this.taxonomicAuthorityID = authority.id
+                    }
+                })
             })
-
     }
 
     /*

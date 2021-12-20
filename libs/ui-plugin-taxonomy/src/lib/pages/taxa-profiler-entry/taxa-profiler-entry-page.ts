@@ -43,7 +43,7 @@ export class TaxaProfilerEntryPage implements OnInit {
     kindOfName = "Scientific"
     languageList = []
     taxonomicAuthorityList = []
-    taxonomicAuthorityID = 1 // Set the default taxa authority id
+    taxonomicAuthorityID = 1 // Default is set in nginit
     treeControl = new NestedTreeControl<TaxonNode>((node) => node.children);
     dataSource = new MatTreeNestedDataSource<TaxonNode>()
     dataChange = new BehaviorSubject<TaxonNode[]>([])
@@ -61,7 +61,6 @@ export class TaxaProfilerEntryPage implements OnInit {
     possibleTaxons  = []
 
     constructor(
-        //private readonly userService: UserService,  // TODO: needed for species hiding
         private readonly taxaService: TaxonService,
         private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
         private readonly taxonomicStatusService: TaxonomicStatusService,
@@ -152,6 +151,11 @@ export class TaxaProfilerEntryPage implements OnInit {
         })
         this.taxonomicAuthorityList.sort(function (a, b) {
             return (a.id > b.id ? 1 : -1)
+        })
+        this.taxonomicAuthorityList.forEach((authority) => {
+            if (authority.isPrimay) {
+                this.taxonomicAuthorityID = authority.id
+            }
         })
     }
 

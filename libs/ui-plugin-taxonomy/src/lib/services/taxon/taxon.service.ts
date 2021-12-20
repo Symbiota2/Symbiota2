@@ -50,10 +50,6 @@ export class TaxonService {
             .authorityID(authorityID)
             .scientificName(sciname)
             .build()
-        //const query = this.apiClient.queryBuilder(url).get().build()
-        //return this.apiClient.send<any, Record<string, unknown>>(query)
-        //    .pipe(map((o) => Taxon[].fromJSON(o)))
-
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, Taxon[]>(query)
     }
@@ -91,6 +87,7 @@ export class TaxonService {
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, TaxonIDAndNameItem[]>(query)
     }
+
 
     findAllScientificNamesPlusAuthors(partialName, authorityID?): Observable<string[]> {
         const url = this.createQueryBuilder()

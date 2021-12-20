@@ -10,7 +10,6 @@ import {
 import { TranslateService } from '@ngx-translate/core'
 import { MatDialog } from '@angular/material/dialog';
 
-
 @Component({
     selector: 'taxon-editor',
     templateUrl: './taxon-editor-page.html',

@@ -12,11 +12,21 @@ interface FindAllParams {
 
 @Injectable()
 export class TaxonomicAuthorityService {
-    currentAuthorityID = null
+    currentAuthorityID = 1 // Constructor will overwrite with primary authority id
 
     constructor(
         private readonly apiClient: ApiClientService,
-        private readonly appConfig: AppConfigService) { }
+        private readonly appConfig: AppConfigService)
+    {
+        // Set current taxonomic authority to default one
+        this.findAll().subscribe((authorities) => {
+            authorities.forEach((authority) => {
+                if (authority.isPrimary) {
+                    this.currentAuthorityID = authority.id
+                }
+            })
+        })
+    }
 
     private createQueryBuilder(): TaxonomicAuthorityQueryBuilder {
         return new TaxonomicAuthorityQueryBuilder(this.appConfig.apiUri());

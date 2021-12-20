@@ -431,13 +431,13 @@ export class TaxonService extends BaseService<Taxon>{
     getAllTaxonomicUploadFields(): string[] {
         const entityColumns = this.taxonRepo.metadata.columns
         const statusColumns = this.statusRepo.metadata.columns
-        const vernacularColumns = this.vernacularRepo.metadata.columns
-        const rankColumns = this.rankRepo.metadata.columns
+        //const vernacularColumns = this.vernacularRepo.metadata.columns
+        //const rankColumns = this.rankRepo.metadata.columns
         const artificialColumns = ["AcceptedTaxonName", "ParentTaxonName", "RankName"]
         const allColumns = entityColumns
             .concat(statusColumns)
-            .concat(vernacularColumns)
-            .concat(rankColumns)
+            //.concat(vernacularColumns)
+            //.concat(rankColumns)
         return this.eliminateDuplicates(allColumns.map((c) => c.propertyName).concat(artificialColumns))
     }
 
@@ -486,14 +486,14 @@ export class TaxonService extends BaseService<Taxon>{
         return upload;
     }
 
-    async patchUploadFieldMap(id: number, uniqueIDField: string, fieldMap: TaxonomyUploadFieldMap): Promise<TaxonomyUpload> {
+    async patchUploadFieldMap(id: number, /*uniqueIDField: string,*/ fieldMap: TaxonomyUploadFieldMap): Promise<TaxonomyUpload> {
         const upload = await this.uploadRepo.findOne(id);
         if (!upload) {
             return null;
         }
         await this.uploadRepo.save({
             ...upload,
-            uniqueIDField,
+            //uniqueIDField,
             fieldMap
         });
         return upload;
@@ -506,6 +506,147 @@ export class TaxonService extends BaseService<Taxon>{
     async deleteUploadByID(id: number): Promise<boolean> {
         const upload = await this.uploadRepo.delete({ id });
         return upload.affected > 0;
+    }
+
+    /**
+     * @return List of strings with problem parent names and a count of null parent
+     */
+    async taxonCheck(
+        csvFile: string,
+        sciNameField: string,
+        parentNameField: string,
+        acceptedNameField: string,
+        kingdomNameField: string,
+        rankNameField: string
+    ): Promise<{
+        problemScinames: string[],
+        problemAcceptedNames: string[],
+        problemParentNames: string[],
+        problemRanks: string[],
+        nullSciNames: number,
+        nullParentNames: number,
+        nullKingdomNames: number,
+        nullAcceptedNames: number,
+        nullRankNames: number,
+        totalRecords: number
+    }> {
+        const taxons  = new Set()
+        const parentTaxons  = new Set()
+        const acceptedTaxons  = new Set()
+        const ranks : Set<string> = new Set()
+        let nullSciNames = 0
+        let nullParentNames = 0
+        let nullAcceptedNames = 0
+        let nullKingdomNames = 0
+        let nullRankNames = 0
+        let totalRecords = 0
+
+        try {
+            for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
+                for (const row of batch) {
+                    totalRecords += 1
+
+                    // Check rank and kingdom name
+
+                    if (row[rankNameField] && row[kingdomNameField]) {
+                        const rankVal = row[rankNameField] + ""
+                        const kingdomVal = row[kingdomNameField] + ""
+                        ranks.add(kingdomVal.trim() + ":" + rankVal.trim())
+                    }
+                    if (!row[rankNameField]) {
+                        nullRankNames += 1
+                    }
+                    if (!row[kingdomNameField]) {
+                        nullKingdomNames += 1
+                    }
+
+                    // Check scientific name
+                    let fieldVal = null
+                    if (row[sciNameField]) {
+                        fieldVal = row[sciNameField] + ""
+                        taxons.add(fieldVal.trim())
+                    }
+                    else {
+                        nullSciNames += 1
+                    }
+
+                    // Check parent name
+                    if (row[parentNameField]) {
+                        fieldVal = row[parentNameField] + ""
+                        parentTaxons.add(fieldVal.trim())
+                    }
+                    else {
+                        nullParentNames += 1
+                    }
+
+                    // Check accepted name
+                    if (row[acceptedNameField]) {
+                        fieldVal = row[acceptedNameField] + ""
+                        acceptedTaxons.add(fieldVal.trim())
+                    }
+                    else {
+                        nullAcceptedNames += 1
+                    }
+
+                }
+            }
+        } catch (e) {
+            throw new Error('Error parsing CSV')
+        }
+
+        const problemParentNames = []
+        //const problemScinames = []
+        const problemAcceptedNames = []
+        const problemRanks = []
+
+        // Check to see if the parent names exist
+        for (let key of parentTaxons.keys()) {
+            if (!taxons.has(key)) {
+                // Need to check name
+                const taxons = await this.taxonRepo.find({ where: { scientificName: key } })
+                if (taxons.length == 0) {
+                    problemParentNames.push(key)
+                }
+            }
+        }
+
+        // Check to see if accepted names exist
+        for (let key of acceptedTaxons.keys()) {
+            if (!taxons.has(key)) {
+                // Need to check name
+                const taxons = await this.taxonRepo.find({ where: { scientificName: key } })
+                if (taxons.length == 0) {
+                    problemAcceptedNames.push(key)
+                }
+            }
+        }
+
+        // Get all the taxon and class names
+        const allRanks = await this.rankRepo.find()
+        const both = new Set()
+        allRanks.forEach((rank) => {
+            both.add(rank.kingdomName + ":" + rank.rankName)
+        })
+
+        // Check to see if the kingdom and rank names exist
+        for (let key of ranks.keys()) {
+            if (!both.has(key)) {
+                problemRanks.push(key)
+            }
+        }
+
+        return {
+            problemScinames: [],
+            problemAcceptedNames: [],
+            problemParentNames: [],
+            problemRanks: [],
+            nullSciNames: nullSciNames,
+            nullParentNames: nullParentNames,
+            nullKingdomNames: nullKingdomNames,
+            nullAcceptedNames: nullAcceptedNames,
+            nullRankNames: nullRankNames,
+            totalRecords: totalRecords
+        }
     }
 
     /**
@@ -552,7 +693,20 @@ export class TaxonService extends BaseService<Taxon>{
     }
 
     async startUpload(uid: number, authorityID: number, uploadID: number): Promise<void> {
-        await this.uploadQueue.add({ uid, authorityID, uploadID });
+        await this.uploadQueue.add({
+            uid: uid,
+            authorityID: authorityID,
+            uploadID: uploadID,
+            taxonUpdates : [],
+            skippedTaxonsDueToMulitpleMatch: [],
+            skippedTaxonsDueToMismatchRank: [],
+            skippedTaxonsDueToMissingName: [],
+            statusUpdates : [],
+            skippedStatusesDueToMultipleMatch: [],
+            skippedStatusesDueToAcceptedMismatch: [],
+            skippedStatusesDueToParentMismatch: [],
+            skippedStatusesDueToTaxonMismatch: []
+            })
     }
 
     /**

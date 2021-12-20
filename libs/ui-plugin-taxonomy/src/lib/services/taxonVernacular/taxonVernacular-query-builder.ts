@@ -114,7 +114,7 @@ class FindByCommonNameBuilder extends TaxonVernacularQueryBuilder {
     constructor(apiBaseUrl: string, name: string) {
         super(apiBaseUrl)
         this.baseUrl = apiBaseUrl
-        this.url = new URL(`${apiBaseUrl}/taxonVernacular/byCommonName/${name}`)
+        this.url = new URL(`${apiBaseUrl}/taxonVernacular/commonName/${name}`)
     }
 
     authorityID(authorityID: number): FindByCommonNameBuilder {

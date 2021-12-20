@@ -1,24 +1,26 @@
-<div>
-    <h1>{{ "taxon.editor.title" | translate }} - {{taxonName}}</h1>
+<div id='main'>
+    <div>
+        <h1>{{ "taxon.editor.title" | translate }} - {{taxonName}}</h1>
+    </div>
+
+    <mat-tab-group mat-align-tabs="start">
+        <mat-tab label="{{'taxon.editor.descriptionBlock' | translate}}">
+            <taxon-description-editor></taxon-description-editor>
+        </mat-tab>
+        <mat-tab label="{{'taxon.editor.taxon' | translate}}">
+            <taxon-taxon-editor></taxon-taxon-editor>
+        </mat-tab>
+        <mat-tab label="{{'taxon.editor.common' | translate}}">
+            <taxon-vernacular-editor></taxon-vernacular-editor>
+        </mat-tab>
+        <mat-tab label="{{'taxon.editor.taxonomicStatus' | translate}}">
+            <taxon-status-editor></taxon-status-editor>
+        </mat-tab>
+        <mat-tab label="{{'taxon.editor.images' | translate}}">
+
+        </mat-tab>
+        <mat-tab label="{{'taxon.editor.delete' | translate}}">
+
+        </mat-tab>
+    </mat-tab-group>
 </div>
-
-<mat-tab-group mat-align-tabs="start">
-    <mat-tab label="{{'taxon.editor.descriptionBlock' | translate}}">
-        <taxon-description-editor></taxon-description-editor>
-    </mat-tab>
-    <mat-tab label="{{'taxon.editor.taxon' | translate}}">
-        <taxon-taxon-editor></taxon-taxon-editor>
-    </mat-tab>
-    <mat-tab label="{{'taxon.editor.common' | translate}}">
-        <taxon-vernacular-editor></taxon-vernacular-editor>
-    </mat-tab>
-    <mat-tab label="{{'taxon.editor.taxonomicStatus' | translate}}">
-        <taxon-status-editor></taxon-status-editor>
-    </mat-tab>
-    <mat-tab label="{{'taxon.editor.images' | translate}}">
-
-    </mat-tab>
-    <mat-tab label="{{'taxon.editor.delete' | translate}}">
-
-    </mat-tab>
-</mat-tab-group>

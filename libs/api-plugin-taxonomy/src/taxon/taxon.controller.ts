@@ -165,10 +165,12 @@ export class TaxonController {
     ): Promise<TaxonDto[]> {
         const taxons = await this.taxa.findByScientificName(sciname, findNamesParams)
         if (!taxons) {
-            throw new NotFoundException()
-        } else if (taxons.length == 0) {
-            throw new NotFoundException()
+            //throw new NotFoundException()
+            return []  // returns emptylist if not found
+        } /*else if (taxons.length == 0) {
+            //throw new NotFoundException()
         }
+        */
         const dto = taxons.map((taxon) => new TaxonDto(taxon))
         return dto
     }
@@ -374,19 +376,41 @@ export class TaxonController {
     async mapTaxonUpload(
         //@Query() query: CollectionIDQueryParam,
         @Param('id') id: number,
-        @Body() body: TaxonHeaderMapBody): Promise<{ newRecords: number, updatedRecords: number, nullRecords: number }> {
+        @Body() body: TaxonHeaderMapBody
+    ): Promise<{
+        problemScinames: string[],
+        problemAcceptedNames: string[],
+        problemParentNames: string[],
+        problemRanks: string[],
+        nullSciNames: number,
+        nullParentNames: number,
+        nullKingdomNames: number,
+        nullAcceptedNames: number,
+        nullRankNames: number,
+        totalRecords: number
+    }> {
 
         const upload = await this.taxa.patchUploadFieldMap(
             id,
-            //1, // [TODO fix taxonomic authority id]
-            body.uniqueIDField,
-            body.fieldMap as Record<string, keyof Occurrence>
+            //body.uniqueIDField,
+            body.fieldMap as Record<string, /*keyof Occurrence*/ string>
         )
 
         if (!upload) {
             throw new NotFoundException()
         }
 
+        const problemsFound = await this.taxa.taxonCheck(
+            upload.filePath,
+            body.fieldMap["scientificName"],
+            body.fieldMap["ParentTaxonName"],
+            body.fieldMap["AcceptedTaxonName"],
+            body.fieldMap["kingdomName"],
+            body.fieldMap["RankName"])
+
+        return problemsFound
+
+        /*
         const csvUniqueIDs = await this.taxa.countCSVNonNull(
             upload.filePath,
             body.uniqueIDField
@@ -406,6 +430,7 @@ export class TaxonController {
             updatedRecords: dbUniqueIDs,
             nullRecords: csvUniqueIDs.nulls
         };
+         */
     }
 
     @Post('upload/:id/:authorityID/start')

@@ -53,6 +53,52 @@ export async function* csvIterator<RowType>(filePath: string, bufSize = DEFAULT_
     yield rowBuffer;
 }
 
+/*
+When you want to trim the extra whitespace before and after *all* values in a CSV file use this iterator
+ */
+export async function* csvIteratorWithTrimValues<RowType>(filePath: string, bufSize = DEFAULT_ITER_ROWS) {
+    let rowBuffer: RowType[] = [];
+    const stream = fs.createReadStream(filePath).pipe(csv({
+        mapValues: ({ header, index, value }) => value.trim()
+    }));
+
+    for await (const row of stream) {
+        if (rowBuffer.length >= bufSize) {
+            stream.pause();
+            yield rowBuffer;
+            rowBuffer = [];
+            stream.resume();
+        }
+        else {
+            rowBuffer.push(row);
+        }
+    }
+    yield rowBuffer;
+}
+
+/*
+Iterators through a file of JSON objects
+ */
+export async function* objectIterator<RowType>(filePath: string, bufSize = DEFAULT_ITER_ROWS) {
+    let rowBuffer: RowType[] = []
+    const stream = fs.createReadStream(filePath)
+
+    for await (const row of stream) {
+        const obj = JSON.parse(row)
+        if (rowBuffer.length >= bufSize) {
+            stream.pause()
+            yield rowBuffer
+            rowBuffer = []
+            stream.resume()
+        }
+        else {
+            rowBuffer.push(obj)
+        }
+    }
+
+    yield rowBuffer
+}
+
 export function withTempDir<T>(baseDir: string, cb: InsideTempDirCallback<T>) {
     fsPromises.mkdtemp(pathJoin(baseDir, 'tmp-')).then((tmpDir) => {
         return cb(tmpDir).finally(() => {

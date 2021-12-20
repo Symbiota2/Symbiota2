@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { combineLatest, merge } from 'rxjs';
-import { TaxonService } from '@symbiota2/ui-plugin-taxonomy';
+import { TaxonomicAuthorityService, TaxonService } from '@symbiota2/ui-plugin-taxonomy';
 import { TaxonomyUploadService } from '../../services/taxonomyUpload/taxonomy-upload.service';
 import { TAXA_UPLOADER_FIELD_MAP_ROUTE } from '../../routes';
 import { Q_PARAM_AUTHORITYID } from '../../../constants';
@@ -16,7 +16,7 @@ import { Q_PARAM_AUTHORITYID } from '../../../constants';
 })
 export class TaxonomyUploadPage implements OnInit {
     private static readonly Q_PARAM_PAGE = 'page'
-    taxonomicAuthorityID = 27
+    taxonomicAuthorityID = 27 // Default set in nginit
     fileInput = new FormControl(null)
     userID : number = null
     userCanEdit: boolean = false
@@ -24,6 +24,7 @@ export class TaxonomyUploadPage implements OnInit {
     constructor(
         private readonly userService: UserService,
         private readonly taxaService: TaxonService,
+        private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
         private readonly alerts: AlertService,
         private readonly router: Router,
         private readonly currentRoute: ActivatedRoute,
@@ -31,6 +32,8 @@ export class TaxonomyUploadPage implements OnInit {
 
     ngOnInit(): void {
         const qParams = this.currentRoute.snapshot.queryParamMap
+
+        this.taxonomicAuthorityID = this.taxonomicAuthorityService.getAuthorityID()
 
         this.userService.currentUser
             .pipe(filter((user) => user !== null))

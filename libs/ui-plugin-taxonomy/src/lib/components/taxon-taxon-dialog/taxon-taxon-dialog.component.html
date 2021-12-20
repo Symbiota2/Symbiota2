@@ -1,4 +1,3 @@
-<!-- <h1 mat-dialog-title>Row Action :: <strong>{{action}}</strong></h1> -->
 <div mat-dialog-content>
         <form *ngIf="action == 'Update'; else elseTemplate" class="name-autocomplete-form">
 
@@ -48,12 +47,19 @@
             </mat-form-field>
 
             <mat-form-field appearance="fill">
-                <mat-label>{{'taxon.taxon.editor.rankID' | translate}}</mat-label>
+                <mat-label>{{'taxon.taxon.editor.rankName' | translate}}</mat-label>
+                <!--
                 <input matInput
                        maxlength="3"
                        [value]="local_data.rankID"
                        [(ngModel)]="local_data.rankID"
                        [ngModelOptions]="{standalone: true}">
+                       -->
+                <mat-select [(ngModel)]="rankID" [ngModelOptions]="{standalone: true}">
+                    <mat-option [value]="rankID" *ngFor="let rank of rankNames" [value]="rank.id">
+                        {{rank.name}}
+                    </mat-option>
+                </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="fill">
@@ -67,11 +73,19 @@
 
             <mat-form-field appearance="fill">
                 <mat-label>{{'taxon.taxon.editor.phyloSortSequence' | translate}}</mat-label>
-                <input matInput
-                       maxlength="100"
+                <!-- <input matInput
+                       [formControl]='sortSequence'
                        [value]="local_data.phyloSortSequence"
                        [(ngModel)]="local_data.phyloSortSequence"
-                       [ngModelOptions]="{standalone: true}">
+                       >
+                -->
+                <input matInput
+                       [formControl]='sortSequence'
+                >
+                <div *ngIf="sortSequence.invalid && (sortSequence.dirty || sortSequence.touched)"
+                     >
+                <mat-error *ngIf="sortSequence.invalid">Not a valid number</mat-error>
+                </div>
             </mat-form-field>
 
             <mat-form-field appearance="fill">

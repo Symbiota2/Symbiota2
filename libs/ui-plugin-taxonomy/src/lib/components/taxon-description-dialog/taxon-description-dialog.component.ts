@@ -1,4 +1,3 @@
-//dialog-box.component.ts
 import { Component, Inject, Optional } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { CommonNameInfo } from '../taxon-vernacular-editor/taxon-vernacular-editor.component';

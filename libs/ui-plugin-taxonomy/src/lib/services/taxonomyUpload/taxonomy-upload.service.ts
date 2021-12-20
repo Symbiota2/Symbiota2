@@ -13,7 +13,7 @@ import {
     ApiClientService,
     AppConfigService, UserService
 } from '@symbiota2/ui-common';
-import { TaxonService } from '@symbiota2/ui-plugin-taxonomy';
+import { TaxonomicAuthorityService, TaxonService } from '@symbiota2/ui-plugin-taxonomy';
 import { TaxonQueryBuilder } from '../taxon/taxon-query-builder';
 
 export interface ApiTaxonomyUpload {
@@ -23,7 +23,7 @@ export interface ApiTaxonomyUpload {
 
 @Injectable()
 export class TaxonomyUploadService {
-    taxonomicAuthorityID = 1 // [TODO Fetch isPrimary taxanomic authority
+    taxonomicAuthorityID = 1 // Value will be set in the constructor
 
     private readonly jwtToken = this.user.currentUser.pipe(
         map((user) => user.token)
@@ -55,7 +55,11 @@ export class TaxonomyUploadService {
         private readonly api: ApiClientService,
         private readonly alerts: AlertService,
         private readonly user: UserService,
-        private readonly taxaService: TaxonService) { }
+        private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
+        private readonly taxaService: TaxonService
+    ) {
+        this.taxonomicAuthorityID = this.taxonomicAuthorityService.getAuthorityID()
+    }
 
     setUploadID(id: number): void {
         const url = this.createUrlBuilder().upload().id(id).build();
@@ -131,7 +135,7 @@ export class TaxonomyUploadService {
         )
     }
 
-    patchFieldMap(uniqueIDField: string) {
+    patchFieldMap(/*uniqueIDField: string*/) {
         return combineLatest([
             //this.taxonomicAuthorityID,
             this.jwtToken,
@@ -152,7 +156,7 @@ export class TaxonomyUploadService {
                     //.queryParam('taxonomicAuthorityID', authorityID)
                     .addJwtAuth(token)
                     .body({
-                        uniqueIDField: uniqueIDField,
+                        //uniqueIDField: uniqueIDField,
                         fieldMap: upload.fieldMap
                     })
                     .build();

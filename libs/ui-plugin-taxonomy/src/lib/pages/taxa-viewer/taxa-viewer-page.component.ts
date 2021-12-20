@@ -43,7 +43,7 @@ export class TaxaViewerPageComponent implements OnInit {
     kindOfName = "Scientific"
     languageList = []
     taxonomicAuthorityList = []
-    taxonomicAuthorityID = 1 // Set the default taxa authority id
+    taxonomicAuthorityID = 1 // Default taxa authority is set in nginit
     treeControl = new NestedTreeControl<TaxonNode>((node) => node.children);
     dataSource = new MatTreeNestedDataSource<TaxonNode>()
     dataChange = new BehaviorSubject<TaxonNode[]>([])
@@ -61,7 +61,6 @@ export class TaxaViewerPageComponent implements OnInit {
     possibleTaxons  = []
 
     constructor(
-        //private readonly userService: UserService,  // TODO: needed for species hiding
         private readonly taxaService: TaxonService,
         private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
         private readonly taxonomicStatusService: TaxonomicStatusService,
@@ -147,10 +146,15 @@ export class TaxaViewerPageComponent implements OnInit {
     public loadAuthorities() {
         this.taxonomicAuthorityService.findAll()
             .subscribe((authorities) => {
-            this.taxonomicAuthorityList = authorities
-        })
-        this.taxonomicAuthorityList.sort(function (a, b) {
-            return (a.id > b.id ? 1 : -1)
+                this.taxonomicAuthorityList = authorities
+                this.taxonomicAuthorityList.sort(function (a, b) {
+                    return (a.id > b.id ? 1 : -1)
+                })
+                this.taxonomicAuthorityList.forEach((authority) => {
+                    if (authority.isPrimay) {
+                        this.taxonomicAuthorityID = authority.id
+                    }
+                })
         })
     }
 
@@ -211,7 +215,7 @@ export class TaxaViewerPageComponent implements OnInit {
     }
 
     /*
-    Find the children and ancestors for the given sciname
+    Find the children and ancestors for the given taxonID
      */
     private buildTree(taxonID: number) {
         let children = []
@@ -220,7 +224,6 @@ export class TaxaViewerPageComponent implements OnInit {
         this.looking = true
         // Look up the scientific name first
         this.taxaService.findByID(taxonID)
-        //this.taxaService.findScientificName(sciname.trim(),this.taxonomicAuthorityID)
             .subscribe((taxon) => {
                 if (taxon) {
                     this.taxon = taxon
@@ -346,6 +349,7 @@ export class TaxaViewerPageComponent implements OnInit {
                         })
                 } else {
                     // No taxon found, show error message
+                    console.log("no taxon found")
                     this.nameFound = false
                 }
 
@@ -484,7 +488,7 @@ export class TaxaViewerPageComponent implements OnInit {
                                     synonym: false,
                                     children: []
                                 }
-                              this.possibleTaxons.push(taxonItem)
+                                this.possibleTaxons.push(taxonItem)
                             })
                     })
                 } else {
@@ -507,9 +511,7 @@ export class TaxaViewerPageComponent implements OnInit {
                         this.nameFound = false
                     }
                 }
-
-
-        })
+            })
     }
 
     /*
@@ -528,47 +530,36 @@ export class TaxaViewerPageComponent implements OnInit {
     Expand a node in the tree by finding its children
      */
     private findChildren(node: TaxonNode) {
-
         let childrenTids  = []
 
-        // Match the name to a taxon id
-        //this.taxaService.findScientificName(node.name,
-        //    this.taxonomicAuthorityID).subscribe((taxon) => {
+        // The status table has the direct parent, so lookup its children there
+        this.taxonomicStatusService.findChildren(node.taxonID,
+            this.taxonomicAuthorityID).subscribe((taxonStatus) => {
 
-            // The status table has the direct parent, so lookup its children there
-            this.taxonomicStatusService.findChildren(node.taxonID,
-                this.taxonomicAuthorityID).subscribe((taxonStatus) => {
+            // For each one found, add its list of taxon ids to the children list
+            taxonStatus.forEach(function(rec) {
+                childrenTids = childrenTids.concat(rec.taxonID.toString())
+            })
 
-                // For each one found, add its list of taxon ids to the children list
-                // TODO: should this be just one, due to taxa authority id?
-                taxonStatus.forEach(function(rec) {
-                    childrenTids = childrenTids.concat(rec.taxonID.toString())
-                })
+            // Check to see if there are any children
+            if (childrenTids.length == 0) {
+                // There are no children (current node is a leaf node)
+                // Mark that current node should be expanded to show children
+                node.expanded = true
 
-                // Check to see if there are any children
-                if (childrenTids.length == 0) {
-                    // There are no children (current node is a leaf node)
-                    // Mark that current node should be expanded to show children
-                    node.expanded = true
+                // Redraw the tree and exit
+                this.refreshTree()
+                return
+            }
 
-                    // Redraw the tree and exit
-                    this.refreshTree()
-                    return
-                }
+            // Need to build up list of children names
+            let children = []
 
-                // Need to build up list of children names
-                let children = []
-
-                // Look up the names by their ids
-                this.taxaService
-                    .findAll(this.taxonomicAuthorityID,{ taxonIDs: childrenTids })
-                    .subscribe((t) => {
-                        /*
-                    t.forEach(function(r) {
-                        children.push(r.scientificName)
-                    })
-                         */
-                        children = t
+            // Look up the names by their ids
+            this.taxaService
+                .findAll(this.taxonomicAuthorityID,{ taxonIDs: childrenTids })
+                .subscribe((t) => {
+                    children = t
 
                     // Sort and format the children as tree nodes
                     const childrenTree = []
@@ -587,11 +578,10 @@ export class TaxaViewerPageComponent implements OnInit {
                     node.children = childrenTree
                     node.expanded = true
 
-                        // Refresh the tree
+                    // Refresh the tree
                     this.refreshTree()
                 })
-            })
-        //})
+        })
     }
 
     /*
@@ -608,7 +598,6 @@ export class TaxaViewerPageComponent implements OnInit {
             this.taxonomicEnumTreeService.findDescendants(taxon.id, this.taxonomicAuthorityID).subscribe((taxonET) => {
 
                 // For each one found, add its list of taxon ids to the children list
-                // TODO: should this be just one, due to taxa authority id?
                 taxonET.forEach(function(rec) {
                     descTids = descTids.concat(rec.taxonID.toString())
                 })
@@ -657,27 +646,6 @@ export class TaxaViewerPageComponent implements OnInit {
                         // Next build tree
                         this.fillInDescendants(taxon.id, myMap, nodeMap)
 
-                        /*
-                        // Sort and format the children as tree nodes
-                        const childrenTree = []
-                        children.sort((a,b) => a.scientificName - b.scientificName).forEach((item) => {
-                            //console.log(" what is name " + item.scientificName)
-                            const baseNode: TaxonNode = {
-                                name: item.scientificName,
-                                taxonID: item.id,
-                                author: item.author,
-                                expanded: false,
-                                synonym: false,
-                                children: [] }
-                            childrenTree.push(baseNode)
-                        })
-
-                        // Update the current node with its new children
-                        node.children = childrenTree
-                        node.expanded = true
-
-
-                         */
                         // Refresh the tree
                         this.refreshTree()
 

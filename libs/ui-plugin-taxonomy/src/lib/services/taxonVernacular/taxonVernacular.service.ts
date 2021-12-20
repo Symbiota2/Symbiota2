@@ -34,6 +34,7 @@ export class TaxonVernacularService {
         return this.apiClient.apiRoot()
     }
 
+    /*
     findCommonName(name: string, authorityID?: number): Observable<TaxonVernacularListItem> {
         const url = this.createQueryBuilder()
             .findCommonName(name)
@@ -42,6 +43,7 @@ export class TaxonVernacularService {
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, TaxonVernacularListItem>(query)
     }
+     */
 
     findByCommonName(name: string, authorityID?: number): Observable<TaxonVernacularListItem[]> {
         const url = this.createQueryBuilder()
