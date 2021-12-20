@@ -146,15 +146,15 @@ export class TaxaViewerPageComponent implements OnInit {
     public loadAuthorities() {
         this.taxonomicAuthorityService.findAll()
             .subscribe((authorities) => {
-            this.taxonomicAuthorityList = authorities
-        })
-        this.taxonomicAuthorityList.sort(function (a, b) {
-            return (a.id > b.id ? 1 : -1)
-        })
-        this.taxonomicAuthorityList.forEach((authority) => {
-            if (authority.isPrimay) {
-                this.taxonomicAuthorityID = authority.id
-            }
+                this.taxonomicAuthorityList = authorities
+                this.taxonomicAuthorityList.sort(function (a, b) {
+                    return (a.id > b.id ? 1 : -1)
+                })
+                this.taxonomicAuthorityList.forEach((authority) => {
+                    if (authority.isPrimay) {
+                        this.taxonomicAuthorityID = authority.id
+                    }
+                })
         })
     }
 

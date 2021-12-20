@@ -37,17 +37,9 @@
                 <mat-label>{{'taxon.editor.common.sortSequence' | translate}}</mat-label>
                 <input matInput
                        maxlength="3"
-                       size='3'
-                       pattern="/\d{1,3}/"
-                       #numbererror="ngModel"
                        [value]="local_data.sortSequence"
                        [(ngModel)]="local_data.sortSequence"
-                       [ngModelOptions]="{standalone: true, updateOn: 'blur'}">
-                <div *ngIf="numbererror.invalid && (numbererror.dirty || numbererror.touched)">
-                    <div *ngIf="numbererror.errors.pattern">
-                        <span style="background-color: red">Only Numbers allowed </span>
-                    </div>
-                </div>
+                       [ngModelOptions]="{standalone: true}">
             </mat-form-field>
             <!--
             <mat-form-field class="name-autocomplete-full-width">

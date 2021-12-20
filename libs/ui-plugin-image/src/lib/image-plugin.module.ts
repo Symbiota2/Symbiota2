@@ -64,7 +64,6 @@ import { FilterPipe } from './pages/image-search/filter.pipe';
     SymbiotaComponentModule
   ],
     declarations: [
-//        TaxaSearchPage,
         ImageSearchPageComponent,
         ImageLibraryPageComponent,
         ImageDetailsPageComponent,
@@ -74,7 +73,6 @@ import { FilterPipe } from './pages/image-search/filter.pipe';
         ImageService,
     ],
     entryComponents: [
-//        TaxaSearchPage,
         ImageSearchPageComponent,
         ImageLibraryPageComponent,
         ImageDetailsPageComponent
