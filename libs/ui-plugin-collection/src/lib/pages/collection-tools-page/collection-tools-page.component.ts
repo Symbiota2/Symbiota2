@@ -3,8 +3,8 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
-import { Observable } from 'rxjs';
-import { map, switchMap, take, tap } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { CollectionEditorComponent } from '../../components/collection-editor/collection-editor.component';
 import { CollectionPermissionsComponent } from '../../components/collection-permissions/collection-permissions.component';
 import { DwcPublishingComponent } from '../../components/dwc-publishing/dwc-publishing.component';
@@ -17,6 +17,7 @@ import { DwcPublishingComponent } from '../../components/dwc-publishing/dwc-publ
 export class CollectionToolsPage implements OnInit {
     private static readonly ROUTE_PARAM_COLLID = 'collectionID';
 
+    private subscriptions: Subscription = new Subscription();
 
     static collectionTools: Map<string, Component> = new Map()
         .set('Edit Collection', CollectionEditorComponent)
@@ -30,7 +31,7 @@ export class CollectionToolsPage implements OnInit {
     //TODO: rework into observable
     selectedContent: Component;
 
-    collection: Collection;
+    collection$: Observable<Collection>;
 
     constructor(
         private readonly users: UserService,
@@ -41,17 +42,22 @@ export class CollectionToolsPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.validateCollection().subscribe((collection) => {
-            if (!!collection) {
-                this.collection = collection;
-                this.selectedContent = CollectionToolsPage.collectionTools.get(
-                    'Edit Collection'
-                );
-            }
-        });
+        this.collection$ = this.validateCollection();
 
+        this.subscriptions.add(
+            this.validateCollection().subscribe((collection) => {
+                if (!!collection) {
+                    this.selectedContent = CollectionToolsPage.collectionTools.get(
+                        'Edit Collection'
+                    );
+                }
+            })
+        );
     }
 
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
+    }
 
     setContentView(key: string): void {
         this.selectedContent = CollectionToolsPage.collectionTools.get(key);
@@ -59,7 +65,6 @@ export class CollectionToolsPage implements OnInit {
 
     private validateCollection(): Observable<Collection> {
         return this.currentRoute.paramMap.pipe(
-            take(1),
             map((params) => {
                 //confirm collection id in url is valid
                 return params.has(CollectionToolsPage.ROUTE_PARAM_COLLID)
@@ -71,8 +76,10 @@ export class CollectionToolsPage implements OnInit {
             switchMap((collectionID) => {
                 //grab collection$ based on id
                 this.collections.setCollectionID(collectionID);
-        
-                return this.collections.currentCollection.pipe(take(1));
+
+                return this.collections.currentCollection.pipe(
+                    filter((collection) => collection.id == collectionID)
+                );
             }),
             tap((collection) => {
                 //confirm collection exists if not send user to root

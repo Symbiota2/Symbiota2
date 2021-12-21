@@ -1,7 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, filter, first, map, switchMap, take, tap } from 'rxjs/operators';
-import { combineLatest, Observable, of, Subscription, throwError } from 'rxjs';
+import {
+    catchError,
+    filter,
+    first,
+    map,
+    switchMap,
+    take,
+    tap,
+} from 'rxjs/operators';
+import {
+    combineLatest,
+    forkJoin,
+    Observable,
+    of,
+    Subscription,
+    throwError,
+} from 'rxjs';
 import { CollectionService } from '../../services/collection.service';
 import {
     CollectionProfileLink,
@@ -30,7 +45,7 @@ export class CollectionPage implements OnInit {
 
     public collection$: Observable<Collection>;
 
-    private subscriptions: Subscription[] = [];
+    private subscriptions: Subscription = new Subscription();
 
     private comments_link: CollectionProfileLink;
 
@@ -52,7 +67,7 @@ export class CollectionPage implements OnInit {
     ngOnInit(): void {
         this.collection$ = this.getCollection();
 
-        this.subscriptions.push(
+        this.subscriptions.add(
             this.collection$.subscribe((collection) => {
                 this.geoReferencedPercent =
                     collection.collectionStats != null &&
@@ -77,18 +92,18 @@ export class CollectionPage implements OnInit {
                 this.links$ = this.getLinks();
 
                 this.canUserEdit()
-                    .subscribe((bool) => (this.isColAdmin = bool))
-                    .unsubscribe();
+                    .subscribe((bool) => (this.isColAdmin = bool));
             })
         );
     }
 
     ngOnDestroy(): void {
-        this.subscriptions.forEach(sub => sub.unsubscribe());
+        this.subscriptions.unsubscribe();
     }
 
     getCollection(): Observable<Collection> {
         return this.currentRoute.paramMap.pipe(
+            take(1),
             map((params) => {
                 return params.has(CollectionPage.ROUTE_PARAM_COLLID)
                     ? parseInt(params.get(CollectionPage.ROUTE_PARAM_COLLID))
@@ -98,7 +113,9 @@ export class CollectionPage implements OnInit {
                 console.log('getCollection: Collection ID: ', collectionID);
                 this.collections.setCollectionID(collectionID);
 
-                return this.collections.currentCollection;
+                return this.collections.currentCollection.pipe(
+                    filter((collection) => collection.id == collectionID)
+                );
             }),
             tap((collection) => {
                 if (collection === null) {
@@ -125,23 +142,18 @@ export class CollectionPage implements OnInit {
         );
     }
 
-    canUserEdit(): Observable<boolean> {
+    private canUserEdit(): Observable<boolean> {
         return combineLatest([
             this.userService.currentUser,
             this.collections.currentCollection,
         ]).pipe(
-            first(),
             map(([user, collection]) => {
-                console.error(
-                    'canUserEditCollection: Collection ID: ',
-                    collection.id
-                );
                 return (
                     !!user &&
                     !!collection &&
                     user.canEditCollection(collection.id)
                 );
-            }),
+            })
         );
     }
 
