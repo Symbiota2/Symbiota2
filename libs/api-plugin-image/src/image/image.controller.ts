@@ -1,8 +1,26 @@
-import { Controller, Get, Param, Query, Post, Body, HttpStatus, HttpCode, Delete, NotFoundException, Patch } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Param,
+    Query,
+    Post,
+    Body,
+    HttpStatus,
+    HttpCode,
+    Delete,
+    NotFoundException,
+    Patch,
+    UseInterceptors, UploadedFile, BadRequestException
+} from '@nestjs/common';
 import { ImageService } from './image.service'
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger'
 import { ImageDto } from './dto/ImageDto'
 import { ImageFindAllParams } from './dto/image-find-all.input.dto'
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiFileInput } from '@symbiota2/api-common'
+import { Express } from 'express';
+
+type File = Express.Multer.File
 
 @ApiTags('Image')
 @Controller('image')
@@ -59,6 +77,21 @@ export class ImageController {
         const image = await this.myService.findByID(id)
         const dto = new ImageDto(image)
         return dto
+    }
+
+    @Post('upload/storage/single')
+    @HttpCode(HttpStatus.CREATED)
+    @UseInterceptors(FileInterceptor('file'))
+    // @UseGuards(JwtAuthGuard)
+    @ApiOperation({ summary: "Upload an image file to storage service" })
+    @ApiFileInput('file')
+    // @UseGuards(SuperAdminGuard)
+    async uploadTaxaDwcA(@UploadedFile() file: File) {
+        if (!file.mimetype.startsWith('image/')) {
+            throw new BadRequestException('Invalid Image');
+        }
+
+        await this.myService.fromFile(file.path);
     }
 
 }
