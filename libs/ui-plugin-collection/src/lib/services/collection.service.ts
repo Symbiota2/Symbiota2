@@ -97,7 +97,6 @@ export class CollectionService {
                     this.userService.currentUser,
                     this.currentCollectionID,
                 ]).pipe(
-                    take(1),
                     filter(([currentUser, currentCollectionID]) => {
                         return currentUser !== null && currentCollectionID > 0;
                     }),
@@ -287,9 +286,9 @@ export class CollectionService {
      */
     updateCurrentCollection(collectionData: Partial<CollectionInputDto>): Observable<Boolean> {
         return combineLatest([this.userService.currentUser, this.currentCollection]).pipe(
-            take(1),
             map(([user, collection]) => {
                 console.log("updateCurrentCollection currentCollection: ", collection);
+                console.log("updateCurrentCollection updateCollection: ", collectionData);
                 if (!!user && !!collection && user.canEditCollection(collection.id)){
                     this.updateCollectionData.next(collectionData);
                     return true;
