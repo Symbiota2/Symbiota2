@@ -42,6 +42,10 @@ export class TaxonQueryBuilder {
         return new FindOneWithSynonymsBuilder(this.baseUrl)
     }
 
+    problemUploadRows(): ProblemUploadRowsBuilder {
+        return new ProblemUploadRowsBuilder(this.baseUrl)
+    }
+
     problemAcceptedNames(): ProblemAcceptedNamesBuilder {
         return new ProblemAcceptedNamesBuilder(this.baseUrl)
     }
@@ -104,6 +108,13 @@ class DeleteOneBuilder extends TaxonQueryBuilder {
 class ProblemAcceptedNamesBuilder extends TaxonQueryBuilder {
     build(): string {
         this.url.pathname = `${this.url.pathname}/upload/problemAcceptedNames`;
+        return super.build();
+    }
+}
+
+class ProblemUploadRowsBuilder extends TaxonQueryBuilder {
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/upload/problemRows`;
         return super.build();
     }
 }

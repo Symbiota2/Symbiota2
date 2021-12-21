@@ -17,6 +17,7 @@ import { csvIteratorWithTrimValues, objectIterator } from '@symbiota2/api-common
 import { TaxonService } from '../taxon/taxon.service';
 import { TaxonomicEnumTreeService } from '../taxonomicEnumTree/taxonomicEnumTree.service';
 import * as fs from 'fs';
+import { StorageService } from '@symbiota2/api-storage';
 
 export interface TaxonomyUploadJob {
     uid: number
@@ -61,7 +62,8 @@ export class TaxonomyUploadProcessor {
         private readonly statusRepo: Repository<TaxonomicStatus>,
         @Inject(TaxaEnumTreeEntry.PROVIDER_ID)
         private readonly taxaEnumTree: Repository<TaxaEnumTreeEntry>,
-        private readonly taxaEnumTreeService: TaxonomicEnumTreeService) { }
+        private readonly taxaEnumTreeService: TaxonomicEnumTreeService,
+        private readonly storageService: StorageService) { }
 
     // TODO: Wrap in a transaction? Right now each chunk goes straight to the database until a failure occurs
     @Process()
@@ -85,7 +87,7 @@ export class TaxonomyUploadProcessor {
         const fileMap = new Map()
         for await (const batch of csvIteratorWithTrimValues<DeepPartial<Taxon>>(upload.filePath)) {
             try {
-                await this.splitBatchByRank(kingdomAndRankToIDMap, fileMap, upload, batch);
+                await this.splitBatchByRank(kingdomAndRankToIDMap, fileMap, job, upload, batch);
             } catch (e) {
                 error = e;
                 break;
@@ -122,6 +124,7 @@ export class TaxonomyUploadProcessor {
             try {
                 await this.onCSVComplete(job.data.uid, job.data.authorityID)
                 // Update the job status
+                await this.writeBadRows(job)
                 upload.uniqueIDField = "done"
                 await this.uploads.save(upload)
             } catch (e) {
@@ -129,6 +132,41 @@ export class TaxonomyUploadProcessor {
             }
         }
     }
+
+    private async writeBadRows(job) {
+        await this.writeRows(job.data.skippedTaxonsDueToMultipleMatch, TaxonService.skippedTaxonsDueToMultipleMatchPath)
+        await this.writeRows(job.data.skippedTaxonsDueToMismatchRank, TaxonService.skippedTaxonsDueToMismatchRankPath)
+        await this.writeRows(job.data.skippedTaxonsDueToMissingName, TaxonService.skippedTaxonsDueToMissingNamePath)
+
+        // list of all the updates to do to status records
+        await this.writeRows(job.data.skippedStatusesDueToMultipleMatch, TaxonService.skippedStatusesDueToMultipleMatchPath)
+        await this.writeRows(job.data.skippedStatusesDueToAcceptedMismatch, TaxonService.skippedStatusesDueToAcceptedMismatchPath)
+        await this.writeRows(job.data.skippedStatusesDueToParentMismatch, TaxonService.skippedStatusesDueToParentMismatchPath)
+        await this.writeRows(job.data.skippedStatusesDueToTaxonMismatch, TaxonService.skippedStatusesDueToTaxonMismatchPath)
+    }
+
+    private async writeRows(a, path) {
+        await this.storageService.putData(TaxonService.s3Key(path), this.convertToCSV(a))
+    }
+
+    private convertToCSV(objArray) {
+        const array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray
+        let str = ''
+
+        for (let i = 0; i < array.length; i++) {
+            let line = ''
+            for (let index in array[i]) {
+                if (line != '') line += ','
+
+                line += array[i][index]
+            }
+
+            str += line + '\r\n'
+        }
+
+        return str
+    }
+
 
     private async processRankFile(key, job, upload) {
         for await (const batch of objectIterator<DeepPartial<Taxon>>(this.taxonFilesPath + key)) {
@@ -165,7 +203,7 @@ export class TaxonomyUploadProcessor {
      * @param batch - batch of taxon records
      * @return nothing
      */
-    private async splitBatchByRank(rankMap: Map<string, number>, fileMap : Map<number, any>,  upload: TaxonomyUpload, batch: DeepPartial<Taxon>[]) {
+    private async splitBatchByRank(rankMap: Map<string, number>, fileMap : Map<number, any>,  job, upload: TaxonomyUpload, batch: DeepPartial<Taxon>[]) {
         // We first need the kingdomName and the rankName fields
         let kingdomInRowName = null
         let rankInRowName = null
@@ -198,22 +236,18 @@ export class TaxonomyUploadProcessor {
             if (!rankMap.has(key)) {
                 // Error no rank for this row
                 this.logger.error(`Row is missing a matching rank and kingdom ${key} skipping...`)
-                throw new Error('No matching rank and kingdom name')
+                const skippedTaxonsDueToMismatchRank = job.data.skippedTaxonsDueToMismatchRank
+                if (skippedTaxonsDueToMismatchRank.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                    skippedTaxonsDueToMismatchRank.push(row)
+                }
+                continue
+                //throw new Error('No matching rank and kingdom name')
             }
             // Open the file if it does not exist
             const file = rankMap.get(key)
             try {
                 if (!fileMap.has(file)) {
                     let writeStream = fs.createWriteStream(this.taxonFilesPath + file)
-                    /*
-                    fs.open('./key','w', (err,fd) => {
-                        if (err) {
-                            this.logger.error("Could not open " + key)
-                        } else {
-                            fileMap.set(key, fd)
-                        }
-                    })
-                     */
                     fileMap.set(file,writeStream)
                 }
                 const writeStream = fileMap.get(file)

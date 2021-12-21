@@ -2,5 +2,76 @@
     <div>
         <h1>{{ "taxonomy.upload.complete.title" | translate }}</h1>
     </div>
-</div>
 
+    <button
+        mat-flat-button color='primary'
+        (click)='onSubmit()'
+    >
+        {{"taxonomy.uploader.complete.button" | translate}}
+    </button>
+    <div *ngIf='done'>
+        <div *ngIf="someSkipped; else noProblems">
+            <symbiota2-expansion-panel
+                *ngIf="skippedTaxonsDueToMissingName.length > 0"
+                expanded=false
+                label='{{"taxonomy.uploader.complete.taxons.missing.name" | translate}}'>
+        <pre>
+            {{skippedTaxonsDueToMissingName}}
+        </pre>
+            </symbiota2-expansion-panel>
+            <symbiota2-expansion-panel
+                *ngIf="skippedTaxonsDueToMismatchRank.length > 0"
+                expanded=false
+                label='{{"taxonomy.uploader.complete.taxons.mismatch.rank" | translate}}'>
+        <pre>
+            {{skippedTaxonsDueToMismatchRank}}
+        </pre>
+            </symbiota2-expansion-panel>
+            <symbiota2-expansion-panel
+                *ngIf="skippedTaxonsDueToMultipleMatch.length > 0"
+                expanded=false
+                label='{{"taxonomy.uploader.complete.taxons.multiple.matches" | translate}}'>
+        <pre>
+            {{skippedTaxonsDueToMultipleMatch}}
+        </pre>
+            </symbiota2-expansion-panel>
+            <symbiota2-expansion-panel
+                *ngIf="skippedStatusesDueToMultipleMatch.length > 0"
+                expanded=false
+                label='{{"taxonomy.uploader.complete.statuses.multiple.matches" | translate}}'>
+        <pre>
+            {{skippedStatusesDueToMultipleMatch}}
+        </pre>
+            </symbiota2-expansion-panel>
+            <symbiota2-expansion-panel
+                *ngIf="skippedStatusesDueToAcceptedMismatch.length > 0"
+                expanded=false
+                label='{{"taxonomy.uploader.complete.statuses.accepted.mismatches" | translate}}'>
+        <pre>
+            {{skippedStatusesDueToAcceptedMismatch}}
+        </pre>
+            </symbiota2-expansion-panel>
+            <symbiota2-expansion-panel
+                *ngIf="skippedStatusesDueToParentMismatch.length > 0"
+                expanded=false
+                label='{{"taxonomy.uploader.complete.statuses.parent.mismatches" | translate}}'>
+        <pre>
+            {{skippedStatusesDueToParentMismatch}}
+        </pre>
+            </symbiota2-expansion-panel>
+            <symbiota2-expansion-panel
+                *ngIf="skippedStatusesDueToTaxonMismatch.length > 0"
+                expanded=false
+                label='{{"taxonomy.uploader.complete.statuses.taxon.mismatches" | translate}}'>
+        <pre>
+            {{skippedStatusesDueToTaxonMismatch}}
+        </pre>
+            </symbiota2-expansion-panel>
+
+        </div>
+        <ng-template #noProblems>
+            {{"taxonomy.uploader.complete.all.processed" | translate}}
+        </ng-template>
+    </div>
+
+</div>

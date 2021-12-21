@@ -370,6 +370,12 @@ export class TaxonController {
         //return (await this.taxa.getStream(key)).toString()
     }
 
+    @Get('upload/problemRows')
+    @ApiOperation({ summary: 'Retrieve the problem rows in the upload' })
+    async getUploadProblemRows() : Promise<string[]> {
+        return this.taxa.getProblemUploadRows()
+    }
+
     @Get('upload/problemAcceptedNames')
     @ApiOperation({ summary: 'Retrieve the problem accepted names from the most recent upload' })
     async getUploadProblemAcceptedNames(): Promise<string[]> {

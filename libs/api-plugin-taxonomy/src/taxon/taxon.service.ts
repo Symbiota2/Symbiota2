@@ -26,10 +26,19 @@ export class TaxonService extends BaseService<Taxon>{
     private static readonly S3_PREFIX = 'taxon';
     private static readonly UPLOAD_CHUNK_SIZE = 1024;
     private static readonly LOGGER = new Logger(TaxonService.name);
-    private static readonly dataFolderPath = "data/uploads/taxa"
-    private static readonly problemParentNamesPath = TaxonService.dataFolderPath + "/problemParentNames"
-    private static readonly problemAcceptedNamesPath = TaxonService.dataFolderPath + "/problemAcceptedNames"
-    private static readonly problemRanksPath = TaxonService.dataFolderPath + "/problemRanks"
+    public static readonly dataFolderPath = "data/uploads/taxa"
+    public static readonly problemParentNamesPath = TaxonService.dataFolderPath + "/problemParentNames"
+    public static readonly problemAcceptedNamesPath = TaxonService.dataFolderPath + "/problemAcceptedNames"
+    public static readonly problemRanksPath = TaxonService.dataFolderPath + "/problemRanks"
+    public static readonly skippedTaxonsDueToMultipleMatchPath = TaxonService.dataFolderPath + "/taxonsMultipleMath"
+    public static readonly skippedTaxonsDueToMismatchRankPath = TaxonService.dataFolderPath + "/taxonsMismatch"
+    public static readonly skippedTaxonsDueToMissingNamePath = TaxonService.dataFolderPath + "/taxonsMissing"
+
+    // list of all the updates to do to status records
+    public static readonly skippedStatusesDueToMultipleMatchPath = TaxonService.dataFolderPath + "/statusesMultipleMatch"
+    public static readonly skippedStatusesDueToAcceptedMismatchPath = TaxonService.dataFolderPath + "/statusesAcceptedMismatch"
+    public static readonly skippedStatusesDueToParentMismatchPath = TaxonService.dataFolderPath + "/statusesParentMismatch"
+    public static readonly skippedStatusesDueToTaxonMismatchPath = TaxonService.dataFolderPath + "/statusesTaxonMismatch"
 
     constructor(
         @Inject(Taxon.PROVIDER_ID)
@@ -48,12 +57,12 @@ export class TaxonService extends BaseService<Taxon>{
         private readonly uploadCleanupQueue: Queue<TaxonomyUploadCleanupJob>,
         @InjectQueue(QUEUE_ID_TAXONOMY_UPLOAD)
         private readonly uploadQueue: Queue<TaxonomyUploadJob>,
-        private readonly storage: StorageService)
+        private readonly storageService: StorageService)
     {
         super(taxonRepo);
     }
 
-    private static s3Key(objectName: string): string {
+    public static s3Key(objectName: string): string {
         return [TaxonService.S3_PREFIX, objectName].join('/');
     }
 
@@ -191,7 +200,6 @@ export class TaxonService extends BaseService<Taxon>{
      * @see TaxonFindNamesParams
      */
     async findAllScientificNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
-        //console.log("Taxon service: finding scientific names")
         const { limit,...qParams } = params
 
         if (qParams.taxonAuthorityID) {
@@ -280,7 +288,6 @@ export class TaxonService extends BaseService<Taxon>{
      * @see TaxonFindNamesParams
      */
     async findGenusNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
-        //console.log("Taxon service: finding scientific names")
         const { limit,...qParams } = params
 
         if (qParams.taxonAuthorityID) {
@@ -513,10 +520,9 @@ export class TaxonService extends BaseService<Taxon>{
     }
 
     async getStream(key) {
-        const stream = await this.storage.getObject(key)
+        const stream = await this.storageService.getObject(key)
         const chunks = [];
         stream.on('data', (d) => chunks.push(d));
-        console.log( "dat is " + chunks.length)
         return chunks[0]
 
         /*
@@ -539,15 +545,42 @@ export class TaxonService extends BaseService<Taxon>{
         return await this.getStringListData(TaxonService.s3Key(TaxonService.problemRanksPath))
     }
 
+    async getProblemUploadRows(): Promise<string[]> {
+        // Should convert to using a map, ugly code :-)
+        const result = []
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedTaxonsDueToMultipleMatchPath)))
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedTaxonsDueToMismatchRankPath)))
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedTaxonsDueToMissingNamePath)))
+
+        // list of all the updates to do to status records
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedStatusesDueToMultipleMatchPath)))
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedStatusesDueToAcceptedMismatchPath)))
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedStatusesDueToParentMismatchPath)))
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedStatusesDueToTaxonMismatchPath)))
+        return result
+    }
+
+    private async getStringData(key): Promise<string> {
+        // See if there exists such an object
+        const exists = await this.storageService.hasObject(key)
+        if (!exists) {
+            return ""
+        }
+
+        // Fetch the object if it exists
+        const buffer = await this.storageService.getData(key)
+        return buffer.toString()
+    }
+
     private async getStringListData(key): Promise<string[]> {
         // See if there exists such an object
-        const exists = await this.storage.hasObject(key)
+        const exists = await this.storageService.hasObject(key)
         if (!exists) {
             return []
         }
 
         // Fetch the object if it exists
-        const buffer = await this.storage.getData(key)
+        const buffer = await this.storageService.getData(key)
         return JSON.parse(buffer.toString())
     }
 
@@ -667,7 +700,7 @@ export class TaxonService extends BaseService<Taxon>{
             }
         }
         //problemParentNamesStream.end()
-        await this.storage.putData(TaxonService.s3Key(TaxonService.problemParentNamesPath), JSON.stringify(problemParentNames))
+        await this.storageService.putData(TaxonService.s3Key(TaxonService.problemParentNamesPath), JSON.stringify(problemParentNames))
 
         // Check to see if accepted names exist
         for (let key of acceptedTaxons.keys()) {
@@ -681,7 +714,7 @@ export class TaxonService extends BaseService<Taxon>{
             }
         }
         // problemAcceptedNamesStream.end()
-        await this.storage.putData(TaxonService.s3Key(TaxonService.problemAcceptedNamesPath), JSON.stringify(problemAcceptedNames))
+        await this.storageService.putData(TaxonService.s3Key(TaxonService.problemAcceptedNamesPath), JSON.stringify(problemAcceptedNames))
 
         // Get all the taxon and class names
         const allRanks = await this.rankRepo.find()
@@ -698,7 +731,7 @@ export class TaxonService extends BaseService<Taxon>{
             }
         }
         // problemRanksStream.end()
-        await this.storage.putData(TaxonService.s3Key(TaxonService.problemRanksPath), JSON.stringify(problemRanks))
+        await this.storageService.putData(TaxonService.s3Key(TaxonService.problemRanksPath), JSON.stringify(problemRanks))
 
         return {
             problemScinames: problemScinames.length,
