@@ -5,15 +5,26 @@ import { Image, Taxon } from '@symbiota2/api-database';
 import { ImageFindAllParams } from './dto/image-find-all.input.dto'
 import { Express } from 'express';
 import { DwCArchiveParser, getDwcField } from '@symbiota2/dwc';
+import { StorageService } from '@symbiota2/api-storage';
+import * as fs from 'fs';
 
 type File = Express.Multer.File
 
 @Injectable()
 export class ImageService extends BaseService<Image>{
+    private static readonly S3_PREFIX = 'image'
+    public static readonly imageUploadFolder = './data/uploads/images/'
+
     constructor(
         @Inject(Image.PROVIDER_ID)
-        private readonly myRepository: Repository<Image>) {
+        private readonly myRepository: Repository<Image>,
+        private readonly storageService: StorageService)
+    {
         super(myRepository)
+    }
+
+    public static s3Key(objectName: string): string {
+        return [ImageService.S3_PREFIX, objectName].join('/');
     }
 
     /*
@@ -81,8 +92,13 @@ export class ImageService extends BaseService<Image>{
         return null;
     }
 
-    async fromFile(filename: string): Promise<void> {
-
+    async fromFile(originalname: string, filename: string, mimetype: string): Promise<void> {
+        const readStream = fs.createReadStream(ImageService.imageUploadFolder + filename)
+        await this.storageService.putObject(
+            ImageService.s3Key(filename),
+            readStream,
+            {"contentType" : mimetype}
+        )
     }
 
 }

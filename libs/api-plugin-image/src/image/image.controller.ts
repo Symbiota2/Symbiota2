@@ -25,6 +25,7 @@ type File = Express.Multer.File
 @ApiTags('Image')
 @Controller('image')
 export class ImageController {
+
     constructor(private readonly myService: ImageService) { }
 
     @Get()
@@ -81,17 +82,21 @@ export class ImageController {
 
     @Post('upload/storage/single')
     @HttpCode(HttpStatus.CREATED)
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor(
+        'file',
+        {
+            dest: ImageService.imageUploadFolder /*,
+            storage: storage */
+        }))
     // @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: "Upload an image file to storage service" })
     @ApiFileInput('file')
     // @UseGuards(SuperAdminGuard)
-    async uploadTaxaDwcA(@UploadedFile() file: File) {
+    async uploadStorageSingle(@UploadedFile() file: File) {
         if (!file.mimetype.startsWith('image/')) {
             throw new BadRequestException('Invalid Image');
         }
-
-        await this.myService.fromFile(file.path);
+        await this.myService.fromFile(file.originalname, file.filename, file.mimetype)
     }
 
 }
