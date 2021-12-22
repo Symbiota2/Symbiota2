@@ -1,3 +1,4 @@
+import { NgSwitchCase } from '@angular/common';
 import { HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
@@ -36,8 +37,15 @@ export class DwcService {
                 return this.api.sendFullResponse(req).pipe(
                     take(1),
                     catchError((err) => {
-                        console.log('error caught in service');
-                        console.error(err);
+                        switch (err.status) {
+                            case 404:
+                                console.log("404 ERROR: dwc Archive does not exist for this collection");
+                                break;
+                        
+                            default:
+                                console.log("error getting Dwc Archive");
+                                break;
+                        }
 
                         //Handle the error here
 
@@ -93,7 +101,6 @@ export class DwcService {
 
     /**
      * PUT request to the api to create a darwin core archive for the givin collection.
-     * TODO: if the darwin core archive exists for the collection already, will set refresh flag to true in api request.
      *
      * @remarks user needs to have super admin access or collection admin access in order to use function
      *
@@ -135,7 +142,6 @@ export class DwcService {
                     return of(false);
                 }
             }),
-            take(1)
         );
     }
 }

@@ -600,7 +600,6 @@ export class CollectionService {
                         return roles[index];
                     }
                 }
-                this.alertService.showError(`User Role not found for uid${uid}`);
                 return null;
             })
         );
