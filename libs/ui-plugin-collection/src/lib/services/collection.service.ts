@@ -21,6 +21,7 @@ import {
     distinctUntilChanged,
     filter,
     map,
+    mergeMap,
     shareReplay,
     switchMap,
     take,
@@ -39,6 +40,8 @@ import {
     CollectionRoleInput,
     CollectionRoleOutput,
 } from '../dto/CollectionRole.dto';
+import { log } from 'console';
+import { copyFile } from 'fs';
 
 interface FindAllParams {
     id?: number | number[];
@@ -94,7 +97,6 @@ export class CollectionService {
                     this.userService.currentUser,
                     this.currentCollectionID,
                 ]).pipe(
-                    take(1),
                     filter(([currentUser, currentCollectionID]) => {
                         return currentUser !== null && currentCollectionID > 0;
                     }),
@@ -105,17 +107,16 @@ export class CollectionService {
                             collectionData
                         );
                     }),
-                    map(collection => {console.log(collection.id)}),
                     catchError((e) => {
                         this.alertService.showError(
                             `Cannot update collection: ${e.message}`
                         );
                         return of(null);
                     }),
-                    filter((collection) => collection !== null)
+                    filter((collection) => collection !== null),
                 );
             })
-        )
+        ),
     ).pipe(shareReplay(1));
 
     /** Observable of a list of `collectionsListItem` pulled from api fulfilling `collectionQueryParams`
@@ -309,7 +310,8 @@ export class CollectionService {
                     return null;
                 }
                 return new Collection(collection);
-            })
+            }),
+            take(1)
         );
     }
 
@@ -332,6 +334,7 @@ export class CollectionService {
                 this.currentCategories.next(categories);
             });
     }
+
 
     /**
      * checks if Collection Name is already in use in existing collections
@@ -597,7 +600,6 @@ export class CollectionService {
                         return roles[index];
                     }
                 }
-                this.alertService.showError(`User Role not found for uid${uid}`);
                 return null;
             })
         );
@@ -675,6 +677,7 @@ export class CollectionService {
         return this.api.send(req).pipe(
             map((collection: ApiCollectionOutput) => {
                 if (collection !== null) {
+                    this.alertService.showMessage("Collection Updated")
                     return new Collection(collection);
                 }
                 this.alertService.showError("Api error updating collection by id")
@@ -683,3 +686,4 @@ export class CollectionService {
         );
     }
 }
+

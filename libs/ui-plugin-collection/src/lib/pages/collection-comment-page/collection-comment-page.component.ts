@@ -9,7 +9,7 @@ import { UserService } from '@symbiota2/ui-common';
 import { filter } from 'rxjs/operators';
 import { Comment } from '../../dto/Comment.output.dto';
 import { CommentService } from '../../services/comments.service';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { once } from 'node:events';
 
 @Component({
@@ -18,6 +18,7 @@ import { once } from 'node:events';
     styleUrls: ['./collection-comment-page.component.scss'],
 })
 export class CollectionCommentPage implements OnInit {
+    private subscriptions: Subscription = new Subscription();
 
     public collection$: Observable<Collection>;
 
@@ -38,7 +39,7 @@ export class CollectionCommentPage implements OnInit {
         this.collection$ = this.getCollection();
 
         //once collection is pulled from api pull said collections comments/set data reliant on collection
-        this.collection$.pipe(
+        this.subscriptions.add(this.collection$.pipe(
             map(collection => {
 
                 //TODO: change to a function that pulls list of comments from api
@@ -47,7 +48,11 @@ export class CollectionCommentPage implements OnInit {
                     this.commentSlice = this.commentList.slice(0, 5);
                 });
             })
-        ).subscribe();
+        ).subscribe())
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     private getCollection(): Observable<Collection> {

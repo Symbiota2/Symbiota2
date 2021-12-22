@@ -98,7 +98,7 @@ export class CollectionNewCollectionComponent implements OnInit {
                 } else {
                     this.alertService.showError("Error: something went wrong creating new collection")
                 }
-            });
+            }).unsubscribe();
     }
 
     onAddNewInst(): void {

@@ -35,7 +35,7 @@ export class DwcPublishingComponent implements OnInit {
         this.archiveInfo$ = this.dwcService.getCurrentCollectionArchiveInfo();
         this.archiveInfo$.subscribe((archive)=> {
             this.lastUpdate = new Date(archive.updatedAt);
-        })
+        }).unsubscribe();
     }
 
     onPublishArchive(): void {

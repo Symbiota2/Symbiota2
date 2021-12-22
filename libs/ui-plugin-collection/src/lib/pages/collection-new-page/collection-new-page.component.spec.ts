@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CollectionNewPageComponent } from './collection-new-page.component';
+import { CollectionNewPage } from './collection-new-page.component';
 
 describe('CollectionNewPageComponent', () => {
-  let component: CollectionNewPageComponent;
-  let fixture: ComponentFixture<CollectionNewPageComponent>;
+  let component: CollectionNewPage;
+  let fixture: ComponentFixture<CollectionNewPage>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CollectionNewPageComponent ]
+      declarations: [ CollectionNewPage ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CollectionNewPageComponent);
+    fixture = TestBed.createComponent(CollectionNewPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
