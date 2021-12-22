@@ -30,7 +30,7 @@ import {
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
-import { ImageLibraryPageComponent, ImageSearchPageComponent } from './pages';
+import { ImageDisplayPage, ImageLibraryPageComponent, ImageSearchPageComponent } from './pages';
 import { ImageDetailsPageComponent } from './pages/image-details/image-details-page.component';
 import { FilterPipe } from './pages/image-search/filter.pipe';
 
@@ -67,6 +67,7 @@ import { FilterPipe } from './pages/image-search/filter.pipe';
         ImageSearchPageComponent,
         ImageLibraryPageComponent,
         ImageDetailsPageComponent,
+        ImageDisplayPage,
         FilterPipe
     ],
     providers: [
@@ -75,6 +76,7 @@ import { FilterPipe } from './pages/image-search/filter.pipe';
     entryComponents: [
         ImageSearchPageComponent,
         ImageLibraryPageComponent,
+        ImageDisplayPage,
         ImageDetailsPageComponent
     ]
 })
@@ -84,6 +86,7 @@ export class ImagePlugin extends SymbiotaUiPlugin {
     private static IMAGE_LIBRARY_ROUTE = "images/library/:level"
     private static IMAGE_DETAILS_ROUTE = "image/details/:imageID"
     private static IMAGE_SEARCH_ROUTE = "image/search"
+    private static IMAGE_DISPLAY_ROUTE = "image/display"
 
     constructor() {
         super();
@@ -103,7 +106,10 @@ export class ImagePlugin extends SymbiotaUiPlugin {
                 path: ImagePlugin.IMAGE_SEARCH_ROUTE,
                 component: ImageSearchPageComponent
             },
-
+            {
+                path: ImagePlugin.IMAGE_DISPLAY_ROUTE,
+                component: ImageDisplayPage
+            },
         ];
     }
 
