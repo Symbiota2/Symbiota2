@@ -15,14 +15,20 @@ export class CollectionLogoComponent implements OnInit{
 
     readonly ROUTE_COLLECTION_PROFILE = ROUTE_COLLECTION_PROFILE;
 
+    readonly DEFAULT_ICON_PATH = "assets/images/default_av.png"
+
     constructor(private readonly collectionService: CollectionService){
     }
 
     ngOnInit(): void {
-        if(this.src === "" && this.collectionID > 0){
+        if(this.src == "" && this.collectionID > 0){
             this.collectionService.getCollection(this.collectionID).subscribe(collection => {
                 this.src = collection.icon;
             })
+        }
+
+        if(this.src == ""){
+            this.src = this.DEFAULT_ICON_PATH;
         }
     }
 

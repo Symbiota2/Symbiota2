@@ -1,5 +1,5 @@
 <div
-    *ngIf="collection"
+    *ngIf="collection$ | async as collection"
     id="main"
     fxLayout="column"
     fxLayoutAlign="start center"

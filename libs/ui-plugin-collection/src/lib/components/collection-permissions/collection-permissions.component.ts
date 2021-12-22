@@ -109,7 +109,7 @@ export class CollectionPermissionsComponent implements OnInit {
             .getUserRole(uid)
             .pipe(
                 map((resRole) => {
-                    if (!!resRole) {
+                    if (resRole != null && resRole.name != null) {
                         dialogText = `Change ${userName} permission from ${resRole.name} to ${role}?`;
 
                         this.dialog
