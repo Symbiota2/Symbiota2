@@ -1,15 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { In, Repository } from 'typeorm'
 import { BaseService } from '@symbiota2/api-common'
-import { Image } from '@symbiota2/api-database'
+import { Image, Taxon } from '@symbiota2/api-database';
 import { ImageFindAllParams } from './dto/image-find-all.input.dto'
+import { Express } from 'express';
+import { DwCArchiveParser, getDwcField } from '@symbiota2/dwc';
+
+type File = Express.Multer.File
 
 @Injectable()
 export class ImageService extends BaseService<Image>{
     constructor(
         @Inject(Image.PROVIDER_ID)
         private readonly myRepository: Repository<Image>) {
-
         super(myRepository)
     }
 
@@ -58,6 +61,7 @@ export class ImageService extends BaseService<Image>{
             : []
     }
 
+
     /*
     TODO: Not sure if this is implemented correctly.
      */
@@ -75,6 +79,10 @@ export class ImageService extends BaseService<Image>{
             return this.findByID(id);
         }
         return null;
+    }
+
+    async fromFile(filename: string): Promise<void> {
+
     }
 
 }

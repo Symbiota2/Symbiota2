@@ -42,6 +42,22 @@ export class TaxonQueryBuilder {
         return new FindOneWithSynonymsBuilder(this.baseUrl)
     }
 
+    problemUploadRows(): ProblemUploadRowsBuilder {
+        return new ProblemUploadRowsBuilder(this.baseUrl)
+    }
+
+    problemAcceptedNames(): ProblemAcceptedNamesBuilder {
+        return new ProblemAcceptedNamesBuilder(this.baseUrl)
+    }
+
+    problemParentNames(): ProblemParentNamesBuilder {
+        return new ProblemParentNamesBuilder(this.baseUrl)
+    }
+
+    problemRanks(): ProblemRanksBuilder {
+        return new ProblemRanksBuilder(this.baseUrl)
+    }
+
     create(): CreateOneBuilder {
         return new CreateOneBuilder(this.baseUrl);
     }
@@ -88,6 +104,35 @@ class DeleteOneBuilder extends TaxonQueryBuilder {
         return super.build()
     }
 }
+
+class ProblemAcceptedNamesBuilder extends TaxonQueryBuilder {
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/upload/problemAcceptedNames`;
+        return super.build();
+    }
+}
+
+class ProblemUploadRowsBuilder extends TaxonQueryBuilder {
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/upload/problemRows`;
+        return super.build();
+    }
+}
+
+class ProblemParentNamesBuilder extends TaxonQueryBuilder {
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/upload/problemParentNames`;
+        return super.build();
+    }
+}
+
+class ProblemRanksBuilder extends TaxonQueryBuilder {
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/upload/problemRanks`;
+        return super.build();
+    }
+}
+
 
 class UploadBuilder extends TaxonQueryBuilder {
     private _id: number = null;

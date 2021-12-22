@@ -106,6 +106,18 @@ export class TaxonomyUploadService {
         });
     }
 
+    checkFieldMapKeyMapped(key: string) {
+        const currentUpload = { ...this._currentUpload.getValue() }
+        const fieldMap = { ...currentUpload.fieldMap }
+        let flag = false
+        Object.keys(fieldMap).forEach((csvField) => {
+            if (fieldMap[csvField] == key) {
+                flag = true
+            }
+        })
+        return flag
+    }
+
     uploadFile(file: File): Observable<void> {
         const url = this.createUrlBuilder()
             .upload()
@@ -190,7 +202,6 @@ export class TaxonomyUploadService {
                 // TODO: Clean this up
                 url += '/start';
 
-                console.log(" url is " + url)
                 const query = this.api.queryBuilder(url)
                     .post()
                     //.queryParam('collectionID', collectionID)

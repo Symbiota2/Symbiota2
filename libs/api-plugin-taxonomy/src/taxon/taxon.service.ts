@@ -18,11 +18,27 @@ import { QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP } from '../queues/taxonomy-upload-clea
 import { TaxonomyUploadCleanupJob } from '../queues/taxonomy-upload-cleanup.processor';
 import { QUEUE_ID_TAXONOMY_UPLOAD } from '../queues/taxonomy-upload.queue';
 import { TaxonomyUploadJob } from '../queues/taxonomy-upload.processor';
+import fs, { createReadStream } from 'fs';
+import { StorageService } from '@symbiota2/api-storage';
 
 @Injectable()
 export class TaxonService extends BaseService<Taxon>{
+    private static readonly S3_PREFIX = 'taxon';
     private static readonly UPLOAD_CHUNK_SIZE = 1024;
     private static readonly LOGGER = new Logger(TaxonService.name);
+    public static readonly dataFolderPath = "data/uploads/taxa"
+    public static readonly problemParentNamesPath = TaxonService.dataFolderPath + "/problemParentNames"
+    public static readonly problemAcceptedNamesPath = TaxonService.dataFolderPath + "/problemAcceptedNames"
+    public static readonly problemRanksPath = TaxonService.dataFolderPath + "/problemRanks"
+    public static readonly skippedTaxonsDueToMultipleMatchPath = TaxonService.dataFolderPath + "/taxonsMultipleMath"
+    public static readonly skippedTaxonsDueToMismatchRankPath = TaxonService.dataFolderPath + "/taxonsMismatch"
+    public static readonly skippedTaxonsDueToMissingNamePath = TaxonService.dataFolderPath + "/taxonsMissing"
+
+    // list of all the updates to do to status records
+    public static readonly skippedStatusesDueToMultipleMatchPath = TaxonService.dataFolderPath + "/statusesMultipleMatch"
+    public static readonly skippedStatusesDueToAcceptedMismatchPath = TaxonService.dataFolderPath + "/statusesAcceptedMismatch"
+    public static readonly skippedStatusesDueToParentMismatchPath = TaxonService.dataFolderPath + "/statusesParentMismatch"
+    public static readonly skippedStatusesDueToTaxonMismatchPath = TaxonService.dataFolderPath + "/statusesTaxonMismatch"
 
     constructor(
         @Inject(Taxon.PROVIDER_ID)
@@ -40,8 +56,14 @@ export class TaxonService extends BaseService<Taxon>{
         @InjectQueue(QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP)
         private readonly uploadCleanupQueue: Queue<TaxonomyUploadCleanupJob>,
         @InjectQueue(QUEUE_ID_TAXONOMY_UPLOAD)
-        private readonly uploadQueue: Queue<TaxonomyUploadJob>) {
+        private readonly uploadQueue: Queue<TaxonomyUploadJob>,
+        private readonly storageService: StorageService)
+    {
         super(taxonRepo);
+    }
+
+    public static s3Key(objectName: string): string {
+        return [TaxonService.S3_PREFIX, objectName].join('/');
     }
 
     /**
@@ -178,7 +200,6 @@ export class TaxonService extends BaseService<Taxon>{
      * @see TaxonFindNamesParams
      */
     async findAllScientificNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
-        //console.log("Taxon service: finding scientific names")
         const { limit,...qParams } = params
 
         if (qParams.taxonAuthorityID) {
@@ -267,7 +288,6 @@ export class TaxonService extends BaseService<Taxon>{
      * @see TaxonFindNamesParams
      */
     async findGenusNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
-        //console.log("Taxon service: finding scientific names")
         const { limit,...qParams } = params
 
         if (qParams.taxonAuthorityID) {
@@ -489,14 +509,79 @@ export class TaxonService extends BaseService<Taxon>{
     async patchUploadFieldMap(id: number, /*uniqueIDField: string,*/ fieldMap: TaxonomyUploadFieldMap): Promise<TaxonomyUpload> {
         const upload = await this.uploadRepo.findOne(id);
         if (!upload) {
-            return null;
+            return null
         }
         await this.uploadRepo.save({
             ...upload,
             //uniqueIDField,
             fieldMap
         });
-        return upload;
+        return upload
+    }
+
+    async getStream(key) {
+        const stream = await this.storageService.getObject(key)
+        const chunks = [];
+        stream.on('data', (d) => chunks.push(d));
+        return chunks[0]
+
+        /*
+        const stream = await this.storage.getData(key)
+        //const data  = stream.read()
+        return stream
+
+         */
+    }
+
+    async getProblemAcceptedNames(): Promise<string[]> {
+        return await this.getStringListData(TaxonService.s3Key(TaxonService.problemAcceptedNamesPath))
+    }
+
+    async getProblemParentNames(): Promise<string[]> {
+        return await this.getStringListData(TaxonService.s3Key(TaxonService.problemParentNamesPath))
+    }
+
+    async getProblemRanks(): Promise<string[]> {
+        return await this.getStringListData(TaxonService.s3Key(TaxonService.problemRanksPath))
+    }
+
+    async getProblemUploadRows(): Promise<string[]> {
+        // Should convert to using a map, ugly code :-)
+        const result = []
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedTaxonsDueToMultipleMatchPath)))
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedTaxonsDueToMismatchRankPath)))
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedTaxonsDueToMissingNamePath)))
+
+        // list of all the updates to do to status records
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedStatusesDueToMultipleMatchPath)))
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedStatusesDueToAcceptedMismatchPath)))
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedStatusesDueToParentMismatchPath)))
+        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedStatusesDueToTaxonMismatchPath)))
+        return result
+    }
+
+    private async getStringData(key): Promise<string> {
+        // See if there exists such an object
+        const exists = await this.storageService.hasObject(key)
+        if (!exists) {
+            return ""
+        }
+
+        // Fetch the object if it exists
+        const buffer = await this.storageService.getData(key)
+        return buffer.toString()
+    }
+
+    private async getStringListData(key): Promise<string[]> {
+        // See if there exists such an object
+        const exists = await this.storageService.hasObject(key)
+        if (!exists) {
+            return []
+        }
+
+        // Fetch the object if it exists
+        const buffer = await this.storageService.getData(key)
+        return JSON.parse(buffer.toString())
     }
 
     async findUploadByID(id: number): Promise<TaxonomyUpload> {
@@ -519,10 +604,10 @@ export class TaxonService extends BaseService<Taxon>{
         kingdomNameField: string,
         rankNameField: string
     ): Promise<{
-        problemScinames: string[],
-        problemAcceptedNames: string[],
-        problemParentNames: string[],
-        problemRanks: string[],
+        problemScinames: number,
+        problemAcceptedNames: number,
+        problemParentNames: number,
+        problemRanks: number,
         nullSciNames: number,
         nullParentNames: number,
         nullKingdomNames: number,
@@ -595,9 +680,13 @@ export class TaxonService extends BaseService<Taxon>{
         }
 
         const problemParentNames = []
-        //const problemScinames = []
+        const problemScinames = []
         const problemAcceptedNames = []
         const problemRanks = []
+
+        //const problemParentNamesStream = fs.createWriteStream(problemParentNamesPath)
+        //const problemAcceptedNamesStream = fs.createWriteStream(problemAcceptedNamesPath)
+        //const problemRanksStream = fs.createWriteStream(problemRanksPath)
 
         // Check to see if the parent names exist
         for (let key of parentTaxons.keys()) {
@@ -606,9 +695,12 @@ export class TaxonService extends BaseService<Taxon>{
                 const taxons = await this.taxonRepo.find({ where: { scientificName: key } })
                 if (taxons.length == 0) {
                     problemParentNames.push(key)
+                    // problemParentNamesStream.write(key)
                 }
             }
         }
+        //problemParentNamesStream.end()
+        await this.storageService.putData(TaxonService.s3Key(TaxonService.problemParentNamesPath), JSON.stringify(problemParentNames))
 
         // Check to see if accepted names exist
         for (let key of acceptedTaxons.keys()) {
@@ -617,9 +709,12 @@ export class TaxonService extends BaseService<Taxon>{
                 const taxons = await this.taxonRepo.find({ where: { scientificName: key } })
                 if (taxons.length == 0) {
                     problemAcceptedNames.push(key)
+                    // problemAcceptedNamesStream.write(key)
                 }
             }
         }
+        // problemAcceptedNamesStream.end()
+        await this.storageService.putData(TaxonService.s3Key(TaxonService.problemAcceptedNamesPath), JSON.stringify(problemAcceptedNames))
 
         // Get all the taxon and class names
         const allRanks = await this.rankRepo.find()
@@ -632,14 +727,17 @@ export class TaxonService extends BaseService<Taxon>{
         for (let key of ranks.keys()) {
             if (!both.has(key)) {
                 problemRanks.push(key)
+                    // problemRanksStream.write(key)
             }
         }
+        // problemRanksStream.end()
+        await this.storageService.putData(TaxonService.s3Key(TaxonService.problemRanksPath), JSON.stringify(problemRanks))
 
         return {
-            problemScinames: [],
-            problemAcceptedNames: [],
-            problemParentNames: [],
-            problemRanks: [],
+            problemScinames: problemScinames.length,
+            problemAcceptedNames: problemAcceptedNames.length,
+            problemParentNames: problemParentNames.length,
+            problemRanks: problemRanks.length,
             nullSciNames: nullSciNames,
             nullParentNames: nullParentNames,
             nullKingdomNames: nullKingdomNames,
@@ -698,7 +796,7 @@ export class TaxonService extends BaseService<Taxon>{
             authorityID: authorityID,
             uploadID: uploadID,
             taxonUpdates : [],
-            skippedTaxonsDueToMulitpleMatch: [],
+            skippedTaxonsDueToMultipleMatch: [],
             skippedTaxonsDueToMismatchRank: [],
             skippedTaxonsDueToMissingName: [],
             statusUpdates : [],

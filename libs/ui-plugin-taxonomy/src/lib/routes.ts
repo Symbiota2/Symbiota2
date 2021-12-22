@@ -12,3 +12,6 @@ export const TAXA_EDITOR_ROUTE = "taxonomy/edit"
 export const TAXA_PROFILER_ROUTE = "taxonomy/profile"
 
 export const TAXA_UPLOAD_COMPLETE_ROUTE = "taxonomy/uploadComplete"
+export const TAXA_UPLOAD_PROBLEM_ACCEPTED_NAMES_ROUTE = "taxonomy/upload/problemAcceptedNames"
+export const TAXA_UPLOAD_PROBLEM_PARENT_NAMES_ROUTE = "taxonomy/upload/problemParentNames"
+export const TAXA_UPLOAD_PROBLEM_RANKS_ROUTE = "taxonomy/upload/problemRanks"

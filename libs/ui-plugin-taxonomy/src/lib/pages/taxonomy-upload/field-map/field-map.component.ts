@@ -63,7 +63,7 @@ export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
     fieldMap = this.uploads.currentUpload.pipe(
         filter((upload) => upload !== null),
         map((upload) => upload.fieldMap)
-    );
+    )
 
     tableData: Observable<TableRow[]> = combineLatest([
         this.fieldMap,
@@ -126,7 +126,9 @@ export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
 
         this.tableData.subscribe((data) => {
             this.dataSource.data = data
+            this.requiredFieldsMapped = this.checkRequiredFieldsMapped()
         })
+
     }
 
     ngAfterViewInit() {
@@ -134,13 +136,18 @@ export class TaxonomyUploadFieldMapPage implements OnInit, AfterViewInit {
     }
 
     setFieldMapValue(key: string, value: string) {
-        if (key = "kingdomName") this.kingdomNameMapped = true
-        if (key = "AcceptedTaxonName") this.acceptedTaxonNameMapped = true
-        if (key = "scientificName") this.scientificNameMapped = true
-        if (key = "RankName") this.rankNameMapped = true
         this.uploads.setFieldMap(key, value)
-        this.requiredFieldsMapped =
-            this.kingdomNameMapped && this.scientificNameMapped && this.rankNameMapped && this.acceptedTaxonNameMapped
+        this.requiredFieldsMapped = this.checkRequiredFieldsMapped()
+
+    }
+
+    checkRequiredFieldsMapped() {
+        return this.uploads.checkFieldMapKeyMapped("kingdomName")
+            && this.uploads.checkFieldMapKeyMapped("AcceptedTaxonName")
+            && this.uploads.checkFieldMapKeyMapped("scientificName")
+            && this.uploads.checkFieldMapKeyMapped("RankName")
+            && this.uploads.checkFieldMapKeyMapped("ParentTaxonName")
+
     }
 
     onSubmit() {
