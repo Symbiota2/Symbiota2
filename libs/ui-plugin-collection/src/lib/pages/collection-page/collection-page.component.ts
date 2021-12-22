@@ -110,7 +110,6 @@ export class CollectionPage implements OnInit {
                     : -1;
             }),
             switchMap((collectionID) => {
-                console.log('getCollection: Collection ID: ', collectionID);
                 this.collections.setCollectionID(collectionID);
 
                 return this.collections.currentCollection.pipe(

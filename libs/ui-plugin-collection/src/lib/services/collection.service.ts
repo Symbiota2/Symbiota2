@@ -107,14 +107,13 @@ export class CollectionService {
                             collectionData
                         );
                     }),
-                    map(collection => {console.log(collection.id)}),
                     catchError((e) => {
                         this.alertService.showError(
                             `Cannot update collection: ${e.message}`
                         );
                         return of(null);
                     }),
-                    filter((collection) => collection !== null)
+                    filter((collection) => collection !== null),
                 );
             })
         ),
@@ -286,9 +285,8 @@ export class CollectionService {
      */
     updateCurrentCollection(collectionData: Partial<CollectionInputDto>): Observable<Boolean> {
         return combineLatest([this.userService.currentUser, this.currentCollection]).pipe(
+            take(1),
             map(([user, collection]) => {
-                console.log("updateCurrentCollection currentCollection: ", collection);
-                console.log("updateCurrentCollection updateCollection: ", collectionData);
                 if (!!user && !!collection && user.canEditCollection(collection.id)){
                     this.updateCollectionData.next(collectionData);
                     return true;
@@ -312,7 +310,8 @@ export class CollectionService {
                     return null;
                 }
                 return new Collection(collection);
-            })
+            }),
+            take(1)
         );
     }
 
@@ -679,6 +678,7 @@ export class CollectionService {
         return this.api.send(req).pipe(
             map((collection: ApiCollectionOutput) => {
                 if (collection !== null) {
+                    this.alertService.showMessage("Collection Updated")
                     return new Collection(collection);
                 }
                 this.alertService.showError("Api error updating collection by id")

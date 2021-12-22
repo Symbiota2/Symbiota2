@@ -6,7 +6,7 @@ import { AlertModule } from '../alert.module';
     providedIn: AlertModule
 })
 export class AlertService {
-    public static readonly MSG_DURATION = 4000;
+    public static readonly MSG_DURATION = 3000;
 
     constructor(private snackbar: MatSnackBar) { }
 
