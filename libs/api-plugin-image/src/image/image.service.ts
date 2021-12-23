@@ -41,14 +41,14 @@ export class ImageService extends BaseService<Image>{
     }
 
     /*
-    Fetch distinct photographer names.
+    Fetch distinct photographers info from the image repository.
     */
-    async findPhotographerNames(): Promise<any[]> {
+    async findPhotographers(): Promise<Image[]> {
         //return this.myRepository.find({select: ['photographerName']})
 
         const qb = this.myRepository.createQueryBuilder('o')
             .select(
-                'o.photographerName'
+                ['o.photographerName', 'o.photographerUID']
             )
             .distinct(true)
             //.limit(100)

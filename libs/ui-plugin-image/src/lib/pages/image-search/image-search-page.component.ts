@@ -8,6 +8,23 @@ import {
 } from '@symbiota2/ui-plugin-taxonomy';
 import { ImageService } from '../../services';
 import { FilterPipe } from './filter.pipe';
+import { MatListOption } from '@angular/material/list';
+import { CountryListItem, CountryService } from '@symbiota2/ui-plugin-geography';
+
+/**
+ * Taxonomic data with nested structure.
+ * Each node has a name and an optional list of children.
+ * The expanded flag is set if the node is expanded (already has children listed)
+ * The synonym flag is set if this is a synonym
+ */
+interface TaxonNode {
+    name: string
+    taxonID: number
+    author: string
+    expanded?: boolean
+    synonym?: boolean
+    children?: TaxonNode[]
+}
 
 @Component({
     selector: 'image-search',
@@ -19,8 +36,8 @@ export class ImageSearchPageComponent implements OnInit {
     nameControl = new FormControl()
     nameOptions: string[] = []
     photographerNameControl = new FormControl()
-    photographerNameOptions: string[] = []
-    photographerName: string = null
+    photographerOptions = []
+    photographer = null
     hasAuthors = false
     includeAuthors = false
     language = "none"
@@ -32,6 +49,17 @@ export class ImageSearchPageComponent implements OnInit {
     includeLowQuality = false
     atLevelOfSpecies = true
 
+    countries : CountryListItem[] = []
+
+    nameFound = false
+    looking = false
+    possibleTaxons  = []
+
+    data = []
+    data2 = []
+    page= 0
+    size = 4
+
     constructor(
         //private readonly userService: UserService,  // TODO: needed?
         private readonly taxaService: TaxonService,
@@ -40,6 +68,7 @@ export class ImageSearchPageComponent implements OnInit {
         private readonly taxonVernacularService: TaxonVernacularService,
         private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
         private readonly imageService: ImageService,
+        private readonly countryService: CountryService,
         private router: Router,
         private formBuilder: FormBuilder,
         private currentRoute: ActivatedRoute
@@ -74,7 +103,10 @@ export class ImageSearchPageComponent implements OnInit {
         this.loadVernacularLanguages()
 
         // Get the photographer names for display in the menu
-        this.loadPhotographerNames()
+        this.loadPhotographers()
+
+        // Get list of countries
+        this.loadCountries()
     }
 
     nameFor(option) {
@@ -109,6 +141,10 @@ export class ImageSearchPageComponent implements OnInit {
         }
     }
 
+    countryListChange(country) {
+
+    }
+
     /*
     Called when the choice of scientific vs. common is changed
      */
@@ -139,16 +175,29 @@ export class ImageSearchPageComponent implements OnInit {
     }
 
     /*
+    Load the countries
+    */
+    public loadCountries() {
+        this.countryService.countryList.subscribe((names) => {
+            this.countries = names
+            })
+    }
+
+    /*
     Load the photographer names
     */
-    public loadPhotographerNames() {
-        this.imageService.findPhotographerNames()
+    public loadPhotographers() {
+        this.imageService.findPhotographers()
             .subscribe((names) => {
-                this.photographerNameOptions = names
-                this.photographerNameOptions.sort(function (a, b) {
-                    return (a > b ? 1 : -1)
+                this.photographerOptions = names
+                this.photographerOptions.sort(function (a, b) {
+                    return (a.photographerName > b.photographerName ? 1 : -1)
                 })
             })
+    }
+
+    public photographerListChange(photographer) {
+        this.photographer = photographer
     }
 
     /*
@@ -240,4 +289,63 @@ export class ImageSearchPageComponent implements OnInit {
     goToLink(url: string){
         window.open("taxon/editor/" + url, "_blank");
     }
+
+    getData(obj) {
+        let index=0,
+            startingIndex=obj.pageIndex * obj.pageSize,
+            endingIndex=startingIndex + obj.pageSize;
+
+        this.data = this.data2.filter(() => {
+            index++;
+            return (index > startingIndex && index <= endingIndex) ? true : false;
+        });
+    }
+
+    nameListChange(options: MatListOption[]) {
+        //this.buildTree(+options.map(o => o.value))
+    }
+
+    nameListCheck(sciname) {
+        this.looking = true
+        // Look up the scientific name first
+        this.taxaService.findByScientificName(sciname.trim(), this.taxonomicAuthorityID)
+            .subscribe((taxons) => {
+                if (!taxons) {
+                    // No name found
+                    this.nameFound = false
+                } else if (taxons.length > 1) {
+                    // Found several names
+                    this.nameFound = true
+                    // Need to build a list of taxons to select
+                    // lookup its name by tid
+                    this.possibleTaxons = []
+                    taxons.forEach((item) => {
+                        this.taxaService.findByID(item.id, this.taxonomicAuthorityID)
+                            .subscribe((taxon) => {
+                                // Found a synonym, add it to the list of synonyms
+                                const taxonItem: TaxonNode = {
+                                    name: taxon.scientificName,
+                                    taxonID: item.id,
+                                    author: taxon.author,
+                                    expanded: false,
+                                    synonym: false,
+                                    children: []
+                                }
+                                this.possibleTaxons.push(taxonItem)
+                            })
+                    })
+                } else {
+                    // Found one
+                    const taxon = taxons[0]
+                    if (taxon) {
+                        this.nameFound = true
+                        //this.buildTree(+taxon.id)
+                    } else {
+                        // Should never get here
+                        this.nameFound = false
+                    }
+                }
+            })
+    }
+
 }

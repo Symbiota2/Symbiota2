@@ -33,36 +33,38 @@ import { MatRadioModule } from '@angular/material/radio';
 import { ImageDisplayPage, ImageLibraryPageComponent, ImageSearchPageComponent } from './pages';
 import { ImageDetailsPageComponent } from './pages/image-details/image-details-page.component';
 import { FilterPipe } from './pages/image-search/filter.pipe';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 
 @NgModule({
-  imports: [
-    ApiClientModule,
-    BrowserModule,
-    BrowserAnimationsModule,
-    CommonModule,
-    FormsModule,
-    MatAutocompleteModule,
-    MatButtonModule,
-    MatCardModule,
-    MatDatepickerModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatNativeDateModule,
-    MatOptionModule,
-    MatSelectModule,
-    ReactiveFormsModule,
-    RouterModule,
-    TranslateModule,
-    FlexModule,
-    MatTreeModule,
-    MatCheckboxModule,
-    MatListModule,
-    MatRadioModule,
-    SymbiotaComponentModule
-  ],
+    imports: [
+        ApiClientModule,
+        BrowserModule,
+        BrowserAnimationsModule,
+        CommonModule,
+        FormsModule,
+        MatAutocompleteModule,
+        MatButtonModule,
+        MatCardModule,
+        MatDatepickerModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        MatNativeDateModule,
+        MatOptionModule,
+        MatSelectModule,
+        ReactiveFormsModule,
+        RouterModule,
+        TranslateModule,
+        FlexModule,
+        MatTreeModule,
+        MatCheckboxModule,
+        MatListModule,
+        MatRadioModule,
+        SymbiotaComponentModule,
+        MatPaginatorModule
+    ],
     declarations: [
         ImageSearchPageComponent,
         ImageLibraryPageComponent,
@@ -118,8 +120,12 @@ export class ImagePlugin extends SymbiotaUiPlugin {
             {
                 url: `/${ImagePlugin.IMAGE_LIBRARY_ROUTE}`,
                 name: "core.layout.header.topnav.image_library_link"
-            }
-        ]
-    }
+            },
+            {
+                url: `/${ImagePlugin.IMAGE_SEARCH_ROUTE}`,
+                name: "core.layout.header.topnav.image_search_link"
+                }
+            ]
+        }
 
-}
+    }

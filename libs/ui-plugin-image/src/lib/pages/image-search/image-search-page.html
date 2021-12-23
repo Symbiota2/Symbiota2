@@ -5,7 +5,7 @@
 
     <!-- Configure search options -->
     <div class="expansion-panel">
-        <symbiota2-expansion-panel label='{{"image.search.options.label" | translate}}' [expanded]="false">
+        <symbiota2-expansion-panel expanded=false label='{{"image.search.options.label" | translate}}' >
             <mat-checkbox class="example-margin" [(ngModel)]='needIdentification'>
                 {{"image.search.checkbox.label.need.identification" | translate}}
             </mat-checkbox>
@@ -20,126 +20,153 @@
         </symbiota2-expansion-panel>
     </div>
 
-    <!-- Configure name list -->
+
+
+    <h4>{{"image.search.search.terms" | translate}}</h4>
     <div class="expansion-panel">
-        <symbiota2-expansion-panel label='{{"taxonomy.viewer.configure.label" | translate}}' [expanded]="false">
-            <mat-radio-group
-                aria-labelledby="configure-radio-group-label"
-                class="configure-radio-group"
-                (change)='configureChangeAction()'
-                [(ngModel)]="kindOfName">
-                <mat-radio-button value="Scientific">{{"taxonomy.viewer.option.scientific" | translate}}</mat-radio-button>&nbsp;&nbsp;
-                <mat-radio-button value="Common">{{"taxonomy.viewer.option.common" | translate}}</mat-radio-button>
+        <symbiota2-expansion-panel expanded=false label='{{"image.search.by.name" | translate}}'>
+            <!-- Configure name list -->
+            <div class="expansion-panel">
+                <symbiota2-expansion-panel expanded=false label='{{"taxonomy.viewer.configure.label" | translate}}'>
+                    <mat-radio-group
+                        aria-labelledby="configure-radio-group-label"
+                        class="configure-radio-group"
+                        (change)='configureChangeAction()'
+                        [(ngModel)]="kindOfName">
+                        <mat-radio-button value="Scientific">{{"taxonomy.viewer.option.scientific" | translate}}</mat-radio-button>&nbsp;&nbsp;
+                        <mat-radio-button value="Common">{{"taxonomy.viewer.option.common" | translate}}</mat-radio-button>
 
-                <div>
-                    <br/>
-                    <mat-form-field appearance="fill">
-                        <mat-label>{{"taxonomy.viewer.label.authority" | translate}}</mat-label>
-                        <mat-select field-class="symbiota2-field-class"
-                                    placeholder='{{"taxonomy.viewer.label.authority" | translate}}'
-                                    [(value)]="taxonomicAuthorityID"
-                                    (selectionChange)="authorityChangeAction()">
-                            <mat-option *ngFor="let authority of taxonomicAuthorityList"
-                                        [value]="authority.id" >{{ authority.name }}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
+                        <div>
+                            <br/>
+                            <mat-form-field appearance="fill">
+                                <mat-label>{{"taxonomy.viewer.label.authority" | translate}}</mat-label>
+                                <mat-select field-class="symbiota2-field-class"
+                                            placeholder='{{"taxonomy.viewer.label.authority" | translate}}'
+                                            [(value)]="taxonomicAuthorityID"
+                                            (selectionChange)="authorityChangeAction()">
+                                    <mat-option *ngFor="let authority of taxonomicAuthorityList"
+                                                [value]="authority.id" >{{ authority.name }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
 
-                <!-- <div>Using {{kindOfName}} names</div> -->
-                <div *ngIf='kindOfName == "Scientific"'>
-                    <!-- <mat-checkbox class="example-margin" [(ngModel)]='hasAuthors' (change)='loadScientificNames()'
-                    >{{"taxonomy.viewer.label.checkbox.authors" | translate}}</mat-checkbox>-->
-                    <mat-checkbox class="example-margin" [(ngModel)]='hasAuthors'
-                    >{{"taxonomy.viewer.label.checkbox.authors" | translate}}</mat-checkbox>
-                    <!--
-                    <br/>
-                    <br/>
-                    <mat-form-field appearance="fill">
-                        <mat-label>Narrow kingdom</mat-label>
-                        <mat-select >
-                            <mat-option value="option1">Option 1</mat-option>
-                            <mat-option value="option2">Option 2</mat-option>
-                            <mat-option value="option3">Option 3</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    -->
-                </div>
+                        <div *ngIf='kindOfName == "Scientific"'>
+                            <mat-checkbox class="example-margin" [(ngModel)]='hasAuthors'
+                            >{{"taxonomy.viewer.label.checkbox.authors" | translate}}</mat-checkbox>
+                        </div>
 
-                <div *ngIf='kindOfName == "Common"'>
-                    <mat-form-field appearance="fill">
-                        <mat-label>{{"taxonomy.viewer.label.language" | translate}}</mat-label>
-                        <mat-select field-class="symbiota2-field-class"
-                                    placeholder='{{"taxonomy.viewer.label.language" | translate}}'
-                                    [(value)]="language"
-                                    (selectionChange)="languageChangeAction(language)">
-                            <mat-option *ngFor="let lang of languageList"
-                                        [value]="lang" >{{ lang }}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
-            </mat-radio-group>
-        </symbiota2-expansion-panel>
-
-    </div>
-
-    <!-- Configure photographer list -->
-    <div class="expansion-panel">
-
-    </div>
-    <h4>Search</h4>
-    <form class="name-autocomplete-form" (ngSubmit)="onSubmit()">
-        <!-- Name text box -->
-        <mat-form-field class="name-autocomplete-full-width">
-            <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxonomy.viewer.label.name.scientific" | translate}}</mat-label>
-            <mat-label *ngIf='kindOfName == "Common"'>{{"taxonomy.viewer.label.name.common" | translate}}</mat-label>
-            <!-- (keypress)="onKey($event)" -->
-            <input *ngIf='kindOfName == "Scientific"' type="text"
-                   placeholder='{{"taxonomy.viewer.label.name.scientific" | translate}}'
-                   aria-label="String"
-                   matInput
-                   (keyup)="onKey($event)"
-                   [formControl]="nameControl"
-                   [matAutocomplete]="auto">
-            <input *ngIf='kindOfName == "Common"' type="text"
-                   placeholder='{{"taxonomy.viewer.label.name.common" | translate}}'
-                   aria-label="String"
-                   matInput
-                   (keyup)="onKey($event)"
-                   [formControl]="nameControl"
-                   [matAutocomplete]="auto">
-            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-                <mat-option *ngFor="let option of nameOptions" [value]="nameFor(option)">
-                    {{nameFor(option)}} <small>{{authorFor(option)}}</small>
-                </mat-option>
-            </mat-autocomplete>
-        </mat-form-field>
-
-        <!-- Photographer text box -->
-
-        <mat-form-field class="name-autocomplete-full-width">
-            <mat-label>{{"image.search.label.name.photographer" | translate}}</mat-label>
-            <!--
-        <input type="text"
-               placeholder='{{"image.search.label.name.photographer" | translate}}'
-               aria-label="String"
-               matInput
-
-               [formControl]="photographerNameControl"
-               [matAutocomplete]="autoPhotographerName">
-
-        <mat-autocomplete autoActiveFirstOption #autoPhotographerName="matAutocomplete">
-            <mat-option *ngFor="let name of photographerNameOptions" [value]="name">
-                {{name}}
-            </mat-option>
-        </mat-autocomplete>
-        -->
-            <input type="search" [(ngModel)] = photographerName>
-            <div *ngFor="let name of photographerNameOptions | filter: photographerName">
-                {{name}}
+                        <div *ngIf='kindOfName == "Common"'>
+                            <mat-form-field appearance="fill">
+                                <mat-label>{{"taxonomy.viewer.label.language" | translate}}</mat-label>
+                                <mat-select field-class="symbiota2-field-class"
+                                            placeholder='{{"taxonomy.viewer.label.language" | translate}}'
+                                            [(value)]="language"
+                                            (selectionChange)="languageChangeAction(language)">
+                                    <mat-option *ngFor="let lang of languageList"
+                                                [value]="lang" >{{ lang }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </mat-radio-group>
+                </symbiota2-expansion-panel>
             </div>
-        </mat-form-field>
 
-        <!-- Search button -->
-        <button class="button" type="submit">{{"image.search.search.label" | translate}}</button>
-    </form>
+            <form class="name-autocomplete-form" (ngSubmit)="onSubmit()">
+                <mat-form-field class="name-autocomplete-full-width">
+                    <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxonomy.viewer.label.name.scientific" | translate}}</mat-label>
+                    <mat-label *ngIf='kindOfName == "Common"'>{{"taxonomy.viewer.label.name.common" | translate}}</mat-label>
+                    <!-- (keypress)="onKey($event)" -->
+                    <input *ngIf='kindOfName == "Scientific"' type="text"
+                           placeholder='{{"taxonomy.viewer.label.name.scientific" | translate}}'
+                           aria-label="String"
+                           matInput
+                           (keyup)="onKey($event)"
+                           [formControl]="nameControl"
+                           [matAutocomplete]="auto">
+                    <input *ngIf='kindOfName == "Common"' type="text"
+                           placeholder='{{"taxonomy.viewer.label.name.common" | translate}}'
+                           aria-label="String"
+                           matInput
+                           (keyup)="onKey($event)"
+                           [formControl]="nameControl"
+                           [matAutocomplete]="auto">
+
+                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                        <mat-option *ngFor="let option of nameOptions" [value]="nameFor(option)">
+                            {{nameFor(option)}} <small>{{authorFor(option)}}</small>
+                        </mat-option>
+
+                    </mat-autocomplete>
+
+                </mat-form-field>
+                <mat-label *ngIf="looking && !nameFound" style='color:red'>
+                    <b>{{"taxonomy.viewer.name.error" | translate}}</b>
+                    <br/>
+                </mat-label>
+                <button class="button" type="submit">{{"taxonomy.viewer.label.taxonomy" | translate}}</button>
+            </form>
+            <br/>
+            <mat-checkbox class="example-margin" [(ngModel)]='includeAuthors'>{{"taxonomy.viewer.label.checkbox.include.authors" | translate}}</mat-checkbox>
+
+            <symbiota2-expansion-panel
+                *ngIf='possibleTaxons.length > 1'
+                label='{{"taxonomy.viewer.label.choose.taxon" | translate}}'
+            >
+                <mat-selection-list
+                    #names
+                    (selectionChange)="nameListChange(names.selectedOptions.selected)"
+                    [multiple]="false"
+                >
+                    <mat-list-option *ngFor="let txn of possibleTaxons" [value]="txn.taxonID">
+                        {{txn.name}} {{txn.author}}
+                    </mat-list-option>
+                </mat-selection-list>
+            </symbiota2-expansion-panel>
+
+        </symbiota2-expansion-panel>
+    </div>
+
+    <div class="expansion-panel">
+        <symbiota2-expansion-panel expanded=false label='{{"image.search.by.photographer" | translate}}'>
+            <mat-selection-list
+                #photographers
+                (selectionChange)="photographerListChange(photographers.selectedOptions.selected)"
+                [multiple]="false"
+            >
+                <mat-list-option *ngFor="let photographer of photographerOptions" [value]="photographer.photographerUID">
+                    {{photographer.photographerName}}
+                </mat-list-option>
+            </mat-selection-list>
+        </symbiota2-expansion-panel>
+    </div>
+
+    <div class="expansion-panel">
+        <symbiota2-expansion-panel expanded=false label='{{"image.search.by.country" | translate}}'>
+            <mat-selection-list
+                #countries
+                (selectionChange)="countryListChange(countries.selectedOptions.selected)"
+                [multiple]="false"
+            >
+                <mat-list-option *ngFor="let country of countries" [value]="country.id">
+                    <!-- {{country.countryTerm}} -->
+                </mat-list-option>
+            </mat-selection-list>
+        </symbiota2-expansion-panel>
+    </div>
+
+    <div fxFill fxLayout="column" fxLayoutAlign="space-between">
+        <div fxLayout="row wrap">
+            <ng-container *ngFor="let image of data">
+                <img [src]="image.url">
+            </ng-container>
+        </div>
+
+        <mat-paginator [length]="data2.length"
+                       [pageSize]="size"
+                       [pageIndex]="page"
+                       [pageSizeOptions]="[4, 8, 12]"
+                       (page)="getData($event)">
+        </mat-paginator>
+    </div>
+
 </div>

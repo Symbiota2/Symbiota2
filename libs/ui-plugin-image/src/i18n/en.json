@@ -1,5 +1,7 @@
 {
     "plugins.image.name": "Images",
+    "core.layout.header.topnav.image_search_link" : "Search",
+    "core.layout.header.topnav.image_library_link" : "Library",
     "image.library.title": "Species with Images",
     "image.library.intro": "This page provides a complete list to taxa that have images. Use the controls below to browse and search for images by family, genus, or species.",
     "image.library.names": "Names",
@@ -14,5 +16,17 @@
     "image.details.manager": "Manager",
     "image.details.image.source": "Image Source",
     "image.details.image.notes": "Notes",
-    "image.details.image.locality": "Locality"
+    "image.details.image.locality": "Locality",
+
+    "image.search.title": "Image Search",
+    "image.search.options.label" : "Search options",
+    "image.search.option.all.images" : "All images",
+    "image.search.option.one.per.taxon" : "One per taxon",
+    "image.search.option.one.per.specimen" : "One per specimen",
+    "image.search.checkbox.label.need.identification" : "Display images needing identification",
+    "image.search.checkbox.label.low.quality" : "Display images with low quality identifications",
+    "image.search.checkbox.label.to.species" : "Display images identified to species",
+    "image.search.by.name" : "Using name",
+    "image.search.by.photographer" : "Using photographer",
+    "image.search.search.terms" : "Search terms"
 }

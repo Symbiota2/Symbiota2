@@ -5,8 +5,6 @@
 	"core.layout.header.banner.symbiota_logo_alt_text": "Symbiota logo",
 	"core.layout.header.topnav.dynamic_checklist_link": "Dynamic Checklist",
 	"core.layout.header.topnav.home_link": "Home",
-	"core.layout.header.topnav.image_library_link": "Image Library",
-	"core.layout.header.topnav.image_search_link": "Image Search",
 	"core.layout.header.topnav.images_link": "Images",
 	"core.layout.header.topnav.login_link": "Login",
 	"core.layout.header.topnav.logout_link": "Logout",

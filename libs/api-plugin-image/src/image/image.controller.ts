@@ -19,6 +19,7 @@ import { ImageFindAllParams } from './dto/image-find-all.input.dto'
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiFileInput } from '@symbiota2/api-common'
 import { Express } from 'express';
+import { PhotographerNameAndIDDto } from './dto/PhotographerNameAndIDDto';
 
 type File = Express.Multer.File
 
@@ -42,15 +43,16 @@ export class ImageController {
         return Promise.all(taxonDtos)
     }
 
-    @Get('photographerNames')
-    @ApiResponse({ status: HttpStatus.OK, type: String, isArray: true })
+    @Get('photographers')
+    @ApiResponse({ status: HttpStatus.OK, type: PhotographerNameAndIDDto, isArray: true })
     @ApiOperation({
-        summary: "Retrieve a list of distinct photographer names."
+        summary: "Retrieve a list of distinct photographer names and ids (basic photographer info)."
     })
-    async findPhotographerNames(): Promise<String[]> {
-        const images = await this.myService.findPhotographerNames()
+    async findPhotographerNames(): Promise<PhotographerNameAndIDDto[]> {
+        const images = await this.myService.findPhotographers()
         const s = images.map(async (c) => {
-            return c.o_photographer
+            //return c.o_photographer
+            return new PhotographerNameAndIDDto(c)
         });
         return Promise.all(s)
     }

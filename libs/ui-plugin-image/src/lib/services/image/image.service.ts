@@ -4,6 +4,7 @@ import { map } from 'rxjs/operators'
 import { Injectable } from '@angular/core'
 import { ImageQueryBuilder } from './image-query-builder'
 import { ImageListItem } from '../../dto/image-list-item'
+import { PhotographerInfoDto } from '../../dto/PhotographerInfoDto';
 
 interface FindAllParams {
     imageIDs: number[]
@@ -42,13 +43,13 @@ export class ImageService {
             )
     }
 
-    findPhotographerNames(): Observable<string[]> {
+    findPhotographers(): Observable<PhotographerInfoDto[]> {
         const url = this.createQueryBuilder()
-            .findPhotographerNames()
+            .findPhotographers()
             .build()
 
         const query = this.apiClient.queryBuilder(url).get().build()
-        return this.apiClient.send<any, string[]>(query)
+        return this.apiClient.send<any, PhotographerInfoDto[]>(query)
             .pipe(
                 map((descriptions) => descriptions.map((o) => {
                     return o;
