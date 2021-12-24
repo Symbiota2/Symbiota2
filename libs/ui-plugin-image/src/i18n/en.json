@@ -28,8 +28,11 @@
     "image.search.checkbox.label.to.species" : "Display images identified to species",
     "image.search.by.name" : "Using name",
     "image.search.by.photographer" : "Using photographer",
+    "image.search.by.photographers" : "Choose photographers",
     "image.search.by.country" : "Using country",
     "image.search.by.countries" : "Choose countries",
+    "image.search.by.state.province" : "Using state",
+    "image.search.by.state.provinces" : "Choose states or provinces",
     "image.search.by.tag.keys" : "Choose tags",
     "image.search.search.terms" : "Search terms"
 }

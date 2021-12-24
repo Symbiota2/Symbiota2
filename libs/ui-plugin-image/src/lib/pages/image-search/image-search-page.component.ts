@@ -7,10 +7,13 @@ import {
     TaxonService, TaxonVernacularService
 } from '@symbiota2/ui-plugin-taxonomy';
 import { ImageService, ImageTagKeyService } from '../../services';
-import { FilterPipe } from './filter.pipe';
-import { CommonModule } from "@angular/common";
 import { MatListOption } from '@angular/material/list';
-import { CountryListItem, CountryService } from '@symbiota2/ui-plugin-geography';
+import {
+    CountryListItem,
+    CountryService,
+    ProvinceListItem,
+    StateProvinceService
+} from '@symbiota2/ui-plugin-geography';
 import { ImageTagKeyListItem } from '../../dto';
 
 /**
@@ -37,9 +40,12 @@ interface TaxonNode {
 export class ImageSearchPageComponent implements OnInit {
     nameControl = new FormControl()
     nameOptions: string[] = []
+
     photographerNameControl = new FormControl()
     photographerOptions = []
     photographer = null
+    photographerForm
+
     hasAuthors = false
     includeAuthors = false
     language = "none"
@@ -60,6 +66,10 @@ export class ImageSearchPageComponent implements OnInit {
     countryOptions : CountryListItem[] = []
     countryForm
 
+    stateProvince : ProvinceListItem[] = []
+    stateProvinceOptions : ProvinceListItem[] = []
+    stateProvinceForm
+
     nameFound = false
     looking = false
     possibleTaxons  = []
@@ -79,6 +89,7 @@ export class ImageSearchPageComponent implements OnInit {
         private readonly imageService: ImageService,
         private readonly imageTagKeyService: ImageTagKeyService,
         private readonly countryService: CountryService,
+        private readonly stateProvinceService: StateProvinceService,
         private router: Router,
         private formBuilder: FormBuilder,
         private currentRoute: ActivatedRoute
@@ -117,6 +128,9 @@ export class ImageSearchPageComponent implements OnInit {
 
         // Get list of countries
         this.loadCountries()
+
+        // Get list of states and provinces
+        this.loadStates()
 
         // Get list of tag keys
         this.loadTagKeys()
@@ -200,6 +214,15 @@ export class ImageSearchPageComponent implements OnInit {
         this.countryService.countryList.subscribe((names) => {
             this.countryOptions = names
             })
+    }
+
+    /*
+    Load the countries
+    */
+    public loadStates() {
+        this.stateProvinceService.provinceList.subscribe((states) => {
+            this.stateProvinceOptions = states
+        })
     }
 
     /*

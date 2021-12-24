@@ -75,6 +75,24 @@ export class ImageService extends BaseService<Image>{
         return await qb.getRawMany()
     }
 
+    /*
+    Fetch image types info from the image repository.
+    */
+    async findImageTypes(): Promise<Image[]> {
+        //return this.myRepository.find({select: ['photographerName']})
+
+        const qb = this.myRepository.createQueryBuilder('o')
+            .select(
+                ['o.imageType as imageType', 'count(*) as sortSequence']
+            )
+            //.distinct(true)
+            //.limit(100)
+            .where('o.imageType IS NOT NULL')
+            .groupBy('o.imageType')
+            //.orderBy('o.photographerName')
+
+        return await qb.getRawMany()
+    }
 
     /*
     Fetch all of the taxon links.

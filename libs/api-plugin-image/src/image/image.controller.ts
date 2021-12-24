@@ -70,6 +70,19 @@ export class ImageController {
         return Promise.all(s)
     }
 
+    @Get('imageTypes')
+    @ApiResponse({ status: HttpStatus.OK, type: String, isArray: true })
+    @ApiOperation({
+        summary: "Retrieve a list of image types and their cound"
+    })
+    async findImageTypes(): Promise<string[][]> {
+        const images = await this.myService.findImageTypes()
+        const s = images.map(async (c) => {
+            return [c.type, c.sortSequence.toString()]
+        });
+        return Promise.all(s)
+    }
+
     @Get('taxonIDs')
     @ApiResponse({ status: HttpStatus.OK, type: ImageDto, isArray: true })
     @ApiOperation({
