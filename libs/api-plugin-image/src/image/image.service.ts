@@ -4,7 +4,6 @@ import { BaseService } from '@symbiota2/api-common'
 import { Image, Taxon } from '@symbiota2/api-database';
 import { ImageFindAllParams } from './dto/image-find-all.input.dto'
 import { Express } from 'express';
-import { DwCArchiveParser, getDwcField } from '@symbiota2/dwc';
 import { StorageService } from '@symbiota2/api-storage';
 import * as fs from 'fs';
 
@@ -38,6 +37,24 @@ export class ImageService extends BaseService<Image>{
         return await (qParams.id)?
             this.myRepository.find({take: limit, skip: offset, where: { id: In(params.id)}})
             : this.myRepository.find({take: limit, skip: offset})
+    }
+
+    /*
+ Fetch distinct photographers info from the image repository.
+ */
+    async findPhotographerNames(): Promise<Image[]> {
+        //return this.myRepository.find({select: ['photographerName']})
+
+        const qb = this.myRepository.createQueryBuilder('o')
+            .select(
+                'o.photographerName as photographerName'
+            )
+            .distinct(true)
+            //.limit(100)
+            .where('o.photographerName IS NOT NULL')
+            //.orderBy('o.photographerName')
+
+        return await qb.getRawMany()
     }
 
     /*

@@ -1,5 +1,4 @@
 import { Exclude, Expose, plainToClass } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
 
 @Exclude()
 export class ImageListItem {

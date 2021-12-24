@@ -35,3 +35,13 @@
     font-size: 10px;
 }
 
+mat-selection-list {
+    max-height: 200px;
+    overflow: auto;
+}
+
+.mat-list .mat-list-option {
+    min-height: 17px;
+    height: 17px;
+}
+

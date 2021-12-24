@@ -133,8 +133,8 @@
                 (selectionChange)="photographerListChange(photographers.selectedOptions.selected)"
                 [multiple]="false"
             >
-                <mat-list-option *ngFor="let photographer of photographerOptions" [value]="photographer.photographerUID">
-                    {{photographer.photographerName}}
+                <mat-list-option *ngFor="let photographer of photographerOptions" [value]="photographer">
+                    {{photographer}}
                 </mat-list-option>
             </mat-selection-list>
         </symbiota2-expansion-panel>
@@ -147,12 +147,66 @@
                 (selectionChange)="countryListChange(countries.selectedOptions.selected)"
                 [multiple]="false"
             >
-                <mat-list-option *ngFor="let country of countries" [value]="country.id">
-                    <!-- {{country.countryTerm}} -->
+                <mat-list-option *ngFor="let country of countryOptions" [value]="country.id">
+                    {{country.countryTerm}}
                 </mat-list-option>
             </mat-selection-list>
         </symbiota2-expansion-panel>
     </div>
+    <!--
+<div class="expansion-panel">
+<symbiota2-expansion-panel expanded=false label='{{"image.search.by.tag.keys" | translate}}'>
+
+    <mat-selection-list
+        #tagKeys
+        (selectionChange)="tagKeyListChange(tagKeys.selectedOptions.selected)"
+        [multiple]="true"
+    >
+        <mat-list-option *ngFor="let tagKey of tagKeyOptions" [value]="tagKey.tagKey">
+            {{tagKey.descriptionEn}}
+        </mat-list-option>
+    </mat-selection-list>
+
+
+
+
+
+        </symbiota2-expansion-panel>
+           </div>
+    -->
+
+
+    <mat-form-field appearance="fill">
+        <mat-label>{{"image.search.by.countries" | translate}}</mat-label>
+        <mat-select [formControl]="countryForm" multiple>
+            <mat-option
+                *ngFor="let country of countryOptions"
+                [value]="country.countryTerm"
+            >{{country.countryTerm}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    &nbsp;&nbsp;
+    <mat-form-field appearance="fill">
+        <mat-label>{{"image.search.by.tag.keys" | translate}}</mat-label>
+        <mat-select [formControl]="tagKeyForm" multiple>
+            <mat-option *ngFor="let tagKey of tagKeyOptions" [value]="tagKey.tagKey">{{tagKey.descriptionEn}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+        <!-- Using Items Input -->
+        <!--
+        <ng-select
+            [items]="tagKeyOptions"
+            bindLabel="name"
+            placeholder="Select Category"
+            appendTo="body"
+            [multiple]="true"
+            [(ngModel)]="selectedTagKeyOptions">
+        </ng-select>
+        -->
+
+
 
     <div fxFill fxLayout="column" fxLayoutAlign="space-between">
         <div fxLayout="row wrap">

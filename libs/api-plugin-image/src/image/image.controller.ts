@@ -48,11 +48,24 @@ export class ImageController {
     @ApiOperation({
         summary: "Retrieve a list of distinct photographer names and ids (basic photographer info)."
     })
-    async findPhotographerNames(): Promise<PhotographerNameAndIDDto[]> {
+    async findPhotographers(): Promise<PhotographerNameAndIDDto[]> {
         const images = await this.myService.findPhotographers()
         const s = images.map(async (c) => {
             //return c.o_photographer
             return new PhotographerNameAndIDDto(c)
+        });
+        return Promise.all(s)
+    }
+
+    @Get('photographerNames')
+    @ApiResponse({ status: HttpStatus.OK, type: PhotographerNameAndIDDto, isArray: true })
+    @ApiOperation({
+        summary: "Retrieve a list of distinct photographer names."
+    })
+    async findPhotographerNames(): Promise<string[]> {
+        const images = await this.myService.findPhotographerNames()
+        const s = images.map(async (c) => {
+            return c.photographerName //.o_photographer
         });
         return Promise.all(s)
     }

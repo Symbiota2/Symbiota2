@@ -25,16 +25,21 @@ import { MatDatepickerModule } from "@angular/material/datepicker";
 import { FlexModule } from "@angular/flex-layout";
 import { MatTreeModule } from '@angular/material/tree';
 import {
-    ImageService
+    ImageService,
+    ImageTagKeyService,
+    ImageTagService
 } from './services';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
-import { ImageDisplayPage, ImageLibraryPageComponent, ImageSearchPageComponent } from './pages';
-import { ImageDetailsPageComponent } from './pages/image-details/image-details-page.component';
+import {
+    ImageDisplayPage,
+    ImageLibraryPageComponent,
+    ImageSearchPageComponent,
+    ImageDetailsPageComponent
+} from './pages';
 import { FilterPipe } from './pages/image-search/filter.pipe';
 import { MatPaginatorModule } from '@angular/material/paginator';
-
 
 @NgModule({
     imports: [
@@ -74,6 +79,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     ],
     providers: [
         ImageService,
+        ImageTagKeyService,
+        ImageTagService,
     ],
     entryComponents: [
         ImageSearchPageComponent,

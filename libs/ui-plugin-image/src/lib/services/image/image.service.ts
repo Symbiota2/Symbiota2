@@ -3,8 +3,8 @@ import { ApiClientService, AppConfigService } from '@symbiota2/ui-common'
 import { map } from 'rxjs/operators'
 import { Injectable } from '@angular/core'
 import { ImageQueryBuilder } from './image-query-builder'
-import { ImageListItem } from '../../dto/image-list-item'
-import { PhotographerInfoDto } from '../../dto/PhotographerInfoDto';
+import { PhotographerInfoListItem } from '../../dto/PhotographerInfoListItem';
+import { ImageListItem, ImageTagListItem } from '../../dto';
 
 interface FindAllParams {
     imageIDs: number[]
@@ -43,13 +43,27 @@ export class ImageService {
             )
     }
 
-    findPhotographers(): Observable<PhotographerInfoDto[]> {
+    findPhotographers(): Observable<PhotographerInfoListItem[]> {
         const url = this.createQueryBuilder()
             .findPhotographers()
             .build()
 
         const query = this.apiClient.queryBuilder(url).get().build()
-        return this.apiClient.send<any, PhotographerInfoDto[]>(query)
+        return this.apiClient.send<any, PhotographerInfoListItem[]>(query)
+            .pipe(
+                map((descriptions) => descriptions.map((o) => {
+                    return o;
+                }))
+            )
+    }
+
+    findPhotographerNames(): Observable<string[]> {
+        const url = this.createQueryBuilder()
+            .findPhotographerNames()
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, string[]>(query)
             .pipe(
                 map((descriptions) => descriptions.map((o) => {
                     return o;

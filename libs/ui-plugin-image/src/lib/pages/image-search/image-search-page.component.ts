@@ -6,10 +6,12 @@ import {
     TaxonomicEnumTreeService, TaxonomicStatusService,
     TaxonService, TaxonVernacularService
 } from '@symbiota2/ui-plugin-taxonomy';
-import { ImageService } from '../../services';
+import { ImageService, ImageTagKeyService } from '../../services';
 import { FilterPipe } from './filter.pipe';
+import { CommonModule } from "@angular/common";
 import { MatListOption } from '@angular/material/list';
 import { CountryListItem, CountryService } from '@symbiota2/ui-plugin-geography';
+import { ImageTagKeyListItem } from '../../dto';
 
 /**
  * Taxonomic data with nested structure.
@@ -49,7 +51,14 @@ export class ImageSearchPageComponent implements OnInit {
     includeLowQuality = false
     atLevelOfSpecies = true
 
-    countries : CountryListItem[] = []
+    tagKey : ImageTagKeyListItem = null
+    tagKeyOptions : ImageTagKeyListItem[] = []
+    selectedTagKeyOptions = []
+    tagKeyForm
+
+    country : CountryListItem[] = []
+    countryOptions : CountryListItem[] = []
+    countryForm
 
     nameFound = false
     looking = false
@@ -68,6 +77,7 @@ export class ImageSearchPageComponent implements OnInit {
         private readonly taxonVernacularService: TaxonVernacularService,
         private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
         private readonly imageService: ImageService,
+        private readonly imageTagKeyService: ImageTagKeyService,
         private readonly countryService: CountryService,
         private router: Router,
         private formBuilder: FormBuilder,
@@ -107,6 +117,9 @@ export class ImageSearchPageComponent implements OnInit {
 
         // Get list of countries
         this.loadCountries()
+
+        // Get list of tag keys
+        this.loadTagKeys()
     }
 
     nameFor(option) {
@@ -145,6 +158,12 @@ export class ImageSearchPageComponent implements OnInit {
 
     }
 
+    tagKeyListChange(tagKey : MatListOption[]) {
+        tagKey.forEach((tagKey) => {
+            console.log(" tag key selected " + tagKey.value)
+        })
+
+    }
     /*
     Called when the choice of scientific vs. common is changed
      */
@@ -179,7 +198,20 @@ export class ImageSearchPageComponent implements OnInit {
     */
     public loadCountries() {
         this.countryService.countryList.subscribe((names) => {
-            this.countries = names
+            this.countryOptions = names
+            })
+    }
+
+    /*
+    Load the photographer names
+    */
+    public loadTagKeys() {
+        this.imageTagKeyService.findAll()
+            .subscribe((tagKeys) => {
+                this.tagKeyOptions = tagKeys
+                this.tagKeyOptions.sort(function (a, b) {
+                    return (a.sortOrder > b.sortOrder ? 1 : -1)
+                })
             })
     }
 
@@ -187,11 +219,11 @@ export class ImageSearchPageComponent implements OnInit {
     Load the photographer names
     */
     public loadPhotographers() {
-        this.imageService.findPhotographers()
+        this.imageService.findPhotographerNames()
             .subscribe((names) => {
                 this.photographerOptions = names
                 this.photographerOptions.sort(function (a, b) {
-                    return (a.photographerName > b.photographerName ? 1 : -1)
+                    return (a > b ? 1 : -1)
                 })
             })
     }

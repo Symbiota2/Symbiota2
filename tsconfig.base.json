@@ -53,5 +53,5 @@
       "@symbiota2/api-dwc": ["libs/api-dwc/src/index.ts"]
     }
   },
-  "exclude": ["node_modules", "tmp", "data"]
+  "exclude": ["node_modules", "tmp", "data", "images"]
 }
