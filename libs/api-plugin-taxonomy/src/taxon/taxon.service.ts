@@ -232,6 +232,53 @@ export class TaxonService extends BaseService<Taxon>{
     }
 
     /**
+     * Find all of the scientific names of taxons but only if the name has an image
+     * possibly using an array of ids and a taxonomic authority ID
+     * Set find params using the 'TaxonFindNamesParams'
+     * @param params - the 'TaxonFindNamesParams'
+     * @returns Observable of response from api casted as `Taxon[]`
+     * will be the found statements
+     * @returns `of(null)` if api errors
+     * @see Taxon
+     * @see TaxonFindNamesParams
+     */
+    async findAllScientificNamesWithImages(params?: TaxonFindNamesParams): Promise<Taxon[]> {
+        const { limit,...qParams } = params
+
+        if (qParams.taxonAuthorityID) {
+            const qb = this.taxonRepo.createQueryBuilder('o')
+                .select([
+                    'o.scientificName'
+                ])
+                .distinct(true)
+                .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
+                .innerJoin('o.taxonStatuses', 'c')
+                .innerJoin('o.images', 'k')
+                .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
+
+            if (qParams.partialName) {
+                qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
+            }
+            if (qParams.id) {
+                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
+            }
+            return await qb.getMany()
+        } else {
+            return (qParams.id)?
+                await this.taxonRepo.find({
+                    select: ["scientificName"],
+                    relations: ["images"],
+                    where: { id: In(params.id) },
+                    take: TaxonFindAllParams.MAX_LIMIT})
+                : await this.taxonRepo.find({
+                    select: ["scientificName"],
+                    relations: ["images"],
+                    take: TaxonFindAllParams.MAX_LIMIT
+                })
+        }
+    }
+
+    /**
      * Project the sciname from the taxa table for the rank of family using possibly
      * a list of taxaIDs and an authority ID
      * Set find params using the 'TaxonFindNamesParams'

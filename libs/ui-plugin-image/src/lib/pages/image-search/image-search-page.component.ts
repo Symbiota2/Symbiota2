@@ -44,12 +44,11 @@ export class ImageSearchPageComponent implements OnInit {
     photographerNameControl = new FormControl()
     photographerOptions = []
     photographer = null
-    photographerForm
+    photographerForm = new FormControl()
 
     hasAuthors = false
     includeAuthors = false
     language = "none"
-    kindOfName = "Scientific"
     languageList = []
     taxonomicAuthorityList = []
     taxonomicAuthorityID = 1 // Set the default taxa authority id
@@ -60,15 +59,19 @@ export class ImageSearchPageComponent implements OnInit {
     tagKey : ImageTagKeyListItem = null
     tagKeyOptions : ImageTagKeyListItem[] = []
     selectedTagKeyOptions = []
-    tagKeyForm
+    tagKeyForm = new FormControl()
+
+    imageType : string[] = []
+    imageTypeOptions : string[] = []
+    imageTypeForm = new FormControl()
 
     country : CountryListItem[] = []
     countryOptions : CountryListItem[] = []
-    countryForm
+    countryForm = new FormControl()
 
     stateProvince : ProvinceListItem[] = []
     stateProvinceOptions : ProvinceListItem[] = []
-    stateProvinceForm
+    stateProvinceForm = new FormControl()
 
     nameFound = false
     looking = false
@@ -120,11 +123,11 @@ export class ImageSearchPageComponent implements OnInit {
         // Load the authorities
         this.loadAuthorities()
 
-        // Get the common languages for display in the menu
-        this.loadVernacularLanguages()
-
         // Get the photographer names for display in the menu
         this.loadPhotographers()
+
+        // Get the image types for display
+        this.loadImageTypes()
 
         // Get list of countries
         this.loadCountries()
@@ -143,29 +146,12 @@ export class ImageSearchPageComponent implements OnInit {
     authorFor(option) {
         return this.hasAuthors? option.split(' -')[1] : ""
     }
-    /*
-    The vernacular language menu has a new choice
-     */
-    languageChangeAction(language) {
-        this.language = language
-    }
 
     /*
     Taxonomic authority has a new value
      */
     authorityChangeAction() {
         // If the authority changes...
-    }
-
-    /*
-    Reload the names as needed
-     */
-    loadNames(partialName) {
-        if (this.kindOfName == 'Scientific') {
-            this.loadScientificNames(partialName)
-        } else {
-            this.loadCommonNames(partialName)
-        }
     }
 
     countryListChange(country) {
@@ -192,7 +178,7 @@ export class ImageSearchPageComponent implements OnInit {
     onKey(event) {
         if (event.target.value) {
             const partialName = event.target.value
-            this.loadNames(partialName)
+            this.loadScientificNames(partialName)
         }
     }
 
@@ -222,6 +208,9 @@ export class ImageSearchPageComponent implements OnInit {
     public loadStates() {
         this.stateProvinceService.provinceList.subscribe((states) => {
             this.stateProvinceOptions = states
+            states.forEach((state) => {
+                console.log("state " + state)
+            })
         })
     }
 
@@ -246,6 +235,19 @@ export class ImageSearchPageComponent implements OnInit {
             .subscribe((names) => {
                 this.photographerOptions = names
                 this.photographerOptions.sort(function (a, b) {
+                    return (a > b ? 1 : -1)
+                })
+            })
+    }
+
+    /*
+    Load the image types
+    */
+    public loadImageTypes() {
+        this.imageService.findImageTypes()
+            .subscribe((types) => {
+                this.imageTypeOptions = types
+                this.imageTypeOptions.sort(function (a, b) {
                     return (a > b ? 1 : -1)
                 })
             })
@@ -281,37 +283,6 @@ export class ImageSearchPageComponent implements OnInit {
     }
 
     /*
-    Load the languages for vernacular names
-     */
-    public loadVernacularLanguages() {
-        this.taxonVernacularService.findAllLanguages(this.taxonomicAuthorityID)
-            .subscribe((language) => {
-                this.languageList = language
-            })
-    }
-
-    /*
-    Load the common names using the chosen language
-     */
-    public loadCommonNames(partialName) {
-        const language = this.language
-
-        // If the language is not set, load all of the common names
-        if (this.language == "none") {
-            this.taxonVernacularService.findAllCommonNames(partialName, this.taxonomicAuthorityID)
-                .subscribe((names) => {
-                    this.nameOptions = names
-                })
-        } else {
-            this.taxonVernacularService.findAllCommonNamesByLanguage(language, partialName, this.taxonomicAuthorityID)
-                .subscribe((names) => {
-                    this.nameOptions = names
-                })
-        }
-
-    }
-
-    /*
     Load Scientific names that start with partialName into a list
      */
     public loadScientificNames(partialName) {
@@ -322,7 +293,7 @@ export class ImageSearchPageComponent implements OnInit {
                     this.nameOptions = names
                 })
         } else {
-            this.taxaService.findAllScientificNames(partialName, this.taxonomicAuthorityID)
+            this.taxaService.findAllScientificNamesWithImages(partialName, this.taxonomicAuthorityID)
                 .subscribe((names) => {
                     this.nameOptions = names
                 })
@@ -332,13 +303,8 @@ export class ImageSearchPageComponent implements OnInit {
     Called when a taxon is chosen to search for an image
     */
     onSubmit(): void {
-        if (this.kindOfName == 'Scientific') {
-            const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
-
-        } else {
-            this.nameControl.value
-        }
-
+        console.log("foo")
+        const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
     }
 
     goToLink(url: string){

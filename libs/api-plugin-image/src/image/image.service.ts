@@ -83,12 +83,12 @@ export class ImageService extends BaseService<Image>{
 
         const qb = this.myRepository.createQueryBuilder('o')
             .select(
-                ['o.imageType as imageType', 'count(*) as sortSequence']
+                ['o.type as type'/*, 'count(*) as sortSequence'*/]
             )
-            //.distinct(true)
+            .distinct(true)
             //.limit(100)
-            .where('o.imageType IS NOT NULL')
-            .groupBy('o.imageType')
+            .where('o.type IS NOT NULL')
+            //.groupBy('o.type')
             //.orderBy('o.photographerName')
 
         return await qb.getRawMany()

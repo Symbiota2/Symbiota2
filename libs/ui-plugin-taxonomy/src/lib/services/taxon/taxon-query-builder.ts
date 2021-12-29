@@ -18,6 +18,10 @@ export class TaxonQueryBuilder {
         return new FindAllScientificNamesBuilder(this.baseUrl)
     }
 
+    findAllScientificNamesWithImages() : FindAllScientificNamesWithImagesBuilder {
+        return new FindAllScientificNamesWithImagesBuilder(this.baseUrl)
+    }
+
     findAllScientificNamesPlusAuthors() : FindAllScientificNamesPlusAuthorsBuilder {
         return new FindAllScientificNamesPlusAuthorsBuilder(this.baseUrl)
     }
@@ -292,6 +296,50 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
     }
 
     partialName(name : string): FindAllScientificNamesBuilder {
+        this._partialName = name
+        return this
+    }
+
+    familyRank(): FindAllScientificNamesBuilder {
+        this.url = new URL(`${this.baseUrl}/taxon/familyNames`)
+        return this
+    }
+
+    genusRank(): FindAllScientificNamesBuilder {
+        this.url = new URL(`${this.baseUrl}/taxon/genusNames`)
+        return this
+    }
+
+    speciesRank(): FindAllScientificNamesBuilder {
+        this.url = new URL(`${this.baseUrl}/taxon/speciesNames`)
+        return this
+    }
+
+    build(): string {
+        if (this._authorityID) {
+            this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
+        }
+        if (this._partialName) {
+            this.url.searchParams.append(Q_PARAM_PARTIALNAME, this._partialName)
+        }
+        return super.build()
+    }
+}
+
+class FindAllScientificNamesWithImagesBuilder extends TaxonQueryBuilder {
+
+    constructor(apiBaseUrl: string) {
+        super(apiBaseUrl)
+        this.baseUrl = apiBaseUrl
+        this.url = new URL(`${apiBaseUrl}/taxon/scientificNamesWithImages`)
+    }
+
+    authorityID(authorityID : string): FindAllScientificNamesWithImagesBuilder {
+        this._authorityID = authorityID
+        return this
+    }
+
+    partialName(name : string): FindAllScientificNamesWithImagesBuilder {
         this._partialName = name
         return this
     }

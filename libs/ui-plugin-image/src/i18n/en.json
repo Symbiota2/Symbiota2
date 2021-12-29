@@ -34,5 +34,8 @@
     "image.search.by.state.province" : "Using state",
     "image.search.by.state.provinces" : "Choose states or provinces",
     "image.search.by.tag.keys" : "Choose tags",
-    "image.search.search.terms" : "Search terms"
+    "image.search.by.image.type" : "Choose image types",
+    "image.search.by.scientific.name" : "Enter scientific name",
+    "image.search.search.terms" : "Search terms",
+    "image.search.search.button" : "Find Images"
 }

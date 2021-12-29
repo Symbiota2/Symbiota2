@@ -71,6 +71,20 @@ export class ImageService {
             )
     }
 
+    findImageTypes(): Observable<string[]> {
+        const url = this.createQueryBuilder()
+            .findImageTypes()
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, string[]>(query)
+            .pipe(
+                map((descriptions) => descriptions.map((o) => {
+                    return o;
+                }))
+            )
+    }
+
     findByTaxonIDs(ids: number[]): Observable<ImageListItem[]> {
         const url = this.createQueryBuilder()
             .findByTaxonIDs()
