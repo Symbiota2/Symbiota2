@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+    TaxonIDAndNameItem,
     TaxonomicAuthorityService,
     TaxonomicEnumTreeService, TaxonomicStatusService,
     TaxonService, TaxonVernacularService
@@ -39,10 +40,11 @@ interface TaxonNode {
 
 export class ImageSearchPageComponent implements OnInit {
     nameControl = new FormControl()
-    nameOptions: string[] = []
+    nameOptions: TaxonIDAndNameItem[] = []
+    taxonIDList: number[] = []
 
     photographerNameControl = new FormControl()
-    photographerOptions = []
+    photographerOptions : string[] = []
     photographer = null
     photographerForm = new FormControl()
 
@@ -80,7 +82,8 @@ export class ImageSearchPageComponent implements OnInit {
     data = []
     data2 = []
     page= 0
-    size = 4
+    size = 20
+    pageSizeOptions = [20, 40, 60, 80, 100]
 
     constructor(
         //private readonly userService: UserService,  // TODO: needed?
@@ -158,12 +161,6 @@ export class ImageSearchPageComponent implements OnInit {
 
     }
 
-    tagKeyListChange(tagKey : MatListOption[]) {
-        tagKey.forEach((tagKey) => {
-            console.log(" tag key selected " + tagKey.value)
-        })
-
-    }
     /*
     Called when the choice of scientific vs. common is changed
      */
@@ -183,17 +180,6 @@ export class ImageSearchPageComponent implements OnInit {
     }
 
     /*
-    Reload the names as a user types
-    */
-    onKeyPhotographerName(event) {
-        console.log(event.target.value)
-        if (event.target.value) {
-            //const partialName = event.target.value
-            //this.loadNames(partialName)
-        }
-    }
-
-    /*
     Load the countries
     */
     public loadCountries() {
@@ -203,14 +189,16 @@ export class ImageSearchPageComponent implements OnInit {
     }
 
     /*
-    Load the countries
+    Load the states
     */
     public loadStates() {
         this.stateProvinceService.provinceList.subscribe((states) => {
             this.stateProvinceOptions = states
+            /*
             states.forEach((state) => {
                 console.log("state " + state)
             })
+             */
         })
     }
 
@@ -253,10 +241,6 @@ export class ImageSearchPageComponent implements OnInit {
             })
     }
 
-    public photographerListChange(photographer) {
-        this.photographer = photographer
-    }
-
     /*
     Load the taxa authorities
     */
@@ -276,22 +260,15 @@ export class ImageSearchPageComponent implements OnInit {
     }
 
     /*
-    Load the kingdoms -- currently not implemented or used
-     */
-    public loadKingdoms() {
-
-    }
-
-    /*
     Load Scientific names that start with partialName into a list
      */
     public loadScientificNames(partialName) {
         this.nameOptions= []
         if (this.hasAuthors) {
-            this.taxaService.findAllScientificNamesPlusAuthors(partialName, this.taxonomicAuthorityID)
-                .subscribe((names) => {
-                    this.nameOptions = names
-                })
+            //this.taxaService.findAllScientificNamesPlusAuthors(partialName, this.taxonomicAuthorityID)
+            //    .subscribe((names) => {
+            //        this.nameOptions = names
+            //    })
         } else {
             this.taxaService.findAllScientificNamesWithImages(partialName, this.taxonomicAuthorityID)
                 .subscribe((names) => {
@@ -303,8 +280,37 @@ export class ImageSearchPageComponent implements OnInit {
     Called when a taxon is chosen to search for an image
     */
     onSubmit(): void {
-        console.log("foo")
-        const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
+        if (this.nameControl.value) {
+            // const names : number[] = this.nameControl.value
+            //names.forEach((value) => {
+            //    this.taxonIDList.push(value)
+            //})
+            this.nameOptions.forEach((name) => {
+                if (this.nameControl.value == name.name) {
+                    this.taxonIDList.push(name.id)
+                }
+            })
+        }
+        this.imageService.imageSearch(
+            this.taxonIDList,
+            this.photographerNameControl.value? this.photographerNameControl.value : [],
+            this.imageTypeForm.value? this.imageTypeForm.value : [],
+            this.tagKeyForm.value? this.tagKeyForm.value : [],
+            this.countryForm.value? this.countryForm.value : [],
+            this.stateProvinceForm.value? this.stateProvinceForm.value : []
+        ).subscribe((images) => {
+            console.log("got images " + images.length)
+            images.forEach((image) => {
+                console.log("url " + image.url)
+                console.log("thumbnail " + image.thumbnailUrl)
+                console.log("id " + image.id)
+            })
+            this.data2 = images
+            this.data = []
+            //this.data = images
+            this.getData(null)
+        })
+        // const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
     }
 
     goToLink(url: string){
@@ -312,18 +318,18 @@ export class ImageSearchPageComponent implements OnInit {
     }
 
     getData(obj) {
-        let index=0,
-            startingIndex=obj.pageIndex * obj.pageSize,
-            endingIndex=startingIndex + obj.pageSize;
+        let index=0
+        let startingIndex = 0
+        let endingIndex = this.size
+        if (obj) {
+            startingIndex= obj.pageIndex * obj.pageSize
+            endingIndex= startingIndex + obj.pageSize
+        }
 
         this.data = this.data2.filter(() => {
             index++;
-            return (index > startingIndex && index <= endingIndex) ? true : false;
-        });
-    }
-
-    nameListChange(options: MatListOption[]) {
-        //this.buildTree(+options.map(o => o.value))
+            return (index > startingIndex && index <= endingIndex) ? true : false
+        })
     }
 
     nameListCheck(sciname) {

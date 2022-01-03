@@ -1,1 +1,6 @@
-export const Q_PARAM_TAXAIDS = 'id[]'
+export const Q_PARAM_TAXAIDS = 'taxaid[]'
+export const Q_PARAM_IMAGE_TYPES = 'type[]'
+export const Q_PARAM_IMAGE_TAGS = 'tag[]'
+export const Q_PARAM_IMAGE_PHOTOGRAPHER_NAMES = 'photographer[]'
+export const Q_PARAM_COUNTRIES = 'country[]'
+export const Q_PARAM_PROVINCES = 'province[]'

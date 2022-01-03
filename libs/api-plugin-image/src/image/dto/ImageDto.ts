@@ -1,9 +1,10 @@
 import { Exclude, Expose, Type } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
+import { Image } from '@symbiota2/api-database';
 
 @Exclude()
 export class ImageDto {
-    constructor(image: ImageDto) {
+    constructor(image: Image) {
         Object.assign(this, image)
     }
 

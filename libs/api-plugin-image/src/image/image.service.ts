@@ -6,6 +6,7 @@ import { ImageFindAllParams } from './dto/image-find-all.input.dto'
 import { Express } from 'express';
 import { StorageService } from '@symbiota2/api-storage';
 import * as fs from 'fs';
+import { ImageSearchParams } from './dto/ImageSearchParams';
 
 type File = Express.Multer.File
 
@@ -94,8 +95,55 @@ export class ImageService extends BaseService<Image>{
         return await qb.getRawMany()
     }
 
+    /* Search
+    Can limit the list by a list of ids.
+    Can also limit the number fetched and use an offset.
+    */
+    async imageSearch(params?: ImageSearchParams): Promise<Image[]> {
+        const { limit, offset, ...qParams } = params;
+
+        let qb = this.myRepository.createQueryBuilder('image')
+            .select()
+            .where('true')
+        if (params?.limit) {
+            qb = qb.limit(limit)
+        }
+        if (params?.offset) {
+            qb = qb.offset(offset)
+        }
+        if (qParams.taxaid) {
+            qb = qb.andWhere("image.taxonID IN (:...taxaIDs)",
+                    { taxaIDs: qParams.taxaid })
+        }
+        if (qParams.type) {
+            qb = qb.andWhere("image.type IN (:...imageTypes)",
+                    { imageTypes: qParams.type })
+        }
+        if (qParams.photographer) {
+            qb = qb.andWhere("image.photographerName IN (:...photographers)",
+                    { photographers: qParams.photographer })
+        }
+        if (qParams.key) {
+            qb = qb.leftJoinAndSelect("image.tags", "tags")
+                .andWhere("tags.keyValueStr IN (:...tagKeys)",
+                    { tagKeys: qParams.key })
+        }
+        if (qParams.country || qParams.province) {
+            qb = qb.leftJoinAndSelect("image.occurrence", "occurrence")
+            if (qParams.country) {
+                qb = qb.andWhere("occurrence.country IN (:...countries)",
+                    { countries: qParams.country })
+            }
+            if (qParams.province) {
+                qb = qb.andWhere("occurrence.stateProvince IN (:...provinces)",
+                    { provinces: qParams.province })
+            }
+        }
+        return await qb.getMany()
+    }
+
     /*
-    Fetch all of the taxon links.
+    Fetch all of the images using taxon ids.
     Can limit the list by a list of ids.
     Can also limit the number fetched and use an offset.
     */
@@ -106,7 +154,6 @@ export class ImageService extends BaseService<Image>{
             this.myRepository.find({take: limit, skip: offset, where: { taxonID: In(params.id)}})
             : []
     }
-
 
     /*
     TODO: Not sure if this is implemented correctly.

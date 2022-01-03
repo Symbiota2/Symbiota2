@@ -161,8 +161,8 @@
                [matAutocomplete]="auto">
 
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-            <mat-option *ngFor="let option of nameOptions" [value]="nameFor(option)">
-                {{nameFor(option)}} <small>{{authorFor(option)}}</small>
+            <mat-option *ngFor="let option of nameOptions" [value]="option.name">
+                {{nameFor(option.name)}} <small>{{authorFor(option.name)}}</small>
             </mat-option>
 
         </mat-autocomplete>
@@ -189,7 +189,7 @@
         <mat-select [formControl]="stateProvinceForm" multiple>
             <mat-option
                 *ngFor="let state of stateProvinceOptions"
-                [value]="state.id"
+                [value]="state.stateTerm"
             >{{state.stateTerm}}
             </mat-option>
         </mat-select>
@@ -238,8 +238,6 @@
         </ng-select>
         -->
 
-
-
     <div fxFill fxLayout="column" fxLayoutAlign="space-between">
         <div fxLayout="row wrap">
             <ng-container *ngFor="let image of data">
@@ -250,7 +248,7 @@
         <mat-paginator [length]="data2.length"
                        [pageSize]="size"
                        [pageIndex]="page"
-                       [pageSizeOptions]="[4, 8, 12]"
+                       [pageSizeOptions]="pageSizeOptions"
                        (page)="getData($event)">
         </mat-paginator>
     </div>

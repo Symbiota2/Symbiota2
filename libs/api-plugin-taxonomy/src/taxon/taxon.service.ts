@@ -248,7 +248,7 @@ export class TaxonService extends BaseService<Taxon>{
         if (qParams.taxonAuthorityID) {
             const qb = this.taxonRepo.createQueryBuilder('o')
                 .select([
-                    'o.scientificName'
+                    'o.id','o.scientificName'
                 ])
                 .distinct(true)
                 .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
@@ -266,12 +266,12 @@ export class TaxonService extends BaseService<Taxon>{
         } else {
             return (qParams.id)?
                 await this.taxonRepo.find({
-                    select: ["scientificName"],
+                    select: ["id","scientificName"],
                     relations: ["images"],
                     where: { id: In(params.id) },
                     take: TaxonFindAllParams.MAX_LIMIT})
                 : await this.taxonRepo.find({
-                    select: ["scientificName"],
+                    select: ["id","scientificName"],
                     relations: ["images"],
                     take: TaxonFindAllParams.MAX_LIMIT
                 })

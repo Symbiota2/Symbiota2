@@ -20,6 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiFileInput } from '@symbiota2/api-common'
 import { Express } from 'express';
 import { PhotographerNameAndIDDto } from './dto/PhotographerNameAndIDDto';
+import { ImageSearchParams } from './dto/ImageSearchParams';
 
 type File = Express.Multer.File
 
@@ -95,6 +96,20 @@ export class ImageController {
             return image
         });
         return Promise.all(taxonDtos)
+    }
+
+    @Get('search')
+    @ApiResponse({ status: HttpStatus.OK, type: ImageDto, isArray: true })
+    @ApiOperation({
+        summary: "Retrieve a list of image records using a slew of potential filters: taxon ids, country ids, state/province ids, image types, image tags, and photographer names"
+    })
+    async imageSearch(@Query() searchParams: ImageSearchParams): Promise<ImageDto[]> {
+        const images = await this.myService.imageSearch(searchParams)
+        const dtos = images.map((c) => {
+            const image = new ImageDto(c)
+            return image
+        })
+        return Promise.all(dtos)
     }
 
     @Get(':id')

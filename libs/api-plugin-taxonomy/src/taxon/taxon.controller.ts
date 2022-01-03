@@ -85,18 +85,20 @@ export class TaxonController {
 
     // Get a list of all the scientific names
     @Get('scientificNamesWithImages')
-    @ApiResponse({ status: HttpStatus.OK, type: String, isArray: true })
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonIDandNameDto, isArray: true })
     @ApiOperation({
         summary: "Retrieve a list of scientific names if the taxon has an image.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
-    async findAllScientificNamesWithImages(@Query() findNamesParams: TaxonFindNamesParams): Promise<string[]> {
+    async findAllScientificNamesWithImages(
+        @Query() findNamesParams: TaxonFindNamesParams
+    ): Promise<TaxonIDandNameDto[]> {
         const taxons = await this.taxa.findAllScientificNamesWithImages(findNamesParams)
         if (!taxons) {
             // throw new NotFoundException()
             return []
         }
         const names = taxons.map(async (c) => {
-            return c.scientificName
+            return new TaxonIDandNameDto(c.id, c.scientificName)
         });
         return Promise.all(names)
     }
@@ -114,7 +116,7 @@ export class TaxonController {
             return []
         }
         const names = items.map(async (c) => {
-            return new TaxonIDandNameDto(c.scientificName, c.id)
+            return new TaxonIDandNameDto(c.id, c.scientificName)
         });
         return Promise.all(names)
     }
@@ -132,7 +134,7 @@ export class TaxonController {
             return []
         }
         const names = items.map(async (c) => {
-            return new TaxonIDandNameDto(c.scientificName, c.id)
+            return new TaxonIDandNameDto(c.id, c.scientificName)
         });
         return Promise.all(names)
     }
@@ -150,7 +152,7 @@ export class TaxonController {
             return []
         }
         const names = items.map(async (c) => {
-            return new TaxonIDandNameDto(c.scientificName, c.id)
+            return new TaxonIDandNameDto(c.id, c.scientificName)
         });
         return Promise.all(names)
     }

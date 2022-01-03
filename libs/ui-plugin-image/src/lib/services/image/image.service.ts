@@ -85,6 +85,33 @@ export class ImageService {
             )
     }
 
+    imageSearch(
+        taxonIds: number[],
+        photographers: string[],
+        imageTypes: string[],
+        tagKeys: string[],
+        countries: string[],
+        provinces: string[]
+    ): Observable<ImageListItem[]> {
+        const url = this.createQueryBuilder()
+            .imageSearch()
+            .taxonIDs(taxonIds)
+            .photographers(photographers)
+            .imageTypes(imageTypes)
+            .tagKeys(tagKeys)
+            .countries(countries)
+            .provinces(provinces)
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build();
+        return this.apiClient.send<any, Record<string, unknown>[]>(query)
+            .pipe(
+                map((descriptions) => descriptions.map((o) => {
+                    return ImageListItem.fromJSON(o);
+                }))
+            )
+    }
+
     findByTaxonIDs(ids: number[]): Observable<ImageListItem[]> {
         const url = this.createQueryBuilder()
             .findByTaxonIDs()
