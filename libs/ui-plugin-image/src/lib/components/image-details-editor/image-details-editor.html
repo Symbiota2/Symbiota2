@@ -1,0 +1,14 @@
+<symbiota2-expansion-panel label='{{taxon?.scientificName}}'>
+    <button *ngIf='userCanEdit' style='float:right' mat-icon-button>
+        <mat-icon color="primary" (click)="openDialog('Update',taxon)">edit</mat-icon>
+    </button>
+
+
+    <div><b>{{"image.details.sciname" | translate}}</b>: {{taxon.scientificName}} {{taxon.author}}</div>
+    <div><b>{{"image.details.caption" | translate}}</b>: {{image.caption}}</div>
+    <div><b>{{"image.details.photographer" | translate}}r</b>: {{image.photographerName}}</div>
+    <div><b>{{"image.details.manager" | translate}}</b>: {{image.owner}}</div>
+    <div><b>{{"image.details.image.source" | translate}}</b>: <a href='{{image.originalUrl}}'>{{image.originalUrl}}</a></div>
+    <div><b>{{"image.details.image.locality" | translate}}</b>: {{image.locality}}</div>
+    <div><b>{{"image.details.image.notes" | translate}}</b>: <span [innerHTML]="image.notes"></span></div>
+</symbiota2-expansion-panel>

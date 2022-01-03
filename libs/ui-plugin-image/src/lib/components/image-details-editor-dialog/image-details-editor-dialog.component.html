@@ -1,0 +1,104 @@
+<div mat-dialog-content>
+        <form *ngIf="action == 'Update'; else elseTemplate" class="name-autocomplete-form">
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{"image.details.caption" | translate}}</mat-label>
+                <input matInput
+                       maxlength="500"
+                       [value]="local_data.caption"
+                       [(ngModel)]="local_data.caption"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{"image.details.photographer" | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.photographerName"
+                       [(ngModel)]="local_data.photographerName"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{"image.details.manager" | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.owner"
+                       [(ngModel)]="local_data.owner"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{"image.details.image.source" | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.originalUrl"
+                       [(ngModel)]="local_data.originalUrl"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{"image.details.image.locality" | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.locality"
+                       [(ngModel)]="local_data.locality"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{"image.details.image.notes" | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.notes"
+                       [(ngModel)]="local_data.notes"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'image.details.image.sortSequence' | translate}}</mat-label>
+                <input matInput
+                       [formControl]='sortSequence'
+                >
+                <div *ngIf="sortSequence.invalid && (sortSequence.dirty || sortSequence.touched)"
+                     >
+                <mat-error *ngIf="sortSequence.invalid">Not a valid number</mat-error>
+                </div>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'image.details.image.copyright' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.copyright"
+                       [(ngModel)]="local_data.copyright"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'image.details.image.accessRights' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.accessRights"
+                       [(ngModel)]="local_data.accessRights"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'image.details.image.rights' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.rights"
+                       [(ngModel)]="local_data.rights"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+        </form>
+    <ng-template #elseTemplate>
+        {{'image.details.editor.dialog.confirm.delete' | translate}}?
+    </ng-template>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="doAction()">{{action}}</button>
+    <button mat-button (click)="closeDialog()" mat-flat-button color="warn">{{'image.details.editor.dialog.cancel' | translate}}</button>
+</div>

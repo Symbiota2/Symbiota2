@@ -226,22 +226,12 @@
         {{"image.search.search.button" | translate}}
     </button>
 
-        <!-- Using Items Input -->
-        <!--
-        <ng-select
-            [items]="tagKeyOptions"
-            bindLabel="name"
-            placeholder="Select Category"
-            appendTo="body"
-            [multiple]="true"
-            [(ngModel)]="selectedTagKeyOptions">
-        </ng-select>
-        -->
-
     <div fxFill fxLayout="column" fxLayoutAlign="space-between">
         <div fxLayout="row wrap">
             <ng-container *ngFor="let image of data">
-                <img [src]="image.url">
+                <a [routerLink]="['/image/details', image.id]" target="_blank" class='imagelink'>
+                    <img height="100" [src]="image.url">&nbsp;&nbsp;
+                </a>
             </ng-container>
         </div>
 

@@ -155,16 +155,21 @@ export class ImageService extends BaseService<Image>{
             : []
     }
 
-    /*
-    TODO: Not sure if this is implemented correctly.
+    /**
+     * Create an image record using a Partial Image record
+     * @param data The data for the record to create
+     * @return number The created data or null (not found)
      */
     async create(data: Partial<Image>): Promise<Image> {
-        const taxon = this.myRepository.create(data);
-        return this.myRepository.save(taxon);
+        const taxon = this.myRepository.create(data)
+        return this.myRepository.save(taxon)
     }
 
-    /*
-    TODO: Implement
+    /**
+     * Update an image record using an image id.
+     * @param id The id of the image
+     * @param data The data to update
+     * @return Image The updated data or null (not found or api error)
      */
     async updateByID(id: number, data: Partial<Image>): Promise<Image> {
         const updateResult = await this.myRepository.update({ id }, data);

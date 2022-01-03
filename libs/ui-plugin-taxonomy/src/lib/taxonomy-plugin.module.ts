@@ -25,16 +25,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { FlexModule } from "@angular/flex-layout";
 import { MatTreeModule } from '@angular/material/tree';
-import {
-    TaxonomicEnumTreeService,
-    TaxonService,
-    TaxonomicStatusService,
-    TaxonVernacularService,
-    TaxonomicAuthorityService,
-    TaxonDescriptionBlockService,
-    TaxonDescriptionStatementService,
-    TaxonomicUnitService
-} from './services';
+
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
@@ -73,10 +64,20 @@ import {
     TAXON_EDITOR_ROUTE,
     TAXON_PROFILE_ROUTE
 } from './routes';
-import { ROUTE_UPLOAD_FIELD_MAP } from '../../../ui-plugin-occurrence/src/lib/routes';
-import { OccurrenceUploadFieldMapPage } from '../../../ui-plugin-occurrence/src/lib/pages/occurrence-upload/field-map/field-map.component';
-import { TaxonomyUploadProblemRanksPage } from './pages/taxonomy-upload/taxonomy-upload-problem-ranks/taxonomy-upload-problem-ranks-page';
-import { TaxonomyUploadProblemParentNamesPage } from './pages/taxonomy-upload/taxonomy-upload-problem-parent-names/taxonomy-upload-problem-parent-names-page';
+//import { ROUTE_UPLOAD_FIELD_MAP } from '../../../ui-plugin-occurrence/src/lib/routes';
+//import { OccurrenceUploadFieldMapPage } from '../../../ui-plugin-occurrence/src/lib/pages/occurrence-upload/field-map/field-map.component';
+import { TaxonomyUploadProblemRanksPage } from './pages/taxonomy-upload/taxonomy-upload-problem-ranks/taxonomy-upload-problem-ranks-page'
+import { TaxonomyUploadProblemParentNamesPage } from './pages/taxonomy-upload/taxonomy-upload-problem-parent-names/taxonomy-upload-problem-parent-names-page'
+import {
+    TaxonomicEnumTreeService,
+    TaxonService,
+    TaxonomicStatusService,
+    TaxonVernacularService,
+    TaxonomicAuthorityService,
+    TaxonDescriptionBlockService,
+    TaxonDescriptionStatementService,
+    TaxonomicUnitService
+} from './services'
 
 @NgModule({
   imports: [

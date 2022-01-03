@@ -2,10 +2,9 @@ import { Observable, of } from 'rxjs'
 import { AlertService, ApiClientService, AppConfigService, UserService } from '@symbiota2/ui-common';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core'
-import { Taxon, TaxonDescriptionBlockInputDto, TaxonDescriptionBlockListItem, TaxonListItem } from '../../dto';
+import { Taxon, TaxonListItem } from '../../dto';
 import { TaxonQueryBuilder } from './taxon-query-builder'
 import { TaxonIDAndNameItem } from '../../dto/taxon-id-and-name-item';
-import { TaxonDescriptionBlockQueryBuilder } from '../taxonDescriptionBlock/taxonDescriptionBlock-query-builder';
 import { TaxonInputDto } from '../../dto/taxonInputDto';
 
 interface FindAllParams {
@@ -24,7 +23,7 @@ export class TaxonService {
         private readonly appConfig: AppConfigService) { }
 
     private createQueryBuilder(): TaxonQueryBuilder {
-        return new TaxonQueryBuilder(this.appConfig.apiUri());
+        return new TaxonQueryBuilder(this.appConfig.apiUri())
     }
 
     public getUrl() {
@@ -197,7 +196,7 @@ export class TaxonService {
      */
     create(taxon: Partial<TaxonInputDto>): Observable<TaxonListItem> {
 
-        const url = this.createUrlBuilder().create()
+        const url = this.createQueryBuilder().create()
             .build()
 
         return this.jwtToken.pipe(
@@ -232,7 +231,7 @@ export class TaxonService {
      * @returns `of(null)` if taxon does not exist or does not have editing permission or api errors
      */
     update(taxon: TaxonInputDto): Observable<TaxonListItem> {
-        const url = this.createUrlBuilder()
+        const url = this.createQueryBuilder()
             .upload()
             .id(taxon.id)
             .build()
@@ -267,10 +266,10 @@ export class TaxonService {
      * sends request to api to delete a taxon record
      * @param id - the id of the taxon to delete
      * @returns Observable of response from api casted as `string`
-     * @returns `of(null)` if block does not exist or does not have editing permission or api errors
+     * @returns `of(null)` if taxon does not exist or does not have editing permission or api errors
      */
     delete(id): Observable<string> {
-        const url = this.createUrlBuilder()
+        const url = this.createQueryBuilder()
             .delete()
             .id(id)
             .build()
@@ -294,10 +293,6 @@ export class TaxonService {
                 )
             })
         )
-    }
-
-    private createUrlBuilder(): TaxonQueryBuilder {
-        return new TaxonQueryBuilder(this.appConfig.apiUri());
     }
 
 }

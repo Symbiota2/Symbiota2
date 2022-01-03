@@ -6,6 +6,7 @@ import {
     Q_PARAM_PROVINCES,
     Q_PARAM_TAXAIDS
 } from '../../../constants';
+import { TaxonQueryBuilder } from '../../../../../ui-plugin-taxonomy/src/lib/services/taxon/taxon-query-builder';
 
 export class ImageQueryBuilder {
     protected baseUrl: string
@@ -50,8 +51,75 @@ export class ImageQueryBuilder {
         return new FindOneBuilder(this.baseUrl)
     }
 
+    create(): CreateOneBuilder {
+        return new CreateOneBuilder(this.baseUrl);
+    }
+
+    delete(): DeleteOneBuilder {
+        return new DeleteOneBuilder(this.baseUrl);
+    }
+
+    upload(): UploadBuilder {
+        return new UploadBuilder(this.baseUrl);
+    }
+
     build(): string {
         return this.url.toString()
+    }
+}
+
+class CreateOneBuilder extends ImageQueryBuilder {
+    protected _myID: number;
+
+    myID(id: number): CreateOneBuilder {
+        this._myID = id;
+        return this;
+    }
+
+    build(): string {
+        return super.build();
+    }
+}
+
+class DeleteOneBuilder extends ImageQueryBuilder {
+    protected _id: number;
+
+    id(id: number): DeleteOneBuilder {
+        this._id = id
+        return this;
+    }
+
+    build(): string {
+        if (this._id) {
+            this.url.pathname += `/${this._id}`
+        }
+        return super.build()
+    }
+}
+
+class UploadBuilder extends ImageQueryBuilder {
+    private _id: number = null;
+    private _authID: number = null
+
+    id(id: number): UploadBuilder {
+        this._id = id;
+        return this;
+    }
+
+    authorityID(id: number): UploadBuilder {
+        this._authID = id;
+        return this;
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/upload`;
+        if (this._id) {
+            this.url.pathname += `/${this._id}`;
+        }
+        if (this._authID) {
+            this.url.pathname += `/${this._authID}`;
+        }
+        return super.build();
     }
 }
 

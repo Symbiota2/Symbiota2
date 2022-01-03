@@ -1,51 +1,90 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonListItem, TaxonomicStatusListItem,
-    TaxonomicStatusService,
-    TaxonService
+    TaxonListItem, TaxonomicStatusListItem, TaxonomicStatusService, TaxonomicUnitService,
+    TaxonService,
 } from '@symbiota2/ui-plugin-taxonomy';
-import { ImageListItem, ImageService } from '@symbiota2/ui-plugin-image';
-import { filter } from 'rxjs/operators';
-import { AlertService, UserService } from '@symbiota2/ui-common';
-import { ImageDetailsEditorDialogComponent } from '../../components';
-import { ImageInputDto } from '../../dto/ImageInputDto';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core'
 import { MatDialog } from '@angular/material/dialog';
+import { AlertService, UserService } from '@symbiota2/ui-common';
+import { filter } from 'rxjs/operators';
+import { ImageListItem, ImageService } from '@symbiota2/ui-plugin-image';
+import { ImageDetailsEditorDialogComponent } from '../image-details-editor-dialog/image-details-editor-dialog.component';
+import { ImageInputDto } from '../../dto/ImageInputDto';
+
+export interface ImageInfo {
+    id: number
+    taxonID: number | null
+    url: string
+    thumbnailUrl: string
+    originalUrl: string
+    archiveUrl: string
+    photographerName: string
+    photographerUID: number | null
+    type: string
+    format: string
+    caption: string
+    owner: string
+    sourceUrl: string
+    referenceUrl: string
+    copyright: string
+    rights: string
+    accessRights: string
+    locality: string
+    occurrenceID: number | null
+    notes: string
+    anatomy: string
+    username: string
+    sourceIdentifier: string
+    mediaMD5: string
+    dynamicProperties: string
+    sortSequence: number
+    initialTimestamp: Date
+}
 
 @Component({
-    selector: 'image-details',
-    templateUrl: './image-details-page.html',
-    styleUrls: ['./image-details-page.component.scss'],
+    selector: 'image-details-editor',
+    templateUrl: './image-details-editor.html',
+    styleUrls: ['./image-details-editor.component.scss'],
 })
 
-export class ImageDetailsPageComponent implements OnInit {
+export class ImageDetailsEditorComponent implements OnInit {
     imageID: string
     image: ImageListItem
     taxon: TaxonListItem
     taxonomicStatus: TaxonomicStatusListItem
 
+    dataSource
+    private taxonID: string
+    private idCounter = 0
     userID : number = null
-    userCanEdit: boolean = false
+    userCanEdit: boolean = true
+    ranksIDtoName = new Map()
+    rankName = ""
 
     constructor(
         private readonly userService: UserService,
-        private readonly taxonService: TaxonService,
+        private readonly taxaService: TaxonService,
+        private readonly taxonomicUnitService: TaxonomicUnitService,
         private readonly imageService: ImageService,
         private readonly taxonStatusService: TaxonomicStatusService,
+        //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
         private readonly alertService: AlertService,
         private router: Router,
         private formBuilder: FormBuilder,
+        private currentRoute: ActivatedRoute,
         private readonly translate: TranslateService,
-        public dialog: MatDialog,
-        private currentRoute: ActivatedRoute
-    ) { }
+        public dialog: MatDialog
+    ) {
+
+    }
 
     /*
     Called when Angular starts
-    */
+     */
     ngOnInit() {
+
         this.currentRoute.paramMap.subscribe(params => {
             this.imageID = params.get('imageID')
             // Load the profile
@@ -79,12 +118,11 @@ export class ImageDetailsPageComponent implements OnInit {
                 })
             })
         })
-     }
-
-    goToLink(url: string){
-        window.open("taxon/editor/" + url, "_blank");
     }
 
+    goToLink(url: string){
+        window.open("image/details/editor/" + url, "_blank");
+    }
 
     openDialog(action, obj) {
         obj.action = action
@@ -119,7 +157,7 @@ export class ImageDetailsPageComponent implements OnInit {
 
         // Construct a new taxon
         let a = obj as unknown as Record<PropertyKey, unknown>
-        a.id = this.imageID
+        a.id = this.taxonID
         a.initialTimestamp = new Date()
         const newImage = new ImageInputDto(a)
 
@@ -153,4 +191,5 @@ export class ImageDetailsPageComponent implements OnInit {
             this.alertService.showMessage(r)
         })
     }
+
 }

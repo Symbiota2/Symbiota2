@@ -10,10 +10,10 @@ import {
     Delete,
     NotFoundException,
     Patch,
-    UseInterceptors, UploadedFile, BadRequestException
+    UseInterceptors, UploadedFile, BadRequestException, UseGuards, Req, ParseArrayPipe, ForbiddenException
 } from '@nestjs/common';
 import { ImageService } from './image.service'
-import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger'
+import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { ImageDto } from './dto/ImageDto'
 import { ImageFindAllParams } from './dto/image-find-all.input.dto'
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -21,6 +21,11 @@ import { ApiFileInput } from '@symbiota2/api-common'
 import { Express } from 'express';
 import { PhotographerNameAndIDDto } from './dto/PhotographerNameAndIDDto';
 import { ImageSearchParams } from './dto/ImageSearchParams';
+import { AuthenticatedRequest, JwtAuthGuard, TokenService } from '@symbiota2/api-auth';
+import { TaxonDto } from '../../../api-plugin-taxonomy/src/taxon/dto/TaxonDto';
+import { TaxonInputDto } from '../../../api-plugin-taxonomy/src/taxon/dto/TaxonInputDto';
+import { Image, Taxon } from '@symbiota2/api-database';
+import { ImageInputDto } from './dto/ImageInputDto';
 
 type File = Express.Multer.File
 
@@ -140,6 +145,84 @@ export class ImageController {
             throw new BadRequestException('Invalid Image');
         }
         await this.myService.fromFile(file.originalname, file.filename, file.mimetype)
+    }
+
+    private canEdit(request) {
+        // SuperAdmins and TaxonProfileEditors have editing privileges
+        const isSuperAdmin = TokenService.isSuperAdmin(request.user)
+        const isEditor = false // TokenService.isImageEditor(request.user)
+        return isSuperAdmin || isEditor
+    }
+
+    @Post()
+    @ApiOperation({
+        summary: "Create a new image"
+    })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({ status: HttpStatus.OK, type: ImageDto })
+    //@SerializeOptions({ groups: ['single'] })
+    @ApiBody({ type: ImageInputDto, isArray: true })
+    /**
+     @see - @link ImageInputDto
+     **/
+    async create(
+        @Req() request: AuthenticatedRequest,
+        @Body(new ParseArrayPipe({ items: ImageInputDto })) data: ImageInputDto[]
+    ): Promise<ImageDto> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const image = await this.myService.create(data[0])
+        const dto = new ImageDto(image)
+        return dto
+    }
+
+    @Patch(':id')
+    @ApiOperation({
+        summary: "Update an image by ID"
+    })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({ status: HttpStatus.OK, type: Image })
+    @ApiBody({ type: ImageInputDto, isArray: true })
+    //@SerializeOptions({ groups: ['single'] })
+    async updateByID(
+        @Req() request: AuthenticatedRequest,
+        @Param('id') id: number,
+        @Body(new ParseArrayPipe({ items: ImageInputDto })) data: Image[]
+    ): Promise<Image> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const image = await this.myService.updateByID(id, data[0])
+        if (!image) {
+            throw new NotFoundException()
+        }
+        return image
+    }
+
+    @Delete(':id')
+    @ApiOperation({
+        summary: "Delete an image by ID"
+    })
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiResponse({ status: HttpStatus.NO_CONTENT })
+    async deleteByID(@Req() request: AuthenticatedRequest, @Param('id') id: number): Promise<void> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const block = await this.myService.deleteByID(id)
+        if (!block) {
+            throw new NotFoundException()
+        }
     }
 
 }

@@ -40,6 +40,7 @@ import {
 } from './pages';
 import { FilterPipe } from './pages/image-search/filter.pipe';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { ImageDetailsEditorComponent, ImageDetailsEditorDialogComponent } from './components';
 
 @NgModule({
     imports: [
@@ -74,6 +75,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
         ImageSearchPageComponent,
         ImageLibraryPageComponent,
         ImageDetailsPageComponent,
+        ImageDetailsEditorComponent,
+        ImageDetailsEditorDialogComponent,
         ImageDisplayPage,
         FilterPipe
     ],
@@ -86,7 +89,9 @@ import { MatPaginatorModule } from '@angular/material/paginator';
         ImageSearchPageComponent,
         ImageLibraryPageComponent,
         ImageDisplayPage,
-        ImageDetailsPageComponent
+        ImageDetailsPageComponent,
+        ImageDetailsEditorComponent,
+        ImageDetailsEditorDialogComponent
     ]
 })
 export class ImagePlugin extends SymbiotaUiPlugin {

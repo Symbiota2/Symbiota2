@@ -5,10 +5,13 @@
     <table>
         <tr>
             <td>
-                <a href='{{image.url}}'><img src='http://openherbarium.org{{image.thumbnailUrl}}'/></a>
+                <a href='{{image.url}}'><img src='{{image.thumbnailUrl}}'/></a>
                 <div style='text-align:center'> {{"image.details.clickon" | translate}} </div>
             </td>
             <td>
+                <button *ngIf='userCanEdit' style='float:right' mat-icon-button>
+                    <mat-icon color="primary" (click)="openDialog('Update',image)">edit</mat-icon>
+                </button>
                 <div>
                     <b>{{"image.details.sciname" | translate}}</b>: {{taxon.scientificName}} {{taxon.author}}
                 </div>
@@ -16,7 +19,7 @@
                     <b>{{"image.details.caption" | translate}}</b>: {{image.caption}}
                 </div>
                 <div>
-                    <b>{{"image.details.photographer" | translate}}r</b>: {{image.photographerName}}
+                    <b>{{"image.details.photographer" | translate}}</b>: {{image.photographerName}}
                 </div>
                 <div>
                     <b>{{"image.details.manager" | translate}}</b>: {{image.owner}}

@@ -1,10 +1,11 @@
-import { Observable } from 'rxjs'
-import { ApiClientService, AppConfigService } from '@symbiota2/ui-common'
-import { map } from 'rxjs/operators'
+import { Observable, of } from 'rxjs';
+import { AlertService, ApiClientService, AppConfigService, UserService } from '@symbiota2/ui-common';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core'
 import { ImageQueryBuilder } from './image-query-builder'
 import { PhotographerInfoListItem } from '../../dto/PhotographerInfoListItem';
-import { ImageListItem, ImageTagListItem } from '../../dto';
+import { ImageListItem } from '../../dto';
+import { ImageInputDto } from '../../dto/ImageInputDto';
 
 interface FindAllParams {
     imageIDs: number[]
@@ -14,7 +15,11 @@ interface FindAllParams {
 
 @Injectable()
 export class ImageService {
+    private jwtToken = this.user.currentUser.pipe(map((user) => user.token))
+
     constructor(
+        private readonly alerts: AlertService,
+        private readonly user: UserService,
         private readonly apiClient: ApiClientService,
         private readonly appConfig: AppConfigService) { }
 
@@ -152,6 +157,115 @@ export class ImageService {
         return this.apiClient.send<any, Record<string, unknown>>(query)
             .pipe(map((o) => ImageListItem.fromJSON(o)))
 
+    }
+
+
+    /**
+     * sends request to api to create an image record
+     * @param image - the image to create
+     * @returns Observable of response from api casted as `ImageListItem`
+     * will be the created taxon
+     * @returns `of(null)` if does not have editing permission or api errors
+     */
+    create(image: Partial<ImageInputDto>): Observable<ImageListItem> {
+
+        const url = this.createQueryBuilder().create()
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const query = this.apiClient.queryBuilder(url)
+                    .addJwtAuth(token)
+                    .post()
+                    .body([image])
+                    .build()
+
+                return this.apiClient.send(query).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((imageJson) => {
+                        if (imageJson === null) {
+                            return null
+                        }
+                        return ImageListItem.fromJSON(imageJson);
+                    })
+                )
+            })
+        )
+    }
+
+    /**
+     * sends request to api to update an image record
+     * @param image - the imagen to update
+     * @returns Observable of response from api casted as `ImageListItem`
+     * will be the updated image
+     * @returns `of(null)` if image does not exist or does not have editing permission or api errors
+     */
+    update(image: ImageInputDto): Observable<ImageListItem> {
+        const url = this.createQueryBuilder()
+            .upload()
+            .id(image.id)
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .patch()
+                    .body([image])
+                    .addJwtAuth(token)
+                    .build()
+
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((imageJson) => {
+                        if (imageJson === null) {
+                            return null
+                        }
+                        return ImageListItem.fromJSON(imageJson)
+                    })
+                )
+            })
+        )
+
+    }
+
+    /**
+     * sends request to api to delete an image record
+     * @param id - the id of the image to delete
+     * @returns Observable of response from api casted as `string`
+     * @returns `of(null)` if image does not exist or does not have editing permission or api errors
+     */
+    delete(id): Observable<string> {
+        const url = this.createQueryBuilder()
+            .delete()
+            .id(id)
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .delete()
+                    .addJwtAuth(token)
+                    .build()
+
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((blockJson) => {
+                        return "success"
+                    })
+                )
+            })
+        )
     }
 
 }
