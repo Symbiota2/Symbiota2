@@ -42,9 +42,10 @@ export class ImageSearchPageComponent implements OnInit {
     nameControl = new FormControl()
     nameOptions: TaxonIDAndNameItem[] = []
     taxonIDList: number[] = []
+    taxons: string[] = []
 
-    photographerNameControl = new FormControl()
     photographerOptions : string[] = []
+    photographerNames : string[] = []
     photographer = null
     photographerForm = new FormControl()
 
@@ -58,26 +59,28 @@ export class ImageSearchPageComponent implements OnInit {
     includeLowQuality = false
     atLevelOfSpecies = true
 
-    tagKey : ImageTagKeyListItem = null
+    tagKeys : string[] = []
     tagKeyOptions : ImageTagKeyListItem[] = []
     selectedTagKeyOptions = []
     tagKeyForm = new FormControl()
 
-    imageType : string[] = []
+    imageTypes : string[] = []
     imageTypeOptions : string[] = []
     imageTypeForm = new FormControl()
 
-    country : CountryListItem[] = []
+    countries : string[] = []
     countryOptions : CountryListItem[] = []
     countryForm = new FormControl()
 
-    stateProvince : ProvinceListItem[] = []
+    stateProvinces : string[] = []
     stateProvinceOptions : ProvinceListItem[] = []
     stateProvinceForm = new FormControl()
 
     nameFound = false
     looking = false
     possibleTaxons  = []
+
+    submitted = false
 
     data = []
     data2 = []
@@ -278,6 +281,27 @@ export class ImageSearchPageComponent implements OnInit {
     }
     /*
     Called when a taxon is chosen to search for an image
+     */
+    onClear(): void {
+        this.taxons = []
+        this.taxonIDList = []
+        this.imageTypes = []
+        this.tagKeys = []
+        this.photographerNames = []
+        this.countries = []
+        this.stateProvinces = []
+
+        this.countryForm.reset()
+        this.stateProvinceForm.reset()
+        this.imageTypeForm.reset()
+        this.photographerForm.reset()
+        this.tagKeyForm.reset()
+        this.nameControl.reset()
+
+        this.submitted = false
+    }
+    /*
+    Called when a taxon is chosen to search for an image
     */
     onSubmit(): void {
         if (this.nameControl.value) {
@@ -288,28 +312,37 @@ export class ImageSearchPageComponent implements OnInit {
             this.nameOptions.forEach((name) => {
                 if (this.nameControl.value == name.name) {
                     this.taxonIDList.push(name.id)
+                    this.taxons.push(name.name)
                 }
             })
         }
+        this.stateProvinces = this.stateProvinceForm.value? this.stateProvinceForm.value : []
+        this.imageTypes = this.imageTypeForm.value? this.imageTypeForm.value : []
+        this.tagKeys = this.tagKeyForm.value? this.tagKeyForm.value : []
+        this.photographerNames = this.photographerForm.value? this.photographerForm.value : []
+        this.countries = this.countryForm.value? this.countryForm.value : []
         this.imageService.imageSearch(
             this.taxonIDList,
-            this.photographerNameControl.value? this.photographerNameControl.value : [],
-            this.imageTypeForm.value? this.imageTypeForm.value : [],
-            this.tagKeyForm.value? this.tagKeyForm.value : [],
-            this.countryForm.value? this.countryForm.value : [],
-            this.stateProvinceForm.value? this.stateProvinceForm.value : []
+            this.photographerNames,
+            this.imageTypes,
+            this.tagKeys,
+            this.countries,
+            this.stateProvinces
         ).subscribe((images) => {
+            /*
             console.log("got images " + images.length)
             images.forEach((image) => {
                 console.log("url " + image.url)
                 console.log("thumbnail " + image.thumbnailUrl)
                 console.log("id " + image.id)
             })
+             */
             this.data2 = images
             this.data = []
             //this.data = images
             this.getData(null)
         })
+        this.submitted = true
         // const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
     }
 

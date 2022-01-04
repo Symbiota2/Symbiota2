@@ -46,14 +46,14 @@ export class ImageSearchParams extends BaseFindAllParams {
     @ApiProperty({ name: 'country[]', type: [String], required: false })
     @Type(() => String)
     @IsArray()
-    @IsInt({ each: true })
+    @IsString({ each: true })
     @IsOptional()
     country: string[]
 
     @ApiProperty({ name: 'province[]', type: [String], required: false })
     @Type(() => String)
     @IsArray()
-    @IsInt({ each: true })
+    @IsString({ each: true })
     @IsOptional()
     province: string[]
 

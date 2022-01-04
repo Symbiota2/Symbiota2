@@ -154,7 +154,7 @@ export class ImageController {
         return isSuperAdmin || isEditor
     }
 
-    @Post()
+    @Post('upload')
     @ApiOperation({
         summary: "Create a new image"
     })
@@ -180,7 +180,7 @@ export class ImageController {
         return dto
     }
 
-    @Patch(':id')
+    @Patch('upload/:id')
     @ApiOperation({
         summary: "Update an image by ID"
     })
@@ -206,7 +206,7 @@ export class ImageController {
         return image
     }
 
-    @Delete(':id')
+    @Delete('upload/:id')
     @ApiOperation({
         summary: "Delete an image by ID"
     })
