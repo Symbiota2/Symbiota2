@@ -29,7 +29,12 @@ import { MatTreeModule } from '@angular/material/tree';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
-import { TaxonomyUploadCompletePage, TaxonomyUploadProblemAcceptedNamesPage, TaxonProfilePageComponent } from './pages';
+import {
+    TaxonCreatePageComponent,
+    TaxonomyUploadCompletePage,
+    TaxonomyUploadProblemAcceptedNamesPage,
+    TaxonProfilePageComponent
+} from './pages';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
@@ -60,7 +65,7 @@ import {
     TAXA_UPLOAD_PROBLEM_ACCEPTED_NAMES_ROUTE, TAXA_UPLOAD_PROBLEM_PARENT_NAMES_ROUTE, TAXA_UPLOAD_PROBLEM_RANKS_ROUTE,
     TAXA_UPLOADER_FIELD_MAP_ROUTE,
     TAXA_UPLOADER_ROUTE,
-    TAXA_VIEWER_ROUTE,
+    TAXA_VIEWER_ROUTE, TAXON_CREATE_ROUTE,
     TAXON_EDITOR_ROUTE,
     TAXON_PROFILE_ROUTE
 } from './routes';
@@ -122,6 +127,7 @@ import {
         TaxaProfilerEntryPage,
         TaxaEditorEntryPage,
         TaxaViewerPageComponent,
+        TaxonCreatePageComponent,
         TaxonProfilePageComponent,
         TaxonomyFieldMapSelectComponent,
         TaxonomyConfirmDialogComponent,
@@ -159,6 +165,7 @@ import {
         TaxonomyUploadProblemRanksPage,
         TaxonProfilePageComponent,
         TaxaViewerPageComponent,
+        TaxonCreatePageComponent,
         TaxonEditorPageComponent,
         TaxonomyUploadFieldMapPage,
         TaxonomyFieldMapSelectComponent,
@@ -199,6 +206,10 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
             {
                 path: TAXA_EDITOR_ROUTE,
                 component: TaxaEditorEntryPage
+            },
+            {
+                path: TAXON_CREATE_ROUTE,
+                component: TaxonCreatePageComponent
             },
             {
                 path: TAXA_PROFILER_ROUTE,
@@ -244,6 +255,10 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
             {
                 url: `/${TAXA_PROFILER_ROUTE}`,
                 name: "core.layout.header.topnav.taxonomy.profiler.link"
+            },
+            {
+                url: `/${TAXON_CREATE_ROUTE}`,
+                name: "core.layout.header.topnav.taxon.create.link"
             },
             {
                 url: `/${TAXA_UPLOADER_ROUTE}`,

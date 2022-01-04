@@ -16,6 +16,7 @@ import {
     StateProvinceService
 } from '@symbiota2/ui-plugin-geography';
 import { ImageTagKeyListItem } from '../../dto';
+import { ImageListItem } from '../../dto/ImageListItem';
 
 /**
  * Taxonomic data with nested structure.
@@ -82,8 +83,8 @@ export class ImageSearchPageComponent implements OnInit {
 
     submitted = false
 
-    data = []
-    data2 = []
+    data : ImageListItem[] = []
+    data2 : ImageListItem[] = []
     page= 0
     size = 20
     pageSizeOptions = [20, 40, 60, 80, 100]

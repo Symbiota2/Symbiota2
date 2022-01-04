@@ -26,6 +26,7 @@ import { TaxonDto } from '../../../api-plugin-taxonomy/src/taxon/dto/TaxonDto';
 import { TaxonInputDto } from '../../../api-plugin-taxonomy/src/taxon/dto/TaxonInputDto';
 import { Image, Taxon } from '@symbiota2/api-database';
 import { ImageInputDto } from './dto/ImageInputDto';
+import { ImageAndTaxonDto } from './dto/ImageAndTaxonDto';
 
 type File = Express.Multer.File
 
@@ -104,17 +105,30 @@ export class ImageController {
     }
 
     @Get('search')
-    @ApiResponse({ status: HttpStatus.OK, type: ImageDto, isArray: true })
+    @ApiResponse({ status: HttpStatus.OK, type: ImageAndTaxonDto, isArray: true })
     @ApiOperation({
-        summary: "Retrieve a list of image records using a slew of potential filters: taxon ids, country ids, state/province ids, image types, image tags, and photographer names"
+        summary: "Retrieve a list of image records and associated taxon info using a slew of potential filters: taxon ids, country ids, state/province ids, image types, image tags, and photographer names"
     })
-    async imageSearch(@Query() searchParams: ImageSearchParams): Promise<ImageDto[]> {
+    async imageSearch(@Query() searchParams: ImageSearchParams): Promise<ImageAndTaxonDto[]> {
         const images = await this.myService.imageSearch(searchParams)
+        const result = []
+        for (const image of images) {
+            const taxon = await image.taxon
+            const taxonDto = new TaxonDto(taxon)
+            const imageDto = new ImageAndTaxonDto(image, taxonDto)
+            imageDto.taxon = taxonDto
+            result.push(imageDto)
+        }
+        /*
         const dtos = images.map((c) => {
+            const taxon = c.taxon
+            const taxonDto = new TaxonDto(taxon)
             const image = new ImageDto(c)
             return image
         })
         return Promise.all(dtos)
+         */
+        return Promise.all(result)
     }
 
     @Get(':id')

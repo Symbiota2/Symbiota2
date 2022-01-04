@@ -1,4 +1,5 @@
 import { Exclude, Expose, plainToClass } from 'class-transformer';
+import { TaxonOnlyListItem } from '@symbiota2/ui-plugin-taxonomy';
 
 @Exclude()
 export class ImageListItem {
@@ -29,6 +30,7 @@ export class ImageListItem {
     @Expose() dynamicProperties: string
     @Expose() sortSequence: number
     @Expose() initialTimestamp: Date
+    @Expose() taxon: TaxonOnlyListItem | null
 
     static fromJSON(imageJSON: Record<string, unknown>): ImageListItem {
         return plainToClass(

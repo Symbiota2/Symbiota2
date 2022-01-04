@@ -52,14 +52,14 @@ export class ImageLibraryPageComponent implements OnInit {
                         //this.level = 'family'
                         this.level = 'species'
                         this.descendant = Number(maybeLevel)
-                    }
 
+                    }
                 }
-                console.log("level change " + maybeLevel)
             }
+            this.loadNames(this.level, this.prefix, this.descendant)
         })
         // Load the names, comes preloaded with families
-        this.loadNames(this.level, this.prefix, this.descendant)
+        //this.loadNames(this.level, this.prefix, this.descendant)
     }
 
     /*
@@ -73,6 +73,7 @@ export class ImageLibraryPageComponent implements OnInit {
                 .subscribe((items) => {
                     items.forEach((item) =>{
                         const pair = new TaxonIDAndNameItem()
+                        console.log("name is " + pair.name)
                         pair.name = item.taxon.scientificName
                         pair.id = item.taxonID
                         myNames.push(pair)

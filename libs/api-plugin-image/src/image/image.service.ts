@@ -104,6 +104,7 @@ export class ImageService extends BaseService<Image>{
 
         let qb = this.myRepository.createQueryBuilder('image')
             .select()
+            .innerJoinAndSelect("image.taxon", "taxon")
             .where('true')
         if (params?.limit) {
             qb = qb.limit(limit)

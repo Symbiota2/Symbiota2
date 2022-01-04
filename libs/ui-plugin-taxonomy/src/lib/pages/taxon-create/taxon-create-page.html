@@ -1,0 +1,147 @@
+<div id='main'>
+    <div>
+        <h1>{{ "taxon.create.title" | translate }}</h1>
+    </div>
+
+    <div mat-dialog-content>
+        <form class="name-autocomplete-form">
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.scientificName' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.scientificName"
+                       [(ngModel)]="local_data.scientificName"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.unitName1' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.unitName1"
+                       [(ngModel)]="local_data.unitName1"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.unitName2' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.unitName2"
+                       [(ngModel)]="local_data.unitName2"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.unitName3' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.unitName3"
+                       [(ngModel)]="local_data.unitName3"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.kingdomName' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.kingdomName"
+                       [(ngModel)]="local_data.kingdomName"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.rankName' | translate}}</mat-label>
+                <!--
+                <input matInput
+                       maxlength="3"
+                       [value]="local_data.rankID"
+                       [(ngModel)]="local_data.rankID"
+                       [ngModelOptions]="{standalone: true}">
+                       -->
+                <mat-select [(ngModel)]="rankID" [ngModelOptions]="{standalone: true}">
+                    <mat-option [value]="rankID" *ngFor="let rank of rankNames" [value]="rank.id">
+                        {{rank.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.author' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.author"
+                       [(ngModel)]="local_data.author"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.phyloSortSequence' | translate}}</mat-label>
+                <!-- <input matInput
+                       [formControl]='sortSequence'
+                       [value]="local_data.phyloSortSequence"
+                       [(ngModel)]="local_data.phyloSortSequence"
+                       >
+                -->
+                <input matInput
+                       [formControl]='sortSequence'
+                >
+                <div *ngIf="sortSequence.invalid && (sortSequence.dirty || sortSequence.touched)"
+                >
+                    <mat-error *ngIf="sortSequence.invalid">Not a valid number</mat-error>
+                </div>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.status' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.status"
+                       [(ngModel)]="local_data.status"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.source' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.source"
+                       [(ngModel)]="local_data.source"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.notes' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.notes"
+                       [(ngModel)]="local_data.notes"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.hybrid' | translate}}</mat-label>
+                <input matInput
+                       maxlength="100"
+                       [value]="local_data.hybrid"
+                       [(ngModel)]="local_data.hybrid"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{'taxon.taxon.editor.securityStatus' | translate}}</mat-label>
+                <input matInput
+                       maxlength="3"
+                       [value]="local_data.securityStatus"
+                       [(ngModel)]="local_data.securityStatus"
+                       [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
+
+        </form>
+    </div>
+    <div mat-dialog-actions>
+        <button mat-button (click)="doAction()">{{action}}</button>
+        <button mat-button (click)="closeDialog()" mat-flat-button color="warn">{{'taxon.editor.dialog.cancel' | translate}}</button>
+    </div>
+
+</div>

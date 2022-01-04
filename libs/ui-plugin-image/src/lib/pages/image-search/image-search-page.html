@@ -238,6 +238,8 @@
     </div>
 
     <div *ngIf='nameControl.value || countryForm.value?.length > 0 || stateProvinceForm.value?.length > 0 || imageTypeForm.value?.length > 0 || tagKeyForm.value?.length > 0 || photographerForm.value?.length > 0'>
+        <br/>
+        <br/>
         <h1>{{"image.search.search.terms" | translate}}</h1>
         <ul *ngIf='nameControl.value'>
             {{"image.search.scientific.name" | translate}}: {{nameControl.value.name}}
@@ -259,27 +261,53 @@
         </ul>
     </div>
 
+    <br/>
+    <br/>
     <div *ngIf='submitted && !data2'>
         <h1>{{"image.search.none.found" | translate}}</h1>
     </div>
     <div *ngIf='submitted && data2?.length > 0'>
         <h1>{{"image.search.found.images" | translate}}</h1>
         <div fxFill fxLayout="column" fxLayoutAlign="space-between">
-            <div fxLayout="row wrap">
-                <ng-container *ngFor="let image of data">
-                    <a [routerLink]="['/image/details', image.id]" target="_blank" class='imagelink'>
-                        <img height="100" [src]="image.url">&nbsp;&nbsp;
-                    </a>
-                </ng-container>
-            </div>
 
-            <mat-paginator [length]="data2.length"
-                           [pageSize]="size"
-                           [pageIndex]="page"
-                           [pageSizeOptions]="pageSizeOptions"
-                           (page)="getData($event)">
-            </mat-paginator>
-        </div>
-    </div>
+        <mat-grid-list cols='{{data.length > 5? 5 : data.length}}' rowHeight='150px' gutterSize='5'>
+            <mat-grid-tile  *ngFor="let image of data">
+                <a [routerLink]="['/image/details', image.id]" target="_blank" class='imagelink'>
+                    <img height="100" [src]="image.url">
+                </a>
+                <mat-grid-tile-footer style='background-color:white'>
+                    <div fxLayout="row" fxLayoutAlign="center center">
+                    <a [routerLink]="['/image/details', image.id]" target="_blank" style='text-align:center'>
+                        <i style='text-align:center'>{{image.taxon?.scientificName}}</i>
+                    </a>
+                    </div>
+                </mat-grid-tile-footer>
+            </mat-grid-tile>
+        </mat-grid-list>
+
+
+    <!--
+<div fxLayout="row wrap">
+
+<span style='text-align:center'>
+<ng-container *ngFor="let image of data">
+<a [routerLink]="['/image/details', image.id]" target="_blank" class='imagelink'>
+ <img height="100" [src]="image.url">&nbsp;&nbsp;
+</a>
+{{image.taxon?.scientificName}}
+</ng-container>
+</span>
+
+
+</div>
+-->
+    <mat-paginator [length]="data2.length"
+                   [pageSize]="size"
+                   [pageIndex]="page"
+                   [pageSizeOptions]="pageSizeOptions"
+                   (page)="getData($event)">
+    </mat-paginator>
+</div>
+</div>
 
 </div>

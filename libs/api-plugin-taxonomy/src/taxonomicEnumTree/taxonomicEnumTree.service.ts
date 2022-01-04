@@ -123,7 +123,7 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
 
         // If authorityID is present use it
         if (params.taxonAuthorityID) {
-            qb.andWhere('o.taxonomicAuthorityID = :authorityID',
+            qb.andWhere('o.taxonAuthorityID = :authorityID',
                     { authorityID: params.taxonAuthorityID })
         }
 

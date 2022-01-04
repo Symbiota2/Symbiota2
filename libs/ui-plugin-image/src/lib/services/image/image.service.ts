@@ -6,6 +6,7 @@ import { ImageQueryBuilder } from './image-query-builder'
 import { PhotographerInfoListItem } from '../../dto/PhotographerInfoListItem';
 import { ImageListItem } from '../../dto';
 import { ImageInputDto } from '../../dto/ImageInputDto';
+import { ImageAndTaxonListItem } from '../../dto/ImageAndTaxonListItem';
 
 interface FindAllParams {
     imageIDs: number[]

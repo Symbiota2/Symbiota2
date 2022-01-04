@@ -41,6 +41,7 @@ import {
 import { FilterPipe } from './pages/image-search/filter.pipe';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { ImageDetailsEditorComponent, ImageDetailsEditorDialogComponent } from './components';
+import { MatGridListModule } from '@angular/material/grid-list';
 
 @NgModule({
     imports: [
@@ -69,7 +70,8 @@ import { ImageDetailsEditorComponent, ImageDetailsEditorDialogComponent } from '
         MatListModule,
         MatRadioModule,
         SymbiotaComponentModule,
-        MatPaginatorModule
+        MatPaginatorModule,
+        MatGridListModule
     ],
     declarations: [
         ImageSearchPageComponent,

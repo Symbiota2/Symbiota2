@@ -1,9 +1,10 @@
 {
     "plugins.taxa.name": "Taxonomy",
     "core.layout.header.topnav.taxonomy.viewer.link": "View",
-    "core.layout.header.topnav.taxonomy.editor.link": "Edit",
-    "core.layout.header.topnav.taxonomy.profiler.link": "Profile",
+    "core.layout.header.topnav.taxonomy.editor.link": "Edit Taxon",
+    "core.layout.header.topnav.taxonomy.profiler.link": "Profile Taxon",
     "core.layout.header.topnav.taxonomy.uploader.link": "Upload",
+    "core.layout.header.topnav.taxon.create.link" : "Create Taxon",
     "taxa.taxa_available_permission.admin": "Admin",
     "taxa.taxa_available_permission.taxa_permissions": "taxa Permissions",
     "taxa.taxa_available_permission.editor": "Editor",
@@ -110,6 +111,8 @@
     "taxon.editor.added.error": "Error adding taxon",
     "taxon.editor.updated.error": "Error updating taxon",
     "taxon.editor.deleted.error": "Error deleting taxon",
+
+    "taxon.create.title" : "Add a New Taxon",
 
     "taxon.description.editor.block.added": "Description Block Added",
     "taxon.description.editor.block.updated": "Description Block Updated",
