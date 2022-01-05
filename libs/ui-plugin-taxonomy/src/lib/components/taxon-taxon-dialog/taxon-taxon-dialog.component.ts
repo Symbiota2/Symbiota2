@@ -18,12 +18,21 @@ export class TaxonTaxonDialogComponent {
     public rankID
     public element
     sortSequence
+    unit1ind
+    unit2ind
+    unit3ind
+    kingdomNames
+    isPublic = true
+
     constructor(
         public dialogRef: MatDialogRef<TaxonTaxonDialogComponent>,
         private readonly taxonomicUnitService: TaxonomicUnitService,
         //@Optional() is used to prevent error if no data is passed
         @Optional() @Inject(MAT_DIALOG_DATA) public data: TaxonInfo) {
         this.local_data = {...data}
+        console.log(" status " + this.local_data.securityStatus)
+        this.isPublic = !(this.local_data.securityStatus == "x" || this.local_data.securityStatus == "X")
+        console.log(" status " + this.isPublic)
         this.action = this.local_data.action
         this.sortSequence =
             new FormControl(
@@ -48,7 +57,21 @@ export class TaxonTaxonDialogComponent {
                 this.rankNames.push(this.rankNamesMap.get(key))
             })
         })
+        this.taxonomicUnitService.findKingdomNames().subscribe((names) => {
+            this.kingdomNames = names
+        })
 
+    }
+
+    // Change the security status
+    onSecurityStatusChange() {
+        if (this.local_data.securityStatus == "x" || this.local_data.securityStatus == "X") {
+            this.local_data.securityStatus = "0"
+            this.isPublic = true
+        } else {
+            this.local_data.securityStatus = "x"
+            this.isPublic = false
+        }
     }
 
     doAction(){

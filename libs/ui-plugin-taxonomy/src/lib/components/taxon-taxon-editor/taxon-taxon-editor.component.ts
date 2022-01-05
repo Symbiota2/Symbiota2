@@ -18,8 +18,11 @@ export interface TaxonInfo {
     rankID: number | null
     scientificName: string
     unitName1: string
+    unit1ind: number
     unitName2: string
+    unit2ind: number
     unitName3: string
+    unit3ind: number
     author: string
     phyloSortSequence: number | null
     status: string
@@ -41,9 +44,12 @@ export class TaxonTaxonEditorComponent implements OnInit {
     private taxonID: string
     private idCounter = 0
     userID : number = null
-    userCanEdit: boolean = true
+    userCanEdit: boolean = false
     ranksIDtoName = new Map()
     rankName = ""
+    unit1ind : boolean = false
+    unit2ind : boolean = false
+    unit3ind : boolean = false
 
     constructor(
         private readonly userService: UserService,
@@ -84,7 +90,7 @@ export class TaxonTaxonEditorComponent implements OnInit {
     }
 
     /*
-    Load the taxon description blocks
+    Load the taxon info
     */
     loadTaxon(taxonID: number) {
         this.taxaService.findByID(taxonID)
@@ -96,24 +102,17 @@ export class TaxonTaxonEditorComponent implements OnInit {
                 this.ranksIDtoName = this.taxonomicUnitService.getRanksLookup()
                 if (this.ranksIDtoName == null) {
                     // First load the names of the ranks
+                    this.ranksIDtoName = new Map()
                     this.taxonomicUnitService.findAll().subscribe((ranks) => {
                         ranks.forEach((rank) => {
-                            this.ranksIDtoName.set(rank.rankID,rank.rankName)
+                            this.ranksIDtoName.set(rank.rankID + rank.kingdomName,rank.rankName)
                         })
+                        this.rankName = this.ranksIDtoName.has(key) ? this.ranksIDtoName.get(key) : 'unknown'
                     })
-                    this.rankName = this.ranksIDtoName.has(key) ? this.ranksIDtoName.get(key) : 'unknown'
                 } else {
                     this.rankName = this.ranksIDtoName.has(key) ? this.ranksIDtoName.get(key) : 'unknown'
                 }
 
-
-
-                /* Name is cache in service
-                this.rankName = this.ranksIDtoName.has(item.rankID) ?
-                    this.ranksIDtoName.get(item.rankID)
-                    : 'unknown'
-
-                 */
             })
     }
 

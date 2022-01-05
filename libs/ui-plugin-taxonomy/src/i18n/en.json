@@ -104,6 +104,8 @@
     "taxon.editor.dialog.confirm.delete": "Confirm Delete",
     "taxon.editor.dialog.cancel": "Cancel",
     "taxon.editor.dialog.edit": "Edit",
+    "taxon.editor.dialog.save": "Save",
+    "taxon.editor.dialog.clear": "Clear",
     "taxon.editor.dialog.delete": "Delete",
     "taxon.editor.dialog.update": "Save",
     "taxon.editor.added": "Taxon Added",
@@ -114,7 +116,10 @@
     "taxon.editor.deleted.error": "Error deleting taxon",
 
     "taxon.create.title" : "Add a New Taxon",
-
+    "taxon.create.acceptance.status" : "Acceptance Status",
+    "taxon.create.accepted.status" : "Accepted",
+    "taxon.create.not.accepted.status" : "Not Accepted",
+    "taxon.create.parent.taxon" : "Parent Taxon",
 
     "taxon.description.editor.block.added": "Description Block Added",
     "taxon.description.editor.block.updated": "Description Block Updated",
@@ -160,6 +165,8 @@
     "taxon.taxon.editor.notes": "Notes",
     "taxon.taxon.editor.hybrid": "Hybrid",
     "taxon.taxon.editor.securityStatus": "Security Status",
+    "taxon.taxon.editor.locality.hidden": "Locality hidden",
+    "taxon.taxon.editor.locality.public": "Locality public",
 
     "taxon.status.status.label": "Status",
     "taxon.status.placement.label": "Taxonomic Placement",

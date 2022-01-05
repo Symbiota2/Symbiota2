@@ -19,7 +19,7 @@ interface FindAllParams {
 @Injectable()
 export class TaxonomicUnitService {
     private jwtToken = this.user.currentUser.pipe(map((user) => user.token))
-    static ranksLookup = new Map()
+    static ranksLookup
 
     constructor(
         private readonly alerts: AlertService,
@@ -28,6 +28,7 @@ export class TaxonomicUnitService {
         private readonly appConfig: AppConfigService)
     {
         this.findAll().subscribe((units) => {
+            TaxonomicUnitService.ranksLookup = new Map()
             units.forEach((unit) => {
                 const key = unit.rankID + unit.kingdomName
                 TaxonomicUnitService.ranksLookup.set(key,unit.rankName)

@@ -16,6 +16,7 @@
             <mat-checkbox [(ngModel)]="unit1ind" [ngModelOptions]="{standalone: true}">
                 <mat-label>{{'taxon.taxon.editor.unitName1.indicator' | translate}}</mat-label>
             </mat-checkbox>
+            &nbsp; &nbsp;
             <mat-form-field appearance="fill" [style.width.vw]="70">
                 <mat-label>{{'taxon.taxon.editor.unitName1' | translate}}</mat-label>
                 <input matInput
@@ -28,6 +29,7 @@
             <mat-checkbox [(ngModel)]="unit2ind" [ngModelOptions]="{standalone: true}">
                 <mat-label>{{'taxon.taxon.editor.unitName2.indicator' | translate}}</mat-label>
             </mat-checkbox>
+            &nbsp; &nbsp;
             <mat-form-field appearance="fill" [style.width.vw]="70">
                 <mat-label>{{'taxon.taxon.editor.unitName2' | translate}}</mat-label>
                 <input matInput
@@ -40,6 +42,7 @@
             <mat-checkbox [(ngModel)]="unit3ind" [ngModelOptions]="{standalone: true}">
                 <mat-label>{{'taxon.taxon.editor.unitName3.indicator' | translate}}</mat-label>
             </mat-checkbox>
+            &nbsp; &nbsp;
             <mat-form-field appearance="fill" [style.width.vw]="70">
                 <mat-label>{{'taxon.taxon.editor.unitName3' | translate}}</mat-label>
                 <input matInput
@@ -58,17 +61,10 @@
                 </mat-select>
             </mat-form-field>
 
-            <mat-form-field *ngIf="local_data.kingdomName" appearance="fill">
+            <mat-form-field appearance="fill">
                 <mat-label>{{'taxon.taxon.editor.rankName' | translate}}</mat-label>
-                <!--
-                <input matInput
-                       maxlength="3"
-                       [value]="local_data.rankID"
-                       [(ngModel)]="local_data.rankID"
-                       [ngModelOptions]="{standalone: true}">
-                       -->
                 <mat-select [(ngModel)]="rankID" [ngModelOptions]="{standalone: true}">
-                    <mat-option [value]="rankID" *ngFor="let rank of rankNames" [value]="rank.id">
+                    <mat-option *ngFor="let rank of rankNames" [value]="rank.id">
                         {{rank.name}}
                     </mat-option>
                 </mat-select>
@@ -85,20 +81,12 @@
 <br/>
             <mat-form-field appearance="fill" >
                 <mat-label>{{'taxon.taxon.editor.phyloSortSequence' | translate}}</mat-label>
-                <!-- <input matInput
-                       [formControl]='sortSequence'
-                       [value]="local_data.phyloSortSequence"
-                       [(ngModel)]="local_data.phyloSortSequence"
-                       >
-                -->
-                <input matInput
-                       [formControl]='sortSequence'
-                >
-                <div *ngIf="sortSequence.invalid && (sortSequence.dirty || sortSequence.touched)"
-                >
+                <input matInput [formControl]='sortSequence'>
+                <div *ngIf="sortSequence.invalid && (sortSequence.dirty || sortSequence.touched)">
                     <mat-error *ngIf="sortSequence.invalid">Not a valid number</mat-error>
                 </div>
             </mat-form-field>
+
             <br/>
             <mat-form-field appearance="fill">
                 <mat-label>{{'taxon.taxon.editor.status' | translate}}</mat-label>
@@ -108,6 +96,7 @@
                        [(ngModel)]="local_data.status"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
+
             <br/>
             <mat-form-field appearance="fill" [style.width.vw]="90">
                 <mat-label>{{'taxon.taxon.editor.source' | translate}}</mat-label>
@@ -136,20 +125,60 @@
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
             <br/>
+            <b><mat-label>{{'taxon.taxon.editor.securityStatus' | translate}}</mat-label></b>:&nbsp;
+                <mat-radio-group name="securityStatus" (change)="onSecurityStatusChange()">
+                    <mat-radio-button name="securityStatus" value="y" checked>{{"taxon.taxon.editor.locality.public" | translate}}</mat-radio-button>
+                    &nbsp; &nbsp;
+                    <mat-radio-button name="securityStatus" value="x" #hidden>{{"taxon.taxon.editor.locality.hidden" | translate}}</mat-radio-button>
+                </mat-radio-group>
+            <br/>
+
+            <br/>
+            <b>{{"taxon.create.parent.taxon" | translate}}</b>:&nbsp;
+
             <mat-form-field appearance="fill">
-                <mat-label>{{'taxon.taxon.editor.securityStatus' | translate}}</mat-label>
-                <input matInput
-                       maxlength="3"
-                       [value]="local_data.securityStatus"
-                       [(ngModel)]="local_data.securityStatus"
-                       [ngModelOptions]="{standalone: true}">
+                <mat-label>{{"taxonomy.viewer.label.authority" | translate}}</mat-label>
+                <mat-select field-class="symbiota2-field-class"
+                            placeholder='{{"taxonomy.viewer.label.authority" | translate}}'
+                            [(value)]="taxonomicAuthorityID"
+                            (selectionChange)="authorityChangeAction()">
+                    <mat-option *ngFor="let authority of taxonomicAuthorityList"
+                                [value]="authority.id" >{{ authority.name }}</mat-option>
+                </mat-select>
             </mat-form-field>
 
+                <mat-form-field class="name-autocomplete-full-width">
+                    <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxon.status.parent.editor.dialog.parent.taxon.label" | translate}}</mat-label>
+                    <!-- (keypress)="onKey($event)" -->
+                    <input *ngIf='kindOfName == "Scientific"' type="text"
+                           placeholder='{{"taxon.status.parent.editor.dialog.parent.taxon.placeholder" | translate}}'
+                           aria-label="String"
+                           matInput
+                           (keyup)="onKey($event)"
+                           [formControl]="nameControl"
+                           [matAutocomplete]="auto">
+                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                        <mat-option *ngFor="let option of nameOptions" [value]="nameFor(option)">
+                            {{nameFor(option)}} <small>{{authorFor(option)}}</small>
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+
+
+            <br/>
+            <b><mat-label>{{'taxon.create.acceptance.status' | translate}}</mat-label></b>:&nbsp;
+            <mat-radio-group name="acceptance" (change)="onSecurityStatusChange()">
+                <mat-radio-button name="acceptance" value="1" checked>{{"taxon.create.accepted.status" | translate}}</mat-radio-button>
+                &nbsp; &nbsp;
+                <mat-radio-button name="acceptance" value="0" #hidden>{{"taxon.create.not.accepted.status" | translate}}</mat-radio-button>
+            </mat-radio-group>
         </form>
     </div>
+    <br/><br/>
     <div mat-dialog-actions>
-        <button mat-button (click)="doAction()">{{action}}</button>
-        <button mat-button (click)="closeDialog()" mat-flat-button color="warn">{{'taxon.editor.dialog.cancel' | translate}}</button>
+        <button mat-button (click)="doSave()" mat-flat-button color="primary">{{'taxon.editor.dialog.save' | translate}}</button>
+        &nbsp;
+        <button mat-button (click)="doClear()" mat-flat-button color="warn">{{'taxon.editor.dialog.clear' | translate}}</button>
     </div>
 
 </div>
