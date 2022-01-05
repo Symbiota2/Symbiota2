@@ -74,6 +74,15 @@ export class TaxonomicUnitService {
             )
     }
 
+    findKingdomNames(): Observable<string[]> {
+        const url = this.createQueryBuilder()
+            .findKingdomNames()
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, string[]>(query)
+    }
+
     findByID(id: number): Observable<TaxonomicUnitListItem> {
         const url = this.createQueryBuilder()
             .findOne()

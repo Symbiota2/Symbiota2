@@ -31,6 +31,21 @@ export class TaxonomicUnitService extends BaseService<TaxonomicUnit>{
     }
 
     /*
+    Fetch all of the taxonomic units.
+    Can limit the list by a list of Unit IDs.
+    Can also limit the number fetched and use an offset.
+    */
+    async findKingdomNames(): Promise<TaxonomicUnit[]> {
+
+        const names = await this.taxonRanks.createQueryBuilder()
+            .select('kingdomName')
+            .distinct(true)
+            .getRawMany()
+
+        return names
+    }
+
+    /*
     TODO: Not sure if this is implemented correctly.
      */
     async create(data: Partial<TaxonomicUnit>): Promise<TaxonomicUnit> {

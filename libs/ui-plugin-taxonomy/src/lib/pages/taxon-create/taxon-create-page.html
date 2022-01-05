@@ -5,16 +5,18 @@
 
     <div mat-dialog-content>
         <form class="name-autocomplete-form">
-            <mat-form-field appearance="fill">
+            <mat-form-field appearance="fill" [style.width.vw]="90">
                 <mat-label>{{'taxon.taxon.editor.scientificName' | translate}}</mat-label>
                 <input matInput
-                       maxlength="100"
                        [value]="local_data.scientificName"
                        [(ngModel)]="local_data.scientificName"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-
-            <mat-form-field appearance="fill">
+<br/>
+            <mat-checkbox [(ngModel)]="unit1ind" [ngModelOptions]="{standalone: true}">
+                <mat-label>{{'taxon.taxon.editor.unitName1.indicator' | translate}}</mat-label>
+            </mat-checkbox>
+            <mat-form-field appearance="fill" [style.width.vw]="70">
                 <mat-label>{{'taxon.taxon.editor.unitName1' | translate}}</mat-label>
                 <input matInput
                        maxlength="100"
@@ -22,8 +24,11 @@
                        [(ngModel)]="local_data.unitName1"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-
-            <mat-form-field appearance="fill">
+            <br/>
+            <mat-checkbox [(ngModel)]="unit2ind" [ngModelOptions]="{standalone: true}">
+                <mat-label>{{'taxon.taxon.editor.unitName2.indicator' | translate}}</mat-label>
+            </mat-checkbox>
+            <mat-form-field appearance="fill" [style.width.vw]="70">
                 <mat-label>{{'taxon.taxon.editor.unitName2' | translate}}</mat-label>
                 <input matInput
                        maxlength="100"
@@ -31,8 +36,11 @@
                        [(ngModel)]="local_data.unitName2"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-
-            <mat-form-field appearance="fill">
+            <br/>
+            <mat-checkbox [(ngModel)]="unit3ind" [ngModelOptions]="{standalone: true}">
+                <mat-label>{{'taxon.taxon.editor.unitName3.indicator' | translate}}</mat-label>
+            </mat-checkbox>
+            <mat-form-field appearance="fill" [style.width.vw]="70">
                 <mat-label>{{'taxon.taxon.editor.unitName3' | translate}}</mat-label>
                 <input matInput
                        maxlength="100"
@@ -40,17 +48,17 @@
                        [(ngModel)]="local_data.unitName3"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-
+<br/>
             <mat-form-field appearance="fill">
                 <mat-label>{{'taxon.taxon.editor.kingdomName' | translate}}</mat-label>
-                <input matInput
-                       maxlength="100"
-                       [value]="local_data.kingdomName"
-                       [(ngModel)]="local_data.kingdomName"
-                       [ngModelOptions]="{standalone: true}">
+                <mat-select [(ngModel)]="local_data.kingdomName" [ngModelOptions]="{standalone: true}">
+                    <mat-option *ngFor="let name of kingdomNames" [value]="name">
+                        {{name}}
+                    </mat-option>
+                </mat-select>
             </mat-form-field>
 
-            <mat-form-field appearance="fill">
+            <mat-form-field *ngIf="local_data.kingdomName" appearance="fill">
                 <mat-label>{{'taxon.taxon.editor.rankName' | translate}}</mat-label>
                 <!--
                 <input matInput
@@ -65,8 +73,8 @@
                     </mat-option>
                 </mat-select>
             </mat-form-field>
-
-            <mat-form-field appearance="fill">
+<br/>
+            <mat-form-field appearance="fill" [style.width.vw]="90">
                 <mat-label>{{'taxon.taxon.editor.author' | translate}}</mat-label>
                 <input matInput
                        maxlength="100"
@@ -74,8 +82,8 @@
                        [(ngModel)]="local_data.author"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-
-            <mat-form-field appearance="fill">
+<br/>
+            <mat-form-field appearance="fill" >
                 <mat-label>{{'taxon.taxon.editor.phyloSortSequence' | translate}}</mat-label>
                 <!-- <input matInput
                        [formControl]='sortSequence'
@@ -91,7 +99,7 @@
                     <mat-error *ngIf="sortSequence.invalid">Not a valid number</mat-error>
                 </div>
             </mat-form-field>
-
+            <br/>
             <mat-form-field appearance="fill">
                 <mat-label>{{'taxon.taxon.editor.status' | translate}}</mat-label>
                 <input matInput
@@ -100,8 +108,8 @@
                        [(ngModel)]="local_data.status"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-
-            <mat-form-field appearance="fill">
+            <br/>
+            <mat-form-field appearance="fill" [style.width.vw]="90">
                 <mat-label>{{'taxon.taxon.editor.source' | translate}}</mat-label>
                 <input matInput
                        maxlength="100"
@@ -109,8 +117,8 @@
                        [(ngModel)]="local_data.source"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-
-            <mat-form-field appearance="fill">
+            <br/>
+            <mat-form-field appearance="fill" [style.width.vw]="90">
                 <mat-label>{{'taxon.taxon.editor.notes' | translate}}</mat-label>
                 <input matInput
                        maxlength="100"
@@ -118,8 +126,8 @@
                        [(ngModel)]="local_data.notes"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-
-            <mat-form-field appearance="fill">
+            <br/>
+            <mat-form-field appearance="fill" [style.width.vw]="90">
                 <mat-label>{{'taxon.taxon.editor.hybrid' | translate}}</mat-label>
                 <input matInput
                        maxlength="100"
@@ -127,7 +135,7 @@
                        [(ngModel)]="local_data.hybrid"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-
+            <br/>
             <mat-form-field appearance="fill">
                 <mat-label>{{'taxon.taxon.editor.securityStatus' | translate}}</mat-label>
                 <input matInput

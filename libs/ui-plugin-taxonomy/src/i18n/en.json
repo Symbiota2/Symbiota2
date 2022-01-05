@@ -87,6 +87,7 @@
     "taxon.editor.title": "Taxon Editor",
     "taxon.editor.link.label": "Edit Taxon",
     "taxon.editor.description": "Description",
+
     "taxon.editor.descriptionBlock": "Description Block",
     "taxon.editor.images": "Images",
     "taxon.editor.common": "Common/Vernacular Name",
@@ -113,6 +114,7 @@
     "taxon.editor.deleted.error": "Error deleting taxon",
 
     "taxon.create.title" : "Add a New Taxon",
+
 
     "taxon.description.editor.block.added": "Description Block Added",
     "taxon.description.editor.block.updated": "Description Block Updated",
@@ -146,8 +148,11 @@
     "taxon.taxon.editor.rankName": "Rank",
     "taxon.taxon.editor.scientificName": "Scientific Name",
     "taxon.taxon.editor.unitName1": "Unit Name 1",
+    "taxon.taxon.editor.unitName1.indicator" : "Use unit name 1",
     "taxon.taxon.editor.unitName2": "Unit Name 2",
+    "taxon.taxon.editor.unitName2.indicator" : "Use unit name 2",
     "taxon.taxon.editor.unitName3": "Unit Name 3",
+    "taxon.taxon.editor.unitName3.indicator" : "Use unit name 3",
     "taxon.taxon.editor.author": "Author",
     "taxon.taxon.editor.phyloSortSequence": "(Phylogenetic) Sort Sequence",
     "taxon.taxon.editor.status": "Status",

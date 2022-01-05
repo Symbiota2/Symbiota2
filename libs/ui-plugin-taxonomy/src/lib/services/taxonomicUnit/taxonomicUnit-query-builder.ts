@@ -15,6 +15,10 @@ export class TaxonomicUnitQueryBuilder {
         return new FindAllBuilder(this.baseUrl)
     }
 
+    findKingdomNames(): FindKingdomNamesBuilder {
+        return new FindKingdomNamesBuilder(this.baseUrl)
+    }
+
     findOne(): FindOneBuilder {
         return new FindOneBuilder(this.baseUrl)
     }
@@ -93,6 +97,14 @@ class FindOneBuilder extends TaxonomicUnitQueryBuilder {
     build(): string {
         this.url.pathname = `${this.url.pathname}/${this._taxonID}`
         return super.build()
+    }
+}
+
+class FindKingdomNamesBuilder extends TaxonomicUnitQueryBuilder {
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/kingdomNames`
+        return super.build();
     }
 }
 

@@ -25,6 +25,19 @@ export class TaxonomicUnitController {
         return Promise.all(taxonDtos)
     }
 
+    @Get('kingdomNames')
+    @ApiResponse({ status: HttpStatus.OK, type: String, isArray: true })
+    @ApiOperation({
+        summary: "Retrieve a list of kingdom names."
+    })
+    async findKingdomNames(): Promise<string[]> {
+        const raw = await this.taxons.findKingdomNames()
+        const result = raw.map((name) => {
+            return name.kingdomName
+        })
+        return result
+    }
+
     @Get(':id')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonomicUnit })
     @ApiOperation({

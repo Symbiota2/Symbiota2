@@ -34,6 +34,11 @@ export class TaxonCreatePageComponent implements OnInit {
     public rankID
     public element
     sortSequence
+    unit1ind = false
+    unit2ind = false
+    unit3ind = false
+
+    kingdomNames = []
 
     constructor(
         private readonly userService: UserService,
@@ -65,17 +70,28 @@ export class TaxonCreatePageComponent implements OnInit {
         this.rankNamesMap = new Map()
         this.taxonomicUnitService.findAll().subscribe((ranks) => {
             ranks.forEach((rank) => {
+                console.log("rank " + rank.rankName + " " + rank.kingdomName)
                 if (rank.kingdomName == this.local_data.kingdomName) {
+                    console.log("setting")
                     this.rankNamesMap.set(rank.rankID, {name: rank.rankName, id: rank.rankID})
                 }
                 if (rank.rankID = this.local_data.rankID) {
+                    console.log("xxx")
                     this.rankID = rank.rankID
                 }
             })
             const keys =[ ...this.rankNamesMap.keys() ].sort((a,b) => a-b)
             keys.forEach((key) => {
+                console.log("rank " + key + this.rankNamesMap.get(key))
                 this.rankNames.push(this.rankNamesMap.get(key))
             })
+            // Trigger binding
+            const temp = this.rankNames
+            this.rankNames = []
+            this.rankNames = temp
+        })
+        this.taxonomicUnitService.findKingdomNames().subscribe((names) => {
+            this.kingdomNames = names
         })
     }
 

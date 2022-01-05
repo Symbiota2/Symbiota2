@@ -20,7 +20,7 @@
 
 .mat-form-field {
     //ont-size: 14px;
-    width: 100%;
+    //width: 100%;
     margin: 4pt;
 }
 
@@ -51,14 +51,6 @@ table{
 .mat-tab {
     width: 100%;
 }
-
-/*
-::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
-    min-width: 0!important;
-    padding: 3px!important;
-    margin: 3px!important;
-}
- */
 
 /* Styles for tab labels */
 .ng-deep.mat-tab-label {
@@ -101,40 +93,8 @@ table{
     }
 }
 
-
 .expansion-panel {
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
 
-/*
-.name-autocomplete-form {
-    min-width: 150px;
-    max-width: 500px;
-    width: 100%;
-}
-
-.taxonlink {
-    text-decoration: none;
-}
-
-.name-autocomplete-full-width {
-    width: 100%;
-}
-
-.symbiota2-panel-class {
-    width:20px;
-    max-width:20px;
-    font-size: 10px;
-}
-
-.mat-icon-button {
-    padding: 0;
-    min-width: 0;
-    height: 10px;
-    flex-shrink: 0;
-    line-height: 0px;
-}
-
-
- */
