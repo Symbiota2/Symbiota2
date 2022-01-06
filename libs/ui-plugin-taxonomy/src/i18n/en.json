@@ -120,6 +120,7 @@
     "taxon.create.accepted.status" : "Accepted",
     "taxon.create.not.accepted.status" : "Not Accepted",
     "taxon.create.parent.taxon" : "Parent Taxon",
+    "taxon.create.saved" : "Taxon Created",
 
     "taxon.description.editor.block.added": "Description Block Added",
     "taxon.description.editor.block.updated": "Description Block Updated",

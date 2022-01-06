@@ -2,14 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonDescriptionBlockListItem, TaxonDescriptionBlockService,
-    TaxonomicAuthorityService,
+    TaxonDescriptionBlockListItem, TaxonDescriptionBlockService, TaxonInputDto,
+    TaxonomicAuthorityService, TaxonomicEnumTreeService,
     TaxonomicStatusService, TaxonomicUnitService,
     TaxonService, TaxonVernacularService
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TranslateService } from '@ngx-translate/core'
 import { MatDialog } from '@angular/material/dialog';
-import { UserService } from '@symbiota2/ui-common';
+import { AlertService, UserService } from '@symbiota2/ui-common';
+import { TaxonomicStatusInputDto } from '../../dto/taxonomicStatusInputDto';
 
 @Component({
     selector: 'taxon-create',
@@ -53,9 +54,11 @@ export class TaxonCreatePageComponent implements OnInit {
         private readonly taxaService: TaxonService,
         private readonly taxonomicUnitService: TaxonomicUnitService,
         private readonly taxonomicStatusService: TaxonomicStatusService,
-        private readonly taxonVernacularService: TaxonVernacularService,
+        private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
+        // private readonly taxonVernacularService: TaxonVernacularService,
         private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
-        private readonly taxonDescriptionBlockService: TaxonDescriptionBlockService,
+        // private readonly taxonDescriptionBlockService: TaxonDescriptionBlockService,
+        private readonly alertService: AlertService,
         private router: Router,
         private formBuilder: FormBuilder,
         private currentRoute: ActivatedRoute,
@@ -181,32 +184,64 @@ Load Scientific names that start with partialName into a list
         }
     }
 
+    moveTaxonToNewParent(taxonID, newParent: string, authorityID) {
+        // Figure out taxon id for the new parent
+        // Look up the scientific name first
+        this.taxaService.findScientificName(newParent.trim(),authorityID)
+            .subscribe((taxon) => {
+                let parentTaxonID = taxon.id
+                // Move in taxa enum tree
+                this.taxonomicEnumTreeService.move(+taxonID, parentTaxonID, authorityID).subscribe((enumTree) => {
+                    if (!enumTree) {
+                        // [TODO fix since Error occurred]
+                        this.showError("taxon.status.editor.updated.move.error")
+                    }
+                    // Update the parent to the new parent
+                    this.taxonomicStatusService.findByID(+taxonID, +authorityID, taxonID).subscribe((status) => {
+                        let a = status as unknown as Record<PropertyKey, unknown>
+                        const data = new TaxonomicStatusInputDto(a)
+                        data.parentTaxonID = parentTaxonID
+                        this.taxonomicStatusService
+                            .update(data)
+                            .subscribe((taxStatus)=> {
+                                if (taxStatus) {
+                                    // It has been updated in the database
+                                    this.showMessage("taxon.status.editor.move.updated")
+                                } else {
+                                    // Error in adding
+                                    this.showError("taxon.status.editor.updated.move.error")
+                                }
+                                // Reload the taxon
+                                // this.loadTaxonStatus(+this.taxonID)
+                            })
+                    })
+                })
+            })
+    }
+
     doSave(){
         this.local_data.phyloSortSequence = this.sortSequence
         this.local_data.rankID = this.rankID
-        // this.dialogRef.close({event:this.action,data:this.local_data})
-    }
 
-    doClear(){
-        //this.dialogRef.close({event:'Cancel'})
-    }
-
-    /*
-    Load the taxon profile
-    */
-    loadProfile(taxonID: number) {
-        this.taxaService.findByID(taxonID).subscribe((taxon) => {
-            this.taxon = taxon
-            this.taxonName = taxon.scientificName
-        })
-        this.taxonDescriptionBlockService.findBlocksByTaxonID(taxonID).subscribe((blocks) => {
-            blocks.forEach((block) => {
-                if (block.descriptionStatements.length > 0) {
-                    block.descriptionStatements = block.descriptionStatements.sort((a, b) => a.sortSequence - b.sortSequence)
+        // Construct a new taxon
+        let a = this.local_data as unknown as Record<PropertyKey, unknown>
+        a.initialTimestamp = new Date()
+        const newTaxon = new TaxonInputDto(a)
+        this.taxaService
+            .create(newTaxon)
+            .subscribe((taxon)=> {
+                if (taxon) {
+                    // It has been saved in the database
+                    this.showMessage("taxon.create.saved")
+                } else {
+                    // Error in adding
+                    this.showError("taxon.editor.updated.error")
                 }
             })
-            this.blocks = blocks
-        })
+    }
+
+    doClear() {
+        //this.dialogRef.close({event:'Cancel'})
     }
 
     /*
@@ -215,4 +250,23 @@ Load Scientific names that start with partialName into a list
     authorityChangeAction() {
         // If the authority changes...
     }
+
+    /*
+    Internal routine to encapsulate the show error message at the bottom in case something goes awry
+    */
+    private showError(s) {
+        this.translate.get(s).subscribe((r)  => {
+            this.alertService.showError(r)
+        })
+    }
+
+    /*
+    Internal routine to encapsulate the show message at the bottom to confirm things actually happened
+    */
+    private showMessage(s) {
+        this.translate.get(s).subscribe((r)  => {
+            this.alertService.showMessage(r)
+        })
+    }
+
 }
