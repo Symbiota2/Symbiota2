@@ -11,6 +11,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { MatDialog } from '@angular/material/dialog';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { TaxonomicStatusInputDto } from '../../dto/taxonomicStatusInputDto';
+import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
 
 @Component({
     selector: 'taxon-create',
@@ -34,7 +35,16 @@ export class TaxonCreatePageComponent implements OnInit {
     public rankNames = []
     public rankID
     public element
-    sortSequence
+    isPublic = true
+
+    // Form control for sort sequence field
+    sortSequence : FormControl
+
+    // Form control for required fields
+    scientificNameControl : FormControl
+    kingdomNameControl : FormControl
+    rankControl : FormControl
+
     unit1ind = false
     unit2ind = false
     unit3ind = false
@@ -44,9 +54,16 @@ export class TaxonCreatePageComponent implements OnInit {
     taxonomicAuthorityList = []
     taxonomicAuthorityID = 1 // Default taxa authority is set in nginit
 
+    // Only support scientific names
     kindOfName = 'Scientific'
-    nameControl = new FormControl()
-    nameOptions: string[] = []
+
+    // Name of parent taxon
+    nameControl
+    nameOptions: TaxonIDAuthorNameItem[] = []
+
+    // Name of accepted taxons
+    acceptedNameControl
+    acceptedNameOptions: TaxonIDAuthorNameItem[] = []
     hasAuthors = true
 
     constructor(
@@ -65,6 +82,14 @@ export class TaxonCreatePageComponent implements OnInit {
         private readonly translate: TranslateService,
         public dialog: MatDialog
     ) {
+
+    }
+
+    /*
+    Called when Angular starts
+     */
+    ngOnInit() {
+        // Initialize form validators
         this.local_data = { }
         this.action = this.local_data.action
         this.sortSequence =
@@ -72,12 +97,37 @@ export class TaxonCreatePageComponent implements OnInit {
                 this.local_data.phyloSortSequence,
                 [Validators.pattern("[0-9]+")]
             )
-    }
 
-    /*
-    Called when Angular starts
-     */
-    ngOnInit() {
+        this.scientificNameControl =
+            new FormControl(
+                this.local_data.scientificName,
+                [Validators.required]
+            )
+
+        this.kingdomNameControl =
+            new FormControl(
+                this.local_data.kingdomName,
+                [Validators.required]
+            )
+
+        this.rankControl =
+            new FormControl(
+                this.local_data.rankID,
+                [Validators.required]
+            )
+
+        this.nameControl =
+            new FormControl(
+                undefined,
+                [Validators.required]
+            )
+
+        this.acceptedNameControl =
+            new FormControl(
+                undefined,
+                [Validators.required]
+            )
+
         // Load the authorities
         this.loadAuthorities()
 
@@ -128,12 +178,15 @@ export class TaxonCreatePageComponent implements OnInit {
             })
     }
 
-    nameFor(option) {
-        return this.hasAuthors? option.split(' -')[0] : option
+    /*
+    public hasError = (controlName: string, errorName: string) =>{
+        return this.formControl.controls[controlName].hasError(errorName);
     }
 
-    authorFor(option) {
-        return this.hasAuthors? option.split(' -')[1] : ""
+     */
+
+    getName(s) {
+        return s ? s.name + " " + s.author : ""
     }
 
     /*
@@ -150,6 +203,18 @@ Load Scientific names that start with partialName into a list
             this.taxaService.findAllScientificNames(partialName, this.taxonomicAuthorityID)
                 .subscribe((names) => {
                     this.nameOptions = names
+                })
+        }
+        this.acceptedNameOptions= []
+        if (this.hasAuthors) {
+            this.taxaService.findAllScientificNamesPlusAuthors(partialName, this.taxonomicAuthorityID)
+                .subscribe((names) => {
+                    this.acceptedNameOptions = names
+                })
+        } else {
+            this.taxaService.findAllScientificNames(partialName, this.taxonomicAuthorityID)
+                .subscribe((names) => {
+                    this.acceptedNameOptions = names
                 })
         }
     }
@@ -179,8 +244,10 @@ Load Scientific names that start with partialName into a list
     onSecurityStatusChange() {
         if (this.local_data.securityStatus == "x" || this.local_data.securityStatus == "X") {
             this.local_data.securityStatus = "0"
+            this.isPublic = true
         } else {
             this.local_data.securityStatus = "x"
+            this.isPublic = false
         }
     }
 
@@ -220,13 +287,30 @@ Load Scientific names that start with partialName into a list
     }
 
     doSave(){
-        this.local_data.phyloSortSequence = this.sortSequence
-        this.local_data.rankID = this.rankID
+        this.local_data.phyloSortSequence = this.sortSequence.value
+        this.local_data.rankID = this.rankControl.value
+        this.local_data.scientificName = this.scientificNameControl.value
+        this.local_data.parentTaxon = this.nameControl.value?.id
+        this.local_data.acceptedID = this.acceptedNameControl.value?.id
+        this.local_data.unitInd1 = this.unit1ind ? "x" : null
+        this.local_data.unitInd2 = this.unit2ind ? "x" : null
+        this.local_data.unitInd3 = this.unit3ind ? "x" : null
+
+        for (let key of Object.keys(this.local_data)) {
+            console.log(key + ": " + this.local_data[key])
+        }
+
 
         // Construct a new taxon
         let a = this.local_data as unknown as Record<PropertyKey, unknown>
         a.initialTimestamp = new Date()
         const newTaxon = new TaxonInputDto(a)
+
+        for (let key of Object.keys(newTaxon)) {
+            console.log(key + ": " + newTaxon[key])
+        }
+
+        return
         this.taxaService
             .create(newTaxon)
             .subscribe((taxon)=> {

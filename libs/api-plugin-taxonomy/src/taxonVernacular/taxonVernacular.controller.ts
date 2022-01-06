@@ -22,6 +22,7 @@ import { TaxonVernacularFindParams } from './dto/taxonVernacular-find.input.dto'
 import { AuthenticatedRequest, JwtAuthGuard, TokenService } from '@symbiota2/api-auth';
 import { TaxonVernacularInputDto } from './dto/TaxonVernacular.input.dto';
 import { TaxonDescriptionStatementInputDto } from '../taxonDescriptionStatement/dto/TaxonDescriptionStatemenInputtDto';
+import { TaxonIDAuthorNameDto } from '../taxon/dto/TaxonIDAuthorNameDto';
 
 @ApiTags('TaxonVernacular')
 @Controller('taxonVernacular')
@@ -84,14 +85,14 @@ export class TaxonVernacularController {
     Get a list of all the common names
      */
     @Get('commonNames')
-    @ApiResponse({ status: HttpStatus.OK, type: String, isArray: true })
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonIDAuthorNameDto, isArray: true })
     @ApiOperation({
-        summary: "Get a list of all of the common names, optionally using a list of taxon ids and limited to a specific taxonomic authority"
+        summary: "Get a list of all of the common names, optionally using a list of taxon ids and limited to a specific taxonomic authority, author is null always"
     })
-    async findAllCommonNames(@Query() findAllParams: TaxonVernacularFindParams): Promise<string[]> {
+    async findAllCommonNames(@Query() findAllParams: TaxonVernacularFindParams): Promise<TaxonIDAuthorNameDto[]> {
         const myRows = await this.myService.findAllCommonNames(findAllParams)
         const names = myRows.map(async (row) => {
-            return row.vernacularName
+            return new TaxonIDAuthorNameDto(row.taxonID, row.vernacularName, null)
         })
         return Promise.all(names)
     }
@@ -100,14 +101,14 @@ export class TaxonVernacularController {
     Get a list of all the common names for a specific natural language
      */
     @Get('commonNamesByLanguage/:language')
-    @ApiResponse({ status: HttpStatus.OK, type: String, isArray: true })
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonIDAuthorNameDto, isArray: true })
     @ApiOperation({
         summary: "Get a list of all of the common names for a given (natural) language, optionally using a list of taxon ids and limited to a specific taxonomic authority"
     })
-    async findAllCommonNamesByLanguage(@Param('language') language: string, @Query() findAllParams: TaxonVernacularFindParams): Promise<string[]> {
+    async findAllCommonNamesByLanguage(@Param('language') language: string, @Query() findAllParams: TaxonVernacularFindParams): Promise<TaxonIDAuthorNameDto[]> {
         const myRows = await this.myService.findAllCommonNamesByLanguage(language,findAllParams)
         const names = myRows.map(async (row) => {
-            return row.vernacularName
+            return new TaxonIDAuthorNameDto(row.taxonID, row.vernacularName, null)
         })
         return Promise.all(names)
     }

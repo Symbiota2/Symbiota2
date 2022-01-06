@@ -6,6 +6,7 @@ import { Taxon, TaxonListItem } from '../../dto';
 import { TaxonQueryBuilder } from './taxon-query-builder'
 import { TaxonIDAndNameItem } from '../../dto/taxon-id-and-name-item';
 import { TaxonInputDto } from '../../dto/taxonInputDto';
+import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
 
 interface FindAllParams {
     taxonIDs: number[]
@@ -53,6 +54,18 @@ export class TaxonService {
         return this.apiClient.send<any, Taxon[]>(query)
     }
 
+    findAllScientificNames(partialName, authorityID?): Observable<TaxonIDAuthorNameItem[]> {
+        const qb = this.createQueryBuilder()
+            .findAllScientificNames()
+            .authorityID(authorityID)
+            .partialName(partialName)
+
+        const url = qb.build()
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, TaxonIDAuthorNameItem[]>(query)
+    }
+
+    /*
     findAllScientificNames(partialName, authorityID?): Observable<string[]> {
         const qb = this.createQueryBuilder()
             .findAllScientificNames()
@@ -63,6 +76,7 @@ export class TaxonService {
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)
     }
+     */
 
     findAllScientificNamesWithImages(partialName, authorityID?): Observable<TaxonIDAndNameItem[]> {
         const qb = this.createQueryBuilder()
@@ -98,7 +112,17 @@ export class TaxonService {
         return this.apiClient.send<any, TaxonIDAndNameItem[]>(query)
     }
 
+    findAllScientificNamesPlusAuthors(partialName, authorityID?): Observable<TaxonIDAuthorNameItem[]> {
+        const url = this.createQueryBuilder()
+            .findAllScientificNamesPlusAuthors()
+            .authorityID(authorityID)
+            .partialName(partialName)
+            .build()
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, TaxonIDAuthorNameItem[]>(query)
+    }
 
+    /*
     findAllScientificNamesPlusAuthors(partialName, authorityID?): Observable<string[]> {
         const url = this.createQueryBuilder()
             .findAllScientificNamesPlusAuthors()
@@ -108,6 +132,7 @@ export class TaxonService {
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)
     }
+     */
 
     findAll(authorityID?, params?: FindAllParams): Observable<TaxonListItem[]> {
         const url = this.createQueryBuilder()

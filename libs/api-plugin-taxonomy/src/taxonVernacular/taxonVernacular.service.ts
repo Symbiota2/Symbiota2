@@ -86,7 +86,8 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
             const whereClause = (qParams.id)? "o.taxonID in " + params.id : "true"
             const qb = this.myRepository.createQueryBuilder('o')
                 .select([
-                    'o.vernacularName'
+                    'o.vernacularName',
+                    'o.taxonID'
                 ])
                 .innerJoin('o.taxon', 't')
                 .innerJoin('t.taxonStatuses', 's')
@@ -107,7 +108,8 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
             const whereClause = (qParams.id)? "o.taxonID in " + params.id : "true"
             const qb = this.myRepository.createQueryBuilder('o')
                 .select([
-                    'o.vernacularName'
+                    'o.vernacularName',
+                    'o.taxonID'
                 ])
                 .where("o.vernacularName IS NOT NULL AND " + whereClause)
                 .groupBy('o.vernacularName')  // For distinct
@@ -130,7 +132,8 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
         if (qParams.taxonAuthorityID) {
             const qb = this.myRepository.createQueryBuilder('o')
                 .select([
-                    'o.vernacularName'
+                    'o.vernacularName',
+                    'o.taxonID'
                 ])
                 .innerJoin('o.taxon', 't')
                 .innerJoin('t.taxonStatuses', 's')
@@ -149,7 +152,8 @@ export class TaxonVernacularService extends BaseService<TaxonVernacular>{
         } else {
             const qb = this.myRepository.createQueryBuilder('o')
                 .select([
-                    'o.vernacularName'
+                    'o.vernacularName',
+                    'o.taxonID'
                 ])
                 .where("o.language = '" + language + "' AND o.vernacularName IS NOT NULL AND " + whereClause)
                 .groupBy('o.vernacularName')  // For distinct

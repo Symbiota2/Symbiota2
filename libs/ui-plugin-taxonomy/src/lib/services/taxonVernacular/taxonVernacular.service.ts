@@ -8,6 +8,7 @@ import { TaxonVernacularListItem } from '../../dto/taxonVernacular-list-item';
 import { TaxonInputDto } from '../../dto/taxonInputDto';
 import { TaxonQueryBuilder } from '../taxon/taxon-query-builder';
 import { TaxonVernacularInputDto } from '../../dto/taxonVernacularInputDto';
+import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
 
 interface FindAllParams {
     IDs: number[]
@@ -54,6 +55,17 @@ export class TaxonVernacularService {
         return this.apiClient.send<any, TaxonVernacularListItem[]>(query)
     }
 
+    findAllCommonNamesByLanguage(language: string, partialName: string, authorityID?: number): Observable<TaxonIDAuthorNameItem[]> {
+        const url = this.createQueryBuilder()
+            .findAllCommonNamesByLanguage(language)
+            .authorityID(authorityID)
+            .partialName(partialName)
+            .build()
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, TaxonIDAuthorNameItem[]>(query)
+    }
+
+    /*
     findAllCommonNamesByLanguage(language: string, partialName: string, authorityID?: number): Observable<string[]> {
         const url = this.createQueryBuilder()
             .findAllCommonNamesByLanguage(language)
@@ -63,7 +75,19 @@ export class TaxonVernacularService {
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)
     }
+     */
 
+    findAllCommonNames(partialName: string, authorityID?: number): Observable<TaxonIDAuthorNameItem[]> {
+        const url = this.createQueryBuilder()
+            .findAllCommonNames()
+            .authorityID(authorityID)
+            .partialName(partialName)
+            .build()
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, TaxonIDAuthorNameItem[]>(query)
+    }
+
+    /*
     findAllCommonNames(partialName: string, authorityID?: number): Observable<string[]> {
         const url = this.createQueryBuilder()
             .findAllCommonNames()
@@ -73,6 +97,7 @@ export class TaxonVernacularService {
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, string[]>(query)
     }
+     */
 
     findAllLanguages(authorityID?: number): Observable<string[]> {
         const url = this.createQueryBuilder()

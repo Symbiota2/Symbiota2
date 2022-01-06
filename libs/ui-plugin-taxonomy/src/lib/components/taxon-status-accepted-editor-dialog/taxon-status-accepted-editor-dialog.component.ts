@@ -9,6 +9,7 @@ import {
     TaxonService,
     TaxonVernacularService
 } from '../../services';
+import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
 
 @Component({
     selector: 'taxon-status-accepted-editor-dialog',
@@ -22,7 +23,7 @@ export class TaxonStatusAcceptedEditorDialogComponent {
     public element
     taxonomicAuthorityID
     nameControl = new FormControl()
-    nameOptions: string[] = []
+    nameOptions: TaxonIDAuthorNameItem[] = []
     hasAuthors = true
     taxonID
     switchAcceptance = true
@@ -37,14 +38,6 @@ export class TaxonStatusAcceptedEditorDialogComponent {
         this.action = this.local_data.action
         this.taxonomicAuthorityID = this.local_data.taxonomicAuthorityID
         this.taxonID = this.local_data.taxon
-    }
-
-    nameFor(option) {
-        return this.hasAuthors? option.split(' -')[0] : option
-    }
-
-    authorFor(option) {
-        return this.hasAuthors? option.split(' -')[1] : ""
     }
 
     /*

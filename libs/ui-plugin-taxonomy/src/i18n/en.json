@@ -121,6 +121,12 @@
     "taxon.create.not.accepted.status" : "Not Accepted",
     "taxon.create.parent.taxon" : "Parent Taxon",
     "taxon.create.saved" : "Taxon Created",
+    "taxon.create.accepted.name": "Accepted Name",
+    "taxon.create.required.field.kingdom.name" : "Kingdom name is required",
+    "taxon.create.required.field.rank" : "Rank is required",
+    "taxon.create.required.field.scientific.name" : "Scientific name is required",
+    "taxon.create.required.field.parent" : "Parent taxon is required",
+    "taxon.create.required.field.accepted" : "Accepted name is required",
 
     "taxon.description.editor.block.added": "Description Block Added",
     "taxon.description.editor.block.updated": "Description Block Updated",

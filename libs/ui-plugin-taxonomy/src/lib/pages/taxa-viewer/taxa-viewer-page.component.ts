@@ -12,6 +12,7 @@ import { TaxonomicEnumTreeService } from '@symbiota2/ui-plugin-taxonomy'
 import { BehaviorSubject } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 import { MatListOption } from '@angular/material/list';
+import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
 
 /**
  * Taxonomic data with nested structure.
@@ -36,7 +37,7 @@ interface TaxonNode {
 
 export class TaxaViewerPageComponent implements OnInit {
     nameControl = new FormControl()
-    nameOptions: string[] = []
+    nameOptions: TaxonIDAuthorNameItem[] = []
     hasAuthors = false
     includeAuthors = false
     language = "none"
@@ -86,13 +87,6 @@ export class TaxaViewerPageComponent implements OnInit {
         this.loadVernacularLanguages()
     }
 
-    nameFor(option) {
-        return this.hasAuthors? option.split(' -')[0] : option
-    }
-
-    authorFor(option) {
-        return this.hasAuthors? option.split(' -')[1] : ""
-    }
     /*
     The vernacular language menu has a new choice
      */

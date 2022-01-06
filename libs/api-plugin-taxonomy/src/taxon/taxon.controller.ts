@@ -37,6 +37,7 @@ import { TaxonFindAllParams, TaxonFindNamesParams } from './dto/taxon-find-parms
 import path from 'path'
 import fs, { createReadStream } from 'fs';
 import { TaxonHeaderMapBody } from './dto/taxon-header-map.input.dto';
+import { TaxonIDAuthorNameDto } from './dto/TaxonIDAuthorNameDto';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -67,18 +68,17 @@ export class TaxonController {
 
     // Get a list of all the scientific names
     @Get('scientificNames')
-    @ApiResponse({ status: HttpStatus.OK, type: String, isArray: true })
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonIDAuthorNameDto, isArray: true })
     @ApiOperation({
         summary: "Retrieve a list of scientific names.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
-    async findAllScientificNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<string[]> {
+    async findAllScientificNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDAuthorNameDto[]> {
         const taxons = await this.taxa.findAllScientificNames(findNamesParams)
         if (!taxons) {
-            // throw new NotFoundException()
             return []
         }
         const names = taxons.map(async (c) => {
-            return c.scientificName
+            return new TaxonIDAuthorNameDto(c.id, c.scientificName, null)
         });
         return Promise.all(names)
     }
@@ -94,7 +94,6 @@ export class TaxonController {
     ): Promise<TaxonIDandNameDto[]> {
         const taxons = await this.taxa.findAllScientificNamesWithImages(findNamesParams)
         if (!taxons) {
-            // throw new NotFoundException()
             return []
         }
         const names = taxons.map(async (c) => {
@@ -112,7 +111,6 @@ export class TaxonController {
     async findFamilyNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
         const items = await this.taxa.findFamilyNames(findNamesParams)
         if (!items) {
-            // throw new NotFoundException()
             return []
         }
         const names = items.map(async (c) => {
@@ -130,7 +128,6 @@ export class TaxonController {
     async findGenusNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
         const items = await this.taxa.findGenusNames(findNamesParams)
         if (!items) {
-            // throw new NotFoundException()
             return []
         }
         const names = items.map(async (c) => {
@@ -148,7 +145,6 @@ export class TaxonController {
     async findSpeciesNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDandNameDto[]> {
         const items = await this.taxa.findSpeciesNames(findNamesParams)
         if (!items) {
-            // throw new NotFoundException()
             return []
         }
         const names = items.map(async (c) => {
@@ -159,18 +155,17 @@ export class TaxonController {
 
     // Get a list of all the scientific names
     @Get('scientificNamesPlusAuthors')
-    @ApiResponse({ status: HttpStatus.OK, type: String, isArray: true })
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonIDAuthorNameDto, isArray: true })
     @ApiOperation({
         summary: "Retrieve a list of scientific names and authors.  The list can be narrowed by taxa authority and/or taxon IDs."
     })
-    async findAllScientificNamesPlusAuthors(@Query() findNamesParams: TaxonFindNamesParams): Promise<string[]> {
+    async findAllScientificNamesPlusAuthors(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDAuthorNameDto[]> {
         const taxons = await this.taxa.findAllScientificNamesPlusAuthors(findNamesParams)
         if (!taxons) {
-            // throw new NotFoundException()
             return []  // returns emptylist if not found
         }
         const names = taxons.map(async (c) => {
-            return c.scientificName + (c.author? " - " + c.author : "")
+            return new TaxonIDAuthorNameDto(c.id, c.scientificName, c.author)
         });
         return Promise.all(names)
     }
@@ -187,7 +182,6 @@ export class TaxonController {
     ): Promise<TaxonDto[]> {
         const taxons = await this.taxa.findByScientificName(sciname, findNamesParams)
         if (!taxons) {
-            //throw new NotFoundException()
             return []  // returns emptylist if not found
         }
         const dto = taxons.map((taxon) => new TaxonDto(taxon))

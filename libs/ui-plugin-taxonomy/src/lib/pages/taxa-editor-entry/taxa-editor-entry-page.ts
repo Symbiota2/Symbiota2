@@ -12,6 +12,7 @@ import { TaxonomicEnumTreeService } from '@symbiota2/ui-plugin-taxonomy'
 import { BehaviorSubject } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 import { TAXON_EDITOR_ROUTE_PREFIX, TAXON_PROFILE_ROUTE_PREFIX } from '../../routes';
+import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
 
 /**
  * Taxonomic data with nested structure.
@@ -36,7 +37,7 @@ interface TaxonNode {
 
 export class TaxaEditorEntryPage implements OnInit {
     nameControl = new FormControl()
-    nameOptions: string[] = []
+    nameOptions: TaxonIDAuthorNameItem[] = []
     hasAuthors = false
     includeAuthors = false
     language = "none"

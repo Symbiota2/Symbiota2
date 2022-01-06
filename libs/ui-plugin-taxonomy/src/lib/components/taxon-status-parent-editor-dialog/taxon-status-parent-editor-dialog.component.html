@@ -24,8 +24,8 @@
                            [formControl]="nameControl"
                            [matAutocomplete]="auto">
                     <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-                        <mat-option *ngFor="let option of nameOptions" [value]="nameFor(option)">
-                            {{nameFor(option)}} <small>{{authorFor(option)}}</small>
+                        <mat-option *ngFor="let option of nameOptions" [value]="option.name">
+                            {{option.name}} <small>{{option.author}}</small>
                         </mat-option>
                     </mat-autocomplete>
                 </mat-form-field>
