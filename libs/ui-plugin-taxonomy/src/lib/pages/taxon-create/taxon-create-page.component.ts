@@ -12,6 +12,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { TaxonomicStatusInputDto } from '../../dto/taxonomicStatusInputDto';
 import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
+import { plainToClass } from 'class-transformer';
+import { filter } from 'rxjs/operators';
 
 @Component({
     selector: 'taxon-create',
@@ -20,6 +22,10 @@ import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
 })
 
 export class TaxonCreatePageComponent implements OnInit {
+    // User stuff
+    userID : number = null
+    userCanEdit: boolean = false
+
     // Which taxon am I editing?
     taxonID: string
     // Bound information about the taxon
@@ -36,6 +42,9 @@ export class TaxonCreatePageComponent implements OnInit {
     public rankID
     public element
     isPublic = true
+
+    // If it is accepted
+    isAcceptedControl = new FormControl()
 
     // Form control for sort sequence field
     sortSequence : FormControl
@@ -158,6 +167,12 @@ export class TaxonCreatePageComponent implements OnInit {
         this.taxonomicUnitService.findKingdomNames().subscribe((names) => {
             this.kingdomNames = names
         })
+        this.userService.currentUser
+            .pipe(filter((user) => user !== null))
+            .subscribe((user) => {
+                this.userID = user.uid
+                this.userCanEdit = user.canEditTaxon(user.uid)
+            })
     }
 
     /*
@@ -290,38 +305,76 @@ Load Scientific names that start with partialName into a list
         this.local_data.phyloSortSequence = this.sortSequence.value
         this.local_data.rankID = this.rankControl.value
         this.local_data.scientificName = this.scientificNameControl.value
-        this.local_data.parentTaxon = this.nameControl.value?.id
-        this.local_data.acceptedID = this.acceptedNameControl.value?.id
+        this.local_data.parentTaxonID = this.nameControl.value?.id
+        this.local_data.taxonIDAccepted = this.acceptedNameControl.value?.id
+        this.local_data.kingdomName = this.kingdomNameControl.value
+        this.local_data.taxonAuthorityID = this.taxonomicAuthorityID
         this.local_data.unitInd1 = this.unit1ind ? "x" : null
         this.local_data.unitInd2 = this.unit2ind ? "x" : null
         this.local_data.unitInd3 = this.unit3ind ? "x" : null
+        this.local_data.initialTimestamp = new Date()
+        this.local_data.lastModifiedTimestamp = this.local_data.initialTimestamp
+        this.local_data.lastModifiedUID = this.userID
 
         for (let key of Object.keys(this.local_data)) {
             console.log(key + ": " + this.local_data[key])
         }
 
+        console.log("new stuff")
 
         // Construct a new taxon
-        let a = this.local_data as unknown as Record<PropertyKey, unknown>
-        a.initialTimestamp = new Date()
-        const newTaxon = new TaxonInputDto(a)
+        //let a = this.local_data as unknown as Record<PropertyKey, unknown>
+        // a.initialTimestamp = new Date()
+        const newTaxon =  plainToClass(TaxonInputDto, this.local_data)
 
         for (let key of Object.keys(newTaxon)) {
             console.log(key + ": " + newTaxon[key])
         }
 
+        console.log(" ------ ")
+
+        // Create the taxonomic status
+        const data = {
+            "taxonID" : 1,
+            "parentTaxonID" : this.nameControl.value?.id,
+            "taxonIDAccepted" : this.acceptedNameControl.value?.id,
+            "taxonAuthorityID" : this.taxonomicAuthorityID
+        }
+        const newStatus =  plainToClass(TaxonomicStatusInputDto, this.local_data)
+
+        if (this.isAcceptedControl.value == "1") {
+            console.log("accepted")
+            newStatus.taxonIDAccepted = newStatus.taxonID
+        } else {
+            console.log(" not accepted ")
+            newStatus.taxonIDAccepted = this.local_data.acceptedID
+        }
+        for (let key of Object.keys(newStatus)) {
+            console.log(key + ": " + newStatus[key])
+        }
+
         return
-        this.taxaService
-            .create(newTaxon)
-            .subscribe((taxon)=> {
-                if (taxon) {
-                    // It has been saved in the database
-                    this.showMessage("taxon.create.saved")
-                } else {
-                    // Error in adding
-                    this.showError("taxon.editor.updated.error")
-                }
-            })
+        this.taxaService.create(newTaxon).subscribe((taxon)=> {
+            if (taxon) {
+                // It has been saved in the database
+                console.log("taxon id is " + taxon.id)
+
+                // Now save the taxonomic status
+
+
+                this.taxonomicEnumTreeService.move(taxon.id, this.local_data.parentTaxon, this.taxonomicAuthorityID).subscribe((enumTree) => {
+                    if (!enumTree) {
+                        // [TODO fix since Error occurred]
+                        this.showError("taxon.status.editor.updated.move.error")
+                    }
+
+                })
+                this.showMessage("taxon.create.saved")
+            } else {
+                // Error in adding
+                this.showError("taxon.editor.updated.error")
+            }
+        })
     }
 
     doClear() {

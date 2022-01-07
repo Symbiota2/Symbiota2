@@ -185,10 +185,10 @@
 
             <br/>
             <b><mat-label>{{'taxon.create.acceptance.status' | translate}}</mat-label></b>:&nbsp;
-            <mat-radio-group name="acceptance" (change)="onSecurityStatusChange()">
-                <mat-radio-button name="acceptance" value="1" checked>{{"taxon.create.accepted.status" | translate}}</mat-radio-button>
+            <mat-radio-group name="acceptance" [formControl]="isAcceptedControl">
+                <mat-radio-button name="acceptance" value="true" checked>{{"taxon.create.accepted.status" | translate}}</mat-radio-button>
                 &nbsp; &nbsp;
-                <mat-radio-button name="acceptance" value="0" #hidden>{{"taxon.create.not.accepted.status" | translate}}</mat-radio-button>
+                <mat-radio-button name="acceptance" value="false" #hidden>{{"taxon.create.not.accepted.status" | translate}}</mat-radio-button>
             </mat-radio-group>
             <symbiota2-expansion-panel *ngIf="!isPublic" label='{{"taxon.status.accepted.editor.dialog.change.link" | translate}}' expanded='true'>
                 <mat-form-field class="name-autocomplete-full-width">
