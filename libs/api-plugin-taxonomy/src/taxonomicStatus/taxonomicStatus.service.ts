@@ -114,7 +114,8 @@ export class TaxonomicStatusService extends BaseService<TaxonomicStatus>{
      * @return number The created data or null (not found)
      */
     async create(data: Partial<TaxonomicStatus>): Promise<TaxonomicStatus> {
-        const taxon = this.myRepository.create(data);
+        const taxon = this.myRepository.create(data)
+        ////return this.myRepository.save(data)
         return this.myRepository.save(taxon);
     }
 

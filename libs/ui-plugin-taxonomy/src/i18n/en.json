@@ -127,6 +127,7 @@
     "taxon.create.required.field.scientific.name" : "Scientific name is required",
     "taxon.create.required.field.parent" : "Parent taxon is required",
     "taxon.create.required.field.accepted" : "Accepted name is required",
+    "taxon.create.unacceptability.reason" : "Unacceptability reason",
 
     "taxon.description.editor.block.added": "Description Block Added",
     "taxon.description.editor.block.updated": "Description Block Updated",

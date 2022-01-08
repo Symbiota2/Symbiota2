@@ -185,12 +185,12 @@
 
             <br/>
             <b><mat-label>{{'taxon.create.acceptance.status' | translate}}</mat-label></b>:&nbsp;
-            <mat-radio-group name="acceptance" [formControl]="isAcceptedControl">
-                <mat-radio-button name="acceptance" value="true" checked>{{"taxon.create.accepted.status" | translate}}</mat-radio-button>
+            <mat-radio-group name="acceptance" (change)="onAcceptedChange()">
+                <mat-radio-button name="acceptance" value="1" checked>{{"taxon.create.accepted.status" | translate}}</mat-radio-button>
                 &nbsp; &nbsp;
-                <mat-radio-button name="acceptance" value="false" #hidden>{{"taxon.create.not.accepted.status" | translate}}</mat-radio-button>
+                <mat-radio-button name="acceptance" value="0" #hidden>{{"taxon.create.not.accepted.status" | translate}}</mat-radio-button>
             </mat-radio-group>
-            <symbiota2-expansion-panel *ngIf="!isPublic" label='{{"taxon.status.accepted.editor.dialog.change.link" | translate}}' expanded='true'>
+            <symbiota2-expansion-panel *ngIf="!isAccepted" label='{{"taxon.status.accepted.editor.dialog.change.link" | translate}}' expanded='true'>
                 <mat-form-field class="name-autocomplete-full-width">
                     <mat-label>{{"taxon.create.accepted.name" | translate}}</mat-label>
                     <input type="text"
@@ -207,6 +207,14 @@
                     </mat-autocomplete>
                 </mat-form-field>
                 <mat-error *ngIf="acceptedNameControl.invalid">{{"taxon.create.required.field.accepted" | translate}}</mat-error>
+                <mat-form-field appearance="fill" [style.width.vw]="90">
+                    <mat-label>{{'taxon.create.unacceptability.reason' | translate}}</mat-label>
+                    <input matInput
+                           maxlength="100"
+                           [value]="local_data.unacceptabilityReason"
+                           [(ngModel)]="local_data.unacceptabilityReason"
+                           [ngModelOptions]="{standalone: true}">
+                </mat-form-field>
             </symbiota2-expansion-panel>
         </form>
     </div>

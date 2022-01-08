@@ -44,7 +44,7 @@ export class TaxonCreatePageComponent implements OnInit {
     isPublic = true
 
     // If it is accepted
-    isAcceptedControl = new FormControl()
+    isAccepted = true
 
     // Form control for sort sequence field
     sortSequence : FormControl
@@ -144,16 +144,6 @@ export class TaxonCreatePageComponent implements OnInit {
         this.taxonomicUnitService.findAll().subscribe((ranks) => {
             ranks.forEach((rank) => {
                 this.rankNamesMap.set(rank.rankID, {name: rank.rankName, id: rank.rankID})
-                /*
-                if (rank.kingdomName == this.local_data.kingdomName) {
-                    console.log("setting")
-                    this.rankNamesMap.set(rank.rankID, {name: rank.rankName, id: rank.rankID})
-                }
-                if (rank.rankID = this.local_data.rankID) {
-                    console.log("xxx")
-                    this.rankID = rank.rankID
-                }
-                 */
             })
             const keys =[ ...this.rankNamesMap.keys() ].sort((a,b) => a-b)
             keys.forEach((key) => {
@@ -266,6 +256,11 @@ Load Scientific names that start with partialName into a list
         }
     }
 
+    // Change the acceptance
+    onAcceptedChange() {
+        this.isAccepted = !this.isAccepted
+    }
+
     moveTaxonToNewParent(taxonID, newParent: string, authorityID) {
         // Figure out taxon id for the new parent
         // Look up the scientific name first
@@ -316,60 +311,39 @@ Load Scientific names that start with partialName into a list
         this.local_data.lastModifiedTimestamp = this.local_data.initialTimestamp
         this.local_data.lastModifiedUID = this.userID
 
-        for (let key of Object.keys(this.local_data)) {
-            console.log(key + ": " + this.local_data[key])
-        }
-
-        console.log("new stuff")
-
         // Construct a new taxon
         //let a = this.local_data as unknown as Record<PropertyKey, unknown>
         // a.initialTimestamp = new Date()
         const newTaxon =  plainToClass(TaxonInputDto, this.local_data)
 
-        for (let key of Object.keys(newTaxon)) {
-            console.log(key + ": " + newTaxon[key])
-        }
-
-        console.log(" ------ ")
-
-        // Create the taxonomic status
-        const data = {
-            "taxonID" : 1,
-            "parentTaxonID" : this.nameControl.value?.id,
-            "taxonIDAccepted" : this.acceptedNameControl.value?.id,
-            "taxonAuthorityID" : this.taxonomicAuthorityID
-        }
-        const newStatus =  plainToClass(TaxonomicStatusInputDto, this.local_data)
-
-        if (this.isAcceptedControl.value == "1") {
-            console.log("accepted")
-            newStatus.taxonIDAccepted = newStatus.taxonID
-        } else {
-            console.log(" not accepted ")
-            newStatus.taxonIDAccepted = this.local_data.acceptedID
-        }
-        for (let key of Object.keys(newStatus)) {
-            console.log(key + ": " + newStatus[key])
-        }
-
-        return
         this.taxaService.create(newTaxon).subscribe((taxon)=> {
             if (taxon) {
-                // It has been saved in the database
-                console.log("taxon id is " + taxon.id)
+                // It has been saved in the database, create the status record
+                const data = {
+                    "taxonID" : taxon.id,
+                    "parentTaxonID" : this.nameControl.value?.id,
+                    "taxonIDAccepted" : this.isAccepted ? taxon.id : this.acceptedNameControl.value?.id,
+                    "initialTimestamp" : new Date(),
+                    "taxonAuthorityID" : this.taxonomicAuthorityID
+                }
+                const newStatus =  plainToClass(TaxonomicStatusInputDto, data)
 
                 // Now save the taxonomic status
-
-
-                this.taxonomicEnumTreeService.move(taxon.id, this.local_data.parentTaxon, this.taxonomicAuthorityID).subscribe((enumTree) => {
-                    if (!enumTree) {
-                        // [TODO fix since Error occurred]
-                        this.showError("taxon.status.editor.updated.move.error")
+                this.taxonomicStatusService.create(newStatus).subscribe((status) => {
+                    if (status) {
+                        this.taxonomicEnumTreeService.move(taxon.id, this.nameControl.value?.id, this.taxonomicAuthorityID).subscribe((enumTree) => {
+                            if (!enumTree) {
+                                // [TODO fix since Error occurred]
+                                this.showError("taxon.status.editor.updated.move.error")
+                            } else {
+                                this.showMessage("taxon.create.saved")
+                            }
+                        })
+                    } else {
+                        // Error in adding
+                        this.showError("taxon.editor.updated.error")
                     }
-
                 })
-                this.showMessage("taxon.create.saved")
             } else {
                 // Error in adding
                 this.showError("taxon.editor.updated.error")
