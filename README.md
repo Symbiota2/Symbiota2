@@ -10,9 +10,9 @@ This project was uses [Nx](https://nx.dev), [Angular](https://angular.io), and [
 
 [Nest Documentation](https://docs.nestjs.com/)
 
-[Tutorial on writing a Symbiota2 API endpoint](./tutorials/simpleWebService.md)
+[Tutorial on writing a Symbiota2 API endpoint](./docs/tutorials/simpleWebService.md)
 
-[Tutorial on writing a Symbiota2 UI page](./tutorials/simpleWebPage.md)
+[Tutorial on writing a Symbiota2 UI page](./docs/tutorials/simpleWebPage.md)
 
 ## Environment
 
