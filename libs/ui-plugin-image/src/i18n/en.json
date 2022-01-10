@@ -15,6 +15,7 @@
     "image.details.photographer": "Photographer",
     "image.details.manager": "Manager",
     "image.details.image.source": "Image Source",
+    "image.details.image.source.url": "Source URL",
     "image.details.image.notes": "Notes",
     "image.details.image.locality": "Locality",
     "image.details.image.sortSequence": "Sort Sequence",
@@ -25,6 +26,14 @@
     "image.details.editor.dialog.cancel" : "Cancel",
     "image.details.editor.updated" : "Image details updated.",
     "image.details.editor.update.error" : "Error updating image details.",
+
+    "image.add.image.sortSequence.error" : "Not a valid number",
+    "image.add.dialog.upload" : "Upload Image",
+    "image.add.title" : "Add an Image",
+    "image.add.select.message" : "Select an image file located on your computer that you want to upload",
+    "image.add.image.keep.message" : "Keep a large version of the image, when applicable",
+    "image.add.image.keep.message.note" : "Note: upload image size can not be greater than 2MB",
+    "image.add.lacks.edit.permission" : "User does not have permission to add an image.",
 
     "image.search.title": "Image Search",
     "image.search.options.label" : "Search options",

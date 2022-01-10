@@ -1,12 +1,13 @@
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { AlertService, ApiClientService, AppConfigService, UserService } from '@symbiota2/ui-common';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { Injectable } from '@angular/core'
 import { ImageQueryBuilder } from './image-query-builder'
 import { PhotographerInfoListItem } from '../../dto/PhotographerInfoListItem';
 import { ImageListItem } from '../../dto';
 import { ImageInputDto } from '../../dto/ImageInputDto';
 import { ImageAndTaxonListItem } from '../../dto/ImageAndTaxonListItem';
+import { ApiTaxonomyUpload } from '../../../../../ui-plugin-taxonomy/src/lib/services/taxonomyUpload/taxonomy-upload.service';
 
 interface FindAllParams {
     imageIDs: number[]
@@ -17,6 +18,7 @@ interface FindAllParams {
 @Injectable()
 export class ImageService {
     private jwtToken = this.user.currentUser.pipe(map((user) => user.token))
+    private readonly _currentUpload = new BehaviorSubject<ApiTaxonomyUpload>(null)
 
     constructor(
         private readonly alerts: AlertService,
@@ -89,6 +91,35 @@ export class ImageService {
                     return o;
                 }))
             )
+    }
+a
+    uploadImageFile(file: File): Observable<void> {
+        const url = this.createQueryBuilder()
+            .upload()
+            .build()
+
+        const body = new FormData();
+        body.append('file', file);
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const query = this.apiClient.queryBuilder(url).fileUpload()
+                    .addJwtAuth(token)
+                    .body(body)
+                    .build()
+
+                return this.apiClient.send(query).pipe(
+                    catchError((e) => {
+                        this.alerts.showError(JSON.stringify(e));
+                        return of(null);
+                    }),
+                )
+            }),
+            tap((uploadResponse) => {
+                this._currentUpload.next(uploadResponse);
+            }),
+            map(() => null)
+        )
     }
 
     imageSearch(

@@ -35,7 +35,6 @@ export class TaxonCreatePageComponent implements OnInit {
     // The description of the taxon
     blocks: TaxonDescriptionBlockListItem[] =[]
 
-    public action : string
     public local_data : any
     public rankNamesMap = new Map()
     public rankNames = []
@@ -100,42 +99,7 @@ export class TaxonCreatePageComponent implements OnInit {
     ngOnInit() {
         // Initialize form validators
         this.local_data = { }
-        this.action = this.local_data.action
-        this.sortSequence =
-            new FormControl(
-                this.local_data.phyloSortSequence,
-                [Validators.pattern("[0-9]+")]
-            )
-
-        this.scientificNameControl =
-            new FormControl(
-                this.local_data.scientificName,
-                [Validators.required]
-            )
-
-        this.kingdomNameControl =
-            new FormControl(
-                this.local_data.kingdomName,
-                [Validators.required]
-            )
-
-        this.rankControl =
-            new FormControl(
-                this.local_data.rankID,
-                [Validators.required]
-            )
-
-        this.nameControl =
-            new FormControl(
-                undefined,
-                [Validators.required]
-            )
-
-        this.acceptedNameControl =
-            new FormControl(
-                undefined,
-                [Validators.required]
-            )
+        this.setUpFormControls()
 
         // Load the authorities
         this.loadAuthorities()
@@ -351,8 +315,48 @@ Load Scientific names that start with partialName into a list
         })
     }
 
+    setUpFormControls() {
+        this.sortSequence =
+            new FormControl(
+                this.local_data.phyloSortSequence,
+                [Validators.pattern("[0-9]+")]
+            )
+
+        this.scientificNameControl =
+            new FormControl(
+                this.local_data.scientificName,
+                [Validators.required]
+            )
+
+        this.kingdomNameControl =
+            new FormControl(
+                this.local_data.kingdomName,
+                [Validators.required]
+            )
+
+        this.rankControl =
+            new FormControl(
+                this.local_data.rankID,
+                [Validators.required]
+            )
+
+        this.nameControl =
+            new FormControl(
+                undefined,
+                [Validators.required]
+            )
+
+        this.acceptedNameControl =
+            new FormControl(
+                undefined,
+                [Validators.required]
+            )
+    }
+
     doClear() {
         //this.dialogRef.close({event:'Cancel'})
+        this.local_data = { }
+        this.setUpFormControls()
     }
 
     /*

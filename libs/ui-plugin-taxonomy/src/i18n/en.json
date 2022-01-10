@@ -90,6 +90,7 @@
 
     "taxon.editor.descriptionBlock": "Description Block",
     "taxon.editor.images": "Images",
+    "taxon.editor.add.image" : "Add Image",
     "taxon.editor.common": "Common/Vernacular Name",
     "taxon.editor.taxon": "Taxon",
     "taxon.editor.delete": "Delete",

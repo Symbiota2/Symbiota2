@@ -1,3 +1,4 @@
+export * from './taxon-image-add/taxon-image-add.component'
 export * from './taxon-description-dialog/taxon-description-dialog.component'
 export * from './taxon-description-editor/taxon-description-editor.component'
 export * from './taxon-description-statement-dialog/taxon-description-statement-dialog.component'
