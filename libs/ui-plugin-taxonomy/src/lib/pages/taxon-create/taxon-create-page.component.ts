@@ -225,10 +225,10 @@ Load Scientific names that start with partialName into a list
         this.isAccepted = !this.isAccepted
     }
 
-    moveTaxonToNewParent(taxonID, newParent: string, authorityID) {
+    moveTaxonToNewParent(taxonID, newParentID, authorityID) {
         // Figure out taxon id for the new parent
         // Look up the scientific name first
-        this.taxaService.findScientificName(newParent.trim(),authorityID)
+        this.taxaService.findByID(newParentID,authorityID)
             .subscribe((taxon) => {
                 let parentTaxonID = taxon.id
                 // Move in taxa enum tree

@@ -14,6 +14,7 @@ type File = Express.Multer.File
 export class ImageService extends BaseService<Image>{
     private static readonly S3_PREFIX = 'image'
     public static readonly imageUploadFolder = './data/uploads/images/'
+    public static readonly imageLibraryFolder = './imglib/'
 
     constructor(
         @Inject(Image.PROVIDER_ID)
@@ -180,13 +181,20 @@ export class ImageService extends BaseService<Image>{
         return null;
     }
 
-    async fromFile(originalname: string, filename: string, mimetype: string): Promise<void> {
+    async fromFileToStorageService(originalname: string, filename: string, mimetype: string): Promise<void> {
         const readStream = fs.createReadStream(ImageService.imageUploadFolder + filename)
         await this.storageService.putObject(
             ImageService.s3Key(filename),
             readStream,
             {"contentType" : mimetype}
         )
+    }
+
+    async fromFileToLocalStorage(originalname: string, filename: string, mimetype: string): Promise<void> {
+        fs.rename(ImageService.imageUploadFolder + filename, ImageService.imageLibraryFolder + filename, (err) => {
+            if (err) throw err
+            console.log('Successfully uploaded ' + ImageService.imageLibraryFolder + filename)
+        })
     }
 
 }

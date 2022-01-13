@@ -1,21 +1,7 @@
-<!-- <h1 mat-dialog-title>Row Action :: <strong>{{action}}</strong></h1> -->
 <div mat-dialog-content>
         <form *ngIf="action == 'Update Parent'" class="name-autocomplete-form">
-
-            <!--
-            <mat-form-field appearance="fill">
-                <mat-label>{{'taxon.taxon.editor.scientificName' | translate}}</mat-label>
-                <input matInput
-                       maxlength="100"
-                       [value]="local_data.currentParentName"
-                       [(ngModel)]="local_data.currentParentName"
-                       [ngModelOptions]="{standalone: true}">
-            </mat-form-field>
-            -->
-
                 <mat-form-field class="name-autocomplete-full-width">
                     <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxon.status.parent.editor.dialog.parent.taxon.label" | translate}}</mat-label>
-                    <!-- (keypress)="onKey($event)" -->
                     <input *ngIf='kindOfName == "Scientific"' type="text"
                            placeholder='{{"taxon.status.parent.editor.dialog.parent.taxon.placeholder" | translate}}'
                            aria-label="String"
@@ -24,7 +10,7 @@
                            [formControl]="nameControl"
                            [matAutocomplete]="auto">
                     <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-                        <mat-option *ngFor="let option of nameOptions" [value]="option.name">
+                        <mat-option *ngFor="let option of nameOptions" [value]="option.id">
                             {{option.name}} <small>{{option.author}}</small>
                         </mat-option>
                     </mat-autocomplete>

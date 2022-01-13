@@ -30,9 +30,11 @@ export class TaxonQueryBuilder {
         return new FindByScientificNameBuilder(this.baseUrl)
     }
 
+    /*
     findScientificName() : FindScientificNameBuilder {
         return new FindScientificNameBuilder(this.baseUrl)
     }
+     */
 
     findAll(): FindAllBuilder {
         return new FindAllBuilder(this.baseUrl)
@@ -111,28 +113,28 @@ class DeleteOneBuilder extends TaxonQueryBuilder {
 
 class ProblemAcceptedNamesBuilder extends TaxonQueryBuilder {
     build(): string {
-        this.url.pathname = `${this.url.pathname}/upload/problemAcceptedNames`;
+        this.url.pathname = `${this.url.pathname}/upload/results/2`;
         return super.build();
     }
 }
 
 class ProblemUploadRowsBuilder extends TaxonQueryBuilder {
     build(): string {
-        this.url.pathname = `${this.url.pathname}/upload/problemRows`;
+        this.url.pathname = `${this.url.pathname}/upload/results/1`;
         return super.build();
     }
 }
 
 class ProblemParentNamesBuilder extends TaxonQueryBuilder {
     build(): string {
-        this.url.pathname = `${this.url.pathname}/upload/problemParentNames`;
+        this.url.pathname = `${this.url.pathname}/upload/results/3`;
         return super.build();
     }
 }
 
 class ProblemRanksBuilder extends TaxonQueryBuilder {
     build(): string {
-        this.url.pathname = `${this.url.pathname}/upload/problemRanks`;
+        this.url.pathname = `${this.url.pathname}/upload/results/4`;
         return super.build();
     }
 }
@@ -200,6 +202,7 @@ class FindByScientificNameBuilder extends TaxonQueryBuilder {
     }
 }
 
+/*
 class FindScientificNameBuilder extends TaxonQueryBuilder {
     protected _scientificName: string = null
 
@@ -235,6 +238,7 @@ class FindScientificNameBuilder extends TaxonQueryBuilder {
         return super.build()
     }
 }
+ */
 
 class FindOneBuilder extends TaxonQueryBuilder {
     protected taxonID: number = null

@@ -306,13 +306,13 @@ export class TaxonStatusEditorComponent implements OnInit {
             })
     }
 
-    moveTaxonToNewParent(newParent: string) {
+    moveTaxonToNewParent(newParentID: number) {
         // Figure out taxon id for the new parent
         let children = []
         const childrenSynonyms = {}
 
         // Look up the scientific name first
-        this.taxaService.findScientificName(newParent.trim(),this.currentAuthorityID)
+        this.taxaService.findByID(newParentID,this.currentAuthorityID)
             .subscribe((taxon) => {
                 let parentTaxonID = taxon.id
                 // Move in taxa enum tree

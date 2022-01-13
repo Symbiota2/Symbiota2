@@ -45,6 +45,7 @@ const fsPromises = fs.promises;
 @ApiTags('Taxon')
 @Controller('taxon')
 export class TaxonController {
+
     constructor(private readonly taxa: TaxonService) { }
 
     // The default controller fetches all of the records
@@ -188,6 +189,7 @@ export class TaxonController {
         return dto
     }
 
+    /*
     // The scientificName controller finds using a scientific name
     @Get('scientificName/:scientificName')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDto })
@@ -204,6 +206,7 @@ export class TaxonController {
         const dto = new TaxonDto(taxons[0])
         return dto
     }
+     */
 
     @Get('withSynonyms/:taxonid')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDto })
@@ -374,6 +377,19 @@ export class TaxonController {
         return upload;
     }
 
+    /*
+    @Get('upload/results')
+    @ApiOperation({ summary: 'Retrieve the problem accepted names from the most recent upload' })
+    async getStream(@Param('kind') kind: number) : Promise<string> {
+        if (kind == 1) {
+            return this.taxa.getProblemParentNames()
+        }
+
+        const key = dataFolderPath + "/problemParentNames"
+        return JSON.stringify(await this.taxa.getStream(key))
+        //return (await this.taxa.getStream(key)).toString()
+    }
+
     @Get('upload/stream')
     @ApiOperation({ summary: 'Retrieve the problem accepted names from the most recent upload' })
     async getStream() : Promise<string> {
@@ -383,6 +399,25 @@ export class TaxonController {
         //return (await this.taxa.getStream(key)).toString()
     }
 
+     */
+
+    @Get('upload/results/:kind')
+    @ApiOperation({ summary: 'Retrieve the potential problems in the upload. You must choose by kind of problem by setting the "kind" field. Potential choices are 1 (problem rows), 2 (problem accepted names), 3 (problem parent names), and 4 (problem ranks).' })
+    async getresults(@Param('kind') kind: number) : Promise<string[]> {
+        if (kind == 1) {
+            return this.taxa.getProblemUploadRows()
+        } else if (kind == 2) {
+            return this.taxa.getProblemAcceptedNames()
+        } else if (kind == 3) {
+            return this.taxa.getProblemParentNames()
+        } else if (kind == 4) {
+            return this.taxa.getProblemRanks()
+        } else {
+            throw new BadRequestException(" The kind is out of the range 1 to 4 it is " + kind)
+        }
+    }
+
+    /*
     @Get('upload/problemRows')
     @ApiOperation({ summary: 'Retrieve the problem rows in the upload' })
     async getUploadProblemRows() : Promise<string[]> {
@@ -406,6 +441,7 @@ export class TaxonController {
     async getUploadProblemRanks(): Promise<string[]> {
         return this.taxa.getProblemRanks()
     }
+     */
 
     @Get('upload/:id')
     @ApiOperation({ summary: 'Retrieve an upload by its ID' })

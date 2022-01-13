@@ -154,11 +154,16 @@ export class ImageController {
     @ApiOperation({ summary: "Upload an image file to storage service" })
     @ApiFileInput('file')
     // @UseGuards(SuperAdminGuard)
-    async uploadStorageSingle(@UploadedFile() file: File) {
+    async uploadStorageSingle(@Param('useStorageService') useStorageService: boolean, @UploadedFile() file: File) {
         if (!file.mimetype.startsWith('image/')) {
             throw new BadRequestException('Invalid Image');
         }
-        await this.myService.fromFile(file.originalname, file.filename, file.mimetype)
+        if (useStorageService) {
+            await this.myService.fromFileToStorageService(file.originalname, file.filename, file.mimetype)
+        } else {
+            await this.myService.fromFileToLocalStorage(file.originalname, file.filename, file.mimetype)
+        }
+
     }
 
     private canEdit(request) {

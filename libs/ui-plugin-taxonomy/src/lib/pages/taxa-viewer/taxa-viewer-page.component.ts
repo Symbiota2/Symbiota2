@@ -586,7 +586,7 @@ export class TaxaViewerPageComponent implements OnInit {
         let descTids  = []
 
         // Match the name to a taxon id
-        this.taxaService.findScientificName(node.name, this.taxonomicAuthorityID).subscribe((taxon) => {
+        this.taxaService.findByID(node.taxonID, this.taxonomicAuthorityID).subscribe((taxon) => {
 
             // The enum table has the descendants so look them up there
             this.taxonomicEnumTreeService.findDescendants(taxon.id, this.taxonomicAuthorityID).subscribe((taxonET) => {

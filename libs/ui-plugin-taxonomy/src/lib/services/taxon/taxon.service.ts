@@ -33,6 +33,7 @@ export class TaxonService {
         return this.apiClient.apiRoot()
     }
 
+    /*
     findScientificName(sciname, authorityID?): Observable<TaxonListItem> {
         const url = this.createQueryBuilder()
             .findScientificName()
@@ -43,6 +44,7 @@ export class TaxonService {
         return this.apiClient.send<any, Record<string, unknown>>(query)
             .pipe(map((o) => Taxon.fromJSON(o)))
     }
+     */
 
     findByScientificName(sciname, authorityID?): Observable<TaxonListItem[]> {
         const url = this.createQueryBuilder()

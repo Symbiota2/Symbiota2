@@ -23,7 +23,7 @@ export class ImageTagService {
 
     public getUrl() {
         const apiBaseUrl = this.appConfig.apiUri()
-        const x = new URL(`${apiBaseUrl}/imageTag`)
+        const x = new URL(`${apiBaseUrl}/image/tag`)
         return this.apiClient.apiRoot()
     }
 

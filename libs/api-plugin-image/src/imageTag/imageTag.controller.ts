@@ -18,7 +18,7 @@ import { ImageTagDto } from './dto/ImageTagDto'
 import { ImageTagFindAllParams } from './dto/image-tag-find-all.input.dto'
 
 @ApiTags('ImageTag')
-@Controller('imageTag')
+@Controller('image/tag')
 export class ImageTagController {
 
     constructor(private readonly myService: ImageTagService) { }
@@ -26,7 +26,7 @@ export class ImageTagController {
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: ImageTagDto, isArray: true })
     @ApiOperation({
-        summary: "Retrieve a list of image records."
+        summary: "Retrieve a list of image tag records.  Can use a list of image tag ids to filter the records, and a limit and/or offset."
     })
     async findAll(@Query() findAllParams: ImageTagFindAllParams): Promise<ImageTagDto[]> {
         const imageTags = await this.myService.findAll(findAllParams)
@@ -44,6 +44,9 @@ export class ImageTagController {
     })
     async findByID(@Param('id') id: number): Promise<ImageTagDto> {
         const image = await this.myService.findByID(id)
+        if (!image) {
+            throw new NotFoundException("Image tag id " + id + " is not present in the database.")
+        }
         const dto = new ImageTagDto(image)
         return dto
     }

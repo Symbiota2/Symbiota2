@@ -23,7 +23,7 @@ export class ImageTagKeyService {
 
     public getUrl() {
         const apiBaseUrl = this.appConfig.apiUri()
-        const x = new URL(`${apiBaseUrl}/imageTagKey`)
+        const x = new URL(`${apiBaseUrl}/image/tagKey`)
         return this.apiClient.apiRoot()
     }
 
