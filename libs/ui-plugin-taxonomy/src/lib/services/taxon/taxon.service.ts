@@ -29,7 +29,7 @@ export class TaxonService {
 
     public getUrl() {
         const apiBaseUrl = this.appConfig.apiUri()
-        const x = new URL(`${apiBaseUrl}/taxon/scientificNames`)
+        //const x = new URL(`${apiBaseUrl}/taxon/scientificNames`)
         return this.apiClient.apiRoot()
     }
 
@@ -48,12 +48,13 @@ export class TaxonService {
 
     findByScientificName(sciname, authorityID?): Observable<TaxonListItem[]> {
         const url = this.createQueryBuilder()
-            .findByScientificName()
+            .findAll()
             .authorityID(authorityID)
             .scientificName(sciname)
             .build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, Taxon[]>(query)
+
     }
 
     findAllScientificNames(partialName, authorityID?): Observable<TaxonIDAuthorNameItem[]> {
@@ -67,22 +68,10 @@ export class TaxonService {
         return this.apiClient.send<any, TaxonIDAuthorNameItem[]>(query)
     }
 
-    /*
-    findAllScientificNames(partialName, authorityID?): Observable<string[]> {
-        const qb = this.createQueryBuilder()
-            .findAllScientificNames()
-            .authorityID(authorityID)
-            .partialName(partialName)
-
-        const url = qb.build()
-        const query = this.apiClient.queryBuilder(url).get().build()
-        return this.apiClient.send<any, string[]>(query)
-    }
-     */
-
     findAllScientificNamesWithImages(partialName, authorityID?): Observable<TaxonIDAndNameItem[]> {
         const qb = this.createQueryBuilder()
-            .findAllScientificNamesWithImages()
+            .findAllScientificNames()
+            .withImages()
             .authorityID(authorityID)
             .partialName(partialName)
 
@@ -91,29 +80,20 @@ export class TaxonService {
         return this.apiClient.send<any, TaxonIDAndNameItem[]>(query)
     }
 
-    findScientificNames(partialName, rank, authorityID?): Observable<TaxonIDAndNameItem[]> {
+    findScientificNames(partialName, rankID, kingdomName, authorityID?): Observable<TaxonIDAndNameItem[]> {
         const qb = this.createQueryBuilder()
             .findAllScientificNames()
+            .rankID(rankID)
+            .kingdomName(kingdomName)
             .authorityID(authorityID)
             .partialName(partialName)
-
-        if (rank) {
-            if (rank == "family") {
-                qb.familyRank()
-            } else if (rank == "species") {
-                qb.speciesRank()
-            } else if (rank == "genus") {
-                qb.genusRank()
-            }
-        } else {
-            qb.familyRank()  // Default to family rank
-        }
 
         const url = qb.build()
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, TaxonIDAndNameItem[]>(query)
     }
 
+    /*
     findAllScientificNamesPlusAuthors(partialName, authorityID?): Observable<TaxonIDAuthorNameItem[]> {
         const url = this.createQueryBuilder()
             .findAllScientificNamesPlusAuthors()
@@ -123,6 +103,8 @@ export class TaxonService {
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, TaxonIDAuthorNameItem[]>(query)
     }
+
+     */
 
     /*
     findAllScientificNamesPlusAuthors(partialName, authorityID?): Observable<string[]> {

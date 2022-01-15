@@ -35,6 +35,22 @@ export class TaxonFindNamesParams extends TaxonFindCommonParams {
     @Type(() => String)
     @IsOptional()
     partialName: string
+
+    @ApiProperty({ name: 'withImages', type: String, required: false })
+    @Type(() => String)
+    @IsOptional()
+    withImages: string
+
+    @ApiProperty({ name: 'kingdom', type: String, required: false })
+    @Type(() => String)
+    @IsOptional()
+    kingdom: string
+
+    @ApiProperty({ name: 'rankID', type: Number, required: false })
+    @Type(() => Number)
+    @IsInt({ each: true })
+    @IsOptional()
+    rankID: string
 }
 
 export class TaxonFindAllParams extends TaxonFindCommonParams {
@@ -51,5 +67,10 @@ export class TaxonFindAllParams extends TaxonFindCommonParams {
     @IsInt({ each: true })
     @IsOptional()
     taxonAuthorityID: number
+
+    @ApiProperty({ name: 'scientificName', type: String, required: false })
+    @Type(() => String)
+    @IsOptional()
+    scientificName: string
 
 }

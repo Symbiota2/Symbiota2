@@ -2,6 +2,7 @@ import { Exclude, Expose } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
 import { TaxaEnumTreeEntry, Taxon } from '@symbiota2/api-database';
 import { TaxonDto } from '../../taxon/dto/TaxonDto'
+import { TaxonAndAcceptedStatusesDto } from '../../taxon/dto/TaxonAndAcceptedStatusesDto';
 
 @Exclude()
 export class TaxonomicEnumTreeDto {
@@ -31,7 +32,7 @@ export class TaxonomicEnumTreeDto {
 
     @ApiProperty()
     @Expose()
-    parent : TaxonDto
+    parent : TaxonAndAcceptedStatusesDto
 
     @ApiProperty()
     @Expose()

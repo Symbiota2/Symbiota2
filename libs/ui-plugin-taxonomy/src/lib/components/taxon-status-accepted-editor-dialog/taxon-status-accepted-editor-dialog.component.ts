@@ -45,17 +45,10 @@ export class TaxonStatusAcceptedEditorDialogComponent {
      */
     public loadScientificNames(partialName) {
         this.nameOptions= []
-        if (this.hasAuthors) {
-            this.taxaService.findAllScientificNamesPlusAuthors(partialName, this.taxonomicAuthorityID)
-                .subscribe((names) => {
-                    this.nameOptions = names
-                })
-        } else {
-            this.taxaService.findAllScientificNames(partialName, this.taxonomicAuthorityID)
-                .subscribe((names) => {
-                    this.nameOptions = names
-                })
-        }
+        this.taxaService.findAllScientificNames(partialName, this.taxonomicAuthorityID)
+            .subscribe((names) => {
+                this.nameOptions = names
+            })
     }
 
     /*

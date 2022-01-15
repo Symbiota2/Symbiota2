@@ -38,6 +38,7 @@ import path from 'path'
 import fs, { createReadStream } from 'fs';
 import { TaxonHeaderMapBody } from './dto/taxon-header-map.input.dto';
 import { TaxonIDAuthorNameDto } from './dto/TaxonIDAuthorNameDto';
+import { TaxonAndAcceptedStatusesDto } from './dto/TaxonAndAcceptedStatusesDto';
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -57,7 +58,6 @@ export class TaxonController {
     async findAll(@Query() findAllParams: TaxonFindAllParams): Promise<TaxonDto[]> {
         const taxons = await this.taxa.findAll(findAllParams)
         if (!taxons) {
-            // throw new NotFoundException()
             return []
         }
         const taxonDtos = taxons.map(async (c) => {
@@ -71,7 +71,7 @@ export class TaxonController {
     @Get('scientificNames')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonIDAuthorNameDto, isArray: true })
     @ApiOperation({
-        summary: "Retrieve a list of scientific names.  The list can be narrowed by taxa authority and/or taxon IDs."
+        summary: "Retrieve a list of scientific names.  The list can be narrowed by taxa authority, taxon IDs, whether the taxon has images, or to a specific rank/kingdom."
     })
     async findAllScientificNames(@Query() findNamesParams: TaxonFindNamesParams): Promise<TaxonIDAuthorNameDto[]> {
         const taxons = await this.taxa.findAllScientificNames(findNamesParams)
@@ -79,11 +79,12 @@ export class TaxonController {
             return []
         }
         const names = taxons.map(async (c) => {
-            return new TaxonIDAuthorNameDto(c.id, c.scientificName, null)
+            return new TaxonIDAuthorNameDto(c.id, c.scientificName, c.author)
         });
         return Promise.all(names)
     }
 
+    /*
     // Get a list of all the scientific names
     @Get('scientificNamesWithImages')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonIDandNameDto, isArray: true })
@@ -171,7 +172,10 @@ export class TaxonController {
         return Promise.all(names)
     }
 
+
+     */
     // The scientificName controller finds using a scientific name
+    /*
     @Get('byScientificName/:scientificName')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonDto, isArray: true })
     @ApiOperation({
@@ -188,7 +192,7 @@ export class TaxonController {
         const dto = taxons.map((taxon) => new TaxonDto(taxon))
         return dto
     }
-
+     */
     /*
     // The scientificName controller finds using a scientific name
     @Get('scientificName/:scientificName')
@@ -209,12 +213,12 @@ export class TaxonController {
      */
 
     @Get('withSynonyms/:taxonid')
-    @ApiResponse({ status: HttpStatus.OK, type: TaxonDto })
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonAndAcceptedStatusesDto })
     @ApiOperation({
-        summary: "Find a taxon by the taxonID"
+        summary: "Find a taxon by the taxonID together with its status and accepted statuses (synonyms)."
     })
-    async findByTIDWithSynonyms(@Param('taxonid') id: number): Promise<TaxonDto> {
-        const taxon = await this.taxa.findByTID(id)
+    async findByTIDWithSynonyms(@Param('taxonid') id: number): Promise<TaxonAndAcceptedStatusesDto> {
+        const taxon = await this.taxa.findByTIDWithSynonyms(id)
         if (!taxon) {
             throw new NotFoundException()
         }
@@ -225,7 +229,7 @@ export class TaxonController {
             const dto = new TaxonomicStatusDto(status)
             a.push(dto)
         })
-        const dto = new TaxonDto(taxon)
+        const dto = new TaxonAndAcceptedStatusesDto(taxon)
         dto.acceptedTaxonStatuses = a
         return dto
     }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -7,6 +7,10 @@ import {
     TaxonService
 } from '@symbiota2/ui-plugin-taxonomy';
 import { ImageListItem, ImageService } from '@symbiota2/ui-plugin-image';
+// import * as fs from 'fs'
+import { Express } from 'express';
+//import * as fs from 'fs';
+//type File = Express.Multer.File
 
 @Component({
     selector: 'image-display',
@@ -19,8 +23,8 @@ export class ImageDisplayPage implements OnInit {
     image: ImageListItem
     taxon: TaxonListItem
     taxonomicStatus: TaxonomicStatusListItem
-    selecetdFile : File
-    imagePreview: string
+    selecetdFile
+    imagePreview
 
     constructor(
         //private readonly userService: UserService,  // TODO: needed?
@@ -29,6 +33,7 @@ export class ImageDisplayPage implements OnInit {
         private readonly taxonStatusService: TaxonomicStatusService,
         private router: Router,
         private formBuilder: FormBuilder,
+        // @Inject(IMAGES_PATH) public imagesPath: string,
         private currentRoute: ActivatedRoute
     ) { }
 
@@ -36,6 +41,20 @@ export class ImageDisplayPage implements OnInit {
     Called when Angular starts
     */
     ngOnInit() {
+        this.selecetdFile = "data/logo_green.png"//
+        //const readStream = fs.createReadStream(this.selecetdFile)
+        //let base64Image = new Buffer(readStream.read(), 'binary').toString('base64');
+        //this.imagePreview = `data:image/logo_green.png;base64,${base64Image}`;
+
+        /*
+        const reader = new FileReader();
+        reader.onload = () => {
+            this.imagePreview = reader.result;
+        };
+        //reader.readAsDataURL(this.selecetdFile);
+        reader.readAsDataURL(readStream)
+
+         */
         /*
         //this.selecetdFile = event.target.files[0];
         const reader = new FileReader();
@@ -70,5 +89,15 @@ export class ImageDisplayPage implements OnInit {
 
     goToLink(url: string){
         window.open("taxon/editor/" + url, "_blank");
+    }
+
+
+    onFileUpload(event){
+        this.selecetdFile = "data/logo_green.png"//
+        const reader = new FileReader();
+        reader.onload = () => {
+            this.imagePreview = reader.result;
+        };
+        reader.readAsDataURL(this.selecetdFile);
     }
 }

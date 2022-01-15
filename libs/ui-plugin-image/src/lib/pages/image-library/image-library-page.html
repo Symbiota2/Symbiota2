@@ -5,10 +5,10 @@
     </div>
     {{"image.library.intro" | translate}}
     <div>
-        <a href="images/library/family">{{"image.library.browse.family" | translate}}</a>
+        <a href="images/library/Family">{{"image.library.browse.family" | translate}}</a>
     </div>
     <div>
-        <a href="images/library/genus">{{"image.library.browse.genus" | translate}}</a>
+        <a href="images/library/Genus">{{"image.library.browse.genus" | translate}}</a>
     </div>
     <div>
         {{"image.library.browse.species" | translate}}
@@ -30,28 +30,15 @@
 
     <symbiota2-expansion-panel label='{{"image.library.names" | translate}}'>
         <mat-list *ngFor='let name of names'>
-            <mat-list-item *ngIf="level == 'family'" role="listitem">
+            <mat-list-item *ngIf="level == 'Family'" role="listitem">
                 <a href='images/library/{{name.id}}'  (click)="loadDescendants(name.id)" style='color:inherit;text-decoration:none'>{{name.name.toUpperCase()}}</a>
             </mat-list-item>
-            <mat-list-item *ngIf="level == 'genus'" role="listitem">
+            <mat-list-item *ngIf="level == 'Genus'" role="listitem">
                 <a href='images/library/{{name.id}}'  (click)="loadDescendants(name.id)" style='color:inherit;text-decoration:none'>{{name.name}}</a>
             </mat-list-item>
-            <mat-list-item *ngIf="level == 'species'" role="listitem">
+            <mat-list-item *ngIf="level == 'Species'" role="listitem">
                 <a href='taxon/profile/{{name.id}}' target='_blank' style='color:inherit;text-decoration:none'><i>{{name.name}}</i></a>
             </mat-list-item>
         </mat-list>
-        <!--
-        <mat-nav-list *ngFor='let name of names'>
-            <mat-list-item *ngIf="level == 'family'" role="listitem" (click)="loadDescendants(name.id)">
-                {{name.name.toUpperCase()}}
-            </mat-list-item>
-            <mat-list-item *ngIf="level == 'genus'" role="listitem">
-                <a href='images/library/{{name.id}}'  (click)="loadDescendants(name.id)" style='color:inherit;text-decoration:none'>{{name.name}}</a>
-            </mat-list-item>
-            <mat-list-item *ngIf="level == 'species'" role="listitem">
-                <a href='taxon/profile/{{name.id}}' target='_blank' style='color:inherit;text-decoration:none'><i>{{name.name}}</i></a>
-            </mat-list-item>
-        </mat-nav-list>
-        -->
     </symbiota2-expansion-panel>
 </div>

@@ -164,7 +164,7 @@ Load Scientific names that start with partialName into a list
     public loadScientificNames(partialName) {
         this.nameOptions= []
         if (this.hasAuthors) {
-            this.taxaService.findAllScientificNamesPlusAuthors(partialName, this.taxonomicAuthorityID)
+            this.taxaService.findAllScientificNames(partialName, this.taxonomicAuthorityID)
                 .subscribe((names) => {
                     this.nameOptions = names
                 })
@@ -176,7 +176,7 @@ Load Scientific names that start with partialName into a list
         }
         this.acceptedNameOptions= []
         if (this.hasAuthors) {
-            this.taxaService.findAllScientificNamesPlusAuthors(partialName, this.taxonomicAuthorityID)
+            this.taxaService.findAllScientificNames(partialName, this.taxonomicAuthorityID)
                 .subscribe((names) => {
                     this.acceptedNameOptions = names
                 })

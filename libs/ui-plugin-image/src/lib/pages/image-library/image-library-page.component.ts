@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonomicEnumTreeService,
+    TaxonomicEnumTreeService, TaxonomicUnitService,
     TaxonService
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TaxonIDAndNameItem } from '../../../../../ui-plugin-taxonomy/src/lib/dto/taxon-id-and-name-item';
@@ -20,9 +20,12 @@ export class ImageLibraryPageComponent implements OnInit {
     level: string = 'family'
     prefix: string = null
 
+    ranksNameLookup
+
     constructor(
         //private readonly userService: UserService,  // TODO: needed?
         private readonly taxonService: TaxonService,
+        private readonly taxonomicUnitService: TaxonomicUnitService,
         private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
         private router: Router,
         private formBuilder: FormBuilder,
@@ -38,25 +41,30 @@ export class ImageLibraryPageComponent implements OnInit {
         this.currentRoute.paramMap.subscribe(params => {
             const maybeLevel = params.get('level')
             if (maybeLevel) {
-                if (maybeLevel == 'genus' || maybeLevel == 'family') {
+                if (maybeLevel == 'Genus' || maybeLevel == 'Family') {
                     this.level = maybeLevel
                 } else if (maybeLevel == ':level') {
-                    this.level = 'family'
+                    this.level = 'Family'
                 } else {
                     if (isNaN(Number(maybeLevel))) {
                         this.prefix = maybeLevel
-                        //this.level = 'family'
-                        this.level = 'species'
+                        this.level = 'Species'
                     } else {
                         // Load the descendents of the passed taxonID
-                        //this.level = 'family'
-                        this.level = 'species'
+                        this.level = 'Species'
                         this.descendant = Number(maybeLevel)
-
                     }
                 }
+
             }
-            this.loadNames(this.level, this.prefix, this.descendant)
+            this.taxonomicUnitService.findAll().subscribe((units) => {
+                this.ranksNameLookup = new Map()
+                units.forEach((unit) => {
+                    const key = unit.rankID + unit.kingdomName
+                    this.ranksNameLookup.set(unit.rankName, unit.rankID)
+                })
+                this.loadNames(this.ranksNameLookup.get(this.level), null, this.prefix, this.descendant)
+            })
         })
         // Load the names, comes preloaded with families
         //this.loadNames(this.level, this.prefix, this.descendant)
@@ -65,15 +73,14 @@ export class ImageLibraryPageComponent implements OnInit {
     /*
     Load the names at this level
      */
-    loadNames(level: string, prefix: string, descendant: number) {
+    loadNames(rankID : number, kingdomName : string, prefix: string, descendant: number) {
         const partialName = prefix ? prefix : ''
         if (descendant) {
             const myNames = []
-            this.taxonomicEnumTreeService.findDescendantsByRank(descendant,220)
+            this.taxonomicEnumTreeService.findDescendantsByRank(descendant,this.ranksNameLookup("Species"))
                 .subscribe((items) => {
                     items.forEach((item) =>{
                         const pair = new TaxonIDAndNameItem()
-                        console.log("name is " + pair.name)
                         pair.name = item.taxon.scientificName
                         pair.id = item.taxonID
                         myNames.push(pair)
@@ -83,7 +90,7 @@ export class ImageLibraryPageComponent implements OnInit {
             })
         }
         else {
-            this.taxonService.findScientificNames(partialName,level).subscribe((myNames) => {
+            this.taxonService.findScientificNames(partialName,rankID, kingdomName).subscribe((myNames) => {
                 this.names = myNames.sort((a,b) =>
                     a.name > b.name ? 1 : -1)
             })

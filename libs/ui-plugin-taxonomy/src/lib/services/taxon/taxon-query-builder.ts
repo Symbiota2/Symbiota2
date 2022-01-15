@@ -1,4 +1,10 @@
-import { Q_PARAM_TAXAIDS, Q_PARAM_AUTHORITYID, Q_PARAM_PARTIALNAME } from '../../../constants';
+import {
+    Q_PARAM_TAXAIDS,
+    Q_PARAM_AUTHORITYID,
+    Q_PARAM_PARTIALNAME,
+    Q_PARAM_SCIENTIFICNAME,
+    Q_PARAM_WITHIMAGES, Q_PARAM_KINGDOMNAME, Q_PARAM_RANKID
+} from '../../../constants';
 import { TaxonDescriptionBlockQueryBuilder } from '../taxonDescriptionBlock/taxonDescriptionBlock-query-builder';
 
 export class TaxonQueryBuilder {
@@ -18,6 +24,7 @@ export class TaxonQueryBuilder {
         return new FindAllScientificNamesBuilder(this.baseUrl)
     }
 
+    /*
     findAllScientificNamesWithImages() : FindAllScientificNamesWithImagesBuilder {
         return new FindAllScientificNamesWithImagesBuilder(this.baseUrl)
     }
@@ -25,10 +32,14 @@ export class TaxonQueryBuilder {
     findAllScientificNamesPlusAuthors() : FindAllScientificNamesPlusAuthorsBuilder {
         return new FindAllScientificNamesPlusAuthorsBuilder(this.baseUrl)
     }
+     */
 
+    /*
     findByScientificName() : FindByScientificNameBuilder {
         return new FindByScientificNameBuilder(this.baseUrl)
     }
+
+     */
 
     /*
     findScientificName() : FindScientificNameBuilder {
@@ -166,6 +177,7 @@ class UploadBuilder extends TaxonQueryBuilder {
     }
 }
 
+/*
 class FindByScientificNameBuilder extends TaxonQueryBuilder {
     protected _scientificName: string = null
 
@@ -201,6 +213,8 @@ class FindByScientificNameBuilder extends TaxonQueryBuilder {
         return super.build()
     }
 }
+
+ */
 
 /*
 class FindScientificNameBuilder extends TaxonQueryBuilder {
@@ -287,6 +301,9 @@ class FindOneWithSynonymsBuilder extends TaxonQueryBuilder {
 }
 
 class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
+    _withImages: boolean = false
+    _rankID : number
+    _kingdomName : string
 
     constructor(apiBaseUrl: string) {
         super(apiBaseUrl)
@@ -299,11 +316,22 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
         return this
     }
 
+    rankID(authorityID : string): FindAllScientificNamesBuilder {
+        this._authorityID = authorityID
+        return this
+    }
+
     partialName(name : string): FindAllScientificNamesBuilder {
         this._partialName = name
         return this
     }
 
+    kingdomName(name : string): FindAllScientificNamesBuilder {
+        this._kingdomName = name
+        return this
+    }
+
+    /*
     familyRank(): FindAllScientificNamesBuilder {
         this.url = new URL(`${this.baseUrl}/taxon/familyNames`)
         return this
@@ -318,18 +346,34 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
         this.url = new URL(`${this.baseUrl}/taxon/speciesNames`)
         return this
     }
+     */
+    withImages(): FindAllScientificNamesBuilder {
+        this._withImages = true
+        this.url = new URL(`${this.baseUrl}/taxon/speciesNames`)
+        return this
+    }
 
     build(): string {
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
         }
+        if (this._rankID) {
+            this.url.searchParams.append(Q_PARAM_RANKID, this._authorityID)
+        }
         if (this._partialName) {
             this.url.searchParams.append(Q_PARAM_PARTIALNAME, this._partialName)
+        }
+        if (this._kingdomName) {
+            this.url.searchParams.append(Q_PARAM_KINGDOMNAME, this._partialName)
+        }
+        if (this._withImages) {
+            this.url.searchParams.append(Q_PARAM_WITHIMAGES, "yes")
         }
         return super.build()
     }
 }
 
+/*
 class FindAllScientificNamesWithImagesBuilder extends TaxonQueryBuilder {
 
     constructor(apiBaseUrl: string) {
@@ -405,8 +449,11 @@ class FindAllScientificNamesPlusAuthorsBuilder extends TaxonQueryBuilder {
     }
 }
 
+ */
+
 class FindAllBuilder extends TaxonQueryBuilder {
     protected _taxonIDs: number[] = [];
+    protected _scientificName: string = null
 
     taxonIDs(ids: number[]): FindAllBuilder {
         this._taxonIDs = ids
@@ -418,9 +465,17 @@ class FindAllBuilder extends TaxonQueryBuilder {
         return this
     }
 
+    scientificName(sciName: string): FindAllBuilder {
+        this._scientificName = sciName
+        return this
+    }
+
     build(): string {
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
+        }
+        if (this._scientificName) {
+            this.url.searchParams.append(Q_PARAM_SCIENTIFICNAME, this._scientificName)
         }
         this._taxonIDs.forEach((id) => {
             this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString());

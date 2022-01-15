@@ -81,6 +81,7 @@ export class TaxonDto {
     @Expose()
     lastModifiedUID: number | null;
 
+    /*
     @ApiProperty()
     @Expose()
     taxonStatuses: TaxonomicStatusDto[];
@@ -88,6 +89,8 @@ export class TaxonDto {
     @ApiProperty()
     @Expose()
     acceptedTaxonStatuses: TaxonomicStatusDto[];
+
+     */
 
     @ApiProperty()
     @Expose()

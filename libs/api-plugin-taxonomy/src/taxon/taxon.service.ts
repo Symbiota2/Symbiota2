@@ -67,35 +67,49 @@ export class TaxonService extends BaseService<Taxon>{
     }
 
     /**
-     * Service to find all of the taxons possibly using an array of ids and a taxonomic authority ID
+     * Service to find all of the taxons possibly using an array of ids, a scientific name,
+     * and/or a taxonomic authority ID
      * Can also limit the number fetched and use an offset.
-     * Set find params using the 'TaxonAllParams'
-     * @param params - the 'TaxonAllParams'
+     * Set find params using the 'TaxonFindAllParams'
+     * @param params - the 'TaxonFindAllParams'
      * @returns Observable of response from api casted as `Taxon[]`
      * will be the found statements
      * @returns `of(null)` if api errors
      * @see Taxon
-     * @see TaxonAllParams
+     * @see TaxonFindAllParams
      */
     async findAll(params?: TaxonFindAllParams): Promise<Taxon[]> {
         const { limit, offset, ...qParams } = params
 
+        const qb = this.taxonRepo.createQueryBuilder('o')
+            .where("true")
+
         if (qParams.taxonAuthorityID) {
             // Have to use query builder since filter on nested relations does not work
-            const qb = this.taxonRepo.createQueryBuilder('o')
-                .leftJoin('o.taxonStatuses', 'c')
-                //.take(limit)
-
+            qb.leftJoin('o.taxonStatuses', 'c')
                 .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
 
-            if (qParams.id) {
-                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
-            } else {
-                // limit only if we don't have a list of ids
-                qb.take(limit)
-                qb.skip(offset)
-            }
-            return qb.getMany()
+        }
+
+        if (qParams.id) {
+            qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
+        }
+
+        if (limit) {
+            qb.take(limit)
+        }
+
+        if (offset) {
+            qb.skip(offset)
+        }
+
+        if (qParams.scientificName) {
+            qb.andWhere('o.scientificName = :sciname', {sciname: params.scientificName})
+        }
+
+        return qb.getMany()
+
+            /*
         } else {
             // Can use nested relations
             return (qParams.id)?
@@ -107,7 +121,7 @@ export class TaxonService extends BaseService<Taxon>{
                 : await this.taxonRepo.find({
                     take: limit,
                     skip: offset })
-        }
+        }*/
     }
 
     /**
@@ -146,6 +160,7 @@ export class TaxonService extends BaseService<Taxon>{
      * @see Taxon
      * @see TaxonFindNamesParams
      */
+    /*
     async findAllScientificNamesPlusAuthors(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         const { limit,...qParams } = params
         if (qParams.taxonAuthorityID) {
@@ -188,14 +203,14 @@ export class TaxonService extends BaseService<Taxon>{
                 })
         }
     }
+     */
 
     /**
-     * Find all of the scientific names of taxons possibly using an array of ids and
-     * a taxonomic authority ID
+     * Find all of the scientific names of taxons possibly using filters in TaxonFindNamesParams
      * Set find params using the 'TaxonFindNamesParams'
      * @param params - the 'TaxonFindNamesParams'
      * @returns Observable of response from api casted as `Taxon[]`
-     * will be the found statements
+     * will be the found taxons or empty list if nothing found
      * @returns `of(null)` if api errors
      * @see Taxon
      * @see TaxonFindNamesParams
@@ -203,24 +218,44 @@ export class TaxonService extends BaseService<Taxon>{
     async findAllScientificNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         const { limit,...qParams } = params
 
-        if (qParams.taxonAuthorityID) {
-            const qb = this.taxonRepo.createQueryBuilder('o')
-                .select([
-                    'o.scientificName',
-                    'o.author',
-                    'o.id'
-                ])
-                .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
-                .innerJoin('o.taxonStatuses', 'c')
-                .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
+        const qb = this.taxonRepo.createQueryBuilder('o')
+            .select([
+                'o.scientificName',
+                'o.author',
+                'o.id'
+            ])
+            .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
+            .where("true")
 
-            if (qParams.partialName) {
-                qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
-            }
-            if (qParams.id) {
-                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
-            }
-            return await qb.getMany()
+        // See if we need to join with taxonomic status table
+        if (qParams.taxonAuthorityID) {
+            qb.leftJoin('o.taxonStatuses', 'c')
+                .andWhere('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
+        }
+
+        // See if we need to join with images table
+        if (qParams.withImages) {
+            qb.innerJoin('o.images', 'i')
+                .distinct(true)  // need to turn on because could be several images per taxon
+        }
+
+        if (qParams.rankID) {
+            qb.andWhere('o.rankID = :id', {id: params.rankID})
+        }
+
+        if (qParams.kingdom) {
+            qb.andWhere('o.kingdomName = :name', {name: params.kingdom})
+        }
+
+        if (qParams.partialName) {
+            qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
+        }
+
+        if (qParams.id) {
+            qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
+        }
+        return await qb.getMany()
+            /*
         } else {
             return (qParams.id)?
                 await this.taxonRepo.find({
@@ -232,6 +267,7 @@ export class TaxonService extends BaseService<Taxon>{
                     take: TaxonFindAllParams.MAX_LIMIT
                 })
         }
+             */
     }
 
     /**
@@ -245,6 +281,7 @@ export class TaxonService extends BaseService<Taxon>{
      * @see Taxon
      * @see TaxonFindNamesParams
      */
+    /*`
     async findAllScientificNamesWithImages(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         const { limit,...qParams } = params
 
@@ -280,6 +317,7 @@ export class TaxonService extends BaseService<Taxon>{
                 })
         }
     }
+*/
 
     /**
      * Project the sciname from the taxa table for the rank of family using possibly
@@ -292,6 +330,7 @@ export class TaxonService extends BaseService<Taxon>{
      * @see Taxon
      * @see TaxonFindNamesParams
      */
+    /*
     async findFamilyNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         const { limit,...qParams } = params
 
@@ -325,7 +364,7 @@ export class TaxonService extends BaseService<Taxon>{
                 })
         }
     }
-
+*/
     /**
      * Project the sciname from the taxa table for the rank of genus using possibly
      * a list of taxaIDs and an authority ID
@@ -337,6 +376,7 @@ export class TaxonService extends BaseService<Taxon>{
      * @see Taxon
      * @see TaxonFindNamesParams
      */
+    /*
     async findGenusNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         const { limit,...qParams } = params
 
@@ -370,7 +410,7 @@ export class TaxonService extends BaseService<Taxon>{
                 })
         }
     }
-
+*/
     /**
      * Project the sciname from the taxa table for the rank of species using possibly
      * a list of taxaIDs and an authority ID
@@ -382,6 +422,7 @@ export class TaxonService extends BaseService<Taxon>{
      * @see Taxon
      * @see TaxonFindNamesParams
      */
+    /*
     async findSpeciesNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
         const { limit,...qParams } = params
 
@@ -430,7 +471,7 @@ export class TaxonService extends BaseService<Taxon>{
                     })
         }
     }
-
+*/
     /**
      * Find the taxons that match a given scientific name, possibly using an authority id
      * Set find params using the 'TaxonFindNamesParams'
@@ -596,17 +637,21 @@ export class TaxonService extends BaseService<Taxon>{
     }
 
     async getProblemUploadRows(): Promise<string[]> {
-        // Should convert to using a map, ugly code :-)
-        const result = []
-        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedTaxonsDueToMultipleMatchPath)))
-        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedTaxonsDueToMismatchRankPath)))
-        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedTaxonsDueToMissingNamePath)))
+        const result = [
+            TaxonService.skippedTaxonsDueToMultipleMatchPath,
+            TaxonService.skippedTaxonsDueToMismatchRankPath,
+            TaxonService.skippedTaxonsDueToMissingNamePath,
 
-        // list of all the updates to do to status records
-        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedStatusesDueToMultipleMatchPath)))
-        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedStatusesDueToAcceptedMismatchPath)))
-        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedStatusesDueToParentMismatchPath)))
-        result.push(await this.getStringData(TaxonService.s3Key(TaxonService.skippedStatusesDueToTaxonMismatchPath)))
+            // list of all the updates to do to status records
+            TaxonService.skippedStatusesDueToMultipleMatchPath,
+            TaxonService.skippedStatusesDueToAcceptedMismatchPath,
+            TaxonService.skippedStatusesDueToParentMismatchPath,
+            TaxonService.skippedStatusesDueToTaxonMismatchPath
+            ]
+
+        await result.map((key) => {
+            this.getStringData(TaxonService.s3Key(key))
+        })
         return result
     }
 

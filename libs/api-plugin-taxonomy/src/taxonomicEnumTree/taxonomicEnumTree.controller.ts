@@ -22,6 +22,7 @@ import { TaxonDto } from '../taxon/dto/TaxonDto';
 import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
 import { TaxonDescriptionBlock } from '@symbiota2/api-database';
 import { TaxonomicEnumTreeMoveTaxonParams } from './dto/taxonomicEnumTreeQueryParams';
+import { TaxonAndAcceptedStatusesDto } from '../taxon/dto/TaxonAndAcceptedStatusesDto';
 
 @ApiTags('TaxonomicEnumTree')
 @Controller('taxonomicEnumTree')
@@ -61,7 +62,7 @@ export class TaxonomicEnumTreeController {
                 synstatus.taxon = new TaxonDto(t)
                 synonyms.push(synstatus)
             }
-            const taxon = new TaxonDto(parentTaxon)
+            const taxon = new TaxonAndAcceptedStatusesDto(parentTaxon)
             taxon.acceptedTaxonStatuses = synonyms
             return taxon
         })
@@ -86,7 +87,7 @@ export class TaxonomicEnumTreeController {
                 synonyms.push(synstatus)
                 }
             const taxon = new TaxonomicEnumTreeDto(c)
-            taxon.parent = new TaxonDto(parentTaxon)
+            taxon.parent = new TaxonAndAcceptedStatusesDto(parentTaxon)
             taxon.parent.acceptedTaxonStatuses = synonyms
 
             return taxon
