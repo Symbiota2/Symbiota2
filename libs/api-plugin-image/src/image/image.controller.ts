@@ -10,7 +10,7 @@ import {
     Delete,
     NotFoundException,
     Patch,
-    UseInterceptors, UploadedFile, BadRequestException, UseGuards, Req, ParseArrayPipe, ForbiddenException
+    UseInterceptors, UploadedFile, BadRequestException, UseGuards, Req, ParseArrayPipe, ForbiddenException, Res
 } from '@nestjs/common';
 import { ImageService } from './image.service'
 import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
@@ -142,7 +142,15 @@ export class ImageController {
         return dto
     }
 
-    @Post('upload/storage/single')
+    @Get('imglib/:fileName')
+    @ApiOperation({
+        summary: "Retrieve an image from the image library using the filename it was stored under."
+    })
+    async uploads(@Param('fileName') fileName : string, @Res() res): Promise<any> {
+        res.sendFile(fileName, { root: ImageService.imageLibraryFolder});
+    }
+
+    @Post('upload/storage/single/:filename/:useStorageService')
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor(
         'file',

@@ -7,6 +7,7 @@ import { Express } from 'express';
 import { StorageService } from '@symbiota2/api-storage';
 import * as fs from 'fs';
 import { ImageSearchParams } from './dto/ImageSearchParams';
+import * as Path from 'path';
 
 type File = Express.Multer.File
 
@@ -181,6 +182,33 @@ export class ImageService extends BaseService<Image>{
         return null;
     }
 
+    async getFileFromLocalStorage(originalname: string) {
+        //read image file
+        const filename = ImageService.imageLibraryFolder + originalname
+        let dataUrl = null
+        console.log(" file is " + filename)
+        fs.readFile(filename, (err, data)=>{
+
+            //error handle
+            if(err) throw err
+
+            //get image file extension name
+            const extensionName = Path.extname(filename);
+
+            //convert image file to base64-encoded string
+            const base64Image = data.toString('base64');
+            //let base64Image = new Buffer(data, 'binary').toString('base64');
+
+            console.log(" creating " + extensionName)
+            //create data url
+            dataUrl = `data:image/${extensionName.split('.').pop()};base64,${base64Image}`;
+
+        })
+        // const readStream = fs.createReadStream(ImageService.imageLibraryFolder + originalname)
+        // return new File(readStream, originalname)
+        return dataUrl
+    }
+
     async fromFileToStorageService(originalname: string, filename: string, mimetype: string): Promise<void> {
         const readStream = fs.createReadStream(ImageService.imageUploadFolder + filename)
         await this.storageService.putObject(
@@ -191,9 +219,9 @@ export class ImageService extends BaseService<Image>{
     }
 
     async fromFileToLocalStorage(originalname: string, filename: string, mimetype: string): Promise<void> {
-        fs.rename(ImageService.imageUploadFolder + filename, ImageService.imageLibraryFolder + filename, (err) => {
+        fs.rename(ImageService.imageUploadFolder + filename, ImageService.imageLibraryFolder + originalname, (err) => {
             if (err) throw err
-            console.log('Successfully uploaded ' + ImageService.imageLibraryFolder + filename)
+            console.log('Successfully uploaded ' + ImageService.imageLibraryFolder + originalname)
         })
     }
 
