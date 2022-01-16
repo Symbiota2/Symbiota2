@@ -95,7 +95,8 @@ export class ImageService {
 a
     uploadImageFile(file: File): Observable<void> {
         const url = this.createQueryBuilder()
-            .upload()
+            .fileUpload()
+            .filename(file.name)
             .build()
 
         const body = new FormData();
@@ -230,7 +231,7 @@ a
 
     /**
      * sends request to api to update an image record
-     * @param image - the imagen to update
+     * @param image - the image to update
      * @returns Observable of response from api casted as `ImageListItem`
      * will be the updated image
      * @returns `of(null)` if image does not exist or does not have editing permission or api errors

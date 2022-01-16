@@ -4,6 +4,7 @@
         <div style='background-color: #FFFF99; padding: 10px'>
             <b>{{ "image.add.select.message" | translate }}</b>
             <symbiota2-file-upload-field [formControl]='fileInputControl'></symbiota2-file-upload-field>
+            <!--
             <button
                 mat-flat-button color='primary'
                 (click)='onUpload()'
@@ -11,6 +12,7 @@
             >
                 {{"taxonomy.uploader.upload.button" | translate}}
             </button>
+            -->
             <br/>
             <mat-checkbox class="example-margin" [(ngModel)]='keepLarge'
             >{{"image.add.image.keep.message" | translate}}</mat-checkbox>
@@ -84,10 +86,7 @@
         </div>
         <br/><br/>
         <div mat-dialog-actions>
-            <!--
-                    <button mat-button (click)="doSave()" [disabled]="(!isPublic && acceptedNameControl.invalid) || nameControl.invalid || rankControl.invalid || scientificNameControl.invalid || kingdomNameControl.invalid || sortSequence.invalid" mat-flat-button color="primary">{{'taxon.editor.dialog.save' | translate}}</button>
-            -->
-            <button mat-button (click)="doSave()" mat-flat-button color="primary">{{"image.add.dialog.upload" | translate}}</button>
+            <button mat-button (click)="doSave()" [disabled]='!fileInputControl.value' mat-flat-button color="primary">{{"image.add.dialog.upload" | translate}}</button>
         </div>
     </div>
     <div *ngIf="!userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>

@@ -63,6 +63,10 @@ export class ImageQueryBuilder {
         return new UploadBuilder(this.baseUrl);
     }
 
+    fileUpload(): FileUploadBuilder {
+        return new FileUploadBuilder(this.baseUrl);
+    }
+
     build(): string {
         return this.url.toString()
     }
@@ -94,6 +98,31 @@ class DeleteOneBuilder extends ImageQueryBuilder {
             this.url.pathname += `/${this._id}`
         }
         return super.build()
+    }
+}
+
+class FileUploadBuilder extends ImageQueryBuilder {
+    private _filename: string = null
+    private _storageService: boolean = false
+
+    filename(name: string): FileUploadBuilder {
+        this._filename = name
+        return this;
+    }
+
+    useS3() {
+        this._storageService = true
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/upload/storage/service`;
+        if (this._filename) {
+            this.url.pathname += `/${this._filename}`;
+        }
+        if (this._storageService) {
+            this.url.pathname += `/${this._storageService}`;
+        }
+        return super.build();
     }
 }
 

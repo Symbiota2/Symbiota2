@@ -141,9 +141,14 @@ export class TaxonImageAddComponent implements OnInit {
         this.local_data.initialTimestamp = new Date()
         this.local_data.lastModifiedTimestamp = this.local_data.initialTimestamp
         this.local_data.lastModifiedUID = this.userID
+        this.local_data.taxonID = this.taxonID
 
         // Contruct a new image
         const newImage =  plainToClass(ImageInputDto, this.local_data)
+
+        console.log( " input file is " + this.fileInputControl.value)
+
+        return
 
         this.imageService.create(newImage).subscribe((image)=> {
             if (image) {
@@ -163,6 +168,7 @@ export class TaxonImageAddComponent implements OnInit {
             )
     }
 
+    /*
     onUpload() {
         combineLatest([
             //this.taxonomicAuthorityID,
@@ -188,11 +194,16 @@ export class TaxonImageAddComponent implements OnInit {
         })
     }
 
+     */
+
+    /*
     doClear() {
         //this.dialogRef.close({event:'Cancel'})
         this.local_data = { }
         this.setUpFormControls()
     }
+
+     */
 
     /*
     Taxonomic authority has a new value
