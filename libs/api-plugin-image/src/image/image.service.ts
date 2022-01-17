@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { In, Repository } from 'typeorm'
+import { Brackets, In, Repository } from 'typeorm';
 import { BaseService } from '@symbiota2/api-common'
 import { Image, Taxon } from '@symbiota2/api-database';
 import { ImageFindAllParams } from './dto/image-find-all.input.dto'
@@ -7,7 +7,7 @@ import { Express } from 'express';
 import { StorageService } from '@symbiota2/api-storage';
 import * as fs from 'fs';
 import { ImageSearchParams } from './dto/ImageSearchParams';
-import * as Path from 'path';
+import { ImageContributorsSearchParams } from './dto/ImageContributorsSearchParams';
 
 type File = Express.Multer.File
 
@@ -43,8 +43,8 @@ export class ImageService extends BaseService<Image>{
     }
 
     /*
- Fetch distinct photographers info from the image repository.
- */
+    Fetch distinct photographers info from the image repository.
+    */
     async findPhotographerNames(): Promise<Image[]> {
         //return this.myRepository.find({select: ['photographerName']})
 
@@ -95,6 +95,82 @@ export class ImageService extends BaseService<Image>{
             //.orderBy('o.photographerName')
 
         return await qb.getRawMany()
+    }
+
+    /*
+    * Contributors Search
+    * Lots of filters
+    */
+    async imageContributorsSearch(params?: ImageContributorsSearchParams): Promise<Image[]> {
+        const { limit, offset, ...qParams } = params;
+
+        let qb = this.myRepository.createQueryBuilder('image')
+            .select()
+            .innerJoinAndSelect("image.taxon", "taxon")
+            .where('true')
+        if (params?.limit) {
+            qb.limit(limit)
+        }
+        if (params?.offset) {
+            qb.offset(offset)
+        }
+        if (qParams.sciname) {
+            qb.andWhere("taxon.scientificName IN (:...scinames)",
+                { scinames: qParams.sciname })
+            /*
+            qParams.sciname.forEach((name) => {
+                qb.andWhere("taxon.scientificName LIKE :name", {name: name + '%'})
+            })
+             */
+        }
+        if (qParams.keyword) {
+            qb.andWhere(new Brackets( qb => {
+                qb.where('true')
+                qParams.keyword.forEach((word) => {
+                    qb.orWhere("image.caption LIKE :word", {word: '%' + word + '%'})
+                })
+            }))
+            /*
+            qParams.keyword.forEach((word) => {
+                qb.orWhere("image.caption LIKE :word", {word: '%' + word + '%'})
+            })
+             */
+        }
+        if (qParams.commonname) {
+            qb.innerJoin("taxon.vernacularNames", "vernacular")
+            qb.andWhere("vernacular.vernacularName IN (:...names)",
+                { names: qParams.commonname })
+            /*
+            qParams.commonname.forEach((name) => {
+                qb.andWhere('vernacular.vernacularName LIKE :name', {name: name + '%'})
+            })
+             */
+        }
+        if (qParams.type) {
+            qb.andWhere("image.type IN (:...imageTypes)",
+                { imageTypes: qParams.type })
+        }
+        if (qParams.photographer) {
+            qb.andWhere("image.photographerName IN (:...photographers)",
+                { photographers: qParams.photographer })
+        }
+        if (qParams.startDate || qParams.endDate) {
+            qb = qb.leftJoinAndSelect("image.occurrence", "occurrence")
+            if (qParams.startDate) {
+                qb = qb.andWhere("occurrence.dateIdentified <= :date",
+                    { date: qParams.startDate })
+            }
+            if (qParams.endDate) {
+                qb = qb.andWhere("occurrence.dateIdentified >= :date",
+                    { date: qParams.endDate })
+            }
+        }
+        if (qParams.key) {
+            qb.leftJoinAndSelect("image.tags", "tags")
+                .andWhere("tags.keyValueStr IN (:...tagKeys)",
+                    { tagKeys: qParams.key })
+        }
+        return await qb.getMany()
     }
 
     /* Search
@@ -194,7 +270,6 @@ export class ImageService extends BaseService<Image>{
     async fromFileToLocalStorage(originalname: string, filename: string, mimetype: string): Promise<void> {
         fs.rename(ImageService.imageUploadFolder + filename, ImageService.imageLibraryFolder + originalname, (err) => {
             if (err) throw err
-            console.log('Successfully uploaded ' + ImageService.imageLibraryFolder + originalname)
         })
     }
 

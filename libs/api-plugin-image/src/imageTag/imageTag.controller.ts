@@ -18,7 +18,7 @@ import { ImageTagDto } from './dto/ImageTagDto'
 import { ImageTagFindAllParams } from './dto/image-tag-find-all.input.dto'
 
 @ApiTags('ImageTag')
-@Controller('image/tag')
+@Controller('imageTag')
 export class ImageTagController {
 
     constructor(private readonly myService: ImageTagService) { }

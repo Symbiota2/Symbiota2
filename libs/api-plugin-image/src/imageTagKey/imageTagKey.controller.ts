@@ -12,7 +12,7 @@ import { ImageTagKeyFindAllParams } from './dto/image-tag-key-find-all.input.dto
 
 
 @ApiTags('ImageTagKey')
-@Controller('image/tagKey')
+@Controller('imageTagKey')
 export class ImageTagKeyController {
 
     constructor(private readonly myService: ImageTagKeyService) { }

@@ -6,7 +6,7 @@ import { ImageQueryBuilder } from './image-query-builder'
 import { PhotographerInfoListItem } from '../../dto/PhotographerInfoListItem';
 import { ImageListItem } from '../../dto';
 import { ImageInputDto } from '../../dto/ImageInputDto';
-import { ImageAndTaxonListItem } from '../../dto/ImageAndTaxonListItem';
+// import { ImageAndTaxonListItem } from '../../dto/ImageAndTaxonListItem';
 import { ApiTaxonomyUpload } from '../../../../../ui-plugin-taxonomy/src/lib/services/taxonomyUpload/taxonomy-upload.service';
 
 interface FindAllParams {
@@ -92,37 +92,66 @@ export class ImageService {
                 }))
             )
     }
-a
+
     uploadImageFile(file: File): Observable<void> {
         const url = this.createQueryBuilder()
             .fileUpload()
-            //.filename(file.name)
             .build()
 
-        console.log(" building " + url)
         const body = new FormData();
         body.append('file', file);
 
-        // return this.jwtToken.pipe(
-            // switchMap((token) => {
+        return this.jwtToken.pipe(
+            switchMap((token) => {
                 const query = this.apiClient.queryBuilder(url).fileUpload()
                     //.addJwtAuth(token)
                     .body(body)
                     .build()
 
-                console.log(" sending " + file)
                 return this.apiClient.send(query).pipe(
                     catchError((e) => {
                         this.alerts.showError(JSON.stringify(e));
                         return of(null);
                     }),
                 )
-            //}),
-            //tap((uploadResponse) => {
+                //}),
+                //tap((uploadResponse) => {
                 //this._currentUpload.next(uploadResponse);
-            //}),
-            //map(() => null)
-        //)
+                //}),
+                //map(() => null)
+                //)
+            }))
+    }
+
+    imageContributorsSearch(
+        scientificNames: string[],
+        commonNames: string[],
+        keywords: string[],
+        photographers: string[],
+        imageTypes: string[],
+        startDate: Date,
+        endDate: Date,
+        tagKeys: string[]
+    ): Observable<ImageListItem[]> {
+        const url = this.createQueryBuilder()
+            .imageContributorsSearch()
+            .scientificNames(scientificNames)
+            .commonNames(commonNames)
+            .keywords(keywords)
+            .photographers(photographers)
+            .imageTypes(imageTypes)
+            .tagKeys(tagKeys)
+            .startDate(startDate)
+            .endDate(endDate)
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build();
+        return this.apiClient.send<any, Record<string, unknown>[]>(query)
+            .pipe(
+                map((descriptions) => descriptions.map((o) => {
+                    return ImageListItem.fromJSON(o);
+                }))
+            )
     }
 
     imageSearch(

@@ -349,7 +349,7 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
      */
     withImages(): FindAllScientificNamesBuilder {
         this._withImages = true
-        this.url = new URL(`${this.baseUrl}/taxon/speciesNames`)
+        //this.url = new URL(`${this.baseUrl}/taxon/speciesNames`)
         return this
     }
 

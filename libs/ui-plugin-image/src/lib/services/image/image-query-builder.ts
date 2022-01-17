@@ -1,9 +1,10 @@
 import {
-    Q_PARAM_COUNTRIES,
+    Q_PARAM_COMMON_NAMES,
+    Q_PARAM_COUNTRIES, Q_PARAM_END_DATE,
     Q_PARAM_IMAGE_PHOTOGRAPHER_NAMES,
     Q_PARAM_IMAGE_TAGS,
-    Q_PARAM_IMAGE_TYPES,
-    Q_PARAM_PROVINCES,
+    Q_PARAM_IMAGE_TYPES, Q_PARAM_KEYWORDS,
+    Q_PARAM_PROVINCES, Q_PARAM_SCIENTIFIC_NAMES, Q_PARAM_START_DATE,
     Q_PARAM_TAXAIDS
 } from '../../../constants';
 import { TaxonQueryBuilder } from '../../../../../ui-plugin-taxonomy/src/lib/services/taxon/taxon-query-builder';
@@ -37,6 +38,10 @@ export class ImageQueryBuilder {
 
     findByTaxonIDs(): FindByTaxonIDsBuilder {
         return new FindByTaxonIDsBuilder(this.baseUrl)
+    }
+
+    imageContributorsSearch(): ImageContributorsSearchBuilder {
+        return new ImageContributorsSearchBuilder(this.baseUrl)
     }
 
     imageSearch(): ImageSearchBuilder {
@@ -243,6 +248,84 @@ class FindByTaxonIDsBuilder extends ImageQueryBuilder {
             this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString());
         })
 
+        return super.build();
+    }
+}
+class ImageContributorsSearchBuilder extends ImageQueryBuilder {
+    protected _tagKeys: string[] = []
+    protected _imageTypes: string[] = []
+    protected _photographers: string[] = []
+    protected _keywords: string[] = []
+    protected _startDate: Date
+    protected _endDate: Date
+    protected _scientificNames: string[] = []
+    protected _commonNames: string[] = []
+
+
+    constructor(apiBaseUrl: string) {
+        super(apiBaseUrl)
+        this.baseUrl = apiBaseUrl
+        this.url = new URL(`${apiBaseUrl}/image/contributorsSearch`)
+    }
+
+    scientificNames(names: string[]): ImageContributorsSearchBuilder {
+        this._scientificNames = names
+        return this
+    }
+    commonNames(names: string[]): ImageContributorsSearchBuilder {
+        this._commonNames = names
+        return this
+    }
+    keywords(words: string[]): ImageContributorsSearchBuilder {
+        this._keywords = words
+        return this
+    }
+    startDate(date: Date): ImageContributorsSearchBuilder {
+        this._startDate = date
+        return this
+    }
+    endDate(date: Date): ImageContributorsSearchBuilder {
+        this._endDate = date
+        return this
+    }
+    tagKeys(keys: string[]): ImageContributorsSearchBuilder {
+        this._tagKeys = keys
+        return this
+    }
+    imageTypes(types: string[]): ImageContributorsSearchBuilder {
+        this._imageTypes = types
+        return this
+    }
+    photographers(names: string[]): ImageContributorsSearchBuilder {
+        this._photographers = names
+        return this
+    }
+
+    build(): string {
+        this._keywords.forEach((word) => {
+            this.url.searchParams.append(Q_PARAM_KEYWORDS, word.toString())
+        })
+        this._scientificNames.forEach((name) => {
+            this.url.searchParams.append(Q_PARAM_SCIENTIFIC_NAMES, name)
+        })
+        this._commonNames.forEach((name) => {
+            this.url.searchParams.append(Q_PARAM_COMMON_NAMES, name)
+        })
+        if (this._startDate) {
+            this.url.searchParams.append(Q_PARAM_START_DATE, this._startDate.toDateString())
+        }
+        if (this._endDate) {
+            this.url.searchParams.append(Q_PARAM_END_DATE, this._endDate.toDateString())
+        }
+        this._photographers.forEach((name) => {
+            this.url.searchParams.append(Q_PARAM_IMAGE_PHOTOGRAPHER_NAMES, name)
+        })
+        this._imageTypes.forEach((type) => {
+            this.url.searchParams.append(Q_PARAM_IMAGE_TYPES, type)
+        })
+        this._tagKeys.forEach((key) => {
+            this.url.searchParams.append(Q_PARAM_IMAGE_TAGS, key)
+        })
         return super.build();
     }
 }
