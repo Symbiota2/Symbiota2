@@ -96,31 +96,33 @@ a
     uploadImageFile(file: File): Observable<void> {
         const url = this.createQueryBuilder()
             .fileUpload()
-            .filename(file.name)
+            //.filename(file.name)
             .build()
 
+        console.log(" building " + url)
         const body = new FormData();
         body.append('file', file);
 
-        return this.jwtToken.pipe(
-            switchMap((token) => {
+        // return this.jwtToken.pipe(
+            // switchMap((token) => {
                 const query = this.apiClient.queryBuilder(url).fileUpload()
-                    .addJwtAuth(token)
+                    //.addJwtAuth(token)
                     .body(body)
                     .build()
 
+                console.log(" sending " + file)
                 return this.apiClient.send(query).pipe(
                     catchError((e) => {
                         this.alerts.showError(JSON.stringify(e));
                         return of(null);
                     }),
                 )
-            }),
-            tap((uploadResponse) => {
-                this._currentUpload.next(uploadResponse);
-            }),
-            map(() => null)
-        )
+            //}),
+            //tap((uploadResponse) => {
+                //this._currentUpload.next(uploadResponse);
+            //}),
+            //map(() => null)
+        //)
     }
 
     imageSearch(

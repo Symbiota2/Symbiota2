@@ -147,7 +147,9 @@ export class TaxonImageAddComponent implements OnInit {
         const newImage =  plainToClass(ImageInputDto, this.local_data)
 
         console.log( " input file is " + this.fileInputControl.value)
+        this.imageService.uploadImageFile(this.fileInputControl.value).subscribe(()=> {
 
+        })
         return
 
         this.imageService.create(newImage).subscribe((image)=> {

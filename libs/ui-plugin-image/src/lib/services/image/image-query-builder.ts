@@ -115,14 +115,14 @@ class FileUploadBuilder extends ImageQueryBuilder {
     }
 
     build(): string {
-        this.url.pathname = `${this.url.pathname}/upload/storage/service`;
+        this.url.pathname = `${this.url.pathname}/imglib`
         if (this._filename) {
-            this.url.pathname += `/${this._filename}`;
+            this.url.pathname += `/${this._filename}`
         }
         if (this._storageService) {
-            this.url.pathname += `/${this._storageService}`;
+            this.url.pathname += `/${this._storageService}`
         }
-        return super.build();
+        return super.build()
     }
 }
 

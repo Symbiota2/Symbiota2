@@ -150,7 +150,7 @@ export class ImageController {
         res.sendFile(fileName, { root: ImageService.imageLibraryFolder});
     }
 
-    @Post('upload/storage/single/:filename/:useStorageService')
+    @Post('imglib')
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor(
         'file',
@@ -159,19 +159,33 @@ export class ImageController {
             storage: storage */
         }))
     // @UseGuards(JwtAuthGuard)
-    @ApiOperation({ summary: "Upload an image file to storage service" })
+    @ApiOperation({ summary: "Upload an image file to the imglib (local disk storage)" })
     @ApiFileInput('file')
     // @UseGuards(SuperAdminGuard)
-    async uploadStorageSingle(@Param('useStorageService') useStorageService: boolean, @UploadedFile() file: File) {
+    async uploadImglib(@UploadedFile() file: File) {
         if (!file.mimetype.startsWith('image/')) {
             throw new BadRequestException('Invalid Image');
         }
-        if (useStorageService) {
-            await this.myService.fromFileToStorageService(file.originalname, file.filename, file.mimetype)
-        } else {
-            await this.myService.fromFileToLocalStorage(file.originalname, file.filename, file.mimetype)
-        }
+        await this.myService.fromFileToLocalStorage(file.originalname, file.filename, file.mimetype)
+    }
 
+    @Post('upload/storage/single')
+    @HttpCode(HttpStatus.CREATED)
+    @UseInterceptors(FileInterceptor(
+        'file',
+        {
+            dest: ImageService.imageUploadFolder /*,
+            storage: storage */
+        }))
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({ summary: "Upload an image file to storage service" })
+    @ApiFileInput('file')
+    // @UseGuards(SuperAdminGuard)
+    async uploadStorageSingle(@UploadedFile() file: File) {
+        if (!file.mimetype.startsWith('image/')) {
+            throw new BadRequestException('Invalid Image');
+        }
+        await this.myService.fromFileToStorageService(file.originalname, file.filename, file.mimetype)
     }
 
     private canEdit(request) {
