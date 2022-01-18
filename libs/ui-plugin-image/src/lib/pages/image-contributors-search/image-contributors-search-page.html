@@ -7,7 +7,7 @@
         <mat-tab label="{{'image.contributors.search.criteria' | translate}}">
             <!-- Collection select -->
             <div class="expansion-panel">
-                <symbiota2-expansion-panel expanded=false label="Collection Select" required="true">
+                <symbiota2-expansion-panel expanded=false label="Collection Select">
                     <symbiota2-collection-checkbox-selector
                         [collectionIDs]="this.collectionIDs.value"
                         (collectionIDsChange)="this.collectionIDs.setValue($event)"
@@ -30,7 +30,7 @@
                                 </mat-select>
                             </mat-form-field>
                         </div>
-                        &nbsp;
+
                         <div class="form-field w-7">
                             <mat-form-field *ngIf='kindOfName == "1"'>
                                 <mat-label >{{"image.search.by.scientific.name" | translate}}</mat-label>

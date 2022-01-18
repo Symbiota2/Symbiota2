@@ -135,6 +135,8 @@ export class ImageService {
         tagKeys: string[],
         limitTaxons: boolean,
         limitOccurrences: boolean,
+        countries: string[],
+        provinces: string[]
     ): Observable<ImageListItem[]> {
         const url = this.createQueryBuilder()
             .imageContributorsSearch()
@@ -149,6 +151,8 @@ export class ImageService {
             .endDate(endDate)
             .limitTaxons(limitTaxons)
             .limitOccurrences(limitOccurrences)
+            .countries(countries)
+            .provinces(provinces)
             .build()
 
         const query = this.apiClient.queryBuilder(url).get().build();

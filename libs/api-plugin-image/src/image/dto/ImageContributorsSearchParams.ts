@@ -8,6 +8,13 @@ export class ImageContributorsSearchParams extends BaseFindAllParams {
     static readonly DEFAULT_OFFSET = 0
     static readonly MAX_LIMIT = 1000
 
+    @ApiProperty({ name: 'collectionid[]', type: [Number], required: false })
+    @Type(() => Number)
+    @IsArray()
+    @IsInt({ each: true })
+    @IsOptional()
+    collectionid: number[]
+
     @ApiProperty({ name: 'taxaid[]', type: [Number], required: false })
     @Type(() => Number)
     @IsArray()
@@ -80,6 +87,20 @@ export class ImageContributorsSearchParams extends BaseFindAllParams {
     @IsString({ each: true })
     @IsOptional()
     type: string[]
+
+    @ApiProperty({ name: 'country[]', type: [String], required: false })
+    @Type(() => String)
+    @IsArray()
+    @IsString({ each: true })
+    @IsOptional()
+    country: string[]
+
+    @ApiProperty({ name: 'province[]', type: [String], required: false })
+    @Type(() => String)
+    @IsArray()
+    @IsString({ each: true })
+    @IsOptional()
+    province: string[]
 
     @Min(0)
     @Max(ImageContributorsSearchParams.MAX_LIMIT)

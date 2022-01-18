@@ -264,6 +264,8 @@ class ImageContributorsSearchBuilder extends ImageQueryBuilder {
     protected _limitTaxons: boolean = false
     protected _limitOccurrences: boolean = false
     protected _collectionIDs: number[] = []
+    protected _countries: string[] = []
+    protected _provinces: string[] = []
 
     constructor(apiBaseUrl: string) {
         super(apiBaseUrl)
@@ -315,6 +317,14 @@ class ImageContributorsSearchBuilder extends ImageQueryBuilder {
         this._limitOccurrences = value
         return this
     }
+    countries(ids: string[]): ImageContributorsSearchBuilder {
+        this._countries = ids
+        return this
+    }
+    provinces(ids: string[]): ImageContributorsSearchBuilder {
+        this._provinces = ids
+        return this
+    }
 
     build(): string {
         this._collectionIDs.forEach((id) => {
@@ -349,6 +359,12 @@ class ImageContributorsSearchBuilder extends ImageQueryBuilder {
         })
         this._tagKeys.forEach((key) => {
             this.url.searchParams.append(Q_PARAM_IMAGE_TAGS, key)
+        })
+        this._provinces.forEach((id) => {
+            this.url.searchParams.append(Q_PARAM_PROVINCES, id)
+        })
+        this._countries.forEach((id) => {
+            this.url.searchParams.append(Q_PARAM_COUNTRIES, id)
         })
         return super.build();
     }

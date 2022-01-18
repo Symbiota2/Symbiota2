@@ -423,7 +423,9 @@ export class ImageContributorsSearchPageComponent implements OnInit {
             this.endDate,
             this.tagKeys,
             this.limitTaxons,
-            this.limitOccurrences
+            this.limitOccurrences,
+            this.countries,
+            this.stateProvinces
         ).subscribe((images) => {
             /*
             console.log("got images " + images.length)

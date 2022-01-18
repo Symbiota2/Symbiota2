@@ -154,8 +154,12 @@ export class ImageService extends BaseService<Image>{
             qb.andWhere("image.photographerName IN (:...photographers)",
                 { photographers: qParams.photographer })
         }
-        if (qParams.startDate || qParams.endDate) {
+        if (qParams.startDate || qParams.endDate || qParams.country || qParams.province || qParams.collectionid) {
             qb = qb.leftJoinAndSelect("image.occurrence", "occurrence")
+            if (qParams.collectionid) {
+                qb.andWhere("occurrence.collectionID IN (:...ids)",
+                    { ids: qParams.collectionid })
+            }
             if (qParams.startDate) {
                 qb = qb.andWhere("occurrence.dateIdentified <= :date",
                     { date: qParams.startDate })
@@ -164,7 +168,16 @@ export class ImageService extends BaseService<Image>{
                 qb = qb.andWhere("occurrence.dateIdentified >= :date",
                     { date: qParams.endDate })
             }
+            if (qParams.country) {
+                qb = qb.andWhere("occurrence.country IN (:...countries)",
+                    { countries: qParams.country })
+            }
+            if (qParams.province) {
+                qb = qb.andWhere("occurrence.stateProvince IN (:...provinces)",
+                    { provinces: qParams.province })
+            }
         }
+
         if (qParams.key) {
             qb.leftJoinAndSelect("image.tags", "tags")
                 .andWhere("tags.keyValueStr IN (:...tagKeys)",
