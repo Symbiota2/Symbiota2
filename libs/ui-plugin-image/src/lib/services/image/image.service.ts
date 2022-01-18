@@ -6,7 +6,6 @@ import { ImageQueryBuilder } from './image-query-builder'
 import { PhotographerInfoListItem } from '../../dto/PhotographerInfoListItem';
 import { ImageListItem } from '../../dto';
 import { ImageInputDto } from '../../dto/ImageInputDto';
-// import { ImageAndTaxonListItem } from '../../dto/ImageAndTaxonListItem';
 import { ApiTaxonomyUpload } from '../../../../../ui-plugin-taxonomy/src/lib/services/taxonomyUpload/taxonomy-upload.service';
 
 interface FindAllParams {
@@ -18,7 +17,7 @@ interface FindAllParams {
 @Injectable()
 export class ImageService {
     private jwtToken = this.user.currentUser.pipe(map((user) => user.token))
-    private readonly _currentUpload = new BehaviorSubject<ApiTaxonomyUpload>(null)
+    // private readonly _currentUpload = new BehaviorSubject<ApiTaxonomyUpload>(null)
 
     constructor(
         private readonly alerts: AlertService,
@@ -123,7 +122,7 @@ export class ImageService {
             }))
     }
 
-    imageContributorsSearch(
+    imageSearch(
         collectionIDs: number[],
         scientificNames: string[],
         commonNames: string[],
@@ -136,10 +135,12 @@ export class ImageService {
         limitTaxons: boolean,
         limitOccurrences: boolean,
         countries: string[],
-        provinces: string[]
+        provinces: string[],
+        taxonIds: number[]
     ): Observable<ImageListItem[]> {
         const url = this.createQueryBuilder()
-            .imageContributorsSearch()
+            .imageSearch()
+            .taxonIDs(taxonIds)
             .collectionIDs(collectionIDs)
             .scientificNames(scientificNames)
             .commonNames(commonNames)
@@ -164,6 +165,7 @@ export class ImageService {
             )
     }
 
+/*
     imageSearch(
         taxonIds: number[],
         photographers: string[],
@@ -190,6 +192,8 @@ export class ImageService {
                 }))
             )
     }
+
+ */
 
     findByTaxonIDs(ids: number[]): Observable<ImageListItem[]> {
         const url = this.createQueryBuilder()

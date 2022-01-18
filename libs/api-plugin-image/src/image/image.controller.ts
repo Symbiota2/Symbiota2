@@ -23,11 +23,9 @@ import { PhotographerNameAndIDDto } from './dto/PhotographerNameAndIDDto';
 import { ImageSearchParams } from './dto/ImageSearchParams';
 import { AuthenticatedRequest, JwtAuthGuard, TokenService } from '@symbiota2/api-auth';
 import { TaxonDto } from '../../../api-plugin-taxonomy/src/taxon/dto/TaxonDto';
-import { TaxonInputDto } from '../../../api-plugin-taxonomy/src/taxon/dto/TaxonInputDto';
 import { Image, Taxon } from '@symbiota2/api-database';
 import { ImageInputDto } from './dto/ImageInputDto';
 import { ImageAndTaxonDto } from './dto/ImageAndTaxonDto';
-import { ImageContributorsSearchParams } from './dto/ImageContributorsSearchParams';
 
 type File = Express.Multer.File
 
@@ -105,13 +103,13 @@ export class ImageController {
         return Promise.all(taxonDtos)
     }
 
-    @Get('contributorsSearch')
+    @Get('search')
     @ApiResponse({ status: HttpStatus.OK, type: ImageAndTaxonDto, isArray: true })
     @ApiOperation({
-        summary: "Retrieve a list of image records and associated taxon info using a slew of potential filters: scientific names, common names, image types, image tags, range of dates for occurrence identification, and photographer names"
+        summary: "Retrieve a list of image records and associated taxon info using a slew of potential filters: scientific names, common names, image types, image tags, country, province, taxaids, range of dates for occurrence identification, and photographer names"
     })
-    async imageContributorsSearch(@Query() searchParams: ImageContributorsSearchParams): Promise<ImageAndTaxonDto[]> {
-        const images = await this.myService.imageContributorsSearch(searchParams)
+    async imageSearch(@Query() searchParams: ImageSearchParams): Promise<ImageAndTaxonDto[]> {
+        const images = await this.myService.imageSearch(searchParams)
         const result = []
         let taxonSkip : boolean = false
         let occurrenceSkip : boolean = false
@@ -133,33 +131,6 @@ export class ImageController {
             if (!(taxonSkip || occurrenceSkip)) {
                 result.push(imageDto)
             }
-        }
-        /*
-        const dtos = images.map((c) => {
-            const taxon = c.taxon
-            const taxonDto = new TaxonDto(taxon)
-            const image = new ImageDto(c)
-            return image
-        })
-        return Promise.all(dtos)
-         */
-        return Promise.all(result)
-    }
-
-    @Get('search')
-    @ApiResponse({ status: HttpStatus.OK, type: ImageAndTaxonDto, isArray: true })
-    @ApiOperation({
-        summary: "Retrieve a list of image records and associated taxon info using a slew of potential filters: taxon ids, country ids, state/province ids, image types, image tags, and photographer names"
-    })
-    async imageSearch(@Query() searchParams: ImageSearchParams): Promise<ImageAndTaxonDto[]> {
-        const images = await this.myService.imageSearch(searchParams)
-        const result = []
-        for (const image of images) {
-            const taxon = await image.taxon
-            const taxonDto = new TaxonDto(taxon)
-            const imageDto = new ImageAndTaxonDto(image, taxonDto)
-            imageDto.taxon = taxonDto
-            result.push(imageDto)
         }
         /*
         const dtos = images.map((c) => {

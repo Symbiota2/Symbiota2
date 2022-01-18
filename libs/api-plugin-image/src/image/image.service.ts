@@ -7,7 +7,6 @@ import { Express } from 'express';
 import { StorageService } from '@symbiota2/api-storage';
 import * as fs from 'fs';
 import { ImageSearchParams } from './dto/ImageSearchParams';
-import { ImageContributorsSearchParams } from './dto/ImageContributorsSearchParams';
 
 type File = Express.Multer.File
 
@@ -101,7 +100,7 @@ export class ImageService extends BaseService<Image>{
     * Contributors Search
     * Lots of filters
     */
-    async imageContributorsSearch(params?: ImageContributorsSearchParams): Promise<Image[]> {
+    async imageSearch(params?: ImageSearchParams): Promise<Image[]> {
         const { limit, offset, ...qParams } = params;
 
         let qb = this.myRepository.createQueryBuilder('image')
@@ -113,6 +112,10 @@ export class ImageService extends BaseService<Image>{
         }
         if (params?.offset) {
             qb.offset(offset)
+        }
+        if (qParams.taxaid) {
+            qb = qb.andWhere("image.taxonID IN (:...taxaIDs)",
+                { taxaIDs: qParams.taxaid })
         }
         if (qParams.sciname) {
             qb.andWhere("taxon.scientificName IN (:...scinames)",
@@ -190,7 +193,7 @@ export class ImageService extends BaseService<Image>{
     /* Search
     Can limit the list by a list of ids.
     Can also limit the number fetched and use an offset.
-    */
+
     async imageSearch(params?: ImageSearchParams): Promise<Image[]> {
         const { limit, offset, ...qParams } = params;
 
@@ -234,6 +237,8 @@ export class ImageService extends BaseService<Image>{
         }
         return await qb.getMany()
     }
+
+     */
 
     /*
     Fetch all of the images using taxon ids.

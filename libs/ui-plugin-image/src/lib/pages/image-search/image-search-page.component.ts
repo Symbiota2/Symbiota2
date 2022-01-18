@@ -323,12 +323,20 @@ export class ImageSearchPageComponent implements OnInit {
         this.photographerNames = this.photographerForm.value? this.photographerForm.value : []
         this.countries = this.countryForm.value? this.countryForm.value : []
         this.imageService.imageSearch(
-            this.taxonIDList,
+            [],
+            [],
+            [],
+            [],
             this.photographerNames,
             this.imageTypes,
+            null,
+            null,
             this.tagKeys,
+            false,
+            false,
             this.countries,
-            this.stateProvinces
+            this.stateProvinces,
+            this.taxonIDList
         ).subscribe((images) => {
             /*
             console.log("got images " + images.length)

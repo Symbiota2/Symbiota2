@@ -411,7 +411,7 @@ export class ImageContributorsSearchPageComponent implements OnInit {
         this.photographerNames = this.photographerForm.value? this.photographerForm.value : []
         this.countries = this.countryForm.value? this.countryForm.value : []
         this.keywords = this.keywordValue? this.keywordValue.split(',') : []
-        this.imageService.imageContributorsSearch(
+        this.imageService.imageSearch(
             // If the collections haven't changed don't pass them
             this.collectionIDs.value.length == this.initialCollectionListLength ? [] : this.collectionIDs.value,
             this.scinames,
@@ -425,29 +425,24 @@ export class ImageContributorsSearchPageComponent implements OnInit {
             this.limitTaxons,
             this.limitOccurrences,
             this.countries,
-            this.stateProvinces
+            this.stateProvinces,
+            []
         ).subscribe((images) => {
-            /*
-            console.log("got images " + images.length)
-            images.forEach((image) => {
-                console.log("url " + image.url)
-                console.log("thumbnail " + image.thumbnailUrl)
-                console.log("id " + image.id)
-            })
-             */
             this.data2 = images
             this.data = []
             //this.data = images
             this.getData(null)
         })
         this.submitted = true
-        // const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
     }
 
     goToLink(url: string){
         window.open("taxon/editor/" + url, "_blank");
     }
 
+    /*
+    Used in the pagination
+     */
     getData(obj) {
         let index=0
         let startingIndex = 0
@@ -463,6 +458,7 @@ export class ImageContributorsSearchPageComponent implements OnInit {
         })
     }
 
+    /*
     nameListCheck(sciname) {
         this.looking = true
         // Look up the scientific name first
@@ -505,5 +501,5 @@ export class ImageContributorsSearchPageComponent implements OnInit {
                 }
             })
     }
-
+*/
 }

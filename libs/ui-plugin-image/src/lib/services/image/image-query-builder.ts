@@ -41,13 +41,15 @@ export class ImageQueryBuilder {
         return new FindByTaxonIDsBuilder(this.baseUrl)
     }
 
-    imageContributorsSearch(): ImageContributorsSearchBuilder {
-        return new ImageContributorsSearchBuilder(this.baseUrl)
-    }
-
     imageSearch(): ImageSearchBuilder {
         return new ImageSearchBuilder(this.baseUrl)
     }
+
+    /*
+    imageSearch(): ImageSearchBuilder {
+        return new ImageSearchBuilder(this.baseUrl)
+    }
+     */
 
     findDescriptions(): FindDescriptionsBuilder {
         return new FindDescriptionsBuilder(this.baseUrl)
@@ -252,7 +254,8 @@ class FindByTaxonIDsBuilder extends ImageQueryBuilder {
         return super.build();
     }
 }
-class ImageContributorsSearchBuilder extends ImageQueryBuilder {
+
+class ImageSearchBuilder extends ImageQueryBuilder {
     protected _tagKeys: string[] = []
     protected _imageTypes: string[] = []
     protected _photographers: string[] = []
@@ -266,63 +269,68 @@ class ImageContributorsSearchBuilder extends ImageQueryBuilder {
     protected _collectionIDs: number[] = []
     protected _countries: string[] = []
     protected _provinces: string[] = []
+    protected _taxonIDs: number[] = []
 
     constructor(apiBaseUrl: string) {
         super(apiBaseUrl)
         this.baseUrl = apiBaseUrl
-        this.url = new URL(`${apiBaseUrl}/image/contributorsSearch`)
+        this.url = new URL(`${apiBaseUrl}/image/search`)
     }
 
-    collectionIDs(ids: number[]): ImageContributorsSearchBuilder {
+    collectionIDs(ids: number[]): ImageSearchBuilder {
         this._collectionIDs= ids
         return this
     }
-    scientificNames(names: string[]): ImageContributorsSearchBuilder {
+    scientificNames(names: string[]): ImageSearchBuilder {
         this._scientificNames = names
         return this
     }
-    commonNames(names: string[]): ImageContributorsSearchBuilder {
+    commonNames(names: string[]): ImageSearchBuilder {
         this._commonNames = names
         return this
     }
-    keywords(words: string[]): ImageContributorsSearchBuilder {
+    keywords(words: string[]): ImageSearchBuilder {
         this._keywords = words
         return this
     }
-    startDate(date: Date): ImageContributorsSearchBuilder {
+    startDate(date: Date): ImageSearchBuilder {
         this._startDate = date
         return this
     }
-    endDate(date: Date): ImageContributorsSearchBuilder {
+    endDate(date: Date): ImageSearchBuilder {
         this._endDate = date
         return this
     }
-    tagKeys(keys: string[]): ImageContributorsSearchBuilder {
+    tagKeys(keys: string[]): ImageSearchBuilder {
         this._tagKeys = keys
         return this
     }
-    imageTypes(types: string[]): ImageContributorsSearchBuilder {
+    imageTypes(types: string[]): ImageSearchBuilder {
         this._imageTypes = types
         return this
     }
-    photographers(names: string[]): ImageContributorsSearchBuilder {
+    photographers(names: string[]): ImageSearchBuilder {
         this._photographers = names
         return this
     }
-    limitTaxons(value: boolean): ImageContributorsSearchBuilder {
+    limitTaxons(value: boolean): ImageSearchBuilder {
         this._limitTaxons = value
         return this
     }
-    limitOccurrences(value: boolean): ImageContributorsSearchBuilder {
+    limitOccurrences(value: boolean): ImageSearchBuilder {
         this._limitOccurrences = value
         return this
     }
-    countries(ids: string[]): ImageContributorsSearchBuilder {
+    countries(ids: string[]): ImageSearchBuilder {
         this._countries = ids
         return this
     }
-    provinces(ids: string[]): ImageContributorsSearchBuilder {
+    provinces(ids: string[]): ImageSearchBuilder {
         this._provinces = ids
+        return this
+    }
+    taxonIDs(ids: number[]): ImageSearchBuilder {
+        this._taxonIDs = ids
         return this
     }
 
@@ -366,10 +374,14 @@ class ImageContributorsSearchBuilder extends ImageQueryBuilder {
         this._countries.forEach((id) => {
             this.url.searchParams.append(Q_PARAM_COUNTRIES, id)
         })
+        this._taxonIDs.forEach((id) => {
+            this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString())
+        })
         return super.build();
     }
 }
 
+/*
 class ImageSearchBuilder extends ImageQueryBuilder {
     protected _taxonIDs: number[] = []
     protected _tagKeys: string[] = []
@@ -431,6 +443,7 @@ class ImageSearchBuilder extends ImageQueryBuilder {
         return super.build();
     }
 }
+ */
 
 class FindDescriptionsBuilder extends ImageQueryBuilder {
     protected _taxonIDs: number[] = []
