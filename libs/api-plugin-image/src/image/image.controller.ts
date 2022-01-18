@@ -113,12 +113,26 @@ export class ImageController {
     async imageContributorsSearch(@Query() searchParams: ImageContributorsSearchParams): Promise<ImageAndTaxonDto[]> {
         const images = await this.myService.imageContributorsSearch(searchParams)
         const result = []
+        let taxonSkip : boolean = false
+        let occurrenceSkip : boolean = false
+        let previousTaxonID = -1
+        let previousOccurrenceID = -1
         for (const image of images) {
             const taxon = await image.taxon
             const taxonDto = new TaxonDto(taxon)
             const imageDto = new ImageAndTaxonDto(image, taxonDto)
             imageDto.taxon = taxonDto
-            result.push(imageDto)
+            if (searchParams.limitTaxons) {
+                taxonSkip = (imageDto.taxonID) && (imageDto.taxonID == previousTaxonID)
+                previousTaxonID = imageDto.taxonID
+            }
+            if (searchParams.limitOccurrences) {
+                occurrenceSkip = (imageDto.occurrenceID) && (imageDto.occurrenceID == previousOccurrenceID)
+                previousOccurrenceID = imageDto.occurrenceID
+            }
+            if (!(taxonSkip || occurrenceSkip)) {
+                result.push(imageDto)
+            }
         }
         /*
         const dtos = images.map((c) => {

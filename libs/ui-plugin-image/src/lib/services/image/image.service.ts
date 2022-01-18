@@ -124,6 +124,7 @@ export class ImageService {
     }
 
     imageContributorsSearch(
+        collectionIDs: number[],
         scientificNames: string[],
         commonNames: string[],
         keywords: string[],
@@ -131,10 +132,13 @@ export class ImageService {
         imageTypes: string[],
         startDate: Date,
         endDate: Date,
-        tagKeys: string[]
+        tagKeys: string[],
+        limitTaxons: boolean,
+        limitOccurrences: boolean,
     ): Observable<ImageListItem[]> {
         const url = this.createQueryBuilder()
             .imageContributorsSearch()
+            .collectionIDs(collectionIDs)
             .scientificNames(scientificNames)
             .commonNames(commonNames)
             .keywords(keywords)
@@ -143,6 +147,8 @@ export class ImageService {
             .tagKeys(tagKeys)
             .startDate(startDate)
             .endDate(endDate)
+            .limitTaxons(limitTaxons)
+            .limitOccurrences(limitOccurrences)
             .build()
 
         const query = this.apiClient.queryBuilder(url).get().build();

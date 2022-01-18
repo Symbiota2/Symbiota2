@@ -45,6 +45,10 @@ interface TaxonNode {
 
 export class ImageContributorsSearchPageComponent implements OnInit {
     collectionIDs = new TypedFormControl<number[]>([])
+    initialCollectionListLength = 0
+
+    limitTaxons = false
+    limitOccurrences = false
 
     taxonIDList: number[] = []
     taxons: string[] = []
@@ -65,6 +69,7 @@ export class ImageContributorsSearchPageComponent implements OnInit {
     photographerNames : string[] = []
     photographer = null
     photographerForm = new FormControl()
+
 
     keywords: string[] = []
     keywordValue
@@ -133,6 +138,13 @@ export class ImageContributorsSearchPageComponent implements OnInit {
    */
     ngOnInit() {
         this.kindOfName = "1"
+
+        this.initialCollectionListLength = this.collectionIDs.value.length
+        this.collectionIDs.registerOnChange(() => {
+            if (this.initialCollectionListLength == 0) {
+                this.initialCollectionListLength = this.collectionIDs.value.length
+            }
+        })
 
         // Load the authorities
         this.loadAuthorities()
@@ -369,6 +381,9 @@ export class ImageContributorsSearchPageComponent implements OnInit {
         this.commonNameControl.reset()
         this.startDate = null
         this.endDate = null
+        new TypedFormControl<number[]>([])
+        this.limitTaxons = false
+        this.limitOccurrences = false
 
         this.keywordValue = ''
         this.submitted = false
@@ -397,6 +412,8 @@ export class ImageContributorsSearchPageComponent implements OnInit {
         this.countries = this.countryForm.value? this.countryForm.value : []
         this.keywords = this.keywordValue? this.keywordValue.split(',') : []
         this.imageService.imageContributorsSearch(
+            // If the collections haven't changed don't pass them
+            this.collectionIDs.value.length == this.initialCollectionListLength ? [] : this.collectionIDs.value,
             this.scinames,
             this.commonNames,
             this.keywords,
@@ -404,7 +421,9 @@ export class ImageContributorsSearchPageComponent implements OnInit {
             this.imageTypes,
             this.startDate,
             this.endDate,
-            this.tagKeys
+            this.tagKeys,
+            this.limitTaxons,
+            this.limitOccurrences
         ).subscribe((images) => {
             /*
             console.log("got images " + images.length)

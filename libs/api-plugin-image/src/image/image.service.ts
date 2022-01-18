@@ -170,6 +170,7 @@ export class ImageService extends BaseService<Image>{
                 .andWhere("tags.keyValueStr IN (:...tagKeys)",
                     { tagKeys: qParams.key })
         }
+        qb.orderBy('image.taxonID, image.occurrenceID')
         return await qb.getMany()
     }
 

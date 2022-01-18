@@ -42,6 +42,18 @@ export class ImageContributorsSearchParams extends BaseFindAllParams {
     @IsOptional()
     startDate: Date
 
+    @ApiProperty({ name: 'limitTaxons', type: Number, required: false })
+    @Type(() => Number)
+    @IsInt()
+    @IsOptional()
+    limitTaxons: number
+
+    @ApiProperty({ name: 'limitOccurrences', type: Number, required: false })
+    @Type(() => Number)
+    @IsInt()
+    @IsOptional()
+    limitOccurrences: number
+
     @ApiProperty({ name: 'endDate', type: Date, required: false })
     @Type(() => String)
     @IsDate()

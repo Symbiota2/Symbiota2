@@ -3,11 +3,12 @@ import {
     Q_PARAM_COUNTRIES, Q_PARAM_END_DATE,
     Q_PARAM_IMAGE_PHOTOGRAPHER_NAMES,
     Q_PARAM_IMAGE_TAGS,
-    Q_PARAM_IMAGE_TYPES, Q_PARAM_KEYWORDS,
+    Q_PARAM_IMAGE_TYPES, Q_PARAM_KEYWORDS, Q_PARAM_LIMIT_OCCURRENCES, Q_PARAM_LIMIT_TAXONS,
     Q_PARAM_PROVINCES, Q_PARAM_SCIENTIFIC_NAMES, Q_PARAM_START_DATE,
     Q_PARAM_TAXAIDS
 } from '../../../constants';
 import { TaxonQueryBuilder } from '../../../../../ui-plugin-taxonomy/src/lib/services/taxon/taxon-query-builder';
+import { Q_PARAM_COLLID } from '../../../../../ui-plugin-occurrence/src/constants';
 
 export class ImageQueryBuilder {
     protected baseUrl: string
@@ -260,7 +261,9 @@ class ImageContributorsSearchBuilder extends ImageQueryBuilder {
     protected _endDate: Date
     protected _scientificNames: string[] = []
     protected _commonNames: string[] = []
-
+    protected _limitTaxons: boolean = false
+    protected _limitOccurrences: boolean = false
+    protected _collectionIDs: number[] = []
 
     constructor(apiBaseUrl: string) {
         super(apiBaseUrl)
@@ -268,6 +271,10 @@ class ImageContributorsSearchBuilder extends ImageQueryBuilder {
         this.url = new URL(`${apiBaseUrl}/image/contributorsSearch`)
     }
 
+    collectionIDs(ids: number[]): ImageContributorsSearchBuilder {
+        this._collectionIDs= ids
+        return this
+    }
     scientificNames(names: string[]): ImageContributorsSearchBuilder {
         this._scientificNames = names
         return this
@@ -300,8 +307,19 @@ class ImageContributorsSearchBuilder extends ImageQueryBuilder {
         this._photographers = names
         return this
     }
+    limitTaxons(value: boolean): ImageContributorsSearchBuilder {
+        this._limitTaxons = value
+        return this
+    }
+    limitOccurrences(value: boolean): ImageContributorsSearchBuilder {
+        this._limitOccurrences = value
+        return this
+    }
 
     build(): string {
+        this._collectionIDs.forEach((id) => {
+            this.url.searchParams.append(Q_PARAM_COLLID, id.toString())
+        })
         this._keywords.forEach((word) => {
             this.url.searchParams.append(Q_PARAM_KEYWORDS, word.toString())
         })
@@ -316,6 +334,12 @@ class ImageContributorsSearchBuilder extends ImageQueryBuilder {
         }
         if (this._endDate) {
             this.url.searchParams.append(Q_PARAM_END_DATE, this._endDate.toDateString())
+        }
+        if (this._limitTaxons) {
+            this.url.searchParams.append(Q_PARAM_LIMIT_TAXONS, "yes")
+        }
+        if (this._limitOccurrences) {
+            this.url.searchParams.append(Q_PARAM_LIMIT_OCCURRENCES, "yes")
         }
         this._photographers.forEach((name) => {
             this.url.searchParams.append(Q_PARAM_IMAGE_PHOTOGRAPHER_NAMES, name)
