@@ -159,7 +159,7 @@ export class ImageController {
     @ApiOperation({
         summary: "Retrieve an image from the image library using the filename it was stored under."
     })
-    async uploads(@Param('fileName') fileName : string, @Res() res): Promise<any> {
+    async getFile(@Param('fileName') fileName : string, @Res() res): Promise<any> {
         res.sendFile(fileName, { root: ImageService.imageLibraryFolder});
     }
 
@@ -171,11 +171,21 @@ export class ImageController {
             dest: ImageService.imageUploadFolder /*,
             storage: storage */
         }))
+    @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: "Upload an image file to the imglib (local disk storage)" })
     @ApiFileInput('file')
     // @UseGuards(SuperAdminGuard)
-    async uploadImglib(@UploadedFile() file: File) {
+    async uploadImglib(
+        @Req() request: AuthenticatedRequest,
+        @UploadedFile() file: File)
+    {
+        /*
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+         */
         if (!file.mimetype.startsWith('image/')) {
             throw new BadRequestException('Invalid Image');
         }
@@ -190,11 +200,21 @@ export class ImageController {
             dest: ImageService.imageUploadFolder /*,
             storage: storage */
         }))
+    @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: "Upload an image file to storage service" })
     @ApiFileInput('file')
     // @UseGuards(SuperAdminGuard)
-    async uploadStorageSingle(@UploadedFile() file: File) {
+    async uploadStorageSingle(
+        @Req() request: AuthenticatedRequest,
+        @UploadedFile() file: File)
+    {
+        /*
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+         */
         if (!file.mimetype.startsWith('image/')) {
             throw new BadRequestException('Invalid Image');
         }
@@ -208,14 +228,13 @@ export class ImageController {
         return isSuperAdmin || isEditor
     }
 
-    @Post('upload')
+    @Post()
     @ApiOperation({
-        summary: "Create a new image"
+        summary: "Create a new image record"
     })
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @HttpCode(HttpStatus.OK)
-    @ApiResponse({ status: HttpStatus.OK, type: ImageDto })
+    @ApiResponse({ type: ImageDto })
     //@SerializeOptions({ groups: ['single'] })
     @ApiBody({ type: ImageInputDto, isArray: true })
     /**

@@ -98,3 +98,27 @@ table{
     margin-bottom: 1rem;
 }
 
+
+div.form-field {
+    margin: 0 1rem;
+
+    .mat-form-field {
+        width: 100%;
+    }
+}
+
+#filters {
+    .mat-checkbox {
+        margin: 1rem 0;
+    }
+}
+
+.w-fit {
+    flex-basis: fit-content;
+}
+
+@for $i from 1 through 9 {
+    .w-#{$i} {
+        flex-basis: #{$i * 10} + '%';
+    }
+}

@@ -177,6 +177,12 @@
     "taxon.taxon.editor.locality.hidden": "Locality hidden",
     "taxon.taxon.editor.locality.public": "Locality public",
 
+    "taxonomy.image.add.by.file.upload" : "Upload local file",
+    "taxonomy.image.add.by.url" : "Use URL",
+    "taxonomy.image.add.configure.kind.of.upload.label" : "Image Source",
+    "taxonomy.image.add.image.details.label" : "Image Details",
+    "taxon.image.add.photographer" : "Photographer",
+
     "taxon.status.status.label": "Status",
     "taxon.status.placement.label": "Taxonomic Placement",
     "taxon.status.accepted": "Accepted",

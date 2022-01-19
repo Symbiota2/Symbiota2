@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { DatabaseModule } from '@symbiota2/api-database'
+import { AppConfigModule, AppConfigService } from '@symbiota2/api-config';
 import { ImageService } from './image/image.service'
 import { ImageController } from './image/image.controller'
 import { SymbiotaApiPlugin } from '@symbiota2/api-common'
@@ -10,7 +11,7 @@ import { ImageTagController } from './imageTag/imageTag.controller';
 import { StorageModule } from '@symbiota2/api-storage';
 
 @Module({
-    imports: [DatabaseModule,StorageModule],
+    imports: [AppConfigModule,DatabaseModule,StorageModule],
     providers: [
         ImageService,
         ImageTagService,

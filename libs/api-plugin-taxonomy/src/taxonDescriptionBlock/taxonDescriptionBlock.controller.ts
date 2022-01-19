@@ -107,7 +107,10 @@ export class TaxonDescriptionBlockController {
     /**
     @see - @link TaxonDescriptionBlockInputDto
      **/
-    async create(@Req() request: AuthenticatedRequest, @Body(new ParseArrayPipe({ items: TaxonDescriptionBlockInputDto })) data: TaxonDescriptionBlockInputDto[]): Promise<TaxonDescriptionBlockDto> {
+    async create(
+        @Req() request: AuthenticatedRequest,
+        @Body(new ParseArrayPipe({ items: TaxonDescriptionBlockInputDto })) data: TaxonDescriptionBlockInputDto[]
+    ): Promise<TaxonDescriptionBlockDto> {
         if (!this.canEdit(request)) {
             throw new ForbiddenException()
         }

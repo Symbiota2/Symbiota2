@@ -259,8 +259,8 @@ export class ImageService extends BaseService<Image>{
      * @return number The created data or null (not found)
      */
     async create(data: Partial<Image>): Promise<Image> {
-        const taxon = this.myRepository.create(data)
-        return this.myRepository.save(taxon)
+        const image = this.myRepository.create(data)
+        return this.myRepository.save(image)
     }
 
     /**

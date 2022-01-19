@@ -38,6 +38,11 @@ export class TaxonImageAddComponent implements OnInit {
     // The scientific name of the taxon, initially "unknown"
     taxonName = "unknown"
 
+    // Do we enter a source URL or have a file
+    BY_LOCAL_FILE = "local file"
+    BY_URL = "url"
+    whichLocation = this.BY_LOCAL_FILE
+
     keepLarge = false
 
     photographerOptions : string[] = []
@@ -142,10 +147,11 @@ export class TaxonImageAddComponent implements OnInit {
         this.local_data.lastModifiedTimestamp = this.local_data.initialTimestamp
         this.local_data.lastModifiedUID = this.userID
         this.local_data.taxonID = this.taxonID
+        // this.local_data.url = this.local_data.url? "imglib/" + this.fileInputControl.value
 
         // Contruct a new image
         const newImage =  plainToClass(ImageInputDto, this.local_data)
-        this.imageService.uploadImageFile(this.fileInputControl.value).subscribe(()=> {
+        //this.imageService.uploadImageFile(this.fileInputControl.value).subscribe(()=> {
             this.imageService.create(newImage).subscribe((image)=> {
                 if (image) {
                     this.showMessage("taxon.create.saved")
@@ -154,7 +160,7 @@ export class TaxonImageAddComponent implements OnInit {
                     this.showError("taxon.editor.updated.error")
                 }
             })
-        })
+        //})
 
 
     }

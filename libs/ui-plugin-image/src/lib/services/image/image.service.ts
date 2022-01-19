@@ -18,12 +18,21 @@ interface FindAllParams {
 export class ImageService {
     private jwtToken = this.user.currentUser.pipe(map((user) => user.token))
     // private readonly _currentUpload = new BehaviorSubject<ApiTaxonomyUpload>(null)
+    private creatorUID = null
 
     constructor(
         private readonly alerts: AlertService,
         private readonly user: UserService,
         private readonly apiClient: ApiClientService,
-        private readonly appConfig: AppConfigService) { }
+        private readonly appConfig: AppConfigService)
+    {
+        //Fill in the current user id
+        this.user.currentUser.subscribe((user) => {
+            if (user) {
+                this.creatorUID = user.uid
+            }
+        })
+    }
 
     private createQueryBuilder(): ImageQueryBuilder {
         return new ImageQueryBuilder(this.appConfig.apiUri());
@@ -104,6 +113,7 @@ export class ImageService {
             switchMap((token) => {
                 const query = this.apiClient.queryBuilder(url).fileUpload()
                     .addJwtAuth(token)
+                    //.post()
                     .body(body)
                     .build()
 
