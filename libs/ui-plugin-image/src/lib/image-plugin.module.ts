@@ -35,11 +35,9 @@ import { MatRadioModule } from '@angular/material/radio';
 import {
     ImageDisplayPage,
     ImageLibraryPageComponent,
-    ImageSearchPageComponent,
-    ImageContributorsSearchPageComponent,
-    ImageDetailsPageComponent
+    ImageDetailsPageComponent, ImageSearchPageComponent
 } from './pages';
-import { FilterPipe } from './pages/image-search/filter.pipe';
+// import { FilterPipe } from './pages/image-search/filter.pipe';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { ImageDetailsEditorComponent, ImageDetailsEditorDialogComponent } from './components';
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -82,13 +80,12 @@ import { CollectionPlugin } from '@symbiota2/ui-plugin-collection';
     ],
     declarations: [
         ImageSearchPageComponent,
-        ImageContributorsSearchPageComponent,
         ImageLibraryPageComponent,
         ImageDetailsPageComponent,
         ImageDetailsEditorComponent,
         ImageDetailsEditorDialogComponent,
-        ImageDisplayPage,
-        FilterPipe
+        ImageDisplayPage
+//        FilterPipe
     ],
     providers: [
         ImageService,
@@ -97,7 +94,6 @@ import { CollectionPlugin } from '@symbiota2/ui-plugin-collection';
     ],
     entryComponents: [
         ImageSearchPageComponent,
-        ImageContributorsSearchPageComponent,
         ImageLibraryPageComponent,
         ImageDisplayPage,
         ImageDetailsPageComponent,
@@ -111,7 +107,6 @@ export class ImagePlugin extends SymbiotaUiPlugin {
     private static IMAGE_LIBRARY_ROUTE = "images/library/:level"
     private static IMAGE_DETAILS_ROUTE = "image/details/:imageID"
     private static IMAGE_SEARCH_ROUTE = "image/search"
-    private static IMAGE_CONTRIBUTORS_SEARCH_ROUTE = "image/contributors/search"
     private static IMAGE_DISPLAY_ROUTE = "image/display"
 
     constructor() {
@@ -133,10 +128,6 @@ export class ImagePlugin extends SymbiotaUiPlugin {
                 component: ImageSearchPageComponent
             },
             {
-                path: ImagePlugin.IMAGE_CONTRIBUTORS_SEARCH_ROUTE,
-                component: ImageContributorsSearchPageComponent
-            },
-            {
                 path: ImagePlugin.IMAGE_DISPLAY_ROUTE,
                 component: ImageDisplayPage
             },
@@ -153,11 +144,6 @@ export class ImagePlugin extends SymbiotaUiPlugin {
                 url: `/${ImagePlugin.IMAGE_SEARCH_ROUTE}`,
                 name: "core.layout.header.topnav.image_search_link"
             },
-            {
-                url: `/${ImagePlugin.IMAGE_CONTRIBUTORS_SEARCH_ROUTE}`,
-                name: "core.layout.header.topnav.image_contributors_search_link"
-            },
-
         ]
         }
 

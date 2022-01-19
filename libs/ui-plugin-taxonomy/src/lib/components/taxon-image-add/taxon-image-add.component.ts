@@ -145,21 +145,18 @@ export class TaxonImageAddComponent implements OnInit {
 
         // Contruct a new image
         const newImage =  plainToClass(ImageInputDto, this.local_data)
-
-        console.log( " input file is " + this.fileInputControl.value)
         this.imageService.uploadImageFile(this.fileInputControl.value).subscribe(()=> {
-
+            this.imageService.create(newImage).subscribe((image)=> {
+                if (image) {
+                    this.showMessage("taxon.create.saved")
+                } else {
+                    // Error in adding
+                    this.showError("taxon.editor.updated.error")
+                }
+            })
         })
-        return
 
-        this.imageService.create(newImage).subscribe((image)=> {
-            if (image) {
-                this.showMessage("taxon.create.saved")
-            } else {
-                // Error in adding
-                this.showError("taxon.editor.updated.error")
-            }
-        })
+
     }
 
     setUpFormControls() {

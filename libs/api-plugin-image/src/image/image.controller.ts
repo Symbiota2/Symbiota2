@@ -179,7 +179,7 @@ export class ImageController {
         if (!file.mimetype.startsWith('image/')) {
             throw new BadRequestException('Invalid Image');
         }
-        await this.myService.fromFileToLocalStorage(file.originalname, file.filename, file.mimetype)
+        return await this.myService.fromFileToLocalStorage(file.originalname, file.filename, file.mimetype)
     }
 
     @Post('upload/storage/single')

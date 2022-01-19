@@ -92,7 +92,7 @@ export class ImageService {
             )
     }
 
-    uploadImageFile(file: File): Observable<void> {
+    uploadImageFile(file: File): Observable<string> {
         const url = this.createQueryBuilder()
             .fileUpload()
             .build()
@@ -103,7 +103,7 @@ export class ImageService {
         return this.jwtToken.pipe(
             switchMap((token) => {
                 const query = this.apiClient.queryBuilder(url).fileUpload()
-                    //.addJwtAuth(token)
+                    .addJwtAuth(token)
                     .body(body)
                     .build()
 

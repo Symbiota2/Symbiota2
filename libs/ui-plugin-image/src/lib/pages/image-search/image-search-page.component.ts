@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
     TaxonIDAndNameItem,
@@ -17,6 +17,10 @@ import {
 } from '@symbiota2/ui-plugin-geography';
 import { ImageTagKeyListItem } from '../../dto';
 import { ImageListItem } from '../../dto/ImageListItem';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { TypedFormControl } from '@symbiota2/ui-common';
 
 /**
  * Taxonomic data with nested structure.
@@ -40,15 +44,49 @@ interface TaxonNode {
 })
 
 export class ImageSearchPageComponent implements OnInit {
-    nameControl = new FormControl()
-    nameOptions: TaxonIDAndNameItem[] = []
+    collectionIDs = new TypedFormControl<number[]>([])
+    initialCollectionListLength = 0
+
+    ALL_IMAGES = "All images"
+    ONE_PER_TAXON = "One per taxon"
+    ONE_PER_OCCURRENCE = "One per occurrence"
+    kindOfLimit = this.ALL_IMAGES
+
+    IMAGE_TYPE_OBSERVATION = "Observation"
+    IMAGE_TYPE_FIELD_IMAGE = "field image"
+    IMAGE_TYPE_SPECIMEN = "specimen"
+
     taxonIDList: number[] = []
     taxons: string[] = []
 
+    SCIENTIFIC_NAME = "Scientific name"
+    COMMON_NAME = "Common name"
+    kindOfName = this.SCIENTIFIC_NAME
+    nameControl = new FormControl()
+    nameOptions: TaxonIDAndNameItem[] = []
+    scinames: string[] = []
+    @ViewChild('scinameInput') scinameInput: ElementRef<HTMLInputElement>
+
+
+    commonNameControl = new FormControl()
+    commonNames: string[] = []
+    commonNameOptions: TaxonIDAndNameItem[] = []
+    @ViewChild('commonNameInput') commonNameInput: ElementRef<HTMLInputElement>
+
     photographerOptions : string[] = []
+    allPhotographers : string[] = []
     photographerNames : string[] = []
     photographer = null
     photographerForm = new FormControl()
+    photographerNameControl = new FormControl()
+    @ViewChild('photographerNameInput') photographerNameInput: ElementRef<HTMLInputElement>
+
+    keywords: string[] = []
+    keywordValue
+
+    myDateGroup: FormGroup
+    startDate: Date
+    endDate: Date
 
     hasAuthors = false
     includeAuthors = false
@@ -106,27 +144,19 @@ export class ImageSearchPageComponent implements OnInit {
     ) { }
 
     /*
-    value - array of cities
-    input - user input in search box
-    when there is an input, filter & return all matches
-    when there is no input, display all data
-    filter() is a javascript method that returns a new array of all values
-    that pass a test defined in the method.
-     */
-    transform (value: any, input: any): any {
-        if (input) {
-            return value.filter((val) => {
-                val.indexOf(input)  >= 0
-            })
-        } else {
-            return value
-        }
-    }
-
-    /*
    Called when Angular starts
    */
     ngOnInit() {
+        this.kindOfName = this.SCIENTIFIC_NAME
+        this.kindOfLimit = this.ALL_IMAGES
+
+        this.initialCollectionListLength = this.collectionIDs.value.length
+        this.collectionIDs.registerOnChange(() => {
+            if (this.initialCollectionListLength == 0) {
+                this.initialCollectionListLength = this.collectionIDs.value.length
+            }
+        })
+
         // Load the authorities
         this.loadAuthorities()
 
@@ -144,6 +174,48 @@ export class ImageSearchPageComponent implements OnInit {
 
         // Get list of tag keys
         this.loadTagKeys()
+    }
+
+    selectedSciname(event: MatAutocompleteSelectedEvent): void {
+        this.scinames.push(event.option.viewValue)
+        this.scinameInput.nativeElement.value = '';
+        this.nameControl.setValue(null)
+    }
+
+    removeSciname(name: string): void {
+        const index = this.scinames.indexOf(name)
+
+        if (index >= 0) {
+            this.scinames.splice(index, 1)
+        }
+    }
+
+    selectedCommonName(event: MatAutocompleteSelectedEvent): void {
+        this.commonNames.push(event.option.viewValue)
+        this.commonNameInput.nativeElement.value = '';
+        this.commonNameControl.setValue(null)
+    }
+
+    removeCommonName(name: string): void {
+        const index = this.commonNames.indexOf(name)
+
+        if (index >= 0) {
+            this.commonNames.splice(index, 1)
+        }
+    }
+
+    selectedPhotographerName(event: MatAutocompleteSelectedEvent): void {
+        this.photographerNames.push(event.option.viewValue)
+        this.photographerNameInput.nativeElement.value = '';
+        this.photographerNameControl.setValue(null)
+    }
+
+    removePhotographerName(name: string): void {
+        const index = this.photographerNames.indexOf(name)
+
+        if (index >= 0) {
+            this.photographerNames.splice(index, 1)
+        }
     }
 
     nameFor(option) {
@@ -178,8 +250,25 @@ export class ImageSearchPageComponent implements OnInit {
      */
     onKey(event) {
         if (event.target.value) {
-            const partialName = event.target.value
-            this.loadScientificNames(partialName)
+            this.loadScientificNames(event.target.value)
+        }
+    }
+
+    /*
+    Reload the names as a user types
+    */
+    onCommonNameKey(event) {
+        if (event.target.value) {
+            this.loadCommonNames(event.target.value)
+        }
+    }
+
+    /*
+    Reload the names as a user types
+    */
+    onPhotographerNameKey(event) {
+        if (event.target.value) {
+            this.photographerOptions = this.allPhotographers.filter((name) => {return name.toLowerCase().startsWith(event.target.value.toLowerCase())})
         }
     }
 
@@ -198,11 +287,6 @@ export class ImageSearchPageComponent implements OnInit {
     public loadStates() {
         this.stateProvinceService.provinceList.subscribe((states) => {
             this.stateProvinceOptions = states
-            /*
-            states.forEach((state) => {
-                console.log("state " + state)
-            })
-             */
         })
     }
 
@@ -225,8 +309,8 @@ export class ImageSearchPageComponent implements OnInit {
     public loadPhotographers() {
         this.imageService.findPhotographerNames()
             .subscribe((names) => {
-                this.photographerOptions = names
-                this.photographerOptions.sort(function (a, b) {
+                this.allPhotographers = names
+                this.allPhotographers.sort(function (a, b) {
                     return (a > b ? 1 : -1)
                 })
             })
@@ -280,10 +364,34 @@ export class ImageSearchPageComponent implements OnInit {
                 })
         }
     }
+
+    /*
+    Load the common names using the chosen language
+    */
+    public loadCommonNames(partialName) {
+        const language = this.language
+
+        // If the language is not set, load all of the common names
+        if (this.language == "none") {
+            this.taxonVernacularService.findAllCommonNames(partialName, this.taxonomicAuthorityID)
+                .subscribe((names) => {
+                    this.commonNameOptions = names
+                })
+        } else {
+            this.taxonVernacularService.findAllCommonNamesByLanguage(language, partialName, this.taxonomicAuthorityID)
+                .subscribe((names) => {
+                    this.commonNameOptions = names
+                })
+        }
+
+    }
+
     /*
     Called when a taxon is chosen to search for an image
      */
     onClear(): void {
+        this.kindOfName = this.SCIENTIFIC_NAME
+        this.kindOfLimit = this.ALL_IMAGES
         this.taxons = []
         this.taxonIDList = []
         this.imageTypes = []
@@ -298,7 +406,12 @@ export class ImageSearchPageComponent implements OnInit {
         this.photographerForm.reset()
         this.tagKeyForm.reset()
         this.nameControl.reset()
+        this.commonNameControl.reset()
+        this.startDate = null
+        this.endDate = null
+        new TypedFormControl<number[]>([])
 
+        this.keywordValue = ''
         this.submitted = false
     }
     /*
@@ -317,48 +430,45 @@ export class ImageSearchPageComponent implements OnInit {
                 }
             })
         }
+
         this.stateProvinces = this.stateProvinceForm.value? this.stateProvinceForm.value : []
-        this.imageTypes = this.imageTypeForm.value? this.imageTypeForm.value : []
+        this.imageTypes = this.imageTypeForm.value? this.imageTypeForm.value.filter((v) => {return v != this.ALL_IMAGES}) : []
         this.tagKeys = this.tagKeyForm.value? this.tagKeyForm.value : []
-        this.photographerNames = this.photographerForm.value? this.photographerForm.value : []
+        //this.photographerNames = this.photographerForm.value? this.photographerForm.value : []
         this.countries = this.countryForm.value? this.countryForm.value : []
+        this.keywords = this.keywordValue? this.keywordValue.split(',') : []
         this.imageService.imageSearch(
-            [],
-            [],
-            [],
-            [],
+            // If the collections haven't changed don't pass them
+            this.collectionIDs.value.length == this.initialCollectionListLength ? [] : this.collectionIDs.value,
+            this.scinames,
+            this.commonNames,
+            this.keywords,
             this.photographerNames,
             this.imageTypes,
-            null,
-            null,
+            this.startDate,
+            this.endDate,
             this.tagKeys,
-            false,
-            false,
+            this.kindOfLimit == this.ONE_PER_TAXON,
+            this.kindOfLimit == this.ONE_PER_OCCURRENCE,
             this.countries,
             this.stateProvinces,
-            this.taxonIDList
+            []
         ).subscribe((images) => {
-            /*
-            console.log("got images " + images.length)
-            images.forEach((image) => {
-                console.log("url " + image.url)
-                console.log("thumbnail " + image.thumbnailUrl)
-                console.log("id " + image.id)
-            })
-             */
             this.data2 = images
             this.data = []
             //this.data = images
             this.getData(null)
         })
         this.submitted = true
-        // const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
     }
 
     goToLink(url: string){
         window.open("taxon/editor/" + url, "_blank");
     }
 
+    /*
+    Used in the pagination
+     */
     getData(obj) {
         let index=0
         let startingIndex = 0
@@ -374,6 +484,7 @@ export class ImageSearchPageComponent implements OnInit {
         })
     }
 
+    /*
     nameListCheck(sciname) {
         this.looking = true
         // Look up the scientific name first
@@ -416,5 +527,5 @@ export class ImageSearchPageComponent implements OnInit {
                 }
             })
     }
-
+*/
 }

@@ -286,10 +286,11 @@ export class ImageService extends BaseService<Image>{
         )
     }
 
-    async fromFileToLocalStorage(originalname: string, filename: string, mimetype: string): Promise<void> {
+    async fromFileToLocalStorage(originalname: string, filename: string, mimetype: string): Promise<string> {
         fs.rename(ImageService.imageUploadFolder + filename, ImageService.imageLibraryFolder + originalname, (err) => {
             if (err) throw err
         })
+        return originalname
     }
 
 }
