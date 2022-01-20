@@ -33,11 +33,11 @@
                     </div>
                     <div *ngIf="whichLocation == BY_URL" class="form-field w-6">
                         <mat-form-field>
-                            <mat-label>{{"image.details.image.source.url" | translate}}</mat-label>
+                            <mat-label>{{"image.details.image.url" | translate}}</mat-label>
                             <input matInput
                                    maxlength="100"
-                                   [value]="local_data.sourceUrl"
-                                   [(ngModel)]="local_data.sourceUrl"
+                                   [value]="local_data.url"
+                                   [(ngModel)]="local_data.url"
                                    [ngModelOptions]="{standalone: true}">
                         </mat-form-field>
                     </div>
@@ -68,6 +68,32 @@
                                     <mat-select [formControl]="photographerForm">
                                         <mat-option *ngFor="let photographer of photographerOptions" [value]="photographer">{{photographer}}</mat-option>
                                     </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div fxLayout="row wrap">
+                            <div class="form-field w-6">
+                                <mat-form-field>
+                                    <mat-label>{{"image.details.image.source.url" | translate}}</mat-label>
+                                    <input matInput
+                                           maxlength="100"
+                                           [value]="local_data.sourceUrl"
+                                           [(ngModel)]="local_data.sourceUrl"
+                                           [ngModelOptions]="{standalone: true}">
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div fxLayout="row wrap">
+                            <div class="form-field w-6">
+                                <mat-form-field>
+                                    <mat-label>{{"image.details.image.reference.url" | translate}}</mat-label>
+                                    <input matInput
+                                           maxlength="100"
+                                           [value]="local_data.referenceUrl"
+                                           [(ngModel)]="local_data.referenceUrl"
+                                           [ngModelOptions]="{standalone: true}">
                                 </mat-form-field>
                             </div>
                         </div>

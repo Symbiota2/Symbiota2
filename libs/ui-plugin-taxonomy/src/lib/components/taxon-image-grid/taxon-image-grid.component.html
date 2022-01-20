@@ -1,0 +1,32 @@
+<div id='main'>
+    <div *ngIf='!data2 || data2.length == 0'>
+        <h2>{{"image.search.none.found" | translate}}</h2>
+    </div>
+    <div *ngIf='data2?.length > 0'>
+        <div fxFill fxLayout="column" fxLayoutAlign="space-between">
+
+            <mat-grid-list cols='{{data.length > 5? 5 : data.length}}' rowHeight='150px' gutterSize='5'>
+                <mat-grid-tile  *ngFor="let image of data">
+                    <a [routerLink]="['/image/details', image.id]" target="_blank" class='imagelink'>
+                        <img height="100" [src]="localize(image.url)">
+                    </a>
+                    <mat-grid-tile-footer style='background-color:white'>
+                        <div fxLayout="row" fxLayoutAlign="center center">
+                            <a [routerLink]="['/image/details', image.id]" target="_blank" style='text-align:center'>
+                                <i style='text-align:center'>{{image.taxon?.scientificName}}</i>
+                            </a>
+                        </div>
+                    </mat-grid-tile-footer>
+                </mat-grid-tile>
+            </mat-grid-list>
+
+            <mat-paginator [length]="data2.length"
+                           [pageSize]="size"
+                           [pageIndex]="page"
+                           [pageSizeOptions]="pageSizeOptions"
+                           (page)="getData($event)">
+            </mat-paginator>
+        </div>
+    </div>
+
+</div>

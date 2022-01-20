@@ -101,7 +101,7 @@ export class ImageService {
             )
     }
 
-    uploadImageFile(file: File): Observable<string> {
+    uploadImageFile(file: File): Observable<string[]> {
         const url = this.createQueryBuilder()
             .fileUpload()
             .build()

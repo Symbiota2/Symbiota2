@@ -160,7 +160,7 @@ export class ImageController {
         summary: "Retrieve an image from the image library using the filename it was stored under."
     })
     async getFile(@Param('fileName') fileName : string, @Res() res): Promise<any> {
-        res.sendFile(fileName, { root: ImageService.imageLibraryFolder});
+        res.sendFile(fileName, { root: "." + ImageService.imageLibraryFolder});
     }
 
     @Post('imglib')
@@ -168,7 +168,7 @@ export class ImageController {
     @UseInterceptors(FileInterceptor(
         'file',
         {
-            dest: ImageService.imageUploadFolder /*,
+            dest: '.' + ImageService.imageUploadFolder /*,
             storage: storage */
         }))
     @ApiBearerAuth()
@@ -178,14 +178,12 @@ export class ImageController {
     // @UseGuards(SuperAdminGuard)
     async uploadImglib(
         @Req() request: AuthenticatedRequest,
-        @UploadedFile() file: File)
+        @UploadedFile() file: File) : Promise<string[]>
     {
-        /*
         if (!this.canEdit(request)) {
             throw new ForbiddenException()
         }
 
-         */
         if (!file.mimetype.startsWith('image/')) {
             throw new BadRequestException('Invalid Image');
         }
@@ -209,12 +207,10 @@ export class ImageController {
         @Req() request: AuthenticatedRequest,
         @UploadedFile() file: File)
     {
-        /*
         if (!this.canEdit(request)) {
             throw new ForbiddenException()
         }
 
-         */
         if (!file.mimetype.startsWith('image/')) {
             throw new BadRequestException('Invalid Image');
         }

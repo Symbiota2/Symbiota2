@@ -7,14 +7,15 @@ import { Express } from 'express';
 import { StorageService } from '@symbiota2/api-storage';
 import * as fs from 'fs';
 import { ImageSearchParams } from './dto/ImageSearchParams';
+const imageThumbnail = require('image-thumbnail')
 
 type File = Express.Multer.File
 
 @Injectable()
 export class ImageService extends BaseService<Image>{
     private static readonly S3_PREFIX = 'image'
-    public static readonly imageUploadFolder = './data/uploads/images/'
-    public static readonly imageLibraryFolder = './imglib/'
+    public static readonly imageUploadFolder = '/data/uploads/images/'
+    public static readonly imageLibraryFolder = '/imglib/'
 
     constructor(
         @Inject(Image.PROVIDER_ID)
@@ -277,8 +278,11 @@ export class ImageService extends BaseService<Image>{
         return null;
     }
 
+
+
     async fromFileToStorageService(originalname: string, filename: string, mimetype: string): Promise<void> {
-        const readStream = fs.createReadStream(ImageService.imageUploadFolder + filename)
+        const readStream = fs.createReadStream("." + ImageService.imageUploadFolder + filename)
+
         await this.storageService.putObject(
             ImageService.s3Key(filename),
             readStream,
@@ -286,11 +290,32 @@ export class ImageService extends BaseService<Image>{
         )
     }
 
-    async fromFileToLocalStorage(originalname: string, filename: string, mimetype: string): Promise<string> {
-        fs.rename(ImageService.imageUploadFolder + filename, ImageService.imageLibraryFolder + originalname, (err) => {
-            if (err) throw err
-        })
-        return originalname
+    async fromFileToLocalStorage(originalname: string, filename: string, mimetype: string): Promise<string[]> {
+
+        let thumbnailName = originalname
+        try {
+
+            // Create thumbnail
+            const thumbnail = await imageThumbnail("." + ImageService.imageUploadFolder + filename)
+            // Get file name and extension
+            const re = /(?:\.([^.]+))?$/
+            const extension = re.exec(originalname)[0]
+
+            if (extension) {
+                const orig = originalname.substr(0, originalname.length - extension.length)
+                thumbnailName = orig + "_tn" + extension
+            }
+            fs.writeFileSync("." + ImageService.imageLibraryFolder + thumbnailName, thumbnail)
+
+            fs.rename("." + ImageService.imageUploadFolder + filename, "." + ImageService.imageLibraryFolder + originalname, (err) => {
+                if (err) throw err
+            })
+
+        } catch (err) {
+            throw err
+        }
+
+        return [ImageService.imageLibraryFolder + originalname, ImageService.imageLibraryFolder + thumbnailName]
     }
 
 }

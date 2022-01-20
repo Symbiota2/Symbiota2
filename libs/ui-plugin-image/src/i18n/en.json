@@ -16,6 +16,8 @@
     "image.details.photographer": "Photographer",
     "image.details.manager": "Manager",
     "image.details.image.source": "Image Source",
+    "image.details.image.url": "URL",
+    "image.details.image.reference.url": "Reference URL",
     "image.details.image.source.url": "Source URL",
     "image.details.image.notes": "Notes",
     "image.details.image.locality": "Locality",

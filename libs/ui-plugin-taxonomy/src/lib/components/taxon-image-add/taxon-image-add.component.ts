@@ -29,7 +29,7 @@ import { TaxonomyUploadService } from '../../services/taxonomyUpload/taxonomy-up
 export class TaxonImageAddComponent implements OnInit {
     // User stuff
     userID : number = null
-    userCanEdit: boolean = true
+    userCanEdit: boolean = false
 
     // Which taxon am I editing?
     taxonID: string
@@ -50,7 +50,7 @@ export class TaxonImageAddComponent implements OnInit {
     photographer = null
     photographerForm = new FormControl()
 
-    public local_data : any
+    public local_data : ImageInputDto
     public rankNamesMap = new Map()
     public rankNames = []
     public rankID
@@ -91,8 +91,12 @@ export class TaxonImageAddComponent implements OnInit {
     Called when Angular starts
      */
     ngOnInit() {
+        this.currentRoute.paramMap.subscribe(params => {
+            this.taxonID = params.get('taxonID')
+        })
+
         // Initialize form validators
-        this.local_data = { }
+        this.local_data = new ImageInputDto({})
         this.setUpFormControls()
 
         // Load the authorities
@@ -141,17 +145,37 @@ export class TaxonImageAddComponent implements OnInit {
     }
 
     doSave(){
-        this.local_data.phyloSortSequence = this.sortSequenceControl.value
-        this.local_data.taxonAuthorityID = this.taxonomicAuthorityID
+        this.local_data.sortSequence = this.sortSequenceControl.value || 50 // Some default sortSequence is needed
+        //this.local_data.taxonAuthorityID = this.taxonomicAuthorityID
         this.local_data.initialTimestamp = new Date()
-        this.local_data.lastModifiedTimestamp = this.local_data.initialTimestamp
-        this.local_data.lastModifiedUID = this.userID
-        this.local_data.taxonID = this.taxonID
-        // this.local_data.url = this.local_data.url? "imglib/" + this.fileInputControl.value
+        //this.local_data.lastModifiedTimestamp = this.local_data.initialTimestamp
+        //this.local_data.lastModifiedUID = this.userID
+        this.local_data.taxonID = +this.taxonID
+        this.whichLocation == this.BY_LOCAL_FILE ? "imglib/" + this.fileInputControl.value : this.local_data.url
 
         // Contruct a new image
         const newImage =  plainToClass(ImageInputDto, this.local_data)
-        //this.imageService.uploadImageFile(this.fileInputControl.value).subscribe(()=> {
+
+        // Now store stuff
+        if (this.whichLocation == this.BY_LOCAL_FILE) {
+
+            // Doing a file upload
+            this.imageService.uploadImageFile(this.fileInputControl.value).subscribe((fileNames)=> {
+                newImage.url = fileNames[0]
+                newImage.thumbnailUrl = fileNames[1]
+                this.imageService.create(newImage).subscribe((image)=> {
+                    if (image) {
+                        this.showMessage("taxon.create.saved")
+                    } else {
+                        // Error in adding
+                        this.showError("taxon.editor.updated.error")
+                    }
+                })
+            })
+        } else {
+            // Doing it by storing the url and converting the thumbnail
+            // TODO: Add the thumbnail creation and update of the thunbnail url, or do we want to input thumbnail URL?
+            this.local_data.thumbnailUrl = null
             this.imageService.create(newImage).subscribe((image)=> {
                 if (image) {
                     this.showMessage("taxon.create.saved")
@@ -160,15 +184,14 @@ export class TaxonImageAddComponent implements OnInit {
                     this.showError("taxon.editor.updated.error")
                 }
             })
-        //})
-
+        }
 
     }
 
     setUpFormControls() {
         this.sortSequenceControl =
             new FormControl(
-                this.local_data.phyloSortSequence,
+                this.local_data.sortSequence,
                 [Validators.pattern("[0-9]+")]
             )
     }
