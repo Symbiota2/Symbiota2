@@ -26,6 +26,7 @@ type GeoJSON = Record<string, unknown>;
 @Controller('geography')
 export class GeographyController {
     private static readonly FMT_GEOJSON = 'geojson';
+    private country_id = null;
 
     constructor(
         private readonly continents: ContinentService,
@@ -77,6 +78,7 @@ export class GeographyController {
             params.countryTerm,
             params.limit ? params.limit : null
         );
+        this.country_id = countries[0].id;
         return countries.map((country) => {
             return new CountryListItem(country);
         });
@@ -108,7 +110,7 @@ export class GeographyController {
         const provinces = await this.provinces.findAll(
             query.limit,
             query.offset,
-            query.countryID,
+            this.country_id,
             query.stateTerm
         );
         return provinces.map((province) => {
