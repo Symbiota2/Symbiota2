@@ -30,7 +30,7 @@ export class ImageListItem {
     @Expose() dynamicProperties: string
     @Expose() sortSequence: number
     @Expose() initialTimestamp: Date
-    @Expose() taxon: TaxonOnlyListItem | null
+    // @Expose() taxon: TaxonOnlyListItem | null
 
     static fromJSON(imageJSON: Record<string, unknown>): ImageListItem {
         return plainToClass(
