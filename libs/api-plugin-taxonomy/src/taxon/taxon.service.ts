@@ -86,7 +86,7 @@ export class TaxonService extends BaseService<Taxon>{
 
         if (qParams.taxonAuthorityID) {
             // Have to use query builder since filter on nested relations does not work
-            qb.leftJoin('o.taxonStatuses', 'c')
+            qb.innerJoin('o.taxonStatuses', 'c')
                 .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
 
         }
@@ -95,11 +95,12 @@ export class TaxonService extends BaseService<Taxon>{
             qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
         }
 
-        if (limit) {
-            qb.take(limit)
+        // Don't limit if it has filters
+        if (limit && !(qParams.id || qParams.scientificName)) {
+            // qb.take(limit)
         }
 
-        if (offset) {
+        if (offset && !(qParams.id || qParams.scientificName)) {
             qb.skip(offset)
         }
 

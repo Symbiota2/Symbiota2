@@ -55,8 +55,8 @@
         <symbiota2-expansion-panel label='{{"taxonomy.viewer.label.taxonomy" | translate}}'>
             <form class="name-autocomplete-form" (ngSubmit)="onSubmit()">
                 <mat-form-field class="name-autocomplete-full-width">
-                    <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxonomy.viewer.label.name.scientific" | translate}}</mat-label>
-                    <mat-label *ngIf='kindOfName == "Common"'>{{"taxonomy.viewer.label.name.common" | translate}}</mat-label>
+                    <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxonomy.viewer.label.name.enter.scientific" | translate}}</mat-label>
+                    <mat-label *ngIf='kindOfName == "Common"'>{{"taxonomy.viewer.label.name.enter.common" | translate}}</mat-label>
                     <!-- (keypress)="onKey($event)" -->
                     <input *ngIf='kindOfName == "Scientific"' type="text"
                            placeholder='{{"taxonomy.viewer.label.name.scientific" | translate}}'
@@ -73,9 +73,9 @@
                            [formControl]="nameControl"
                            [matAutocomplete]="auto">
 
-                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="selectedSciname($event)">
                         <mat-option *ngFor="let option of nameOptions" [value]="option.name">
-                            {{option.name}} <small>{{option.author}}</small>
+                            {{option.name}} <small *ngIf='hasAuthors'>{{option.author}}</small>
                         </mat-option>
 
                     </mat-autocomplete>
@@ -85,7 +85,9 @@
                     <b>{{"taxonomy.viewer.name.error" | translate}}</b>
                     <br/>
                 </mat-label>
+                <!--
                 <button class="button" type="submit">{{"taxonomy.viewer.label.taxonomy" | translate}}</button>
+                -->
             </form>
             <br/>
             <mat-checkbox class="example-margin" [(ngModel)]='includeAuthors'>{{"taxonomy.viewer.label.checkbox.include.authors" | translate}}</mat-checkbox>

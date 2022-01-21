@@ -13,6 +13,7 @@ import { BehaviorSubject } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 import { MatListOption } from '@angular/material/list';
 import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 /**
  * Taxonomic data with nested structure.
@@ -187,6 +188,13 @@ export class TaxaViewerPageComponent implements OnInit {
                 this.nameOptions = names
             })
         }
+        // remove any duplicate names (without authors)
+        if (!this.hasAuthors) {
+            this.nameOptions = this.nameOptions.filter((item, pos, arr) => {
+                return pos === 0 || item.name !== arr[pos-1].name
+            })
+        }
+
 
     }
 
@@ -197,7 +205,13 @@ export class TaxaViewerPageComponent implements OnInit {
         this.nameOptions= []
         this.taxaService.findAllScientificNames(partialName, this.taxonomicAuthorityID)
             .subscribe((names) => {
-                this.nameOptions = names
+
+                this.nameOptions = this.hasAuthors ?
+                    names
+                    : names.filter((item, pos, arr) =>
+                    {  // Remove duplicates
+                        return pos === 0 || item.name !== arr[pos-1].name;
+                    })
             })
     }
 
@@ -548,6 +562,7 @@ export class TaxaViewerPageComponent implements OnInit {
                 .subscribe((t) => {
                     children = t
 
+                    console.log("children is " + children.length + " " + childrenTids.length)
                     // Sort and format the children as tree nodes
                     const childrenTree = []
                     children.sort((a,b) => a.scientificName - b.scientificName).forEach((item) => {
@@ -660,6 +675,25 @@ export class TaxaViewerPageComponent implements OnInit {
 
     loadChildren(node: TaxonNode) : void {
         this.findChildren(node)
+    }
+
+    selectedSciname(event: MatAutocompleteSelectedEvent): void {
+        //this.scinames.push(event.option.viewValue)
+        //this.scinameInput.nativeElement.value = '';
+        //this.nameControl.setValue(null)
+
+        //console.log("here " + this.nameControl.value + " " + event.option.viewValue)
+
+        this.nameFound = true
+        this.dataSource.data = []
+        if (this.kindOfName == 'Scientific') {
+            const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
+            //this.buildTree(sname)
+            //console.log("check " + sname)
+            this.nameListCheck(sname)
+        } else {
+            this.findCommonAncestors(this.nameControl.value)
+        }
     }
 
     /*

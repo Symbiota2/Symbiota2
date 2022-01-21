@@ -55,8 +55,8 @@
         <symbiota2-expansion-panel label='{{"taxonomy.editor.entry.panel.label" | translate}}'>
             <form class="name-autocomplete-form" (ngSubmit)="onSubmit()">
                 <mat-form-field class="name-autocomplete-full-width">
-                    <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxonomy.viewer.label.name.scientific" | translate}}</mat-label>
-                    <mat-label *ngIf='kindOfName == "Common"'>{{"taxonomy.viewer.label.name.common" | translate}}</mat-label>
+                    <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxonomy.viewer.label.name.enter.scientific" | translate}}</mat-label>
+                    <mat-label *ngIf='kindOfName == "Common"'>{{"taxonomy.viewer.label.name.enter.common" | translate}}</mat-label>
                     <!-- (keypress)="onKey($event)" -->
                     <input *ngIf='kindOfName == "Scientific"' type="text"
                            placeholder='{{"taxonomy.viewer.label.name.scientific" | translate}}'
@@ -72,7 +72,7 @@
                            (keyup)="onKey($event)"
                            [formControl]="nameControl"
                            [matAutocomplete]="auto">
-                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="selectedSciname($event)">
                         <mat-option *ngFor="let option of nameOptions" [value]="option.name">
                             {{option.name}} <small>{{option.author}}</small>
                         </mat-option>
@@ -82,11 +82,14 @@
                     <b>{{"taxonomy.viewer.name.error" | translate}}</b>
                     <br/>
                 </mat-label>
+                <!--
                 <button class="button" type="submit">{{"taxonomy.editor.entry.button.label" | translate}}</button>
+                -->
             </form>
+            <!--
             <br/>
             <mat-checkbox class="example-margin" [(ngModel)]='includeAuthors'>{{"taxonomy.viewer.label.checkbox.include.authors" | translate}}</mat-checkbox>
-
+            -->
             <symbiota2-expansion-panel *ngIf='possibleTaxons.length > 1' label='{{"taxonomy.viewer.label.choose.taxon" | translate}}'>
                 <mat-selection-list [multiple]="false">
                     <mat-list-option *ngFor="let txn of possibleTaxons" [value]="txn.taxonID">

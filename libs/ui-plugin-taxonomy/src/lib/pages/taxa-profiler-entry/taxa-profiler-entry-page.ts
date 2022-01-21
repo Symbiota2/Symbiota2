@@ -275,6 +275,13 @@ export class TaxaProfilerEntryPage implements OnInit {
 
     /*
     Called when the taxon is chosen to display
+    */
+    selectedSciname(event) {
+        this.onSubmit()
+    }
+
+    /*
+    Called when the taxon is chosen to display
      */
     onSubmit(): void {
         this.nameFound = true
