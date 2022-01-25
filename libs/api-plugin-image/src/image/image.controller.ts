@@ -165,11 +165,15 @@ export class ImageController {
 
     @Post('imglib')
     @HttpCode(HttpStatus.CREATED)
+    @UseInterceptors(FileInterceptor('file'))
+    /*
     @UseInterceptors(FileInterceptor(
         'file',
         {
             dest: '.' + ImageService.imageUploadFolder
         }))
+
+     */
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: "Upload an image file to the imglib (local disk storage)" })
@@ -191,12 +195,14 @@ export class ImageController {
 
     @Post('upload/storage/single')
     @HttpCode(HttpStatus.CREATED)
+    @UseInterceptors(FileInterceptor('file'))
+    /*
     @UseInterceptors(FileInterceptor(
         'file',
         {
-            dest: ImageService.imageUploadFolder /*,
-            storage: storage */
+            dest: ImageService.imageUploadFolder
         }))
+     */
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: "Upload an image file to storage service" })
