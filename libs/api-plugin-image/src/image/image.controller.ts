@@ -163,13 +163,13 @@ export class ImageController {
         res.sendFile(fileName, { root: "." + ImageService.imageLibraryFolder});
     }
 
+    /*
     @Post('imglib')
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor(
         'file',
         {
-            dest: '.' + ImageService.imageUploadFolder /*,
-            storage: storage */
+            dest: '.' + ImageService.imageUploadFolder
         }))
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
@@ -189,6 +189,7 @@ export class ImageController {
         }
         return await this.myService.fromFileToLocalStorage(file.originalname, file.filename, file.mimetype)
     }
+    */
 
     @Post('upload/storage/single')
     @HttpCode(HttpStatus.CREATED)
