@@ -1,6 +1,4 @@
 import "reflect-metadata";
-import { core } from '@angular/compiler';
-
 const KG_META_PREFIX = 'kg';
 const KG_FIELD_PREFIX = `${KG_META_PREFIX}:field`;
 const KGRecordTypeKey = Symbol(`${KG_META_PREFIX}:type`);

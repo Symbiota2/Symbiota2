@@ -3,12 +3,6 @@ export const DWC_XML_NS = 'http://rs.tdwg.org/dwc/text/';
 export type DwCAParseCallback = (tmpdir: string, archive: IKGAMeta) => any;
 
 /*
-All interfaces prefixed by DwCAMeta come from the archive schema defined at
-https://dwc.tdwg.org/text/
-Helpful: http://tools.gbif.org/dwca-assistant/gbif_dwc-a_asst_en_v1.1.pdf
- */
-
-/*
 The full meta.xml for a dwc archive
  */
 export interface IKGAMeta {

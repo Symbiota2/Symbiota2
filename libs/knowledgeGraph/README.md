@@ -1,6 +1,6 @@
 # knowledgeGraph
 
-Written by Curtis Dyreson
+Written by Curtis Dyreson 
 
 ## Running unit tests
 

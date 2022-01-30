@@ -41,8 +41,6 @@ export class ImageService {
     }
 
     public getUrl() {
-        //const apiBaseUrl = this.appConfig.apiUri()
-        //const x = new URL(`${apiBaseUrl}/${IMAGE_API_BASE}`)
         return this.apiClient.apiRoot()
     }
 

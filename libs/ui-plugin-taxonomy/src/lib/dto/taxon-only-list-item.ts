@@ -1,4 +1,4 @@
-import { Exclude, Expose, plainToClass, Type } from 'class-transformer';
+import { Exclude, Expose, plainToClass, Type } from 'class-transformer'
 
 @Exclude()
 export class TaxonOnlyListItem {

@@ -85,8 +85,8 @@ class CreateOneBuilder extends ImageQueryBuilder {
     protected _myID: number;
 
     myID(id: number): CreateOneBuilder {
-        this._myID = id;
-        return this;
+        this._myID = id
+        return this
     }
 
     build(): string {

@@ -58,7 +58,7 @@ export class TaxonProfilePageComponent implements OnInit {
     }
 
     /*
-    Load the taxon profile
+      Load the taxon profile
      */
     loadProfile(taxonID: number) {
         this.taxaService.findByID(taxonID).subscribe((taxon) => {

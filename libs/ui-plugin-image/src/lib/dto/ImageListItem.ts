@@ -37,6 +37,6 @@ export class ImageListItem {
             ImageListItem,
             imageJSON,
             { excludeExtraneousValues: true, enableImplicitConversion: true }
-        );
+        )
     }
 }

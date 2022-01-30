@@ -178,7 +178,7 @@ export class ImageSearchPageComponent implements OnInit {
         // Get list of states and provinces
         this.loadStates()
 
-        // Get list of tag keys
+        //  Get list of tag keys
         this.loadTagKeys()
     }
 

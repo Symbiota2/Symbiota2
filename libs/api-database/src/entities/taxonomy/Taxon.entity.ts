@@ -69,7 +69,7 @@ import { KGProperty, KGType } from '../../../../knowledgeGraph/src';
 @Entity('taxa')
 export class Taxon extends EntityProvider {
     static get DWC_TYPE(): string {
-        return dwcRecordType(Taxon);
+        return dwcRecordType(Taxon)
     }
 
     @DwCID()

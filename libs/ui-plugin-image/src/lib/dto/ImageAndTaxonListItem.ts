@@ -39,6 +39,6 @@ export class ImageAndTaxonListItem {
             ImageAndTaxonListItem,
             imageJSON,
             { excludeExtraneousValues: true, enableImplicitConversion: true }
-        );
+        )
     }
 }

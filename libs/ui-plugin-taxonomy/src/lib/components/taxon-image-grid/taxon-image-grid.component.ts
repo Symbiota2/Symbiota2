@@ -114,11 +114,8 @@ export class TaxonImageGridComponent implements OnInit {
 
     stateProvinces : string[] = []
     stateProvinceOptions : ProvinceListItem[] = []
-    stateProvinceForm = new FormControl()
 
-    nameFound = false
     looking = false
-    possibleTaxons  = []
 
     submitted = false
 

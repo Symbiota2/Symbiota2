@@ -24,7 +24,7 @@ export class KnowledgeGraphBuilder {
     private readonly uniqueRecordMap: Map<string, Set<any>>;
     private readonly coreFileType: string;
     private coreIDField: string;
-
+c
     constructor(coreClass: any, tmpDir: string) {
         this.tmpDir = tmpDir;
         this.fileMap = new Map<string, WriteStream>();

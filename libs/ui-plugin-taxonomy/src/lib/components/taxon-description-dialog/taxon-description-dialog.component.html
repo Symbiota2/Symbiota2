@@ -1,77 +1,77 @@
 <div mat-dialog-content>
-        <form *ngIf="action == 'Update'; else elseTemplate" class="name-autocomplete-form">
-            <div fxLayout="row wrap">
-                <div class="form-field w-8">
-                    <mat-form-field>
-                        <mat-label>{{'taxon.description.editor.caption' | translate}}</mat-label>
-                        <input matInput
-                               maxlength="100"
-                               [value]="local_data.caption"
-                               [(ngModel)]="local_data.caption"
-                               [ngModelOptions]="{standalone: true}">
-                    </mat-form-field>
-                </div>
+    <form *ngIf="action == 'Update'; else elseTemplate" class="name-autocomplete-form">
+        <div fxLayout="row wrap">
+            <div class="form-field w-8">
+                <mat-form-field>
+                    <mat-label>{{'taxon.description.editor.caption' | translate}}</mat-label>
+                    <input matInput
+                           maxlength="100"
+                           [value]="local_data.caption"
+                           [(ngModel)]="local_data.caption"
+                           [ngModelOptions]="{standalone: true}">
+                </mat-form-field>
             </div>
-            <div fxLayout="row wrap">
-                <div class="form-field w-6">
-                    <mat-form-field>
-                        <mat-label>{{'taxon.description.editor.language' | translate}}</mat-label>
-                        <input matInput
-                               maxlength="100"
-                               [value]="local_data.language"
-                               [(ngModel)]="local_data.language"
-                               [ngModelOptions]="{standalone: true}">
-                    </mat-form-field>
-                </div>
+        </div>
+        <div fxLayout="row wrap">
+            <div class="form-field w-6">
+                <mat-form-field>
+                    <mat-label>{{'taxon.description.editor.language' | translate}}</mat-label>
+                    <input matInput
+                           maxlength="100"
+                           [value]="local_data.language"
+                           [(ngModel)]="local_data.language"
+                           [ngModelOptions]="{standalone: true}">
+                </mat-form-field>
             </div>
-            <div fxLayout="row wrap">
-                <div class="form-field w-6">
-                    <mat-form-field>
-                        <mat-label>{{'taxon.description.editor.source' | translate}}</mat-label>
-                        <input matInput
-                               [value]="local_data.source"
-                               [(ngModel)]="local_data.source"
-                               [ngModelOptions]="{standalone: true}">
-                    </mat-form-field>
-                </div>
+        </div>
+        <div fxLayout="row wrap">
+            <div class="form-field w-6">
+                <mat-form-field>
+                    <mat-label>{{'taxon.description.editor.source' | translate}}</mat-label>
+                    <input matInput
+                           [value]="local_data.source"
+                           [(ngModel)]="local_data.source"
+                           [ngModelOptions]="{standalone: true}">
+                </mat-form-field>
             </div>
-            <div fxLayout="row wrap">
-                <div class="form-field w-6">
-                    <mat-form-field>
-                        <mat-label>{{'taxon.description.editor.sourceUrl' | translate}}</mat-label>
-                        <input matInput
-                               maxlength="100"
-                               [value]="local_data.sourceUrl"
-                               [(ngModel)]="local_data.sourceUrl"
-                               [ngModelOptions]="{standalone: true}">
-                    </mat-form-field>
-                </div>
+        </div>
+        <div fxLayout="row wrap">
+            <div class="form-field w-6">
+                <mat-form-field>
+                    <mat-label>{{'taxon.description.editor.sourceUrl' | translate}}</mat-label>
+                    <input matInput
+                           maxlength="100"
+                           [value]="local_data.sourceUrl"
+                           [(ngModel)]="local_data.sourceUrl"
+                           [ngModelOptions]="{standalone: true}">
+                </mat-form-field>
             </div>
-            <div fxLayout="row wrap">
-                <div class="form-field w-8">
-                    <mat-form-field>
-                        <mat-label>{{'taxon.description.editor.notes' | translate}}</mat-label>
-                        <input matInput
-                               maxlength="100"
-                               [value]="local_data.notes"
-                               [(ngModel)]="local_data.notes"
-                               [ngModelOptions]="{standalone: true}">
-                    </mat-form-field>
-                </div>
+        </div>
+        <div fxLayout="row wrap">
+            <div class="form-field w-8">
+                <mat-form-field>
+                    <mat-label>{{'taxon.description.editor.notes' | translate}}</mat-label>
+                    <input matInput
+                           maxlength="100"
+                           [value]="local_data.notes"
+                           [(ngModel)]="local_data.notes"
+                           [ngModelOptions]="{standalone: true}">
+                </mat-form-field>
             </div>
-            <div fxLayout="row wrap">
-                <div class="form-field w-1">
-                    <mat-form-field>
-                        <mat-label>{{'taxon.description.editor.displayLevel' | translate}}</mat-label>
-                        <input matInput
-                               maxlength="3"
-                               [value]="local_data.displayLevel"
-                               [(ngModel)]="local_data.displayLevel"
-                               [ngModelOptions]="{standalone: true}">
-                    </mat-form-field>
-                </div>
+        </div>
+        <div fxLayout="row wrap">
+            <div class="form-field w-1">
+                <mat-form-field>
+                    <mat-label>{{'taxon.description.editor.displayLevel' | translate}}</mat-label>
+                    <input matInput
+                           maxlength="3"
+                           [value]="local_data.displayLevel"
+                           [(ngModel)]="local_data.displayLevel"
+                           [ngModelOptions]="{standalone: true}">
+                </mat-form-field>
             </div>
-        </form>
+        </div>
+    </form>
     <ng-template #elseTemplate>
         {{'taxon.editor.dialog.confirm.delete' | translate}}<b>{{local_data.name}}</b>?
     </ng-template>
