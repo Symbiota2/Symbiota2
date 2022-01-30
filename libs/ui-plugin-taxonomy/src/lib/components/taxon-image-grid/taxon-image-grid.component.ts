@@ -9,7 +9,7 @@ import {
 } from '@symbiota2/ui-plugin-taxonomy';
 import { TranslateService } from '@ngx-translate/core'
 import { MatDialog } from '@angular/material/dialog';
-import { AlertService, TypedFormControl, UserService } from '@symbiota2/ui-common';
+import { AlertService, ApiClientService, AppConfigService, TypedFormControl, UserService } from '@symbiota2/ui-common';
 import { TaxonomicStatusInputDto } from '../../dto/taxonomicStatusInputDto';
 import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
 import { plainToClass } from 'class-transformer';
@@ -26,6 +26,8 @@ import {
     StateProvinceService
 } from '@symbiota2/ui-plugin-geography';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { ImageAndTaxonListItem } from '../../../../../ui-plugin-image/src/lib/dto/ImageAndTaxonListItem';
+import { IMAGE_API_BASE, IMAGE_DETAILS_ROUTE } from '../../../../../ui-plugin-image/src/lib/routes';
 
 @Component({
     selector: 'taxon-image-grid',
@@ -49,6 +51,8 @@ export class TaxonImageGridComponent implements OnInit {
     ONE_PER_OCCURRENCE = "One per occurrence"
     kindOfLimit = this.ALL_IMAGES
 
+    imageAPIUrl = null
+    imageDetailsRoute = IMAGE_DETAILS_ROUTE
     IMAGE_TYPE_OBSERVATION = "Observation"
     IMAGE_TYPE_FIELD_IMAGE = "field image"
     IMAGE_TYPE_SPECIMEN = "specimen"
@@ -118,8 +122,8 @@ export class TaxonImageGridComponent implements OnInit {
 
     submitted = false
 
-    data : ImageListItem[] = []
-    data2 : ImageListItem[] = []
+    data : ImageAndTaxonListItem[] = []
+    data2 : ImageAndTaxonListItem[] = []
     page= 0
     size = 20
     pageSizeOptions = [20, 40, 60, 80, 100]
@@ -133,7 +137,8 @@ export class TaxonImageGridComponent implements OnInit {
         private readonly imageService: ImageService,
         private router: Router,
         private formBuilder: FormBuilder,
-        private currentRoute: ActivatedRoute
+        private currentRoute: ActivatedRoute,
+        private readonly apiClient: ApiClientService,
     ) { }
 
     /*
@@ -208,8 +213,10 @@ export class TaxonImageGridComponent implements OnInit {
             // We have an external url
             return name
         } else {
-            // console.log("http://localhost:8080/api/v1/image" + name)
-            return "http://localhost:8080/api/v1/image" + name
+            if (!this.imageAPIUrl) {
+                this.imageAPIUrl = this.apiClient.apiRoot() + "/" + IMAGE_API_BASE + "/"
+            }
+            return this.imageAPIUrl + name
         }
 
     }

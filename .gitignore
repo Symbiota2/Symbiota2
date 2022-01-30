@@ -42,3 +42,5 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+/oldCode/**
+/oldCode/image-old-not-used-search/

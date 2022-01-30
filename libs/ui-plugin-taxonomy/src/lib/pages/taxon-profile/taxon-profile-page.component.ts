@@ -93,7 +93,7 @@ export class TaxonProfilePageComponent implements OnInit {
     }
 
     goToLink(url: string){
-        window.open(TAXON_EDITOR_ROUTE_PREFIX + "/" + url, "_blank")
+        window.open(TAXON_EDITOR_ROUTE_PREFIX + "/" + url)
     }
 
     goToParent(url: string){

@@ -28,8 +28,6 @@ export class TaxonService {
     }
 
     public getUrl() {
-        const apiBaseUrl = this.appConfig.apiUri()
-        //const x = new URL(`${apiBaseUrl}/taxon/scientificNames`)
         return this.apiClient.apiRoot()
     }
 

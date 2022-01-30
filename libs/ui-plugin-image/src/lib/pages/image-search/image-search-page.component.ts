@@ -20,7 +20,9 @@ import { ImageListItem } from '../../dto/ImageListItem';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { TypedFormControl } from '@symbiota2/ui-common';
+import { ApiClientService, TypedFormControl } from '@symbiota2/ui-common';
+import { IMAGE_API_BASE, IMAGE_DETAILS_ROUTE } from '../../routes';
+import { ImageAndTaxonListItem } from '../../dto/ImageAndTaxonListItem';
 
 /**
  * Taxonomic data with nested structure.
@@ -58,6 +60,9 @@ export class ImageSearchPageComponent implements OnInit {
 
     taxonIDList: number[] = []
     taxons: string[] = []
+
+    imageAPIUrl = null
+    imageDetailsRoute = IMAGE_DETAILS_ROUTE
 
     SCIENTIFIC_NAME = "Scientific name"
     COMMON_NAME = "Common name"
@@ -121,8 +126,8 @@ export class ImageSearchPageComponent implements OnInit {
 
     submitted = false
 
-    data : ImageListItem[] = []
-    data2 : ImageListItem[] = []
+    data : ImageAndTaxonListItem[] = []
+    data2 : ImageAndTaxonListItem[] = []
     page= 0
     size = 20
     pageSizeOptions = [20, 40, 60, 80, 100]
@@ -138,6 +143,7 @@ export class ImageSearchPageComponent implements OnInit {
         private readonly imageTagKeyService: ImageTagKeyService,
         private readonly countryService: CountryService,
         private readonly stateProvinceService: StateProvinceService,
+        private readonly apiClient: ApiClientService,
         private router: Router,
         private formBuilder: FormBuilder,
         private currentRoute: ActivatedRoute
@@ -482,6 +488,20 @@ export class ImageSearchPageComponent implements OnInit {
             index++;
             return (index > startingIndex && index <= endingIndex) ? true : false
         })
+    }
+
+    localize(name) {
+        const re = new RegExp('^(?:[a-z]+:)?//', 'i')
+        if (re.test(name)) {
+            // We have an external url
+            return name
+        } else {
+            if (!this.imageAPIUrl) {
+                this.imageAPIUrl = this.apiClient.apiRoot() + "/" + IMAGE_API_BASE + "/"
+            }
+            return this.imageAPIUrl + name
+        }
+
     }
 
     /*

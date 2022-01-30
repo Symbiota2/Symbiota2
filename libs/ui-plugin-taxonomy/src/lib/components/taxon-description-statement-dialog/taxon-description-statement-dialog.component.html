@@ -1,7 +1,9 @@
 <!-- <h1 mat-dialog-title>Row Action :: <strong>{{action}}</strong></h1> -->
 <div mat-dialog-content>
         <form *ngIf="action == 'Update'; else elseTemplate" class="name-autocomplete-form">
-            <mat-form-field appearance="fill">
+            <div fxLayout="row wrap">
+                <div class="form-field w-8">
+            <mat-form-field>
                 <mat-label>{{'taxon.description.editor.statement.heading' | translate}}</mat-label>
                 <input matInput
                        maxlength="100"
@@ -9,7 +11,11 @@
                        [(ngModel)]="local_data.heading"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-            <mat-form-field appearance="fill">
+                </div>
+            </div>
+            <div fxLayout="row wrap">
+                <div class="form-field w-7">
+            <mat-form-field>
                 <mat-label>{{'taxon.description.editor.statement.displayHeader' | translate}}</mat-label>
                 <input matInput
                        maxlength="1"
@@ -17,7 +23,11 @@
                        [(ngModel)]="local_data.displayHeader"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-            <mat-form-field appearance="fill">
+                </div>
+            </div>
+            <div fxLayout="row wrap">
+                <div class="form-field w-1">
+            <mat-form-field>
                 <mat-label>{{'taxon.description.editor.statement.sortSequence' | translate}}</mat-label>
                 <input matInput
                        maxlength="3"
@@ -25,7 +35,11 @@
                        [(ngModel)]="local_data.sortSequence"
                        [ngModelOptions]="{standalone: true}">
             </mat-form-field>
-            <mat-form-field appearance="fill">
+                </div>
+            </div>
+            <div fxLayout="row wrap">
+                <div class="form-field w-8">
+            <mat-form-field>
                 <mat-label>{{'taxon.description.editor.statement.statement' | translate}}</mat-label>
                 <textarea matInput
                           cdkTextareaAutosize
@@ -33,14 +47,9 @@
                           [value]="local_data.statement"
                           [(ngModel)]="local_data.statement"
                           [ngModelOptions]="{standalone: true}"></textarea>
-                <!--
-                <input matInput
-                       [value]="local_data.statement"
-                       [(ngModel)]="local_data.statement"
-                       [ngModelOptions]="{standalone: true}">
-                       -->
-                <!-- <mat-icon matSuffix>mode_edit</mat-icon> -->
             </mat-form-field>
+                </div>
+            </div>
         </form>
     <ng-template #elseTemplate>
         {{'taxon.editor.dialog.confirm.delete' | translate}}?

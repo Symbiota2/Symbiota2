@@ -9,6 +9,7 @@ import {
 } from '../../../constants';
 import { TaxonQueryBuilder } from '../../../../../ui-plugin-taxonomy/src/lib/services/taxon/taxon-query-builder';
 import { Q_PARAM_COLLID } from '../../../../../ui-plugin-occurrence/src/constants';
+import { IMAGE_API_BASE } from '../../routes';
 
 export class ImageQueryBuilder {
     protected baseUrl: string
@@ -18,7 +19,7 @@ export class ImageQueryBuilder {
 
     constructor(apiBaseUrl: string) {
         this.baseUrl = apiBaseUrl
-        this.url = new URL(`${apiBaseUrl}/image`)
+        this.url = new URL(`${apiBaseUrl}/${IMAGE_API_BASE}`)
     }
 
     findAll(): FindAllBuilder {

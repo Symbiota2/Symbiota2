@@ -1,8 +1,8 @@
 import { Exclude, Expose, plainToClass } from 'class-transformer';
-import { TaxonOnlyListItem } from '@symbiota2/ui-plugin-taxonomy';
 
 @Exclude()
 export class ImageListItem {
+    // Any changes to the following, also update ImageAndTaxonListItem
     @Expose() id: number
     @Expose() taxonID: number | null
     @Expose() url: string

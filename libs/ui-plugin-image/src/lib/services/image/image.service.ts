@@ -7,6 +7,8 @@ import { PhotographerInfoListItem } from '../../dto/PhotographerInfoListItem';
 import { ImageListItem } from '../../dto';
 import { ImageInputDto } from '../../dto/ImageInputDto';
 import { ApiTaxonomyUpload } from '../../../../../ui-plugin-taxonomy/src/lib/services/taxonomyUpload/taxonomy-upload.service';
+import { ImageAndTaxonListItem } from '../../dto/ImageAndTaxonListItem';
+import { IMAGE_API_BASE } from '../../routes';
 
 interface FindAllParams {
     imageIDs: number[]
@@ -39,8 +41,8 @@ export class ImageService {
     }
 
     public getUrl() {
-        const apiBaseUrl = this.appConfig.apiUri()
-        const x = new URL(`${apiBaseUrl}/image`)
+        //const apiBaseUrl = this.appConfig.apiUri()
+        //const x = new URL(`${apiBaseUrl}/${IMAGE_API_BASE}`)
         return this.apiClient.apiRoot()
     }
 
@@ -147,7 +149,7 @@ export class ImageService {
         countries: string[],
         provinces: string[],
         taxonIds: number[]
-    ): Observable<ImageListItem[]> {
+    ): Observable<ImageAndTaxonListItem[]> {
         const url = this.createQueryBuilder()
             .imageSearch()
             .taxonIDs(taxonIds)
@@ -170,40 +172,10 @@ export class ImageService {
         return this.apiClient.send<any, Record<string, unknown>[]>(query)
             .pipe(
                 map((descriptions) => descriptions.map((o) => {
-                    return ImageListItem.fromJSON(o);
+                    return ImageAndTaxonListItem.fromJSON(o);
                 }))
             )
     }
-
-/*
-    imageSearch(
-        taxonIds: number[],
-        photographers: string[],
-        imageTypes: string[],
-        tagKeys: string[],
-        countries: string[],
-        provinces: string[]
-    ): Observable<ImageListItem[]> {
-        const url = this.createQueryBuilder()
-            .imageSearch()
-            .taxonIDs(taxonIds)
-            .photographers(photographers)
-            .imageTypes(imageTypes)
-            .tagKeys(tagKeys)
-            .countries(countries)
-            .provinces(provinces)
-            .build()
-
-        const query = this.apiClient.queryBuilder(url).get().build();
-        return this.apiClient.send<any, Record<string, unknown>[]>(query)
-            .pipe(
-                map((descriptions) => descriptions.map((o) => {
-                    return ImageListItem.fromJSON(o);
-                }))
-            )
-    }
-
- */
 
     findByTaxonIDs(ids: number[]): Observable<ImageListItem[]> {
         const url = this.createQueryBuilder()

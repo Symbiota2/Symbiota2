@@ -5,26 +5,33 @@
     <br/>
     <div *ngFor='let block of blocks'>
         <symbiota2-expansion-panel label='{{block.caption}}'>
+            <div *ngIf='userCanEdit'>
+                <button style='float:right' mat-icon-button>
+                    <mat-icon color="primary" (click)="openDialog('Update',block)">edit</mat-icon>
+                </button>
+                <button style='float:right' mat-icon-button>
+                    <mat-icon color="warn" (click)="openDialog('Delete',block)">delete</mat-icon>
+                </button>
+            </div>
             <div><b>{{"taxon.description.editor.caption" | translate}}</b>: {{block.caption}}</div>
             <div><b>{{"taxon.description.editor.language" | translate}}</b>: {{block.language}}</div>
             <div><b>{{"taxon.description.editor.source" | translate}}</b>: {{block.source}}</div>
             <div><b>{{"taxon.description.editor.sourceUrl" | translate}}</b>: {{block.sourceUrl}}</div>
             <div><b>{{"taxon.description.editor.notes" | translate}}</b>: {{block.notes}}</div>
             <div><b>{{"taxon.description.editor.displayLevel" | translate}}</b>: {{block.displayLevel}}</div>
-            <div *ngIf='userCanEdit'>
-                <button mat-icon-button>
-                    <mat-icon color="primary" (click)="openDialog('Update',block)">edit</mat-icon>
-                </button>
-                <button mat-icon-button>
-                    <mat-icon color="warn" (click)="openDialog('Delete',block)">delete</mat-icon>
-                </button>
-            </div>
             <symbiota2-expansion-panel label='{{"taxon.description.editor.statements" | translate}}'>
                 <button *ngIf='userCanEdit' style='float:right' mat-icon-button>
                     <mat-icon color="primary" (click)="onAddStatement(block)">add</mat-icon>
                 </button>
-                <hr/>
                 <div *ngFor='let statement of block.descriptionStatements'>
+                    <div *ngIf='userCanEdit'>
+                        <button style='float:right' mat-icon-button>
+                            <mat-icon color="primary" (click)="openStatementDialog('Update',statement)">edit</mat-icon>
+                        </button>
+                        <button style='float:right' mat-icon-button>
+                            <mat-icon color="warn" (click)="openStatementDialog('Delete',statement)">delete</mat-icon>
+                        </button>
+                    </div>
                     <div>
                         <b>{{"taxon.description.editor.statement.heading" | translate}}</b>: {{statement.heading}}
                         <br/>
@@ -33,14 +40,6 @@
                         <b>{{"taxon.description.editor.statement.sortSequence" | translate}}</b>: {{statement.sortSequence}}
                         <br/>
                         <b>{{"taxon.description.editor.statement.statement" | translate}}</b>:  <span [innerHTML]="statement.statement"></span>
-                    </div>
-                    <div *ngIf='userCanEdit'>
-                        <button mat-icon-button>
-                            <mat-icon color="primary" (click)="openStatementDialog('Update',statement)">edit</mat-icon>
-                        </button>
-                        <button mat-icon-button>
-                            <mat-icon color="warn" (click)="openStatementDialog('Delete',statement)">delete</mat-icon>
-                        </button>
                     </div>
                     <hr/>
                 </div>

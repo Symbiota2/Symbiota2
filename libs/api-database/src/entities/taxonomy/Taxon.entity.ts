@@ -57,8 +57,10 @@ import {
     dwcRecordType
 } from '@symbiota2/dwc';
 import { TaxonomicUnit } from './TaxonomicUnit.entity';
+import { KGProperty, KGType } from '../../../../knowledgeGraph/src';
 
 @DwCRecord(DWC_TERM_TAXON)
+@KGType('taxon:Taxon')
 @Index('sciname_unique', ['scientificName', 'rankID', 'author'], { unique: true })
 @Index('rankid_index', ['rankID'])
 @Index('idx_taxacreated', ['initialTimestamp'])
@@ -75,6 +77,7 @@ export class Taxon extends EntityProvider {
     @PrimaryGeneratedColumn({ type: 'int', name: 'TID', unsigned: true })
     id: number;
 
+    @KGProperty("biol:kingdom")
     @Column('varchar', { name: 'kingdomName', nullable: true, length: 45 })
     kingdomName: string;
 
@@ -82,6 +85,7 @@ export class Taxon extends EntityProvider {
     rankID: number | null;
 
     @DwCField(DWC_FIELD_TAXON_SCIENTIFIC_NAME)
+    @KGProperty('dbpedia-owl:scientificName')
     @Column('varchar', { name: 'SciName', length: 250 })
     scientificName: string;
 
