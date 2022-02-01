@@ -1,6 +1,4 @@
 import { Exclude, Expose, plainToClass, Type } from 'class-transformer';
-import { TaxonListItem } from '@symbiota2/ui-plugin-taxonomy';
-import { ImageListItem } from '@symbiota2/ui-plugin-image';
 import { TaxonOnlyListItem } from './taxon-only-list-item';
 
 @Exclude()

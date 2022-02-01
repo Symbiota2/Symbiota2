@@ -1,7 +1,4 @@
 import { Exclude, Expose, plainToClass, Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
-import { TaxonDescriptionStatementListItem } from './taxonDescriptionStatement-list-item';
-import { TaxonomicStatusListItem } from './taxon-status-list-item';
 import { TaxonomicStatusOnlyListItem } from './taxon-status-only-list-item';
 
 @Exclude()
