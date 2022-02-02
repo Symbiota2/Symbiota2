@@ -4,15 +4,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import {
-    TaxonListItem, TaxonomicAuthorityService,
+    TaxonomicEnumTreeService, TaxonomicAuthorityService,
     TaxonomicStatusService, TaxonomicUnitService,
     TaxonService, TaxonVernacularService
-} from '@symbiota2/ui-plugin-taxonomy';
-import { TaxonomicEnumTreeService } from '@symbiota2/ui-plugin-taxonomy'
+} from '../../services';
 import { BehaviorSubject } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 import { TAXON_EDITOR_ROUTE_PREFIX, TAXON_PROFILE_ROUTE_PREFIX } from '../../routes';
-import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
+import { TaxonListItem, TaxonIDAuthorNameItem } from '../../dto';
 
 /**
  * Taxonomic data with nested structure.

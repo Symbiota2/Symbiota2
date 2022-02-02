@@ -2,23 +2,21 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonDescriptionBlockListItem, TaxonDescriptionBlockService, TaxonIDAndNameItem, TaxonInputDto,
     TaxonomicAuthorityService, TaxonomicEnumTreeService,
-    TaxonomicStatusService, TaxonomicUnitService,
+    TaxonomicStatusService,
     TaxonService, TaxonVernacularService
-} from '@symbiota2/ui-plugin-taxonomy';
+} from '../../services';
+import {
+    TaxonIDAndNameItem
+} from '../../dto';
 import { TranslateService } from '@ngx-translate/core'
 import { MatDialog } from '@angular/material/dialog';
 import { AlertService, ApiClientService, AppConfigService, TypedFormControl, UserService } from '@symbiota2/ui-common';
-import { TaxonomicStatusInputDto } from '../../dto/taxonomicStatusInputDto';
-import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
 import { plainToClass } from 'class-transformer';
 import { filter, switchMap, take } from 'rxjs/operators';
-import { ImageListItem, ImageService, ImageTagKeyListItem, ImageTagKeyService } from '@symbiota2/ui-plugin-image';
-import { ImageInputDto } from '../../../../../ui-plugin-image/src/lib/dto/ImageInputDto';
+import { ImageService, ImageTagKeyListItem } from '@symbiota2/ui-plugin-image';
 import { combineLatest } from 'rxjs';
 import { TAXA_UPLOADER_FIELD_MAP_ROUTE } from '../../routes';
-import { TaxonomyUploadService } from '../../services/taxonomyUpload/taxonomy-upload.service';
 import {
     CountryListItem,
     CountryService,
@@ -26,7 +24,7 @@ import {
     StateProvinceService
 } from '@symbiota2/ui-plugin-geography';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { ImageAndTaxonListItem } from '../../../../../ui-plugin-image/src/lib/dto/ImageAndTaxonListItem';
+import { ImageAndTaxonListItem } from '../../../../../ui-plugin-image/src/lib/dto';
 import { IMAGE_API_BASE, IMAGE_DETAILS_ROUTE } from '../../../../../ui-plugin-image/src/lib/routes';
 
 @Component({

@@ -2,18 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonListItem, TaxonomicAuthorityService,
-    TaxonomicStatusService,
-    TaxonService, TaxonVernacularListItem, TaxonVernacularService
-} from '@symbiota2/ui-plugin-taxonomy';
-import { TaxonomicEnumTreeService } from '@symbiota2/ui-plugin-taxonomy'
+    TaxonomicAuthorityService,
+    TaxonomicStatusService, TaxonomicEnumTreeService,
+    TaxonService, TaxonVernacularService
+} from '../../services';
 import { TranslateService } from '@ngx-translate/core'
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
-import { TaxonEditorDialogComponent } from '../../components';
+import { TaxonEditorDialogComponent } from '../../components/taxon-editor-dialog/taxon-editor-dialog.component';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { filter } from 'rxjs/operators';
-import { TaxonDescriptionStatementInputDto } from '../../dto/taxonDescriptionStatementInputDto';
+import { TaxonVernacularListItem } from '../../dto/taxonVernacular-list-item';
 import { TaxonVernacularInputDto } from '../../dto/taxonVernacularInputDto';
 import { Expose } from 'class-transformer';
 

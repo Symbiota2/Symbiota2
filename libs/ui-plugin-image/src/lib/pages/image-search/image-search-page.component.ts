@@ -2,11 +2,13 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonIDAndNameItem,
     TaxonomicAuthorityService,
     TaxonomicEnumTreeService, TaxonomicStatusService,
     TaxonService, TaxonVernacularService
-} from '@symbiota2/ui-plugin-taxonomy';
+} from '../../../../../ui-plugin-taxonomy/src/lib/services';
+import {
+    TaxonIDAndNameItem
+} from '../../../../../ui-plugin-taxonomy/src/lib/dto/taxon-id-and-name-item';
 import { ImageService, ImageTagKeyService } from '../../services';
 import { MatListOption } from '@angular/material/list';
 import {
@@ -15,14 +17,12 @@ import {
     ProvinceListItem,
     StateProvinceService
 } from '@symbiota2/ui-plugin-geography';
-import { ImageTagKeyListItem } from '../../dto';
-import { ImageListItem } from '../../dto/ImageListItem';
+import { ImageTagKeyListItem, ImageAndTaxonListItem } from '../../dto';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { ApiClientService, TypedFormControl } from '@symbiota2/ui-common';
 import { IMAGE_API_BASE, IMAGE_DETAILS_ROUTE } from '../../routes';
-import { ImageAndTaxonListItem } from '../../dto/ImageAndTaxonListItem';
 
 /**
  * Taxonomic data with nested structure.

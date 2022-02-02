@@ -4,8 +4,7 @@ import { FormControl } from '@angular/forms';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { combineLatest, merge } from 'rxjs';
-import { TaxonomicAuthorityService, TaxonService } from '@symbiota2/ui-plugin-taxonomy';
-import { TaxonomyUploadService } from '../../services/taxonomyUpload/taxonomy-upload.service';
+import { TaxonomicAuthorityService, TaxonService, TaxonomyUploadService } from '../../services';
 import { TAXA_UPLOADER_FIELD_MAP_ROUTE } from '../../routes';
 import { Q_PARAM_AUTHORITYID } from '../../../constants';
 
@@ -25,10 +24,10 @@ export class TaxonomyUploadPage implements OnInit {
         private readonly userService: UserService,
         private readonly taxaService: TaxonService,
         private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
+        private readonly upload: TaxonomyUploadService,
         private readonly alerts: AlertService,
         private readonly router: Router,
-        private readonly currentRoute: ActivatedRoute,
-        private readonly upload: TaxonomyUploadService) { }
+        private readonly currentRoute: ActivatedRoute) { }
 
     ngOnInit(): void {
         const qParams = this.currentRoute.snapshot.queryParamMap

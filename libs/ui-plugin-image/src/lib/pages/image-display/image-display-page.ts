@@ -2,11 +2,12 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonListItem, TaxonomicStatusListItem,
     TaxonomicStatusService,
     TaxonService
-} from '@symbiota2/ui-plugin-taxonomy';
-import { ImageListItem, ImageService } from '@symbiota2/ui-plugin-image';
+} from '../../../../../ui-plugin-taxonomy/src/lib/services';
+import { TaxonListItem, TaxonomicStatusListItem } from '../../../../../ui-plugin-taxonomy/src/lib/dto';
+import { ImageService } from '../../services';
+import { ImageListItem } from '../../dto';
 // import * as fs from 'fs'
 import { Express } from 'express';
 //import * as fs from 'fs';

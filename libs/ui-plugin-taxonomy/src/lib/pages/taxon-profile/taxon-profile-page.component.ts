@@ -2,10 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+    TaxonDescriptionBlockService, TaxonomicStatusService, TaxonService
+} from '../../services';
+import {
     TaxonDescriptionBlockListItem,
-    TaxonDescriptionBlockService, TaxonListItem, TaxonomicStatusListItem, TaxonomicStatusService, TaxonService
-} from '@symbiota2/ui-plugin-taxonomy';
-import { ImageListItem, ImageService } from '@symbiota2/ui-plugin-image';
+    TaxonListItem, TaxonomicStatusListItem
+} from '../../dto';
+import { ImageListItem } from '../../../../../ui-plugin-image/src/lib/dto';
+import { ImageService } from '../../../../../ui-plugin-image/src/lib/services';
 import { filter } from 'rxjs/operators';
 import { UserService } from '@symbiota2/ui-common';
 import { TAXON_EDITOR_ROUTE_PREFIX, TAXON_PROFILE_ROUTE_PREFIX } from '../../routes';

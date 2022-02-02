@@ -7,6 +7,7 @@ export * from './taxonomicStatus/taxonomic.status.service'
 export * from './taxonomicUnit/taxonomicUnit.service'
 export * from './taxonResourceLink/taxonResourceLink.service'
 export * from './taxonVernacular/taxonVernacular.service'
+export * from './taxonomyUpload/taxonomy-upload.service'
 
 
 

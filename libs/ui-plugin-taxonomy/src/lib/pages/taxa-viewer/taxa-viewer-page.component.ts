@@ -4,11 +4,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import {
-    TaxonListItem, TaxonomicAuthorityService,
+    TaxonomicAuthorityService,
     TaxonomicStatusService, TaxonomicUnitService,
-    TaxonService, TaxonVernacularService
-} from '@symbiota2/ui-plugin-taxonomy';
-import { TaxonomicEnumTreeService } from '@symbiota2/ui-plugin-taxonomy'
+    TaxonService, TaxonVernacularService, TaxonomicEnumTreeService
+} from '../../services';
+import { TaxonListItem } from '../../dto'
 import { BehaviorSubject } from 'rxjs'
 import { TranslateService } from '@ngx-translate/core'
 import { MatListOption } from '@angular/material/list';

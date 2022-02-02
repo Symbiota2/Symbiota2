@@ -1,4 +1,6 @@
 export * from './ImageListItem'
+export * from './ImageAndTaxonListItem'
+export * from './ImageInputDto'
 export * from './ImageTagListItem'
 export * from './ImageTagKeyListItem'
 export * from './PhotographerInfoListItem'

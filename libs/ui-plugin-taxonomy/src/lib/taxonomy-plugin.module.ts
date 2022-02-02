@@ -7,7 +7,6 @@ import {
   SymbiotaUiPlugin
 } from '@symbiota2/ui-common';
 
-import { TaxaViewerPageComponent } from "./pages/taxa-viewer/taxa-viewer-page.component";
 import { Route, RouterModule } from "@angular/router";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatCardModule } from "@angular/material/card";
@@ -30,10 +29,20 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
 import {
+    TaxaViewerPageComponent,
     TaxonCreatePageComponent,
     TaxonomyUploadCompletePage,
     TaxonomyUploadProblemAcceptedNamesPage,
-    TaxonProfilePageComponent
+    TaxonProfilePageComponent,
+    TaxonomyUploadFieldMapPage,
+    TaxaProfilerEntryPage,
+    TaxonEditorPageComponent,
+    TaxonomyUploadPage,
+    TaxaEditorEntryPage,
+    TaxonomyUploadProblemRanksPage,
+    TaxonomyFieldMapSelectComponent,
+    TaxonomyConfirmDialogComponent,
+    TaxonomyUploadProblemParentNamesPage
 } from './pages';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -50,17 +59,11 @@ import {
     TaxonStatusAcceptedEditorDialogComponent,
     TaxonImageAddComponent,
     TaxonImageGridComponent,
+    TaxonStatusParentEditorDialogComponent
 } from './components';
-import { TaxonEditorPageComponent, TaxonomyUploadPage, TaxaEditorEntryPage } from './pages'
 import { MatGridListModule } from '@angular/material/grid-list';
-import { TaxonStatusParentEditorDialogComponent } from './components/taxon-status-parent-editor-dialog/taxon-status-parent-editor-dialog.component';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { TaxonomyUploadFieldMapPage } from './pages/taxonomy-upload/field-map/field-map.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { TaxonomyFieldMapSelectComponent } from './pages/taxonomy-upload/field-map/taxonomy-field-map-select-component/taxonomy-field-map-select.component';
-import { TaxonomyConfirmDialogComponent } from './pages/taxonomy-upload/field-map/taxonomy-confirm-dialog-component/taxonomy-confirm-dialog.component';
-import { TaxonomyUploadService } from './services/taxonomyUpload/taxonomy-upload.service';
-import { TaxaProfilerEntryPage } from './pages/taxa-profiler-entry/taxa-profiler-entry-page';
 import {
     TAXA_EDITOR_ROUTE,
     TAXA_PROFILER_ROUTE,
@@ -72,11 +75,8 @@ import {
     TAXON_EDITOR_ROUTE,
     TAXON_PROFILE_ROUTE
 } from './routes';
-//import { ROUTE_UPLOAD_FIELD_MAP } from '../../../ui-plugin-occurrence/src/lib/routes';
-//import { OccurrenceUploadFieldMapPage } from '../../../ui-plugin-occurrence/src/lib/pages/occurrence-upload/field-map/field-map.component';
-import { TaxonomyUploadProblemRanksPage } from './pages/taxonomy-upload/taxonomy-upload-problem-ranks/taxonomy-upload-problem-ranks-page'
-import { TaxonomyUploadProblemParentNamesPage } from './pages/taxonomy-upload/taxonomy-upload-problem-parent-names/taxonomy-upload-problem-parent-names-page'
 import {
+    TaxonomyUploadService,
     TaxonomicEnumTreeService,
     TaxonService,
     TaxonomicStatusService,

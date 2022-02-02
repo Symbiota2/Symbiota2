@@ -1,6 +1,7 @@
 import { Exclude, Expose, plainToClass, Type } from 'class-transformer';
-import { TaxonDescriptionStatementListItem, TaxonListItem } from '@symbiota2/ui-plugin-taxonomy';
-import { ImageListItem } from '../../../../ui-plugin-image/src';
+import { TaxonDescriptionStatementListItem } from '../dto/taxonDescriptionStatement-list-item';
+import { TaxonOnlyListItem } from '../dto/taxon-only-list-item';
+import { ImageListItem } from '../../../../ui-plugin-image/src/lib/dto/ImageListItem';
 
 @Exclude()
 export class TaxonDescriptionBlockListItem {
@@ -18,8 +19,8 @@ export class TaxonDescriptionBlockListItem {
     @Expose() initialTimestamp: Date
     @Type(() => TaxonDescriptionStatementListItem)
     @Expose() descriptionStatements: TaxonDescriptionStatementListItem[]
-    @Type(()=> TaxonListItem)
-    @Expose() taxon: TaxonListItem
+    @Type(()=> TaxonOnlyListItem)
+    @Expose() taxon: TaxonOnlyListItem
     @Type(() => ImageListItem)
     @Expose() images: ImageListItem[]
 

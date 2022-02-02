@@ -4,7 +4,7 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { TaxonomicEnumTreeQueryBuilder } from './taxonomic-enumtree-query-builder';
 import { TaxonomicEnumTreeListItem } from '../../dto/taxonomic-enumtree-list-item';
-import { TaxonDescriptionBlockListItem, TaxonListItem } from '../../dto';
+import { TaxonListItem } from '../../dto/taxon-list-item';
 
 interface FindParams {
     taxonID: number

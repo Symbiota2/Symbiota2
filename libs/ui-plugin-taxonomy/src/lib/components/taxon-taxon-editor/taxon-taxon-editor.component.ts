@@ -2,15 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonDescriptionBlockInputDto,
-    TaxonListItem, TaxonomicUnitService,
+    TaxonomicUnitService,
     TaxonService,
-    TaxonTaxonDialogComponent, TaxonVernacularInputDto
-} from '@symbiota2/ui-plugin-taxonomy';
+} from '../../services';
+import {
+    TaxonTaxonDialogComponent,
+} from '../../components/taxon-taxon-dialog/taxon-taxon-dialog.component';
 import { TranslateService } from '@ngx-translate/core'
 import { MatDialog } from '@angular/material/dialog';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { filter } from 'rxjs/operators';
+import { TaxonListItem } from '../../dto/taxon-list-item';
 import { TaxonInputDto } from '../../dto/taxonInputDto';
 
 export interface TaxonInfo {

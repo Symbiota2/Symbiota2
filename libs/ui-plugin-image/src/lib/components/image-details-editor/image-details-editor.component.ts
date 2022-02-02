@@ -2,16 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonListItem, TaxonomicStatusListItem, TaxonomicStatusService, TaxonomicUnitService,
-    TaxonService,
-} from '@symbiota2/ui-plugin-taxonomy';
+    TaxonomicStatusService,
+    TaxonomicUnitService,
+    TaxonService
+} from '../../../../../ui-plugin-taxonomy/src/lib/services';
+import {
+    TaxonListItem, TaxonomicStatusListItem
+} from '../../../../../ui-plugin-taxonomy/src/lib/dto';
 import { TranslateService } from '@ngx-translate/core'
 import { MatDialog } from '@angular/material/dialog';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { filter } from 'rxjs/operators';
-import { ImageListItem, ImageService } from '@symbiota2/ui-plugin-image';
+import { ImageService } from '../../services';
 import { ImageDetailsEditorDialogComponent } from '../image-details-editor-dialog/image-details-editor-dialog.component';
-import { ImageInputDto } from '../../dto/ImageInputDto';
+import { ImageListItem, ImageInputDto } from '../../dto';
 
 export interface ImageInfo {
     id: number

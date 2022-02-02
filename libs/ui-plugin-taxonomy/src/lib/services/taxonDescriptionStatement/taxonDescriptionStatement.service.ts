@@ -3,13 +3,8 @@ import { AlertService, ApiClientService, AppConfigService, UserService } from '@
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core'
 import { TaxonDescriptionStatementQueryBuilder } from './taxonDescriptionStatement-query-builder'
-import {
-    TaxonDescriptionBlockInputDto,
-    TaxonDescriptionBlockListItem,
-    TaxonDescriptionStatementListItem
-} from '@symbiota2/ui-plugin-taxonomy';
 import { TaxonDescriptionStatementInputDto } from '../../dto/taxonDescriptionStatementInputDto';
-import { TaxonDescriptionBlockQueryBuilder } from '../taxonDescriptionBlock/taxonDescriptionBlock-query-builder';
+import { TaxonDescriptionStatementListItem } from '../../dto/taxonDescriptionStatement-list-item';
 
 interface FindAllParams {
     taxonIDs: number[]

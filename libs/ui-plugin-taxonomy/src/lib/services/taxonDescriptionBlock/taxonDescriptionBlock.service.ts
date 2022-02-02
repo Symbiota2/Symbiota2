@@ -4,7 +4,7 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core'
 import { TaxonDescriptionBlockQueryBuilder } from './taxonDescriptionBlock-query-builder'
 import { TaxonDescriptionBlockListItem } from '../../dto/taxonDescriptionBlock-list-item'
-import { TaxonDescriptionBlockInputDto } from '../../dto'
+import { TaxonDescriptionBlockInputDto } from '../../dto/taxonDescriptionBlockInputDto'
 
 
 interface FindAllParams {

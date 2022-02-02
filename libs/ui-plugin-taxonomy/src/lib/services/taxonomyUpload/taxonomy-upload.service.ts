@@ -13,7 +13,8 @@ import {
     ApiClientService,
     AppConfigService, UserService
 } from '@symbiota2/ui-common';
-import { TaxonomicAuthorityService, TaxonService } from '@symbiota2/ui-plugin-taxonomy';
+import { TaxonService } from '../../services/taxon/taxon.service';
+import { TaxonomicAuthorityService } from '../../services/taxonomicAuthority/taxonomicAuthority.service';
 import { TaxonQueryBuilder } from '../taxon/taxon-query-builder';
 
 export interface ApiTaxonomyUpload {

@@ -2,18 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonDescriptionBlockListItem,
     TaxonDescriptionBlockService,
-    TaxonDescriptionDialogComponent,
-    TaxonDescriptionStatementDialogComponent,
-    TaxonDescriptionBlockInputDto, TaxonDescriptionStatementService, TaxonInputDto
-} from '@symbiota2/ui-plugin-taxonomy';
+    TaxonDescriptionStatementService,
+} from '../../services';
+import { TaxonDescriptionDialogComponent } from '../../components/taxon-description-dialog/taxon-description-dialog.component';
+import { TaxonDescriptionStatementDialogComponent } from '../../components/taxon-description-statement-dialog/taxon-description-statement-dialog.component';
+import { TaxonDescriptionBlockListItem } from '../../dto/taxonDescriptionBlock-list-item';
+import { TaxonDescriptionBlockInputDto } from '../../dto/taxonDescriptionBlockInputDto';
+import { TaxonDescriptionStatementInputDto } from '../../dto/taxonDescriptionStatementInputDto';
 import { TranslateService } from '@ngx-translate/core'
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { TaxonEditorDialogComponent } from '../../components';
 import { Expose } from 'class-transformer';
-import { TaxonDescriptionStatementInputDto } from '../../dto/taxonDescriptionStatementInputDto';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { filter, map } from 'rxjs/operators';
 

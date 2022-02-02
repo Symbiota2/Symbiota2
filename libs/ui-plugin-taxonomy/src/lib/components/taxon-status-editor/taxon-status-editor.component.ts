@@ -2,16 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonListItem, TaxonomicAuthorityService, TaxonomicEnumTreeService, TaxonomicStatusService, TaxonomicUnitService,
-    TaxonService, TaxonStatusAcceptedEditorDialogComponent,
-    TaxonTaxonDialogComponent
-} from '@symbiota2/ui-plugin-taxonomy';
+    TaxonomicAuthorityService, TaxonomicEnumTreeService, TaxonomicStatusService, TaxonomicUnitService,
+    TaxonService,
+} from '../../services';
+import { TaxonStatusParentEditorDialogComponent } from '../../components/taxon-status-parent-editor-dialog/taxon-status-parent-editor-dialog.component';
+import { TaxonStatusAcceptedEditorDialogComponent } from '../../components/taxon-status-accepted-editor-dialog/taxon-status-accepted-editor-dialog.component';
 import { TranslateService } from '@ngx-translate/core'
 import { MatDialog } from '@angular/material/dialog';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import { filter } from 'rxjs/operators';
-import { TaxonInputDto } from '../../dto/taxonInputDto';
-import { TaxonStatusParentEditorDialogComponent } from '../taxon-status-parent-editor-dialog/taxon-status-parent-editor-dialog.component';
 import { TaxonomicStatusInputDto } from '../../dto/taxonomicStatusInputDto';
 
 export interface TaxStatusInfo {

@@ -4,8 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
     TaxonomicEnumTreeService, TaxonomicUnitService,
     TaxonService
-} from '@symbiota2/ui-plugin-taxonomy';
-import { TaxonIDAndNameItem } from '../../../../../ui-plugin-taxonomy/src/lib/dto/taxon-id-and-name-item';
+} from '../../../../../ui-plugin-taxonomy/src/lib/services';
+import { TaxonIDAndNameItem } from '../../../../../ui-plugin-taxonomy/src/lib/dto';
 
 @Component({
     selector: 'image-library',

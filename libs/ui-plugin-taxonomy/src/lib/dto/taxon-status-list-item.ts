@@ -1,5 +1,5 @@
 import { Exclude, Expose, plainToClass, Type } from 'class-transformer';
-import { TaxonListItem } from '@symbiota2/ui-plugin-taxonomy';
+import { TaxonListItem } from '../dto/taxon-list-item';
 
 @Exclude()
 export class TaxonomicStatusListItem {

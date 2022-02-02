@@ -2,11 +2,12 @@ import { Observable, of } from 'rxjs'
 import { AlertService, ApiClientService, AppConfigService, UserService } from '@symbiota2/ui-common';
 import { catchError, map, switchMap } from 'rxjs/operators'
 import { Injectable } from '@angular/core'
-import { Taxon, TaxonListItem } from '../../dto'
+import { Taxon  } from '../../dto/taxon'
+import { TaxonListItem  } from '../../dto/taxon-list-item'
+import { TaxonIDAndNameItem  } from '../../dto/taxon-id-and-name-item'
+import { TaxonInputDto  } from '../../dto/taxonInputDto'
+import { TaxonIDAuthorNameItem  } from '../../dto/taxon-id-author-name-item'
 import { TaxonQueryBuilder } from './taxon-query-builder'
-import { TaxonIDAndNameItem } from '../../dto/taxon-id-and-name-item';
-import { TaxonInputDto } from '../../dto/taxonInputDto';
-import { TaxonIDAuthorNameItem } from '../../dto/taxon-id-author-name-item';
 
 interface FindAllParams {
     taxonIDs: number[]
