@@ -7,7 +7,7 @@ import { TaxonomicStatusListItem } from '../../dto/taxon-status-list-item';
 import { TaxonomicStatusOnlyListItem } from '../../dto/taxon-status-only-list-item';
 import { TaxonDescriptionBlockInputDto, TaxonDescriptionBlockListItem } from '../../dto';
 import { TaxonDescriptionBlockQueryBuilder } from '../taxonDescriptionBlock/taxonDescriptionBlock-query-builder';
-import { TaxonomicStatusInputDto } from '../../dto/TaxonomicStatusInputDto';
+import { TaxonomicStatusInputDto } from '../../dto/taxonomicStatusInputDto';
 
 interface FindParams {
     taxonIDs: number[]

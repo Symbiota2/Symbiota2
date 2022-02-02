@@ -1,5 +1,5 @@
 import { Exclude, Expose, plainToClass, Type } from 'class-transformer';
-import { TaxonOnlyListItem } from '../../../../ui-plugin-taxonomy/src/lib/dto'
+import { TaxonOnlyListItem } from '../../../../ui-plugin-taxonomy/src/lib/dto/taxon-only-list-item'
 
 @Exclude()
 export class ImageAndTaxonListItem {
