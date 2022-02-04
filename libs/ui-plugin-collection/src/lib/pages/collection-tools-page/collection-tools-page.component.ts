@@ -1,13 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService, UserService } from '@symbiota2/ui-common';
-import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { Observable, Subscription } from 'rxjs';
 import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { CollectionEditorComponent } from '../../components/collection-editor/collection-editor.component';
 import { CollectionPermissionsComponent } from '../../components/collection-permissions/collection-permissions.component';
 import { DwcPublishingComponent } from '../../components/dwc-publishing/dwc-publishing.component';
+import { Collection } from '../../dto/Collection.output.dto';
+import { CollectionService } from '../../services/collection.service';
 
 @Component({
     selector: 'symbiota2-collection-tools-page',

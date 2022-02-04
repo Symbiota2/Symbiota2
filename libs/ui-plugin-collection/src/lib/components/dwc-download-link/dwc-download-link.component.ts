@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AlertService } from '@symbiota2/ui-common';
-import { DwcArchive } from '@symbiota2/ui-plugin-collection';
 import { map } from 'rxjs/operators';
+import { DwcArchive } from '../../dto/Dwc.dto';
 import { DwcService } from '../../services/dwc.service';
 
 @Component({
