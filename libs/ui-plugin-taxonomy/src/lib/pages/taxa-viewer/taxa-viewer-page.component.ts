@@ -25,6 +25,7 @@ interface TaxonNode {
     name: string
     taxonID: number
     author: string
+    rankID?: number
     expanded?: boolean
     synonym?: boolean
     children?: TaxonNode[]
@@ -61,6 +62,8 @@ export class TaxaViewerPageComponent implements OnInit {
     nameFound = false
     looking = false
     possibleTaxons  = []
+    genusRankID = 1000 // Will be initialized by constructor
+    nameToRankID
 
     constructor(
         private readonly taxaService: TaxonService,
@@ -86,6 +89,17 @@ export class TaxaViewerPageComponent implements OnInit {
 
         // Get the common languages for display in the menu
         this.loadVernacularLanguages()
+
+        this.taxonomicUnitService.findAll().subscribe((units) => {
+            this.nameToRankID = new Map()
+            units.forEach((unit) => {
+                if (!this.nameToRankID.has(unit.rankName)) {
+                    this.nameToRankID.set(unit.rankName, unit.rankID)
+                }
+            })
+            this.genusRankID = this.nameToRankID.get("Genus")
+        })
+
     }
 
     /*
@@ -233,6 +247,7 @@ export class TaxaViewerPageComponent implements OnInit {
                         name: taxon.scientificName,
                         taxonID: taxonID,
                         author: taxon.author,
+                        rankID : taxon.rankID,
                         expanded: true,
                         synonym: false,
                         children: []
@@ -299,6 +314,7 @@ export class TaxaViewerPageComponent implements OnInit {
                                                     name: r.scientificName,
                                                     taxonID: r.id,
                                                     author: r.author,
+                                                    rankID: r.rankID,
                                                     expanded: false,
                                                     synonym: false,
                                                     children: []
@@ -327,6 +343,7 @@ export class TaxaViewerPageComponent implements OnInit {
                                                                 name: synonym.scientificName,
                                                                 taxonID: synonym.id,
                                                                 author: synonym.author,
+                                                                rankID: synonym.rankID,
                                                                 expanded: false,
                                                                 synonym: true,
                                                                 children: []
@@ -371,6 +388,7 @@ export class TaxaViewerPageComponent implements OnInit {
                     name: synonym.taxon.scientificName,
                     taxonID: synonym.taxon.id,
                     author: synonym.taxon.author,
+                    rankID: synonym.taxon.rankID,
                     expanded: false,
                     synonym: true,
                     children: []
@@ -410,6 +428,7 @@ export class TaxaViewerPageComponent implements OnInit {
                             name: item.scientificName,
                             taxonID: item.id,
                             author: item.author,
+                            rankID: item.rankID,
                             expanded: false,
                             synonym: false,
                             children: [],
@@ -429,6 +448,7 @@ export class TaxaViewerPageComponent implements OnInit {
                                         name: synonym.taxon.scientificName,
                                         taxonID: synonym.taxon.id,
                                         author: synonym.taxon.author,
+                                        rankID: synonym.taxon.rankID,
                                         expanded: false,
                                         synonym: true,
                                         children: []
@@ -485,6 +505,7 @@ export class TaxaViewerPageComponent implements OnInit {
                                     name: taxon.scientificName,
                                     taxonID: item.taxonID,
                                     author: taxon.author,
+                                    rankID: taxon.rankID,
                                     expanded: false,
                                     synonym: false,
                                     children: []
@@ -570,6 +591,7 @@ export class TaxaViewerPageComponent implements OnInit {
                             name: item.scientificName,
                             taxonID: item.id,
                             author: item.author,
+                            rankID: item.rankID,
                             expanded: false,
                             synonym: false,
                             children: [] }
@@ -634,6 +656,7 @@ export class TaxaViewerPageComponent implements OnInit {
                                 name: c.taxon.scientificName,
                                 taxonID: c.taxonID,
                                 author: c.taxon.author,
+                                rankID: c.taxon.rankID,
                                 expanded: true,
                                 synonym: false,
                                 children: [],
@@ -738,6 +761,7 @@ export class TaxaViewerPageComponent implements OnInit {
                                     name: taxon.scientificName,
                                     taxonID: item.id,
                                     author: taxon.author,
+                                    rankID: taxon.rankID,
                                     expanded: false,
                                     synonym: false,
                                     children: []
