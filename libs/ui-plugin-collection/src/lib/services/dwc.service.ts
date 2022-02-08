@@ -5,9 +5,10 @@ import {
     ApiClientService,
     UserService,
 } from '@symbiota2/ui-common';
-import { DwcArchive, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { combineLatest, Observable, of } from 'rxjs';
 import { catchError, map, switchMap, take } from 'rxjs/operators';
+import { DwcArchive } from '../dto/Dwc.dto';
+import { CollectionService } from './collection.service';
 
 
 @Injectable()

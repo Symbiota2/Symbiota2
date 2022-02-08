@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Collection } from '@symbiota2/ui-plugin-collection';
+import { Collection } from '../../dto/Collection.output.dto';
 
 @Component({
     selector: 'symbiota2-collection-editor-dialog',

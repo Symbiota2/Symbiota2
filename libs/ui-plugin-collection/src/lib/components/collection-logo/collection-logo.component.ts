@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Collection, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { ROUTE_COLLECTION_PROFILE } from '../../routes';
+import { CollectionService } from '../../services/collection.service';
 
 @Component({
     selector: 'symbiota2-collection-logo',

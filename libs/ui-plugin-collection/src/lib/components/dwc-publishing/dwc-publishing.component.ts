@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertService } from '@symbiota2/ui-common';
-import { Collection, DwcArchive, CollectionService } from '@symbiota2/ui-plugin-collection';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { Collection } from '../../dto/Collection.output.dto';
+import { DwcArchive } from '../../dto/Dwc.dto';
+import { CollectionService } from '../../services/collection.service';
 import { DwcService } from '../../services/dwc.service';
 
 @Component({

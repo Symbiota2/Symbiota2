@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Collection } from '../../dto/Collection.output.dto';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import {
     AlertService,
@@ -9,14 +8,14 @@ import {
 } from '@symbiota2/ui-common';
 import { Observable, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { CollectionService } from '@symbiota2/ui-plugin-collection';
 import { InstitutionService } from '../../services/institution.service';
 import { CollectionAsyncValidators } from '../../validators/CollectionValidators';
 import { Institution } from '@symbiota2/api-database';
 import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 import { InstitutionNewDialogComponent } from '../institution-new-dialog/institution-new-dialog.component';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
-import { take } from 'rxjs/operators';
+import { CollectionService } from '../../services/collection.service';
+import { Collection } from '../../dto/Collection.output.dto';
 
 @Component({
     selector: 'symbiota2-collection-editor',
