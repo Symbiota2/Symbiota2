@@ -26,6 +26,7 @@ export class ImageDisplayPage implements OnInit {
     taxonomicStatus: TaxonomicStatusListItem
     selecetdFile
     imagePreview
+    imageFile = encodeURIComponent('foo/IMG_8246.JPG')
 
     constructor(
         //private readonly userService: UserService,  // TODO: needed?

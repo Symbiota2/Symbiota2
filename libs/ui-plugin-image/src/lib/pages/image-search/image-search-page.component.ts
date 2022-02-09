@@ -497,9 +497,9 @@ export class ImageSearchPageComponent implements OnInit {
             return name
         } else {
             if (!this.imageAPIUrl) {
-                this.imageAPIUrl = this.apiClient.apiRoot() + "/" + IMAGE_API_BASE + "/"
+                this.imageAPIUrl = this.apiClient.apiRoot() + "/" + IMAGE_API_BASE  + "/imglib/"
             }
-            return this.imageAPIUrl + name
+            return this.imageAPIUrl + encodeURIComponent(name)
         }
 
     }

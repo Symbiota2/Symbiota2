@@ -13,6 +13,7 @@ import {
     ENV_DB_TYPE,
     ENV_DB_USER,
     ENV_ENABLE_AUTH,
+    ENV_IMAGE_LIBRARY,
     ENV_NODE_ENV,
     ENV_REDIS_HOST,
     ENV_REDIS_PORT,
@@ -30,7 +31,7 @@ import {
 import * as path from 'path';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import { StorageService } from '@symbiota2/api-storage';
+//import { StorageService } from '@symbiota2/api-storage';
 
 const fsPromises = fs.promises;
 
@@ -223,6 +224,13 @@ export class AppConfigService {
      */
     isAuthEnabled(): boolean {
         return this.configService.get<string>(ENV_ENABLE_AUTH) === '1';
+    }
+
+    /**
+     * The path to the image library
+     */
+    imageLibrary(): string {
+        return this.configService.get<string>(ENV_IMAGE_LIBRARY);
     }
 
     /**

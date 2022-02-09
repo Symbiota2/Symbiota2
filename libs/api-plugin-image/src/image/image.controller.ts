@@ -160,7 +160,7 @@ export class ImageController {
         summary: "Retrieve an image from the image library using the filename it was stored under."
     })
     async getFile(@Param('fileName') fileName : string, @Res() res): Promise<any> {
-        res.sendFile(fileName, { root: "." + ImageService.imageLibraryFolder});
+        res.sendFile(fileName, { root: ImageService.imageLibraryFolder});
     }
 
     @Post('imglib')

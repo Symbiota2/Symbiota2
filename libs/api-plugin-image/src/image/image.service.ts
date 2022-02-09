@@ -7,6 +7,7 @@ import { Express } from 'express';
 import { StorageService } from '@symbiota2/api-storage';
 import * as fs from 'fs';
 import { ImageSearchParams } from './dto/ImageSearchParams';
+import { AppConfigService } from '@symbiota2/api-config';
 const imageThumbnail = require('image-thumbnail')
 
 type File = Express.Multer.File
@@ -15,14 +16,19 @@ type File = Express.Multer.File
 export class ImageService extends BaseService<Image>{
     private static readonly S3_PREFIX = 'image'
     public static readonly imageUploadFolder = '/data/uploads/images/'
-    public static readonly imageLibraryFolder = '/imglib/'
+    //public static readonly imageLibraryFolder = '/imglib/'
+    public static imageLibraryFolder = "garbage"
+
 
     constructor(
         @Inject(Image.PROVIDER_ID)
         private readonly myRepository: Repository<Image>,
+        private readonly appConfig: AppConfigService,
         private readonly storageService: StorageService)
     {
         super(myRepository)
+        console.log("here asdfjklasdl;fjkjkldfl;jksdfaj " + this.appConfig.imageLibrary())
+        ImageService.imageLibraryFolder = this.appConfig.imageLibrary()
     }
 
     public static s3Key(objectName: string): string {
