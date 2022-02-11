@@ -25,7 +25,7 @@
                     <tr>
                         <td>
                             <a *ngIf='image' href='image/details/{{image.id}}'>
-                                <img src="http://openherbarium.org{{image.thumbnailUrl}}"/>
+                                <img [src]="localize(image.thumbnailUrl)"/>
                             </a>
                             <span *ngIf='!image'>{{"taxon.profile.no.image" | translate}}</span>
                             <br/>

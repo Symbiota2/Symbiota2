@@ -5,7 +5,7 @@
     <table>
         <tr>
             <td>
-                <a href='{{image.url}}'><img src='{{image.thumbnailUrl}}'/></a>
+                <a href='{{image.url}}'><img [src]="localize(image.thumbnailUrl)"/></a>
                 <div style='text-align:center'> {{"image.details.clickon" | translate}} </div>
             </td>
             <td>

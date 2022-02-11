@@ -11,8 +11,9 @@ import {
 import { ImageListItem } from '../../../../../ui-plugin-image/src/lib/dto';
 import { ImageService } from '../../../../../ui-plugin-image/src/lib/services';
 import { filter } from 'rxjs/operators';
-import { UserService } from '@symbiota2/ui-common';
+import { ApiClientService, UserService } from '@symbiota2/ui-common';
 import { TAXON_EDITOR_ROUTE_PREFIX, TAXON_PROFILE_ROUTE_PREFIX } from '../../routes';
+import { IMAGE_API_BASE } from '../../../../../ui-plugin-image/src/lib/routes';
 
 @Component({
     selector: 'taxon-profile',
@@ -30,6 +31,7 @@ export class TaxonProfilePageComponent implements OnInit {
     taxonomicStatus: TaxonomicStatusListItem
     userID : number = null
     userCanEdit: boolean = false
+    imageAPIUrl = null
 
     constructor(
         private readonly userService: UserService,
@@ -39,6 +41,7 @@ export class TaxonProfilePageComponent implements OnInit {
         private readonly taxonStatusService: TaxonomicStatusService,
         private router: Router,
         private formBuilder: FormBuilder,
+        private readonly apiClient: ApiClientService,
         private currentRoute: ActivatedRoute
     ) { }
 
@@ -102,5 +105,19 @@ export class TaxonProfilePageComponent implements OnInit {
 
     goToParent(url: string){
         window.open(TAXON_PROFILE_ROUTE_PREFIX + "/" + url)
+    }
+
+    localize(name) {
+        const re = new RegExp('^(?:[a-z]+:)?//', 'i')
+        if (re.test(name)) {
+            // We have an external url
+            return name
+        } else {
+            if (!this.imageAPIUrl) {
+                this.imageAPIUrl = this.apiClient.apiRoot() + "/" + IMAGE_API_BASE  + "/imglib/"
+            }
+            return this.imageAPIUrl + encodeURIComponent(name)
+        }
+
     }
 }

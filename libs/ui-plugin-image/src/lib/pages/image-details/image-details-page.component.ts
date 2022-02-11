@@ -11,10 +11,11 @@ import {
 import { ImageService } from '../../services';
 import { ImageListItem, ImageInputDto } from '../../dto';
 import { filter } from 'rxjs/operators';
-import { AlertService, UserService } from '@symbiota2/ui-common';
+import { AlertService, ApiClientService, UserService } from '@symbiota2/ui-common';
 import { ImageDetailsEditorDialogComponent } from '../../components';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
+import { IMAGE_API_BASE } from '../../routes';
 
 @Component({
     selector: 'image-details',
@@ -31,6 +32,8 @@ export class ImageDetailsPageComponent implements OnInit {
     userID : number = null
     userCanEdit: boolean = false
 
+    imageAPIUrl = null
+
     constructor(
         private readonly userService: UserService,
         private readonly taxonService: TaxonService,
@@ -41,6 +44,7 @@ export class ImageDetailsPageComponent implements OnInit {
         private formBuilder: FormBuilder,
         private readonly translate: TranslateService,
         public dialog: MatDialog,
+        private readonly apiClient: ApiClientService,
         private currentRoute: ActivatedRoute
     ) { }
 
@@ -154,5 +158,19 @@ export class ImageDetailsPageComponent implements OnInit {
         this.translate.get(s).subscribe((r)  => {
             this.alertService.showMessage(r)
         })
+    }
+
+    localize(name) {
+        const re = new RegExp('^(?:[a-z]+:)?//', 'i')
+        if (re.test(name)) {
+            // We have an external url
+            return name
+        } else {
+            if (!this.imageAPIUrl) {
+                this.imageAPIUrl = this.apiClient.apiRoot() + "/" + IMAGE_API_BASE  + "/imglib/"
+            }
+            return this.imageAPIUrl + encodeURIComponent(name)
+        }
+
     }
 }
