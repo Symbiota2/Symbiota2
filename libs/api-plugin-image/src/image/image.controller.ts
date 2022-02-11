@@ -17,17 +17,20 @@ import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nes
 import { ImageDto } from './dto/ImageDto'
 import { ImageFindAllParams } from './dto/image-find-all.input.dto'
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiFileInput } from '@symbiota2/api-common'
+import { ApiFileInput, getCSVFields } from '@symbiota2/api-common';
+import fs, { createReadStream } from 'fs';
 import { Express } from 'express';
 import { PhotographerNameAndIDDto } from './dto/PhotographerNameAndIDDto';
 import { ImageSearchParams } from './dto/ImageSearchParams';
 import { AuthenticatedRequest, JwtAuthGuard, TokenService } from '@symbiota2/api-auth';
 import { TaxonDto } from '../../../api-plugin-taxonomy/src/taxon/dto/TaxonDto';
-import { Image, Taxon } from '@symbiota2/api-database';
+import { Image, ImageFolderUpload, Taxon, TaxonomyUpload } from '@symbiota2/api-database';
 import { ImageInputDto } from './dto/ImageInputDto';
 import { ImageAndTaxonDto } from './dto/ImageAndTaxonDto';
+import path from 'path';
 
 type File = Express.Multer.File
+const fsPromises = fs.promises;
 
 @ApiTags('Image')
 @Controller('image')
@@ -298,5 +301,39 @@ export class ImageController {
             throw new NotFoundException()
         }
     }
+
+    @Post('zipUpload')
+    @HttpCode(HttpStatus.CREATED)
+    @UseInterceptors(FileInterceptor('file'))
+    //@UseGuards(JwtAuthGuard)
+    @ApiOperation({
+        summary: "Upload a zipped folder of images"
+    })
+    @ApiFileInput('file')
+    async uploadZipFile(@UploadedFile() file: File): Promise<ImageFolderUpload> {
+        let upload: ImageFolderUpload
+
+        if (!file) {
+            throw new BadRequestException('File not specified');
+        }
+
+        console.log(" mime is " + file.mimetype)
+        if (file.mimetype.startsWith('application/zip') ||
+            file.mimetype.startsWith('application/x-zip-compressed')) {
+            const headers = await getCSVFields(file.path);
+
+            upload = await this.myService.createUpload(
+                path.resolve(file.path),
+                file.mimetype
+            );
+        }
+        else {
+            await fsPromises.unlink(file.path);
+            throw new BadRequestException('Unsupported file type: .zip file is supported');
+        }
+
+        return upload;
+    }
+
 
 }

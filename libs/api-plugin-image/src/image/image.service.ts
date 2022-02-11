@@ -1,12 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Brackets, In, Repository } from 'typeorm';
 import { BaseService } from '@symbiota2/api-common'
-import { Image, Taxon } from '@symbiota2/api-database';
+import { Image, ImageFolderUpload, Taxon, TaxonomyUpload, TaxonomyUploadFieldMap } from '@symbiota2/api-database';
 import { ImageFindAllParams } from './dto/image-find-all.input.dto'
 import { Express } from 'express';
 import { StorageService } from '@symbiota2/api-storage';
 import * as fs from 'fs';
 import { ImageSearchParams } from './dto/ImageSearchParams';
+import { InjectQueue } from '@nestjs/bull';
+import { QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP, TaxonomyUploadCleanupJob } from '@symbiota2/api-plugin-taxonomy';
+import { Queue } from 'bull';
+import { QUEUE_ID_IMAGE_FOLDER_UPLOAD_CLEANUP } from '../queues/image-folder-upload-cleanup.queue';
+import { ImageFolderUploadCleanupJob } from '../queues/image-folder-upload-cleanup.processor';
 import { AppConfigService } from '@symbiota2/api-config';
 const imageThumbnail = require('image-thumbnail')
 
@@ -14,20 +19,24 @@ type File = Express.Multer.File
 
 @Injectable()
 export class ImageService extends BaseService<Image>{
-    private static readonly S3_PREFIX = 'image'
+    public static readonly S3_PREFIX = 'image'
     public static readonly imageUploadFolder = '/data/uploads/images/'
-    //public static readonly imageLibraryFolder = '/imglib/'
-    public static imageLibraryFolder = "garbage"
-
+    public static imageLibraryFolder = '/imglib/'
+    public static readonly dataFolderPath = "data/uploads/images"
+    public static readonly skippedImagesDueToTooManyMatches = ImageService.dataFolderPath + "/skippedTooManyMatches"
+    public static readonly skippedImagesDueToNoMatch = ImageService.dataFolderPath + "/skippedNoMatch"
 
     constructor(
         @Inject(Image.PROVIDER_ID)
         private readonly myRepository: Repository<Image>,
+        @Inject(ImageFolderUpload.PROVIDER_ID)
+        private readonly uploadRepo: Repository<ImageFolderUpload>,
+        @InjectQueue(QUEUE_ID_IMAGE_FOLDER_UPLOAD_CLEANUP)
+        private readonly uploadCleanupQueue: Queue<ImageFolderUploadCleanupJob>,
         private readonly appConfig: AppConfigService,
         private readonly storageService: StorageService)
     {
         super(myRepository)
-        console.log("here asdfjklasdl;fjkjkldfl;jksdfaj " + this.appConfig.imageLibrary())
         ImageService.imageLibraryFolder = this.appConfig.imageLibrary()
     }
 
@@ -322,6 +331,26 @@ export class ImageService extends BaseService<Image>{
         }
 
         return [ImageService.imageLibraryFolder + originalname, ImageService.imageLibraryFolder + thumbnailName]
+    }
+
+    /**
+     * Creates a new upload in the database
+     * @param filePath The path to the file containing occurrences
+     * @param mimeType The mimeType of the file
+     */
+    async createUpload(filePath: string, mimeType: string): Promise<ImageFolderUpload> {
+        let upload = this.uploadRepo.create({ filePath, mimeType});
+        upload = await this.uploadRepo.save(upload);
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        await this.uploadCleanupQueue.add({
+            id: upload.id,
+            deleteAfter: tomorrow,
+        });
+
+        return upload;
     }
 
 }

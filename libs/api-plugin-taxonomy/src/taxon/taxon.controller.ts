@@ -20,14 +20,13 @@ import {
 import { TaxonService } from './taxon.service';
 import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { TaxonDto } from './dto/TaxonDto';
-import { TaxonIDandNameDto } from './dto/TaxonIDandNameDto';
 import {
     AuthenticatedRequest,
     JwtAuthGuard,
     SuperAdminGuard,
     TokenService
 } from '@symbiota2/api-auth';
-import { Occurrence, Taxon, TaxonomyUpload } from '@symbiota2/api-database';
+import { Taxon, TaxonomyUpload } from '@symbiota2/api-database';
 import { TaxonInputDto } from './dto/TaxonInputDto';
 import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
 import { FileInterceptor } from '@nestjs/platform-express';
