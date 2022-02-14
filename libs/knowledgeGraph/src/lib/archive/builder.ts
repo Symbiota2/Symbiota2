@@ -5,6 +5,8 @@ import { v4 as uuid4 } from 'uuid';
 import { zipFiles } from '@symbiota2/api-common';
 import { Logger } from '@nestjs/common';
 import { PassThrough } from 'stream';
+import { getKGProperty, isKGID, KGRecordType } from '../decorators';
+import { IKGAMeta, IKGAMetaFileLocationType } from '../interfaces';
 
 export class KnowledgeGraphBuilder {
     private static readonly DWC_FIELD_SEP = ',';
@@ -38,7 +40,6 @@ c
         }
     }
 
-    /*
     private orderedDwcFields(recordType: string): string[] {
         return [...this.fieldMap.get(recordType).keys()].sort();
     }
@@ -52,7 +53,7 @@ c
     private async recordToCSVLine(recordType: string, record: Record<any, any>): Promise<string> {
         const fields = [];
         for (const field of this.orderedRecordFields(recordType)) {
-            let csvField = DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            let csvField = KnowledgeGraphBuilder.DWC_FIELD_ENCLOSE;
             let val = record[field];
 
             if (typeof val === 'function') {
@@ -62,44 +63,44 @@ c
             if (val) {
                 csvField += val.toString()
                     .replace(
-                        DwcArchiveBuilder.DWC_FIELD_ENCLOSE_REPLACE_REGEXP,
-                        `\\${ DwcArchiveBuilder.DWC_FIELD_ENCLOSE }`
+                        KnowledgeGraphBuilder.DWC_FIELD_ENCLOSE_REPLACE_REGEXP,
+                        `\\${ KnowledgeGraphBuilder.DWC_FIELD_ENCLOSE }`
                     )
                     .replace(
-                        DwcArchiveBuilder.DWC_LINE_SEP_REGEXP,
-                        `\\${ DwcArchiveBuilder.DWC_LINE_SEP }`
+                        KnowledgeGraphBuilder.DWC_LINE_SEP_REGEXP,
+                        `\\${ KnowledgeGraphBuilder.DWC_LINE_SEP }`
                     )
             }
-            csvField += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            csvField += KnowledgeGraphBuilder.DWC_FIELD_ENCLOSE;
             fields.push(csvField);
         }
-        let line = fields.join(DwcArchiveBuilder.DWC_FIELD_SEP);
-        line += DwcArchiveBuilder.DWC_LINE_SEP;
+        let line = fields.join(KnowledgeGraphBuilder.DWC_FIELD_SEP);
+        line += KnowledgeGraphBuilder.DWC_LINE_SEP;
         return line;
     }
 
     private csvHeaderLine(recordType: string): string {
         const fields = [];
         for (const field of this.orderedRecordFields(recordType)) {
-            let csvField = DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            let csvField = KnowledgeGraphBuilder.DWC_FIELD_ENCLOSE;
             csvField += field.replace(
-                DwcArchiveBuilder.DWC_FIELD_ENCLOSE_REPLACE_REGEXP,
-                `\\${ DwcArchiveBuilder.DWC_FIELD_ENCLOSE }`
+                KnowledgeGraphBuilder.DWC_FIELD_ENCLOSE_REPLACE_REGEXP,
+                `\\${ KnowledgeGraphBuilder.DWC_FIELD_ENCLOSE }`
             );
-            csvField += DwcArchiveBuilder.DWC_FIELD_ENCLOSE;
+            csvField += KnowledgeGraphBuilder.DWC_FIELD_ENCLOSE;
             fields.push(csvField);
         }
-        let line = fields.join(DwcArchiveBuilder.DWC_FIELD_SEP);
-        line += DwcArchiveBuilder.DWC_LINE_SEP;
+        let line = fields.join(KnowledgeGraphBuilder.DWC_FIELD_SEP);
+        line += KnowledgeGraphBuilder.DWC_LINE_SEP;
         return line;
     }
 
     async addRecord(record: any): Promise<void> {
-        const recordType = dwcRecordType(record.constructor);
+        const recordType = KGRecordType(record.constructor);
         let recordID;
 
         if (!recordType) {
-            this.logger.warn(`Invalid DwC record type for class ${record.constructor.name}`);
+            this.logger.warn(`Invalid knowledge graph record type for class ${record.constructor.name}`);
             return;
         }
 
@@ -114,14 +115,14 @@ c
             ];
 
             for (const recordFieldName of allRecordFields) {
-                const dwcUrl = getDwcField(record.constructor, recordFieldName);
+                const dwcUrl = getKGProperty(record.constructor, recordFieldName);
                 if (!dwcUrl) {
                     continue;
                 }
 
                 recordFieldMap.set(dwcUrl, recordFieldName);
 
-                if (isDwCID(record, recordFieldName) && recordType === this.coreFileType) {
+                if (isKGID(record, recordFieldName) && recordType === this.coreFileType) {
                     this.coreIDField = dwcUrl;
                 }
             }
@@ -130,7 +131,7 @@ c
 
         // Look up the dwc record id
         for (const recordField of Object.keys(record)) {
-            if (isDwCID(record.constructor, recordField)) {
+            if (isKGID(record.constructor, recordField)) {
                 recordID = record[recordField];
             }
         }
@@ -178,20 +179,20 @@ c
 
     async build(archivePath: string) {
         const commonOpts = {
-            fieldsTerminatedBy: DwcArchiveBuilder.DWC_FIELD_SEP,
-            linesTerminatedBy: DwcArchiveBuilder.DWC_LINE_SEP,
-            fieldsEnclosedBy: DwcArchiveBuilder.DWC_FIELD_ENCLOSE,
+            fieldsTerminatedBy: KnowledgeGraphBuilder.DWC_FIELD_SEP,
+            linesTerminatedBy: KnowledgeGraphBuilder.DWC_LINE_SEP,
+            fieldsEnclosedBy: KnowledgeGraphBuilder.DWC_FIELD_ENCLOSE,
             ignoreHeaderLines: 1,
             encoding: "UTF-8"
         };
 
-        const meta: IDwCAMeta = {
+        const meta: IKGAMeta = {
             archive: {
                 $: {
-                    xmlns: DWC_XML_NS,
+                    xmlns: "xml:", //KnowledgeGraphBuilder.DWC_XML_NS,
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
                     "xmlns:xs": "http://www.w3.org/2001/XMLSchema",
-                    "xsi:schemaLocation": DWC_SCHEMA_LOCATION
+                    "xsi:schemaLocation": "xml:" //KnowledgeGraphBuilder.DWC_SCHEMA_LOCATION
                 },
                 core: {
                     $: {
@@ -252,7 +253,7 @@ c
                 fileStream.end();
             });
 
-            let fileArr: IDwCAMetaFileLocationType[];
+            let fileArr: IKGAMetaFileLocationType[];
             if (recordType === this.coreFileType) {
                 fileArr = meta.archive.core.files;
             }
@@ -277,5 +278,5 @@ c
         await zipFiles(archivePath, [metaPath, ...csvFiles]);
     }
 
-     */
+
 }

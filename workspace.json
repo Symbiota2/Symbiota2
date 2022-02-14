@@ -740,6 +740,38 @@
         }
       }
     },
+      "knowledgeGraph": {
+          "root": "libs/knowledgeGraph",
+          "sourceRoot": "libs/knowledgeGraph/src",
+          "projectType": "library",
+          "targets": {
+              "lint": {
+                  "executor": "@nrwl/linter:eslint",
+                  "options": {
+                      "lintFilePatterns": ["libs/knowledgeGraph/**/*.ts"]
+                  }
+              },
+              "test": {
+                  "executor": "@nrwl/jest:jest",
+                  "outputs": ["coverage/libs/knowledgeGraph"],
+                  "options": {
+                      "jestConfig": "libs/knowledgeGraph/jest.config.js",
+                      "passWithNoTests": true
+                  }
+              },
+              "build": {
+                  "executor": "@nrwl/node:package",
+                  "outputs": ["{options.outputPath}"],
+                  "options": {
+                      "outputPath": "dist/libs/knowledgeGraph",
+                      "tsConfig": "libs/knowledgeGraph/tsconfig.lib.json",
+                      "packageJson": "libs/knowledgeGraph/package.json",
+                      "main": "libs/knowledgeGraph/src/index.ts",
+                      "assets": ["libs/knowledgeGraph/*.md"]
+                  }
+              }
+          }
+      },
     "api-email": {
       "root": "libs/api-email",
       "sourceRoot": "libs/api-email/src",

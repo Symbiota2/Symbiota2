@@ -47,6 +47,7 @@
         "libs/ui-plugin-geography/src/index.ts"
       ],
       "@symbiota2/dwc": ["libs/dwc/src/index.ts"],
+        "@symbiota2/knowledgeGraph": ["libs/knowledgeGraph/src/index.ts"],
       "@symbiota2/api-email": ["libs/api-email/src/index.ts"],
       "@symbiota2/assets": ["apps/ui/src/assets/"],
       "@symbiota2/api-storage": ["libs/api-storage/src/index.ts"],

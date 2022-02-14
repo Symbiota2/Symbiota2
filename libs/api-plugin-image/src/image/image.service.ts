@@ -339,7 +339,7 @@ export class ImageService extends BaseService<Image>{
      * @param mimeType The mimeType of the file
      */
     async createUpload(filePath: string, mimeType: string): Promise<ImageFolderUpload> {
-        let upload = this.uploadRepo.create({ filePath, mimeType});
+        let upload = this.uploadRepo.create({ filePath: filePath, mimeType: mimeType, status: ""});
         upload = await this.uploadRepo.save(upload);
 
         const tomorrow = new Date();

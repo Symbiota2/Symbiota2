@@ -328,7 +328,7 @@ export class ImageController {
         console.log(" mime is " + file.mimetype)
         if (file.mimetype.startsWith('application/zip') ||
             file.mimetype.startsWith('application/x-zip-compressed')) {
-            const headers = await getCSVFields(file.path);
+            //const headers = await getCSVFields(file.path);
 
             upload = await this.myService.createUpload(
                 path.resolve(file.path),

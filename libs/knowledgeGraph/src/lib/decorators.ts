@@ -14,9 +14,8 @@ export function KGType(url: string) {
 }
 
 /**
- * Property decorator that describes which KG property the property corresponds
- * to
- * @param url The DwC URI identifier
+ * Property decorator that describes which KG property the property corresponds to
+ * @param url The KG URI identifier
  */
 export function KGProperty(url: string) {
     return function(instance, propertyName) {
@@ -58,7 +57,7 @@ export function getKGProperty(cls: any, propertyName: string) {
  * Returns the DwC unique identifier for the given class, set by the
  * DwCID decorator
  */
-export function dwcCoreID(cls: any) {
+export function KGCoreID(cls: any) {
     return Reflect.getMetadata(KGRecordIDKey, cls);
 }
 
@@ -66,6 +65,6 @@ export function dwcCoreID(cls: any) {
  * Returns whether the given propertyName on the given class is the unique
  * identifier for the class
  */
-export function isDwCID(cls: any, propertyName: string) {
-    return propertyName === dwcCoreID(cls);
+export function isKGID(cls: any, propertyName: string) {
+    return propertyName === KGCoreID(cls);
 }

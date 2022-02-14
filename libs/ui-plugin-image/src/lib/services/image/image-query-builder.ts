@@ -7,7 +7,6 @@ import {
     Q_PARAM_PROVINCES, Q_PARAM_SCIENTIFIC_NAMES, Q_PARAM_START_DATE,
     Q_PARAM_TAXAIDS
 } from '../../../constants';
-import { TaxonQueryBuilder } from '../../../../../ui-plugin-taxonomy/src/lib/services/taxon/taxon-query-builder';
 import { Q_PARAM_COLLID } from '../../../../../ui-plugin-occurrence/src/constants';
 import { IMAGE_API_BASE } from '../../routes';
 
@@ -46,12 +45,6 @@ export class ImageQueryBuilder {
         return new ImageSearchBuilder(this.baseUrl)
     }
 
-    /*
-    imageSearch(): ImageSearchBuilder {
-        return new ImageSearchBuilder(this.baseUrl)
-    }
-     */
-
     findDescriptions(): FindDescriptionsBuilder {
         return new FindDescriptionsBuilder(this.baseUrl)
     }
@@ -74,6 +67,10 @@ export class ImageQueryBuilder {
 
     fileUpload(): FileUploadBuilder {
         return new FileUploadBuilder(this.baseUrl);
+    }
+
+    zipFileUpload(): ZipFileUploadBuilder {
+        return new ZipFileUploadBuilder(this.baseUrl);
     }
 
     build(): string {
@@ -130,6 +127,23 @@ class FileUploadBuilder extends ImageQueryBuilder {
         }
         if (this._storageService) {
             this.url.pathname += `/${this._storageService}`
+        }
+        return super.build()
+    }
+}
+
+class ZipFileUploadBuilder extends ImageQueryBuilder {
+    private _filename: string = null
+
+    filename(name: string): ZipFileUploadBuilder {
+        this._filename = name
+        return this;
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/zipUpload`
+        if (this._filename) {
+            this.url.pathname += `/${this._filename}`
         }
         return super.build()
     }

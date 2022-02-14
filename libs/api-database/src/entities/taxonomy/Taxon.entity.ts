@@ -57,7 +57,7 @@ import {
     dwcRecordType
 } from '@symbiota2/dwc';
 import { TaxonomicUnit } from './TaxonomicUnit.entity';
-import { KGProperty, KGType } from '../../../../knowledgeGraph/src';
+import { KGProperty, KGType } from '@symbiota2/knowledgeGraph';
 
 @DwCRecord(DWC_TERM_TAXON)
 @KGType('taxon:Taxon')
