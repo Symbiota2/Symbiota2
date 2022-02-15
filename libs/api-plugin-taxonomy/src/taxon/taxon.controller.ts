@@ -335,6 +335,7 @@ export class TaxonController {
             throw new ForbiddenException()
         }
 
+        // Delete the taxon
         const block = await this.taxa.deleteByID(id);
         if (!block) {
             throw new NotFoundException();
