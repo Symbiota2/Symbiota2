@@ -10,7 +10,7 @@ import { GeographyModule } from '@symbiota2/api-plugin-geography'
 import { BullModule } from '@nestjs/bull';
 import { DatabaseModule } from '@symbiota2/api-database';
 import { DwCModule } from '@symbiota2/api-dwc';
-import { KnowledgeGraphModule } from '@symbiota2/api-knowledge-graph';
+import { KnowledgeGraphModule } from '../../../libs/api-knowledge-graph/src/lib/knowledge-graph.module';
 
 
 const ENABLED_PLUGINS = [
