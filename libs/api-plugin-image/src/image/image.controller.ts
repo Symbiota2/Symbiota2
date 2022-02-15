@@ -166,14 +166,6 @@ export class ImageController {
         res.sendFile(fileName, { root: ImageService.imageLibraryFolder});
     }
 
-    @Get('imglibenv/:fileName')
-    @ApiOperation({
-        summary: "Retrieve env."
-    })
-    async getEnv(@Param('fileName') fileName : string): Promise<any> {
-        return ImageService.imageLibraryFolder
-    }
-
     @Post('imglib')
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor('file'))

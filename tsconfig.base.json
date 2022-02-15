@@ -51,7 +51,8 @@
       "@symbiota2/api-email": ["libs/api-email/src/index.ts"],
       "@symbiota2/assets": ["apps/ui/src/assets/"],
       "@symbiota2/api-storage": ["libs/api-storage/src/index.ts"],
-      "@symbiota2/api-dwc": ["libs/api-dwc/src/index.ts"]
+      "@symbiota2/api-dwc": ["libs/api-dwc/src/index.ts"],
+        "@symbiota2/api-knowledge-graph": ["libs/api-knowledge-graph/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "data", "images"]

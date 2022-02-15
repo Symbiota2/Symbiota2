@@ -1,4 +1,5 @@
 export const Q_PARAM_TAXAIDS = 'taxaid[]'
+export const Q_PARAM_IDS = 'id[]'
 export const Q_PARAM_IMAGE_TYPES = 'type[]'
 export const Q_PARAM_IMAGE_TAGS = 'tag[]'
 export const Q_PARAM_IMAGE_PHOTOGRAPHER_NAMES = 'photographer[]'

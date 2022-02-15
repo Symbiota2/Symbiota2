@@ -1,4 +1,4 @@
-import { Q_PARAM_TAXAIDS } from '../../../constants';
+import { Q_PARAM_IDS } from '../../../constants';
 
 export class ImageTagQueryBuilder {
     protected baseUrl: string
@@ -41,7 +41,7 @@ class FindAllBuilder extends ImageTagQueryBuilder {
 
     build(): string {
         this._ids.forEach((id) => {
-            this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString());
+            this.url.searchParams.append(Q_PARAM_IDS, id.toString());
         })
 
         return super.build();

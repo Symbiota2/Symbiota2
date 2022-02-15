@@ -184,12 +184,13 @@ export class ImageService {
         const query = this.apiClient.queryBuilder(url).get().build();
         return this.apiClient.send<any, Record<string, unknown>[]>(query)
             .pipe(
-                map((descriptions) => descriptions.map((o) => {
+                map((images) => images.map((o) => {
                     return ImageListItem.fromJSON(o);
                 }))
             );
     }
 
+    /*
     findDescriptions(tid): Observable<ImageListItem[]> {
         const url = this.createQueryBuilder()
             .findDescriptions()
@@ -204,6 +205,7 @@ export class ImageService {
                 }))
             );
     }
+     */
 
     findByID(id: number): Observable<ImageListItem> {
         const url = this.createQueryBuilder()

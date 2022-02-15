@@ -86,6 +86,21 @@ export class TaxonomicStatusController {
         return Promise.all(taxonDtos)
     }
 
+    @Get('inConflict/:taxonid')
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonomicStatusDto, isArray: true })
+    @ApiOperation({
+        summary: "Get the synonyms for the given taxon id, optionally limit it to a specific taxonomic authority"
+    })
+    async findInConflict(@Param('authorityID') authorityID: number): Promise<TaxonomicStatusDto[]> {
+        const taxonomicStatii = await this.taxonomicStatusService.findInConflict(authorityID)
+        console.log("statuii " + taxonomicStatii.length)
+        const taxonDtos = taxonomicStatii.map(async (c) => {
+            const taxonomicStatus = new TaxonomicStatusDto(c)
+            return taxonomicStatus
+        });
+        return Promise.all(taxonDtos)
+    }
+
     @Get('children/:taxonid')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonomicStatusDto, isArray: true })
     @ApiOperation({

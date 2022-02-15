@@ -67,6 +67,31 @@ export class TaxonomicStatusService extends BaseService<TaxonomicStatus>{
     }
 
     /**
+     * Find taxons that are in conflict, which means they have two (or more) taxonomicStatuses
+     * across all taxonomic authorities or within a taxonomicAuthority by ID
+     * @param taxonomicAuthorityID - the authority to limit the search to
+     * @returns Observable of response from api casted as `TaxonomicStatus[]`
+     * will be the found statuses
+     * @returns `of(null)` if api errors or not found
+     * @see TaxonomicStatus
+     */
+    async findInConflict(taxonomicAuthorityID?: number): Promise<TaxonomicStatus[]> {
+
+        const qb = this.myRepository.createQueryBuilder()
+            .addFrom(TaxonomicStatus,"t")
+            .where('t.taxonID = TaxonomicStatus.taxonID')
+            .andWhere('t.taxonIDAccepted != TaxonomicStatus.taxonIDAccepted')
+            .andWhere('TaxonomicStatus.taxonIDAccepted = TaxonomicStatus.taxonID')
+            .andWhere('t.taxonAuthorityID = TaxonomicStatus.taxonAuthorityID')
+
+        if (taxonomicAuthorityID) {
+            qb.andWhere('o.taxonomicAuthorityID = :authorityID', {authorityID: taxonomicAuthorityID})
+        }
+
+        return await qb.getMany()
+    }
+
+    /**
      * Find the children taxonomic statuses using a taxon id
      * Optionally use a taxonomic authority id (probably should in all cases)
      * Set find params using the 'TaxonomicStatusFindAllParams'

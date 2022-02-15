@@ -72,17 +72,8 @@ export class ImageDetailsPageComponent implements OnInit {
     loadImage(imageID: number) {
         this.imageService.findByID(imageID).subscribe((image) => {
             this.image = image
-            this.taxonStatusService.findAll({taxonIDs : [this.image.taxonID], taxonomicAuthorityID: 1}).subscribe((taxonomicStatuses) => {
-                let authoritySet = false
-                taxonomicStatuses.forEach((taxonomicStatus) => {
-                    if (!authoritySet) {
-                        this.taxonomicStatus = taxonomicStatus
-                        this.taxon = taxonomicStatus.taxon
-                    }
-                    if (taxonomicStatus.taxonID == taxonomicStatus.taxonIDAccepted) {
-                        authoritySet = true
-                    }
-                })
+            this.taxonService.findByID(this.image.taxonID).subscribe((txn) => {
+                this.taxon = txn
             })
         })
      }
@@ -128,6 +119,10 @@ export class ImageDetailsPageComponent implements OnInit {
         a.id = this.imageID
         a.initialTimestamp = new Date()
         const newImage = new ImageInputDto(a)
+
+        newImage.sortSequence = 50
+        console.log(" image is " + JSON.stringify(newImage))
+
 
         this.imageService
             .update(newImage)

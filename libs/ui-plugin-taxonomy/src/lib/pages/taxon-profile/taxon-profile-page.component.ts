@@ -71,32 +71,33 @@ export class TaxonProfilePageComponent implements OnInit {
         this.taxaService.findByID(taxonID).subscribe((taxon) => {
             this.taxon = taxon
             this.taxonName = taxon.scientificName
-        })
-        this.taxonDescriptionBlockService.findBlocksByTaxonID(taxonID).subscribe((blocks) => {
-            blocks.forEach((block) => {
-                if (block.descriptionStatements.length > 0) {
-                    block.descriptionStatements = block.descriptionStatements.sort((a, b) => a.sortSequence - b.sortSequence)
-                }
+            this.taxonDescriptionBlockService.findBlocksByTaxonID(taxonID).subscribe((blocks) => {
+                blocks.forEach((block) => {
+                    if (block.descriptionStatements.length > 0) {
+                        block.descriptionStatements = block.descriptionStatements.sort((a, b) => a.sortSequence - b.sortSequence)
+                    }
+                })
+                this.blocks = blocks
             })
-            this.blocks = blocks
-        })
-        this.imageService.findByTaxonIDs([taxonID]).subscribe((images) => {
-            this.image = images.shift()
-            this.images = images
-        })
-        this.taxonStatusService.findAll({taxonIDs : [taxonID], taxonomicAuthorityID: 1}).subscribe((taxonomicStatuses) => {
-            let authoritySet = false
-            taxonomicStatuses.forEach((taxonomicStatus) => {
-                if (!authoritySet) {
-                    this.taxonomicStatus = taxonomicStatus
-                    this.taxon = taxonomicStatus.taxon
-                }
-                if (taxonomicStatus.taxonID == taxonomicStatus.taxonIDAccepted) {
-                    authoritySet = true
-                }
+            this.imageService.findByTaxonIDs([taxonID]).subscribe((images) => {
+                this.image = images.shift()
+                this.images = images
             })
+            this.taxonStatusService.findAll({taxonIDs : [taxonID], taxonomicAuthorityID: 1}).subscribe((taxonomicStatuses) => {
+                let authoritySet = false
+                taxonomicStatuses.forEach((taxonomicStatus) => {
+                    if (!authoritySet) {
+                        this.taxonomicStatus = taxonomicStatus
+                        this.taxon = taxonomicStatus.taxon
+                    }
+                    if (taxonomicStatus.taxonID == taxonomicStatus.taxonIDAccepted) {
+                        authoritySet = true
+                    }
+                })
 
+            })
         })
+
     }
 
     goToLink(url: string){
