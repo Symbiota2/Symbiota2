@@ -65,6 +65,40 @@ export class ImageFolderUploadService {
         })
     }
 
+
+    startUpload(): Observable<Error> {
+        return combineLatest([
+            this.jwtToken,
+            this.currentUpload
+        ]).pipe(
+            filter(([, upload]) => upload !== null),
+            take(1),
+            switchMap(([token, upload]) => {
+                let url = this.createUrlBuilder()
+                    .zipFileUpload()
+                    .id(upload.id)
+                    .build()
+                // TODO: Clean this up
+                url += '/start';
+
+                const query = this.api.queryBuilder(url)
+                    .post()
+                    .addJwtAuth(token)
+                    .build();
+
+                return this.api.send(query).pipe(
+                    catchError((e) => {
+                        this.alerts.showError(JSON.stringify(e));
+                        return of(e);
+                    }),
+                    finalize(() => {
+                        this._currentUpload.next(null);
+                    })
+                );
+            })
+        );
+    }
+
     uploadFile(file: File): Observable<void> {
         const url = this.createUrlBuilder()
             .zipFileUpload()

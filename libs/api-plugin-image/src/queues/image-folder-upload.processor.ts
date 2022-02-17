@@ -62,9 +62,17 @@ export class ImageFolderUploadProcessor {
 
         // Process the zip file extracting to a folder
         let error: Error = null
-        const outputDir = path.join(ImageService.imageUploadFolder, upload.filePath)
-        await zipExtract(upload.filePath,
-            { dir: outputDir });
+        const outputDir = upload.filePath + "unzipped"
+        //const outputDir = upload.filePath
+
+        try {
+            await zipExtract(upload.filePath,
+                { dir: outputDir });
+        } catch (err) {
+            // handle any errors
+            this.logger.error("Failed zip extraction " + err)
+            await job.moveToFailed(error)
+        }
 
         // Update the job status
         upload.status = "started"
@@ -72,6 +80,7 @@ export class ImageFolderUploadProcessor {
 
         // Now let's process all the images
         if (error) {
+            this.logger.error(`Upload failed.` + error)
             await job.moveToFailed(error)
         } else {
             error = await this.processImages(job, upload, outputDir)
@@ -121,7 +130,7 @@ export class ImageFolderUploadProcessor {
 
     @OnQueueCompleted()
     async queueCompletedHandler(job: Job) {
-        this.logger.log(`Upload complete for image folder job ${job.data.authorityID}`);
+        this.logger.log(`Upload complete for image folder job ${job.data.uploadID}`);
     }
 
     @OnQueueFailed()
@@ -150,58 +159,86 @@ export class ImageFolderUploadProcessor {
         const skippedImagesDueToNoMatch = job.data.skippedImagesDueToNoMatch
         const skippedImagesDueToTooManyMatches = job.data.skippedImagesDueToTooManyMatches
 
-        fs.readdir(outputDir, (err, files) => {
-            if (err) return err  // exit on error and report it
-            files.forEach(file => {
-                const parts = file.split('_')
-                // Pop off the last _ part if more than one
-                if (parts.length > 1) {
-                    parts.pop()
-                }
-                const filePrefix = parts.join('_')
-                // First let's try to match just on scientific name
-                const occurrences = from(this.getOccurrences(filePrefix))
-                occurrences.subscribe((occs) => {
-                    if (occs.length == 0) {
-                        // Problematic upload, no matching catalog number
-                        skippedImagesDueToNoMatch.push(file)
-                    } else if (occs.length > 1) {
-                        // Found too many, again problematic
-                        skippedImagesDueToTooManyMatches.push(file)
-                    } else {
-                        // Found only one, let's add this image
-                        // First create a thumbnail
-                        const names = this.imageService.fromFileToLocalStorage(file, file, "")
-                        // Now create an image record
-                        // Create
-                        const imageRec = this.imageRepo.create({
-                            url: names[0],
-                            thumbnailUrl: names[1],
-                            sourceUrl: file,
-                            occurrenceID: occs[0].id,
-                            taxonID: occs[0].taxonID
-                        })
-                        // Add to queue of image updates to perform
-                        imageUpdates.push(imageRec)
-                    }
+        const files = await this.walk(outputDir)
+        for (let file of files) {
+            const steps = file.split(path.sep)
+            const lastStep = steps.pop()
+            const parts = lastStep.split('_')
+            // Pop off the last _ part if more than one
+            if (parts.length > 1) {
+                parts.pop()
+            }
+            const filePrefix = parts.join('_')
+            // First let's try to match just on scientific name
+            const occs = await this.getOccurrences(filePrefix)
+            if (occs.length == 0) {
+                // Problematic upload, no matching catalog number
+                skippedImagesDueToNoMatch.push(file)
+            } else if (occs.length > 1) {
+                // Found too many, again problematic
+                skippedImagesDueToTooManyMatches.push(file)
+            } else {
+                // Found only one, let's add this image
+                // First create a thumbnail
+                const names = await this.imageService.fromFileToLocalStorage(lastStep, file, "")
+
+                // Now create an image record
+                // Create
+                const imageRec = this.imageRepo.create({
+                    url: names[0],
+                    thumbnailUrl: names[1],
+                    sourceUrl: file,
+                    locality: occs[0].locality,
+                    occurrenceID: occs[0].id,
+                    taxonID: occs[0].taxonID
                 })
-                console.log(file);
-            });
-        });
+                // Add to queue of image updates to perform
+                imageUpdates.push(imageRec)
+            }
+        }
 
         // Save all of the images
         await this.imageRepo.save(imageUpdates)
         this.processed += imageUpdates.length
 
         let logMsg = `Processing uploaded images `
-        logMsg += `(${new Intl.NumberFormat().format(imageUpdates.length)} images processed. `
+        logMsg += `(${new Intl.NumberFormat().format(imageUpdates.length)} images processed). `
         this.logger.log(logMsg)
         return null // everything worked!
     }
 
+    // Recursively walk a directory getting all the fil)e names
+    private walk(dir) : string[] {
+        let results = []
+        let fileNames = []
+        try {
+            fileNames = fs.readdirSync(dir)
+        } catch(err) {
+            this.logger.error(" Error reading file/directory " + err)
+            return results
+        }
+        fileNames.forEach((file) => {
+            if (!file) return results
+            const fileRes = path.resolve(dir, file)
+            let stat
+            try {
+                stat = fs.statSync(fileRes)
+            } catch(err) {
+                this.logger.error("Error in statSync " + err)
+                return results
+            }
+            if (stat && stat.isDirectory()) {
+                results = results.concat(this.walk(fileRes))
+            } else {
+                results.push(fileRes)
+            }
+        })
+        return results
+    }
+
     private async getOccurrences(name)  {
-        return await this.occurrenceRepo.find({
-            where: { catalogName: Like(name + "%") }
+        return this.occurrenceRepo.find({
+            where: { catalogNumber: Like(name + "%") }
         })
     }
 

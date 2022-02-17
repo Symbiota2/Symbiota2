@@ -29,7 +29,7 @@ export class TaxonomyUploadProblemRanksPage implements OnInit {
     Called when Angular starts
      */
     ngOnInit() {
-        this.taxaService.getProblemAcceptedNames().subscribe((names) => {
+        this.taxaService.getProblemRanks().subscribe((names) => {
             this.names = names
         })
 

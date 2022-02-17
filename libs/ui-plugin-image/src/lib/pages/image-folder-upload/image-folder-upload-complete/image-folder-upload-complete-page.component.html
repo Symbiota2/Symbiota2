@@ -1,0 +1,29 @@
+<div id='main'>
+    <div>
+        <h1>{{ "image.folder.upload.complete.title" | translate }}</h1>
+    </div>
+
+    <button
+        mat-flat-button color='primary'
+        (click)='onSubmit()'
+    >
+        {{"image.folder.uploader.complete.button" | translate}}
+    </button>
+    <div *ngIf='done'>
+        <div *ngIf="someSkipped; else noProblems">
+            <symbiota2-expansion-panel
+                *ngIf="skippedImagesDueToProblems.length > 0"
+                expanded=false
+                label='{{"image.folder.uploader.complete.problem.images" | translate}}'>
+        <pre>
+            {{skippedImagesDueToProblems}}
+        </pre>
+            </symbiota2-expansion-panel>
+
+        </div>
+        <ng-template #noProblems>
+            {{"taxonomy.uploader.complete.all.processed" | translate}}
+        </ng-template>
+    </div>
+
+</div>

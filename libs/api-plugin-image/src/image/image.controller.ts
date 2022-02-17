@@ -193,7 +193,7 @@ export class ImageController {
         if (!file.mimetype.startsWith('image/')) {
             throw new BadRequestException('Invalid Image');
         }
-        return await this.myService.fromFileToLocalStorage(file.originalname, file.filename, file.mimetype)
+        return await this.myService.fromFileToLocalStorage(file.originalname, path.join(ImageService.imageUploadFolder,file.filename), file.mimetype)
     }
 
     @Post('upload/storage/single')
@@ -333,6 +333,23 @@ export class ImageController {
         }
 
         return upload;
+    }
+
+    @Post('zipUpload/:id/start')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({
+        summary: 'Starts a pre-configured upload of an image folder'
+    })
+    async startUpload(
+        @Param('id') uploadID: number,
+        @Req() request: AuthenticatedRequest) {
+
+        await this.myService.startUpload(
+            request.user.uid,
+            uploadID
+        );
     }
 
 

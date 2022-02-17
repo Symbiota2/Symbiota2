@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Brackets, In, Repository } from 'typeorm';
 import { BaseService } from '@symbiota2/api-common'
 import { Image, ImageFolderUpload, Taxon, TaxonomyUpload, TaxonomyUploadFieldMap } from '@symbiota2/api-database';
@@ -8,11 +8,18 @@ import { StorageService } from '@symbiota2/api-storage';
 import * as fs from 'fs';
 import { ImageSearchParams } from './dto/ImageSearchParams';
 import { InjectQueue } from '@nestjs/bull';
-import { QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP, TaxonomyUploadCleanupJob } from '@symbiota2/api-plugin-taxonomy';
+import {
+    QUEUE_ID_TAXONOMY_UPLOAD,
+    QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP,
+    TaxonomyUploadCleanupJob, TaxonomyUploadJob
+} from '@symbiota2/api-plugin-taxonomy';
 import { Queue } from 'bull';
 import { QUEUE_ID_IMAGE_FOLDER_UPLOAD_CLEANUP } from '../queues/image-folder-upload-cleanup.queue';
 import { ImageFolderUploadCleanupJob } from '../queues/image-folder-upload-cleanup.processor';
 import { AppConfigService } from '@symbiota2/api-config';
+import { QUEUE_ID_IMAGE_FOLDER_UPLOAD } from '../queues/image-folder-upload.queue';
+import { ImageFolderUploadJob } from '../queues/image-folder-upload.processor';
+import path from 'path';
 const imageThumbnail = require('image-thumbnail')
 
 type File = Express.Multer.File
@@ -20,11 +27,12 @@ type File = Express.Multer.File
 @Injectable()
 export class ImageService extends BaseService<Image>{
     public static readonly S3_PREFIX = 'image'
-    public static readonly imageUploadFolder = '/data/uploads/images/'
-    public static imageLibraryFolder = '/imglib/'
+    public static readonly imageUploadFolder = 'data/uploads/images/'
+    public static imageLibraryFolder = 'imglib/'
     public static readonly dataFolderPath = "data/uploads/images"
     public static readonly skippedImagesDueToTooManyMatches = ImageService.dataFolderPath + "/skippedTooManyMatches"
     public static readonly skippedImagesDueToNoMatch = ImageService.dataFolderPath + "/skippedNoMatch"
+    private readonly logger = new Logger(ImageService.name)
 
     constructor(
         @Inject(Image.PROVIDER_ID)
@@ -33,6 +41,8 @@ export class ImageService extends BaseService<Image>{
         private readonly uploadRepo: Repository<ImageFolderUpload>,
         @InjectQueue(QUEUE_ID_IMAGE_FOLDER_UPLOAD_CLEANUP)
         private readonly uploadCleanupQueue: Queue<ImageFolderUploadCleanupJob>,
+        @InjectQueue(QUEUE_ID_IMAGE_FOLDER_UPLOAD)
+        private readonly uploadQueue: Queue<ImageFolderUploadJob>,
         private readonly appConfig: AppConfigService,
         private readonly storageService: StorageService)
     {
@@ -296,7 +306,7 @@ export class ImageService extends BaseService<Image>{
 
 
     async fromFileToStorageService(originalname: string, filename: string, mimetype: string): Promise<void> {
-        const readStream = fs.createReadStream("." + ImageService.imageUploadFolder + filename)
+        const readStream = fs.createReadStream(ImageService.imageUploadFolder + filename)
 
         await this.storageService.putObject(
             ImageService.s3Key(filename),
@@ -311,7 +321,7 @@ export class ImageService extends BaseService<Image>{
         try {
 
             // Create thumbnail
-            const thumbnail = await imageThumbnail("." + ImageService.imageUploadFolder + filename)
+            const thumbnail = await imageThumbnail(filename)
             // Get file name and extension
             const re = /(?:\.([^.]+))?$/
             const extension = re.exec(originalname)[0]
@@ -320,17 +330,31 @@ export class ImageService extends BaseService<Image>{
                 const orig = originalname.substr(0, originalname.length - extension.length)
                 thumbnailName = orig + "_tn" + extension
             }
-            fs.writeFileSync("." + ImageService.imageLibraryFolder + thumbnailName, thumbnail)
+            fs.writeFileSync(path.join(ImageService.imageLibraryFolder,thumbnailName), thumbnail)
 
-            fs.rename("." + ImageService.imageUploadFolder + filename, "." + ImageService.imageLibraryFolder + originalname, (err) => {
-                if (err) throw err
+            // Move image to image library folder
+            fs.copyFile(filename, path.join(ImageService.imageLibraryFolder,originalname), (err) => {
+                if (err) {
+                    this.logger.error("Error copying uploaded image to image library folder " + err)
+                    throw err
+                }
             })
+            // Let's not unlink as it will be cleaned up later
+            /*
+            fs.unlink(filename, (err) => {
+                if (err) {
+                    this.logger.error("Error deleting uploaded image " + err)
+                    throw err
+                }
+            })
+             */
 
         } catch (err) {
+            this.logger.error("Error processing thumbnail " + err)
             throw err
         }
 
-        return [ImageService.imageLibraryFolder + originalname, ImageService.imageLibraryFolder + thumbnailName]
+        return [path.join(ImageService.imageLibraryFolder,originalname), path.join(ImageService.imageLibraryFolder,thumbnailName)]
     }
 
     /**
@@ -352,5 +376,16 @@ export class ImageService extends BaseService<Image>{
 
         return upload;
     }
+
+    async startUpload(uid: number, uploadID: number): Promise<void> {
+        await this.uploadQueue.add({
+            uid: uid,
+            uploadID: uploadID,
+            imageUpdates : [],
+            skippedImagesDueToNoMatch : [],
+            skippedImagesDueToTooManyMatches: []
+        })
+    }
+
 
 }

@@ -1,0 +1,18 @@
+<div id='main'>
+    <div id='header' fxLayoutAlign='start center' fxLayoutGap='1rem'>
+        <h1>{{"image.folder.uploader.title" | translate}}</h1>
+    </div>
+    <div *ngIf="userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
+        <symbiota2-file-upload-field [formControl]='fileInput'></symbiota2-file-upload-field>
+        <button
+            mat-flat-button color='primary'
+            (click)='onUpload()'
+            [disabled]='!fileInput.value'
+        >
+            {{"image.folder.uploader.upload.button" | translate}}
+        </button>
+    </div>
+    <div *ngIf="!userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
+        {{"image.folder.uploader.lacks.edit.permission" | translate}}
+    </div>
+</div>

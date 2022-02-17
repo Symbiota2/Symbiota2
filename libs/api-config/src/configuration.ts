@@ -47,7 +47,8 @@ export const DEFAULT_DB_PORT = '3306';
 export const DEFAULT_DB_NAME = 'symbiota';
 export const DEFAULT_DB_PATH = ':memory:';
 
-export const DEFAULT_IMAGE_LIBRARY = 'C:\\Users\\curt\\Dropbox'
+//export const DEFAULT_IMAGE_LIBRARY = 'C:\\Users\\Curt\\Dropbox\\imglib'
+export const DEFAULT_IMAGE_LIBRARY = 'D:\\Dropbox\\imglib'
 //export const DEFAULT_IMAGE_LIBRARY = '/var/lib/openherb'
 
 export const DEFAULT_REDIS_HOST = '127.0.0.1';

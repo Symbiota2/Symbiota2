@@ -136,14 +136,23 @@ class FileUploadBuilder extends ImageQueryBuilder {
 
 class ZipFileUploadBuilder extends ImageQueryBuilder {
     private _filename: string = null
+    private _id: number = null;
 
     filename(name: string): ZipFileUploadBuilder {
         this._filename = name
         return this;
     }
 
+    id(id: number): ZipFileUploadBuilder {
+        this._id = id;
+        return this;
+    }
+
     build(): string {
         this.url.pathname = `${this.url.pathname}/zipUpload`
+        if (this._id) {
+            this.url.pathname += `/${this._id}`;
+        }
         if (this._filename) {
             this.url.pathname += `/${this._filename}`
         }

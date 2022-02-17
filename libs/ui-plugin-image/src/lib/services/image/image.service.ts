@@ -132,6 +132,15 @@ export class ImageService {
             }))
     }
 
+    getProblemUploadFolderImages(): Observable<string[]> {
+        const url = this.createQueryBuilder()
+            //.problemAcceptedNames()
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, string[]>(query)
+    }
+
     imageSearch(
         collectionIDs: number[],
         scientificNames: string[],
