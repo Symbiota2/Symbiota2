@@ -44,7 +44,7 @@ import {
 } from './pages';
 // import { FilterPipe } from './pages/image-search/filter.pipe';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { ImageDetailsEditorComponent, ImageDetailsEditorDialogComponent } from './components';
+import { ImageDetailsEditorDialogComponent } from './components';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatChipsModule } from '@angular/material/chips';
@@ -94,7 +94,6 @@ import {
         ImageSearchPageComponent,
         ImageLibraryPageComponent,
         ImageDetailsPageComponent,
-        ImageDetailsEditorComponent,
         ImageDetailsEditorDialogComponent,
         ImageDisplayPage,
         ImageFolderUploadPage,
@@ -113,7 +112,6 @@ import {
         ImageLibraryPageComponent,
         ImageDisplayPage,
         ImageDetailsPageComponent,
-        ImageDetailsEditorComponent,
         ImageDetailsEditorDialogComponent,
         ImageFolderUploadPage,
         ImageFolderUploadProblemImagesPage,

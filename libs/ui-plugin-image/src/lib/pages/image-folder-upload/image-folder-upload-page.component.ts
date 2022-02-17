@@ -5,7 +5,7 @@ import { AlertService, UserService } from '@symbiota2/ui-common';
 import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { combineLatest, merge } from 'rxjs';
 import { ImageFolderUploadService } from '../../services/imageFolderUpload/imageFolderUpload.service';
-import { ImageService } from '@symbiota2/ui-plugin-image';
+import { ImageService } from '../../services/image/image.service';
 import { TAXA_UPLOAD_COMPLETE_ROUTE } from '../../../../../ui-plugin-taxonomy/src/lib/routes';
 import { IMAGE_FOLDER_UPLOAD_COMPLETE_ROUTE } from '../../routes';
 

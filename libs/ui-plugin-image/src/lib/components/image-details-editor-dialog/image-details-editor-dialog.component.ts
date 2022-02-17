@@ -1,8 +1,8 @@
 import { Component, Inject, Optional } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { FormControl, Validators } from '@angular/forms'
-import { ImageInfo } from '../image-details-editor/image-details-editor.component';
 import { TaxonomicUnitService } from '../../../../../ui-plugin-taxonomy/src/lib/services';
+import { ImageInfo } from '../../pages/image-details/image-details-page.component';
 
 @Component({
     selector: 'image-details-editor-dialog-box',

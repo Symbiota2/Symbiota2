@@ -17,6 +17,37 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { IMAGE_API_BASE } from '../../routes';
 
+
+export interface ImageInfo {
+    id: number
+    taxonID: number | null
+    url: string
+    thumbnailUrl: string
+    originalUrl: string
+    archiveUrl: string
+    photographerName: string
+    photographerUID: number | null
+    type: string
+    format: string
+    caption: string
+    owner: string
+    sourceUrl: string
+    referenceUrl: string
+    copyright: string
+    rights: string
+    accessRights: string
+    locality: string
+    occurrenceID: number | null
+    notes: string
+    anatomy: string
+    username: string
+    sourceIdentifier: string
+    mediaMD5: string
+    dynamicProperties: string
+    sortSequence: number
+    initialTimestamp: Date
+}
+
 @Component({
     selector: 'image-details',
     templateUrl: './image-details-page.html',
