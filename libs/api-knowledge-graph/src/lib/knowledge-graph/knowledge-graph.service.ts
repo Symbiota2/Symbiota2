@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { StorageService } from '@symbiota2/api-storage';
 import {
     EntityTarget,
@@ -12,7 +12,7 @@ import { join as pathJoin } from 'path';
 import { createReadStream } from 'fs';
 import { Collection, Occurrence } from '@symbiota2/api-database';
 import ReadableStream = NodeJS.ReadableStream;
-import { KnowledgeGraphBuilder } from '@symbiota2/knowledgeGraph';
+import { getKGProperty, KGRecordType, KnowledgeGraphBuilder } from '@symbiota2/knowledgeGraph';
 
 interface CreateGraphOpts {
     publish?: boolean;
@@ -25,7 +25,8 @@ export class KnowledgeGraphService {
     private static readonly DEFAULT_CREATE_ARCHIVE_OPTS: CreateGraphOpts = {
         publish: false
     };
-    private static readonly REGEX_SPACE_REPLACE = new RegExp(/\s/g);
+    private static readonly REGEX_SPACE_REPLACE = new RegExp(/\s/g)
+    private readonly logger = new Logger(KnowledgeGraphService.name)
 
     constructor(
         @Inject(Collection.PROVIDER_ID) private readonly collections: Repository<Collection>,
@@ -38,14 +39,19 @@ export class KnowledgeGraphService {
     }
 
     // TODO: Redact sensitive localities
-    // TODO: Include determination history
-
-    private async createGraph<T>(graphName: string, entityCls: EntityTarget<T>, findOpts: FindManyOptions<T>, objectTags = {}) {
+    private async createGraph<T>(
+        graphName: string,
+        entityCls: EntityTarget<T>,
+        findOpts: FindManyOptions<T>,
+        objectTags = {}
+    ) {
         const db = getConnection();
         const repo = db.getRepository(entityCls);
 
+        console.log("here create Graph")
+
         const dataDir = await this.appConfig.dataDir();
-        const dwcBuilder = new KnowledgeGraphBuilder(entityCls, dataDir);
+        const kgBuilder = new KnowledgeGraphBuilder(entityCls, dataDir);
         const uploadPath = KnowledgeGraphService.s3Key(graphName);
 
         return new Promise<void>((resolve, reject) => {
@@ -59,7 +65,7 @@ export class KnowledgeGraphService {
                     });
 
                     while (entities.length > 0) {
-                        await Promise.all(entities.map((o) => dwcBuilder.addRecord(o)));
+                        await Promise.all(entities.map((o) => kgBuilder.addRecord(o)));
                         offset += entities.length;
                         entities = await repo.find({
                             ...findOpts,
@@ -69,7 +75,7 @@ export class KnowledgeGraphService {
                     }
 
                     const graphPath = pathJoin(tmpDir, graphName);
-                    await dwcBuilder.build(graphPath);
+                    await kgBuilder.build(graphPath);
                     await this.storage.putObject(uploadPath, createReadStream(graphPath), objectTags);
 
                     resolve();
@@ -81,29 +87,54 @@ export class KnowledgeGraphService {
         });
     }
 
-    async createGraphForCollection(collectionID: number, opts = KnowledgeGraphService.DEFAULT_CREATE_ARCHIVE_OPTS): Promise<string> {
-        const graphName = await this.collectionGraphName(collectionID);
+    async createKnowledgeGraph(graphID: number, opts = KnowledgeGraphService.DEFAULT_CREATE_ARCHIVE_OPTS): Promise<string> {
+        const graphName = await this.knowledgeGraphName(graphID);
         const tags = {
-            collectionID: collectionID.toString(),
+            graphID: graphID.toString(),
             public: opts.publish.toString()
         };
 
+        const db = getConnection();
+        db.entityMetadatas.forEach((entityMeta) => {
+            const recordType = KGRecordType(entityMeta.target);
+            // console.log("Meta " + entityMeta.name + " " + recordType)
+            if (recordType) {
+                console.log("Meta " + entityMeta.name)
+                const propertyMap = entityMeta.propertiesMap
+                for (let key in propertyMap) {
+                    const propertyType = getKGProperty(entityMeta.target, key)
+                    if (propertyType) {
+                        console.log(key + " " + propertyType)
+                    }
+                }
+                //console.log(propertyMap.keys().length)
+                //propertyMap.forEach((value, key) => {
+                //    console.log(key)
+                //});
+            }
+        })
+
+        this.logger.log("Creating knowledge graph ")
+
+        /*
         // Make sure all of the occurrences have a guid
         await this.occurrences.createQueryBuilder('o')
             .update({ occurrenceGUID: () => "CONCAT('urn:uuid:', UUID())" })
-            .where({ collectionID, occurrenceGUID: IsNull() })
+            .where({ graphID, occurrenceGUID: IsNull() })
             .execute();
 
         await this.createGraph(
             graphName,
             Occurrence,
             {
-                where: { collectionID },
+                where: { graphID },
                 relations: ['taxon']
             },
             tags
         );
 
+
+         */
         return graphName;
     }
 
@@ -143,21 +174,21 @@ export class KnowledgeGraphService {
         });
     }
 
-    async collectionGraphExists(collectionID: number): Promise<boolean> {
-        const graphName = await this.collectionGraphName(collectionID);
+    async knowledgeGraphExists(graphID: number): Promise<boolean> {
+        const graphName = await this.knowledgeGraphName(graphID);
         return await this.storage.hasObject(KnowledgeGraphService.s3Key(graphName));
     }
 
-    async publishCollectionGraph(collectionID: number): Promise<void> {
-        await this.updateCollectionTags(collectionID, { public: 'true' });
+    async publishKnowledgeGraph(graphID: number): Promise<void> {
+        await this.updateKnowledgeGraphTags(graphID, { public: 'true' });
     }
 
-    async unpublishCollectionGraph(collectionID: number): Promise<void> {
-        await this.updateCollectionTags(collectionID, { public: 'false' });
+    async unpublishKnowledgeGraph(graphID: number): Promise<void> {
+        await this.updateKnowledgeGraphTags(graphID, { public: 'false' });
     }
 
-    async getCollectionGraph(collectionID: number): Promise<ReadableStream> {
-        const graphName = await this.collectionGraphName(collectionID);
+    async getKnowledgeGraph(graphID: number): Promise<ReadableStream> {
+        const graphName = await this.knowledgeGraphName(graphID);
         const objectKey = KnowledgeGraphService.s3Key(graphName);
 
         if (await this.storage.hasObject(objectKey)) {
@@ -170,24 +201,13 @@ export class KnowledgeGraphService {
         return this.storage.getObject(graphName);
     }
 
-    private async updateCollectionTags(collectionID: number, tags: Record<string, string>): Promise<void> {
-        const graphName = await this.collectionGraphName(collectionID);
+    private async updateKnowledgeGraphTags(graphID: number, tags: Record<string, string>): Promise<void> {
+        const graphName = await this.knowledgeGraphName(graphID);
         const objectKey = KnowledgeGraphService.s3Key(graphName);
         await this.storage.patchTags(objectKey, tags);
     }
 
-    private async collectionGraphName(collectionID: number): Promise<string> {
-        const collection = await this.collections.findOne({
-            select: ['collectionName', 'collectionCode'],
-            where: { id: collectionID }
-        });
-        if (!collection) {
-            throw new Error(`Collection with ID ${collectionID} does not exist!`);
-        }
-        const graphPrefix = (
-            collection.collectionCode ||
-            collection.collectionName.replace(KnowledgeGraphService.REGEX_SPACE_REPLACE, '-')
-        );
-        return `${ graphPrefix }_KnowledgeGraph-A.zip`;
+    private async knowledgeGraphName(graphID: number): Promise<string> {
+        return `KnowledgeGraph.zip`;
     }
 }

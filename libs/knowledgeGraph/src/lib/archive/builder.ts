@@ -35,9 +35,9 @@ c
         this.coreIDField = '';
         //this.coreFileType = dwcRecordType(coreClass);
 
-        if (!this.coreFileType) {
-            throw new Error(`Invalid DwC record type for class ${coreClass.name}`);
-        }
+        //if (!this.coreFileType) {
+        //    throw new Error(`Invalid DwC record type for class ${coreClass.name}`);
+        //}
     }
 
     private orderedDwcFields(recordType: string): string[] {
@@ -219,30 +219,6 @@ c
                         meta.archive.core.id.$.index = fieldIdx;
                     }
                 }
-            }
-            else {
-                const extension = {
-                    $: {
-                        rowType: recordType as any,
-                        ...commonOpts
-                    },
-                    files: [],
-                    coreid: { $: { index: -1 } },
-                    field: [],
-                }
-
-                const extensionFields = this.orderedDwcFields(recordType);
-                for (let fieldIdx = 0; fieldIdx < extensionFields.length; fieldIdx++) {
-                    const field = extensionFields[fieldIdx];
-                    if (field === this.coreIDField) {
-                        extension.coreid.$.index = fieldIdx;
-                    }
-                    extension.field.push({
-                        $: { index: fieldIdx, term: field }
-                    });
-                }
-
-                meta.archive.extension.push(extension);
             }
         }
 

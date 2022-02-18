@@ -12,7 +12,7 @@ import { KnowledgeGraphService } from '../knowledge-graph.service';
 
 export interface KnowledgeGraphGenerateJob {
     userID: number;
-    collectionID: number;
+    graphID: number;
     publish: boolean;
 }
 
@@ -21,36 +21,36 @@ export class KnowledgeGraphGenerateProcessor {
     private readonly logger = new Logger(KnowledgeGraphGenerateProcessor.name);
 
     constructor(
-        private readonly dwc: KnowledgeGraphService,
+        private readonly knowledgeGraphService: KnowledgeGraphService,
         private readonly notifications: NotificationService) { }
 
     @Process()
-    async generateKGForCollection(job: Job<KnowledgeGraphGenerateJob>) {
+    async generateKnowledgeGraph(job: Job<KnowledgeGraphGenerateJob>) {
         this.logger.debug(
-            `Generating knowledge graph for collectionID ${job.data.collectionID}...`
+            `Generating knowledge graph ...`
         );
-        await this.dwc.createGraphForCollection(
-            job.data.collectionID,
+        await this.knowledgeGraphService.createKnowledgeGraph(
+            job.data.graphID,
             { publish: job.data.publish }
         );
     }
 
     @OnQueueCompleted()
     async onKGGenerated(job: Job<KnowledgeGraphGenerateJob>) {
-        const message = `Knowledge graph generation complete for collectionID ${job.data.collectionID}`;
+        const message = `Knowledge graph generation complete `;
         this.logger.debug(message);
-        await this.notifications.add(job.data.userID, message);
+        // await this.notifications.add(job.data.userID, message);
     }
 
     @OnQueueFailed()
     async onKGGenerateFailed(job: Job<KnowledgeGraphGenerateJob>, err: Error) {
-        const message = `Failed to generate knowledge graph for collectionID ${job.data.collectionID}`;
+        const message = `Failed to generate knowledge graph `;
         this.logger.error(message);
         this.logger.error(JSON.stringify(err));
 
-        await this.notifications.add(
-            job.data.userID,
-            `${message}: ${JSON.stringify(err)}`
-        );
+        //await this.notifications.add(
+        //    job.data.userID,
+        //    `${message}: ${JSON.stringify(err)}`
+        //);
     }
 }

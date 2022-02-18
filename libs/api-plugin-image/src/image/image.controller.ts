@@ -305,7 +305,8 @@ export class ImageController {
     @Post('zipUpload')
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor('file'))
-    //@UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @ApiOperation({
         summary: "Upload a zipped folder of images"
     })

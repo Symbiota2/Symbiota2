@@ -16,18 +16,18 @@ import { TaxonomicEnumTreeController } from './taxonomicEnumTree/taxonomicEnumTr
 import { TaxonVernacularService } from './taxonVernacular/taxonVernacular.service'
 import { TaxonVernacularController } from './taxonVernacular/taxonVernacular.controller'
 import { TaxonDescriptionBlockService } from './taxonDescriptionBlock/taxonDescriptionBlock.service';
-import { TaxonResourceLinkService } from './taxonResourceLink/taxonResourceLink.service';
-import { TaxonResourceLinkController } from './taxonResourceLink/taxonResourceLink.controller';
+//import { TaxonResourceLinkService } from './taxonResourceLink/taxonResourceLink.service';
+//import { TaxonResourceLinkController } from './taxonResourceLink/taxonResourceLink.controller';
 import { TaxonDescriptionStatementController } from './taxonDescriptionStatement/taxonDescriptionStatement.controller';
 import { TaxonDescriptionStatementService } from './taxonDescriptionStatement/taxonDescriptionStatement.service';
-import { TaxonLinkService } from './taxonLink/taxonLink.service';
-import { TaxonLinkController } from './taxonLink/taxonLink.controller';
-import { TaxonProfilePublicationImageLinkController } from './taxonProfilePublicationImageLink/taxonProfilePublicationImageLink.controller';
-import { TaxonProfilePublicationImageLinkService } from './taxonProfilePublicationImageLink/taxonProfilePublicationImageLink.service';
-import { TaxonProfilePublicationDescriptionLinkController } from './taxonProfilePublicationDescriptionLink/taxonProfilePublicationDescriptionLink.controller';
-import { TaxonProfilePublicationDescriptionLinkService } from './taxonProfilePublicationDescriptionLink/taxonProfilePublicationDescriptionLink.service';
-import { TaxonProfilePublicationService } from './taxonProfilePublication/taxonProfilePublication.service';
-import { TaxonProfilePublicationController } from './taxonProfilePublication/taxonProfilePublication.controller';
+//import { TaxonLinkService } from './taxonLink/taxonLink.service';
+//import { TaxonLinkController } from './taxonLink/taxonLink.controller';
+//import { TaxonProfilePublicationImageLinkController } from './taxonProfilePublicationImageLink/taxonProfilePublicationImageLink.controller';
+//import { TaxonProfilePublicationImageLinkService } from './taxonProfilePublicationImageLink/taxonProfilePublicationImageLink.service';
+//import { TaxonProfilePublicationDescriptionLinkController } from './taxonProfilePublicationDescriptionLink/taxonProfilePublicationDescriptionLink.controller';
+//import { TaxonProfilePublicationDescriptionLinkService } from './taxonProfilePublicationDescriptionLink/taxonProfilePublicationDescriptionLink.service';
+//import { TaxonProfilePublicationService } from './taxonProfilePublication/taxonProfilePublication.service';
+//import { TaxonProfilePublicationController } from './taxonProfilePublication/taxonProfilePublication.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { promises as fsPromises } from 'fs';
 import { join as pathJoin } from 'path';
@@ -85,11 +85,11 @@ import { StorageModule } from '@symbiota2/api-storage';
         TaxonDescriptionStatementService,
         TaxonomyUploadCleanupProcessor,
         TaxonomyUploadProcessor,
-        TaxonLinkService,
-        TaxonProfilePublicationService,
-        TaxonProfilePublicationImageLinkService,
-        TaxonProfilePublicationDescriptionLinkService,
-        TaxonResourceLinkService,
+        //TaxonLinkService,
+        //TaxonProfilePublicationService,
+        //TaxonProfilePublicationImageLinkService,
+        //TaxonProfilePublicationDescriptionLinkService,
+        //TaxonResourceLinkService,
     ],
     controllers: [
         TaxonController,
@@ -100,11 +100,11 @@ import { StorageModule } from '@symbiota2/api-storage';
         TaxonomicEnumTreeController,
         TaxonDescriptionBlockController,
         TaxonDescriptionStatementController,
-        TaxonLinkController,
-        TaxonProfilePublicationController,
-        TaxonProfilePublicationImageLinkController,
-        TaxonProfilePublicationDescriptionLinkController,
-        TaxonResourceLinkController
+        //TaxonLinkController,
+        //TaxonProfilePublicationController,
+        //TaxonProfilePublicationImageLinkController,
+        //TaxonProfilePublicationDescriptionLinkController,
+        //TaxonResourceLinkController
     ],
     exports: [
         TaxonService,
@@ -115,11 +115,11 @@ import { StorageModule } from '@symbiota2/api-storage';
         TaxonomicEnumTreeService,
         TaxonDescriptionBlockService,
         TaxonDescriptionStatementService,
-        TaxonLinkService,
-        TaxonProfilePublicationService,
-        TaxonProfilePublicationImageLinkService,
-        TaxonProfilePublicationDescriptionLinkService,
-        TaxonResourceLinkService
+        //TaxonLinkService,
+        //TaxonProfilePublicationService,
+        //TaxonProfilePublicationImageLinkService,
+        //TaxonProfilePublicationDescriptionLinkService,
+        //TaxonResourceLinkService
     ]
 })
 export class TaxonomyModule extends SymbiotaApiPlugin {
