@@ -1,0 +1,52 @@
+<div id=main>
+
+    <div>
+        <h1>{{ "taxonomy.utils.entry.title" | translate }}</h1>
+    </div>
+
+    <div *ngIf="!userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
+        {{"taxonomy.utils.lacks.edit.permission" | translate}}
+    </div>
+    <div *ngIf="userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
+        <!-- Rebuild the taxonomic enum tree -->
+        <div class="expansion-panel">
+            <symbiota2-expansion-panel expanded=true label='{{"taxonomy.utils.configure.tree.repair.label" | translate}}'>
+                <!-- Chooose the taxonomic authority -->
+
+                <mat-form-field appearance="fill">
+                    <mat-label>{{"taxonomy.viewer.label.authority" | translate}}</mat-label>
+                    <mat-select field-class="symbiota2-field-class"
+                                placeholder='{{"taxonomy.viewer.label.authority" | translate}}'
+                                [(value)]="taxonomicAuthorityID"
+                                (selectionChange)="authorityChangeAction()">
+                        <mat-option *ngFor="let authority of taxonomicAuthorityList"
+                                    [value]="authority.id" >{{ authority.name }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <p>
+                    {{"taxonomy.utils.rebuild.tree.message" | translate}}
+                </p>
+                <div mat-dialog-actions>
+                    <button mat-button (click)="doRebuildTree()"
+                            mat-flat-button color="primary">{{'taxonomy.utils.rebuild.tree.button' | translate}}
+                    </button>
+
+                </div>
+                <br/>
+                <!-- Find in conflict taxons -->
+                <p>
+                    {{"taxonomy.utils.in.conflict.message" | translate}}
+                </p>
+                <div mat-dialog-actions>
+                    <button mat-button (click)="findInConflict()"
+                            mat-flat-button color="primary">{{'taxonomy.utils.in.conflict.button' | translate}}
+                    </button>
+
+                </div>
+
+            </symbiota2-expansion-panel>
+        </div>
+
+    </div>
+
+</div>

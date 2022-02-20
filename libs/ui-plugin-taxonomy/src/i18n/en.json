@@ -5,6 +5,7 @@
     "core.layout.header.topnav.taxonomy.profiler.link": "Profile Taxon",
     "core.layout.header.topnav.taxonomy.uploader.link": "Upload",
     "core.layout.header.topnav.taxon.create.link" : "Create Taxon",
+    "core.layout.header.topnav.taxonomy.utils.link": "Utilities",
     "taxa.taxa_available_permission.admin": "Admin",
     "taxa.taxa_available_permission.taxa_permissions": "taxa Permissions",
     "taxa.taxa_available_permission.editor": "Editor",
@@ -64,6 +65,15 @@
     "taxonomy.upload.problem.accepted.names.title": "List of accepted names that could not be found",
     "taxonomy.upload.problem.parent.names.title": "List of parent names that could not be found",
     "taxonomy.upload.problem.ranks.title": "List of ranks that could not be found",
+
+    "taxonomy.utils.entry.title" : "Taxonomic Utilties",
+    "taxonomy.utils.lacks.edit.permission" : "Not logged in or insufficient privileges to use taxonomic utilities.",
+    "taxonomy.utils.rebuild.tree.button" : "Rebuild Tree",
+    "taxonomy.utils.rebuild.tree.message" : "Rebuild the taxonomic hierarchy.  The hierarchy is used to speed up lookup of a taxon's place in a taxonomic hierarchy.  Depending on the size of the taxonomy the hierarchy may take awhile to rebuild.  The process is idempotent so if it fails to run to completion, you may re-run the build.",
+    "taxonomy.utils.configure.tree.repair.label": "Taxonomic Hierarchy Utilities",
+    "taxonomy.utils.in.conflict.button" : "Find in conflict taxons",
+    "taxonomy.utils.in.conflict.message" : "An in conflict taxon is one that has more than one taxonomic status for the authority.",
+
 
     "taxonomy.viewer.title": "Taxonomy Viewer",
     "taxonomy.viewer.option.scientific": "Use scientific names",

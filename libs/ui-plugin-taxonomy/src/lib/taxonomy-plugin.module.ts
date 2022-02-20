@@ -39,6 +39,7 @@ import {
     TaxonEditorPageComponent,
     TaxonomyUploadPage,
     TaxaEditorEntryPage,
+    TaxaUtilsEntryPage,
     TaxonomyUploadProblemRanksPage,
     TaxonomyFieldMapSelectComponent,
     TaxonomyConfirmDialogComponent,
@@ -70,7 +71,7 @@ import {
     TAXA_UPLOAD_COMPLETE_ROUTE,
     TAXA_UPLOAD_PROBLEM_ACCEPTED_NAMES_ROUTE, TAXA_UPLOAD_PROBLEM_PARENT_NAMES_ROUTE, TAXA_UPLOAD_PROBLEM_RANKS_ROUTE,
     TAXA_UPLOADER_FIELD_MAP_ROUTE,
-    TAXA_UPLOADER_ROUTE,
+    TAXA_UPLOADER_ROUTE, TAXA_UTILS_ENTRY_ROUTE,
     TAXA_VIEWER_ROUTE, TAXON_CREATE_ROUTE,
     TAXON_EDITOR_ROUTE,
     TAXON_PROFILE_ROUTE
@@ -129,6 +130,7 @@ import {
         TaxonomyUploadProblemRanksPage,
         TaxaProfilerEntryPage,
         TaxaEditorEntryPage,
+        TaxaUtilsEntryPage,
         TaxaViewerPageComponent,
         TaxonCreatePageComponent,
         TaxonProfilePageComponent,
@@ -163,6 +165,7 @@ import {
     entryComponents: [
         TaxaEditorEntryPage,
         TaxaProfilerEntryPage,
+        TaxaUtilsEntryPage,
         TaxonomyUploadPage,
         TaxonomyUploadCompletePage,
         TaxonomyUploadProblemAcceptedNamesPage,
@@ -223,6 +226,10 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
                 component: TaxaProfilerEntryPage
             },
             {
+                path: TAXA_UTILS_ENTRY_ROUTE,
+                component: TaxaUtilsEntryPage
+            },
+            {
                 path: TAXA_UPLOADER_ROUTE,
                 component: TaxonomyUploadPage
             },
@@ -270,6 +277,10 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
             {
                 url: `/${TAXA_UPLOADER_ROUTE}`,
                 name: "core.layout.header.topnav.taxonomy.uploader.link"
+            },
+            {
+                url: `/${TAXA_UTILS_ENTRY_ROUTE}`,
+                name: "core.layout.header.topnav.taxonomy.utils.link"
             },
         ]
     }

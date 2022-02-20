@@ -10,10 +10,10 @@ import {
     Delete,
     NotFoundException,
     Patch,
-    SerializeOptions
+    SerializeOptions, UseGuards
 } from '@nestjs/common';
 import { TaxonomicEnumTreeService } from './taxonomicEnumTree.service';
-import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import {
     TaxonomicEnumTreeDto
 } from './dto/TaxonomicEnumTreeDto';
@@ -23,6 +23,7 @@ import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
 import { TaxonDescriptionBlock } from '@symbiota2/api-database';
 import { TaxonomicEnumTreeMoveTaxonParams } from './dto/taxonomicEnumTreeQueryParams';
 import { TaxonAndAcceptedStatusesDto } from '../taxon/dto/TaxonAndAcceptedStatusesDto';
+import { JwtAuthGuard } from '@symbiota2/api-auth';
 
 @ApiTags('TaxonomicEnumTree')
 @Controller('taxonomicEnumTree')
@@ -130,6 +131,7 @@ export class TaxonomicEnumTreeController {
 
 
 
+    /* No single id for a taxa enum tree
     @Get(':id')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonomicEnumTreeDto })
     @ApiOperation({
@@ -140,14 +142,15 @@ export class TaxonomicEnumTreeController {
         const dto = new TaxonomicEnumTreeDto(taxon)
         return dto
     }
+     */
 
     @Patch('move')
     @ApiOperation({
         summary: "Move taxon to a new parent in the enum tree."
     })
-    //@ProtectCollection('id')
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @ApiResponse({ status: HttpStatus.OK, type: TaxonomicEnumTreeDto })
-    //@SerializeOptions({ groups: ['single'] })
     async moveTaxon(@Query() myParams: TaxonomicEnumTreeMoveTaxonParams): Promise<TaxonomicEnumTreeDto> {
         const enumTree = await this.myService.moveTaxon(myParams.taxonID, myParams.taxonAuthorityID, myParams.parentTaxonID);
         if (!enumTree) {
@@ -158,11 +161,11 @@ export class TaxonomicEnumTreeController {
 
     @Patch('rebuildTree/:taxonomicAuthorityID')
     @ApiOperation({
-        summary: "Move taxon to a new parent in the enum tree."
+        summary: "Rebuild the taxonomic enum tree for a given authority."
     })
-    //@ProtectCollection('taxonomicAuthorityID')
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @ApiResponse({ status: HttpStatus.OK, type: TaxonomicEnumTreeDto })
-    //@SerializeOptions({ groups: ['single'] })
     async rebuildTaxonEnumTree(@Param('taxonomicAuthorityID') taxonomicAuthorityID: number): Promise<TaxonomicEnumTreeDto> {
         const enumTree = await this.myService.rebuildTaxonEnumTree(taxonomicAuthorityID);
         if (!enumTree) {

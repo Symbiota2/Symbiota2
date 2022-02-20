@@ -191,4 +191,40 @@ export class TaxonomicEnumTreeService {
         )
     }
 
+    /**
+     * Rebuild the enum tree within the context of a taxa authority id
+     * @param authorityID - the taxonomic authority under which the rebuild should happen
+     * @returns Observable of response from api casted as `TaxonomicEnumTreeListItem`
+     * will be the updated enum tree record
+     * @returns `of(null)` if user does not have editing permission or api errors
+     */
+    rebuildTree(authorityID: number): Observable<TaxonomicEnumTreeListItem> {
+        const url = this.createQueryBuilder()
+            .rebuild()
+            .authorityId(authorityID)
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .patch()
+                    .addJwtAuth(token)
+                    .build()
+
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((enumJson) => {
+                        if (enumJson === null) {
+                            return null
+                        }
+                        return TaxonomicEnumTreeListItem.fromJSON(enumJson);
+                    })
+                )
+            })
+        )
+    }
 }

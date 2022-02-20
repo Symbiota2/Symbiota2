@@ -137,6 +137,29 @@ export class TaxonomicStatusService {
     }
 
     /**
+     * sends request to api to find a the in conflict taxons, those with two or more statuses for a given authority
+     * @param taxonomicAuthorityID - the authority ID
+     * @returns Observable of response from api casted as `TaxonomicStatusListItem[]`
+     * will be the found statuses
+     * @returns `of(null)` if api errors
+     * @returns [] if no children
+     */
+    findInConflict(taxonAuthorityID: number): Observable<TaxonomicStatusListItem[]> {
+        const url = this.createQueryBuilder()
+            .findInConflict()
+            .authorityId(taxonAuthorityID)
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, Record<string, unknown>[]>(query)
+            .pipe(
+                map((taxonstatus) => taxonstatus.map((o) => {
+                    return TaxonomicStatusListItem.fromJSON(o)
+                }))
+            )
+    }
+
+    /**
      * sends request to api to create a taxonomic status
      * @param status - the status to create
      * @returns Observable of response from api casted as `TaxonomicStatusOnlyListItem`

@@ -265,9 +265,6 @@ export class TaxaViewerPageComponent implements OnInit {
                                         .subscribe( (myTaxon) => {
                                             baseNode.name = myTaxon.scientificName
                                             baseNode.taxonID = myTaxon.id
-                                            // Remove the synNode, taken care of below in processing children?
-                                            //const synNode: TaxonNode = {name: sciname, taxonID: taxon.id, author: taxon.author, expanded: false, synonym: true, children: []}
-                                            //baseNode.children = [synNode]
                                             baseNode.children = []
                                             baseNode.expanded = true
                                             baseNode.synonym = false
@@ -297,11 +294,9 @@ export class TaxaViewerPageComponent implements OnInit {
 
                                     // Fetch the scientific names of the children
                                     if (childrenTids.length == 0) {
-
                                         // There are no children
-                                        //const baseNode: TaxonNode = { name: sciname, expanded: true, synonym: false, children: []}
 
-                                        // Fetch ancestors
+                                        // Fetch synonyms
                                         this.fetchSynonyms(taxon.id, baseNode)
                                         return
                                     }
@@ -367,7 +362,6 @@ export class TaxaViewerPageComponent implements OnInit {
                         })
                 } else {
                     // No taxon found, show error message
-                    console.log("no taxon found")
                     this.nameFound = false
                 }
 
@@ -583,7 +577,6 @@ export class TaxaViewerPageComponent implements OnInit {
                 .subscribe((t) => {
                     children = t
 
-                    console.log("children is " + children.length + " " + childrenTids.length)
                     // Sort and format the children as tree nodes
                     const childrenTree = []
                     children.sort((a,b) => a.scientificName - b.scientificName).forEach((item) => {
@@ -701,18 +694,10 @@ export class TaxaViewerPageComponent implements OnInit {
     }
 
     selectedSciname(event: MatAutocompleteSelectedEvent): void {
-        //this.scinames.push(event.option.viewValue)
-        //this.scinameInput.nativeElement.value = '';
-        //this.nameControl.setValue(null)
-
-        //console.log("here " + this.nameControl.value + " " + event.option.viewValue)
-
         this.nameFound = true
         this.dataSource.data = []
         if (this.kindOfName == 'Scientific') {
             const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
-            //this.buildTree(sname)
-            //console.log("check " + sname)
             this.nameListCheck(sname)
         } else {
             this.findCommonAncestors(this.nameControl.value)
