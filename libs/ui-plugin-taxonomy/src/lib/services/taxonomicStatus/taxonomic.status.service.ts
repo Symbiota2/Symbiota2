@@ -346,13 +346,11 @@ export class TaxonomicStatusService {
                         return of(null)
                     }),
                     map((blockJson) => {
-                        return "success"
-                        /*  //API returns null on success so return something else to signal "success"
+                        //API returns null on success so return something else to signal "success"
                         if (blockJson === null) {
                             return null
                         }
-                        return TaxonDescriptionBlockListItem.fromJSON(blockJson)
-                         */
+                        return "success"
                     })
                 )
             })

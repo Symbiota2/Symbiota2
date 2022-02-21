@@ -222,7 +222,7 @@ export class TaxonomicStatusController {
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @HttpCode(HttpStatus.OK)
-    @ApiResponse({ status: HttpStatus.OK, type: Taxon })
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonomicStatus })
     @ApiBody({ type: TaxonomicStatusInputDto, isArray: true })
     //@SerializeOptions({ groups: ['single'] })
     async updateByID(
@@ -244,20 +244,20 @@ export class TaxonomicStatusController {
         return statement
     }
 
-    @Delete(':id/:authorityID:tidAcceptedID')
+    @Delete(':id/:authorityID/:tidAcceptedID')
     @ApiOperation({
         summary: "Delete a taxon by ID"
     })
-    @HttpCode(HttpStatus.NO_CONTENT)
+    @HttpCode(HttpStatus.OK)
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @ApiResponse({ status: HttpStatus.NO_CONTENT })
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonomicStatus })
     async deleteByID(
         @Req() request: AuthenticatedRequest,
         @Param('id') id: number,
         @Param('authorityID') authorityId: number,
         @Param('tidAcceptedID') acceptedId: number,
-    ): Promise<void> {
+    ): Promise<TaxonomicStatus> {
         if (!this.canEdit(request)) {
             throw new ForbiddenException()
         }
@@ -266,6 +266,7 @@ export class TaxonomicStatusController {
         if (!status) {
             throw new NotFoundException();
         }
+        return status
     }
 
 }

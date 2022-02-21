@@ -130,7 +130,6 @@ export class TaxonomicEnumTreeController {
     }
 
 
-
     /* No single id for a taxa enum tree
     @Get(':id')
     @ApiResponse({ status: HttpStatus.OK, type: TaxonomicEnumTreeDto })

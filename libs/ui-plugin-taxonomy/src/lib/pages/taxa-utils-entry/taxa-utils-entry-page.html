@@ -41,6 +41,13 @@
                     <button mat-button (click)="findInConflict()"
                             mat-flat-button color="primary">{{'taxonomy.utils.in.conflict.button' | translate}}
                     </button>
+                </div>
+                <div *ngIf='taxons.length > 0'>
+                    <ul *ngFor='let taxon of taxons'>
+                        <li>
+                            <a href='{{taxon_editor_route}}/{{taxon.id}}'>{{taxon.scientificName}}</a>
+                        </li>
+                    </ul>
 
                 </div>
 

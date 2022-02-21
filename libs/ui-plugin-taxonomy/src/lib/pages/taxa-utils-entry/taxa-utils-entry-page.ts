@@ -13,6 +13,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { TaxonListItem, TaxonIDAuthorNameItem } from '../../dto';
 import { filter } from 'rxjs/operators';
 import { UserService } from '@symbiota2/ui-common';
+import { TAXON_EDITOR_ROUTE_PREFIX } from '../../routes';
 
 @Component({
     selector: 'taxa-utils-entry-page',
@@ -23,7 +24,8 @@ import { UserService } from '@symbiota2/ui-common';
 export class TaxaUtilsEntryPage implements OnInit {
     taxonomicAuthorityList
     taxonomicAuthorityID
-    looking = false
+    taxons = []
+    taxon_editor_route = TAXON_EDITOR_ROUTE_PREFIX
 
     // User stuff
     userID : number = null
@@ -67,7 +69,6 @@ export class TaxaUtilsEntryPage implements OnInit {
     Taxonomic authority has a new value
      */
     authorityChangeAction() {
-        this.looking = false
         // If the authority changes...
     }
 
@@ -97,8 +98,12 @@ export class TaxaUtilsEntryPage implements OnInit {
 
     findInConflict() {
         this.taxonomicStatusService.findInConflict(this.taxonomicAuthorityID).subscribe((items) => {
+            const tids = []
             items.forEach((item) => {
-                console.log(item.taxonID)
+                tids.push(item.taxonID)
+            })
+            this.taxaService.findAll(this.taxonomicAuthorityID,{taxonIDs: tids}).subscribe((taxons) => {
+                this.taxons = taxons
             })
         })
     }
