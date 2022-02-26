@@ -225,8 +225,11 @@
     "taxon.status.editor.updated.in.conflict.accepted.error": "Error in changing the taxon's synonym's status",
     "taxon.status.editor.updated.in.conflict.accepted.button": "Resolve to Accepted",
 
-    "taxon.delete.has.children.message" : "This taxon has children that must first be moved (or deleted).",
-
+    "taxon.delete.label" : "Delete Taxon",
+    "taxon.delete.button" : "Delete Taxon",
+    "taxon.delete.lacks.permission" : "User does not have permission to delete a taxon",
+    "taxon.delete.has.children.message" : "This taxon has children that must first be moved (or deleted). Click on the name below to use the taxon editor to move the taxon.",
+    "taxon.delete.warning.message" : "Deleting a taxon will delete taxonomic statuses, occurrences, occurrence determinations, images, etc.  Warning, the deletion is not reversible.",
 
     "taxon.vernacular.editor.added": "Common name added",
     "taxon.vernacular.editor.updated": "Common name updated",

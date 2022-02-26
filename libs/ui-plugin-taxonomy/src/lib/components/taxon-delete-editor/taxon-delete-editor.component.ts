@@ -15,6 +15,7 @@ import { AlertService, UserService } from '@symbiota2/ui-common';
 import { filter } from 'rxjs/operators';
 import { TaxonListItem } from '../../dto/taxon-list-item';
 import { TaxonInputDto } from '../../dto/taxonInputDto';
+import { TAXON_EDITOR_ROUTE_PREFIX } from '../../routes';
 
 @Component({
     selector: 'taxon-delete-editor',
@@ -28,6 +29,7 @@ export class TaxonDeleteEditorComponent implements OnInit {
     userID : number = null
     userCanEdit: boolean = false
     children = []
+    editorRoute = TAXON_EDITOR_ROUTE_PREFIX
 
     constructor(
         private readonly userService: UserService,
@@ -91,7 +93,6 @@ export class TaxonDeleteEditorComponent implements OnInit {
     }
 
     deleteTaxon(obj) {
-
     }
 
     /*
