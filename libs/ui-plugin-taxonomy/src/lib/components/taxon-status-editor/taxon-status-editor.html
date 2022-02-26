@@ -11,66 +11,33 @@
     </mat-form-field>
 
     <div><b>{{"taxon.status.status.label" | translate}}</b>:
-        <span style="color:blue" *ngIf='!currentInConflict && currentIsAccepted'>{{"taxon.status.accepted" | translate}}</span>
-        <span style="color:#ff0000" *ngIf='!currentInConflict && !currentIsAccepted'>{{"taxon.status.not.accepted" | translate}}</span>
-        <span style="color:#ff0000" *ngIf='currentInConflict'>{{"taxon.status.in.conflict" | translate}}</span>
+        <span style="color:blue" *ngIf='currentIsAccepted'>{{"taxon.status.accepted" | translate}}</span>
+        <span style="color:#ff0000" *ngIf='!currentIsAccepted'>{{"taxon.status.not.accepted" | translate}}</span>
     </div>
 
-        <div>
-            <b>{{"taxon.status.parent.taxon.label" | translate}}</b>:
-            <a [routerLink]="['/taxon/editor', currentParentID]" target="_blank" class='taxonlink'>{{currentParentName}}</a>
-            <span *ngIf='!currentInConflict'>
-                <button *ngIf='userCanEdit' mat-icon-button>
-                    <mat-icon color="primary" (click)="openDialog('Update Parent',{})">edit</mat-icon>
-                </button>
-            </span>
-            <!-- If in conflict then must resolve before doing anything -->
-            <span *ngIf='currentInConflict'>
-                                                                    &nbsp; &nbsp;
-                <button *ngIf='userCanEdit'
-                    color="primary" (click)="resolveConflictedAsAccepted()">
-                    {{"taxon.status.editor.updated.in.conflict.accepted.button" | translate}}
-                </button>
-            </span>
-        </div>
-
-        <div *ngIf='!currentIsAccepted'>
-            <b>{{"taxon.status.accepted.taxon.label" | translate}}</b>:
-            <a [routerLink]="['/taxon/editor', currentAcceptedID]" target="_blank" class='taxonlink'>{{currentAcceptedName}}</a>
-            <span *ngIf='!currentInConflict'>
-                <button *ngIf='userCanEdit' mat-icon-button>
-                    <mat-icon color="primary" (click)="openDialog('Update Accepted',{})">edit</mat-icon>
-                </button>
-            </span>
-            <!-- If in conflict then must resolve before doing anything -->
-            <span *ngIf='currentInConflict'>
-                                &nbsp; &nbsp;
-                <button *ngIf='userCanEdit' color="primary" (click)="resolveConflictedAsSynonym()">
-                    {{"taxon.status.editor.updated.in.conflict.synonym.button" | translate}}
-                </button>
-            </span>
-        </div>
-        <div *ngIf='currentIsAccepted && synonymList.length > 0'>
-            <!-- List of synonnyms
-            -->
-            <b>{{"taxon.status.synonyms.label" | translate}}:</b>
-            <mat-list role='list'>
-                <mat-list-item *ngFor="let syn of synonymList">
-                    {{syn.name}}
-                </mat-list-item>
-            </mat-list>
-        </div>
-
-
-    <!-- If in conflict then must resolve before doing anything
-    <div *ngIf='currentInConflict'>
-        <button *ngIf='true' mat-icon-button>
-            <mat-icon color="primary" (click)="resolveConflictedAsAccepted()"></mat-icon>
-        </button>
-        &nbsp;
+    <div>
+        <b>{{"taxon.status.parent.taxon.label" | translate}}</b>:
+        <a [routerLink]="['/taxon/editor', currentParentID]" target="_blank" class='taxonlink'>{{currentParentName}}</a>
         <button *ngIf='userCanEdit' mat-icon-button>
-            <mat-icon color="primary" (click)="resolveConflictedAsSynonym()"></mat-icon>
+            <mat-icon color="primary" (click)="openDialog('Update Parent',{})">edit</mat-icon>
         </button>
     </div>
--->
+
+    <div *ngIf='!currentIsAccepted'>
+        <b>{{"taxon.status.accepted.taxon.label" | translate}}</b>:
+        <a [routerLink]="['/taxon/editor', currentAcceptedID]" target="_blank" class='taxonlink'>{{currentAcceptedName}}</a>
+        <button *ngIf='userCanEdit' mat-icon-button>
+            <mat-icon color="primary" (click)="openDialog('Update Accepted',{})">edit</mat-icon>
+        </button>
+    </div>
+    <div *ngIf='currentIsAccepted && synonymList.length > 0'>
+        <!-- List of synonnyms
+        -->
+        <b>{{"taxon.status.synonyms.label" | translate}}:</b>
+        <mat-list role='list'>
+            <mat-list-item *ngFor="let syn of synonymList">
+                {{syn.name}}
+            </mat-list-item>
+        </mat-list>
+    </div>
 </symbiota2-expansion-panel>

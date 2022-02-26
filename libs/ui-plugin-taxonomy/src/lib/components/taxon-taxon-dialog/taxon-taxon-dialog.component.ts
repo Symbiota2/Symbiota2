@@ -75,7 +75,7 @@ export class TaxonTaxonDialogComponent {
     }
 
     doAction(){
-        //this.local_data.phyloSortSequence = this.sortSequence
+        this.local_data.phyloSortSequence = this.sortSequence
         this.local_data.rankID = this.rankID
         this.dialogRef.close({event:this.action,data:this.local_data})
     }

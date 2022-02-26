@@ -1,235 +1,422 @@
-<div id='main'>
-    <div>
-        <h1>{{ "taxon.create.title" | translate }}</h1>
+<div id="main">
+  <div>
+    <h1>{{ "taxon.create.add.new.name" | translate }}</h1>
+  </div>
+
+  <div *ngIf="!userCanEdit" class="my2" fxLayout="row" fxLayoutGap="1rem">
+    {{"taxonomy.uploader.lacks.edit.permission" | translate}}
+  </div>
+  <div *ngIf="userCanEdit" class="my2" fxLayout="row" fxLayoutGap="1rem">
+    <div mat-dialog-content>
+      <form class="name-autocomplete-form">
+        <mat-label>{{'taxon.taxon.editor.kingdomName' | translate}}</mat-label>
+        &nbsp; &nbsp;
+        <mat-form-field appearance="fill">
+          <mat-label
+            >{{'taxon.taxon.editor.kingdomName' | translate}}</mat-label
+          >
+          <!--
+                              <mat-select [(ngModel)]="local_data.kingdomName" [ngModelOptions]="{standalone: true}" required>
+                              -->
+          <mat-select
+            [formControl]="kingdomNameControl"
+            required
+            (event)="orderFields($event)"
+          >
+            <mat-option *ngFor="let name of kingdomNames" [value]="name">
+              {{name}}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="kingdomNameControl.invalid"
+            >{{"taxon.create.required.field.kingdom.name" |
+            translate}}</mat-error
+          >
+        </mat-form-field>
+        <br />
+
+        <mat-label
+          >{{'taxon.taxon.editor.taxon.rankName' | translate}}</mat-label
+        >
+        &nbsp; &nbsp;
+        <mat-form-field appearance="fill">
+          <mat-label>{{'taxon.taxon.editor.rankName' | translate}}</mat-label>
+          <!-- <mat-select [(ngModel)]="rankID" [ngModelOptions]="{standalone: true}"> -->
+          <mat-select
+            [formControl]="rankControl"
+            required
+            (event)="orderFields($event)"
+          >
+            <mat-option *ngFor="let rank of rankNames" [value]="rank.id">
+              {{rank.name}}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="rankControl.invalid"
+            >{{"taxon.create.required.field.rank" | translate}}</mat-error
+          >
+        </mat-form-field>
+        <br />
+
+        <mat-form-field appearance="fill" [style.width.vw]="90">
+          <mat-label
+            >{{'taxon.taxon.editor.scientificName' | translate}}</mat-label
+          >
+          <!--
+                      <input matInput
+                             [value] = "local_data.scientificName"
+                             [(ngModel)]="scientificNameControl"
+                             [ngModelOptions]="{standalone: true}"
+                      required>
+                      -->
+          <input
+            matInput
+            [formControl]="scientificNameControl"
+            required
+            (focus)="orderFields()"
+            (focusout)="onKey($event)"
+            [placeholder]="orderFields()"
+          />
+          <mat-error *ngIf="scientificNameControl.invalid"
+            >{{"taxon.create.required.field.scientific.name" |
+            translate}}</mat-error
+          >
+          <!--
+                      <div *ngIf="scientificNameControl.invalid && (scientificNameControl.dirty || scientificNameControl.touched)">
+                          <mat-error *ngIf="scientificNameControl.invalid">Scientific Name is required</mat-error>
+                      </div>
+                      -->
+        </mat-form-field>
+        <br />
+
+        <mat-form-field appearance="fill" [style.width.vw]="90">
+          <mat-label>{{'taxon.taxon.editor.author' | translate}}</mat-label>
+          <input
+            matInput
+            maxlength="100"
+            [value]="local_data.author"
+            [(ngModel)]="local_data.author"
+            [ngModelOptions]="{standalone: true}"
+          />
+        </mat-form-field>
+        <br />
+
+        <b>{{"taxon.create.parent.taxon" | translate}}</b>:&nbsp;
+
+        <mat-form-field appearance="fill">
+          <mat-label
+            >{{"taxonomy.viewer.label.authority" | translate}}</mat-label
+          >
+          <mat-select
+            field-class="symbiota2-field-class"
+            placeholder='{{"taxonomy.viewer.label.authority" | translate}}'
+            [(value)]="taxonomicAuthorityID"
+            (selectionChange)="authorityChangeAction()"
+          >
+            <mat-option
+              *ngFor="let authority of taxonomicAuthorityList"
+              [value]="authority.id"
+              >{{ authority.name }}</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="name-autocomplete-full-width">
+          <mat-label *ngIf='kindOfName == "Scientific"'
+            >{{"taxon.create.parent.taxon" | translate}}</mat-label
+          >
+          <!-- (keypress)="onKey($event)" -->
+          <input
+            *ngIf='kindOfName == "Scientific"'
+            type="text"
+            placeholder='{{"taxon.status.parent.editor.dialog.parent.taxon.placeholder" | translate}}'
+            aria-label="String"
+            matInput
+            (keyup)="onKey($event)"
+            [formControl]="nameControl"
+            [matAutocomplete]="auto"
+            [(ngModel)]="local_data.parentName"
+            required
+          />
+          <mat-autocomplete
+            autoActiveFirstOption
+            #auto="matAutocomplete"
+            [displayWith]="getName"
+          >
+            <mat-option *ngFor="let option of nameOptions" [value]="option">
+              {{option.name}} <small>{{option.author}}</small>
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="nameControl.invalid"
+            >{{"taxon.create.required.field.parent" | translate}}</mat-error
+          >
+        </mat-form-field>
+
+        <br />
+        <b
+          ><mat-label
+            >{{'taxon.create.acceptance.status' | translate}}</mat-label
+          ></b
+        >:&nbsp;
+
+        <mat-radio-group name="acceptance" (change)="onAcceptedChange()">
+          <mat-radio-button name="acceptance" value="1" checked
+            >{{"taxon.create.accepted.status" | translate}}</mat-radio-button
+          >
+          &nbsp; &nbsp;
+          <mat-radio-button name="acceptance" value="0" #hidden
+            >{{"taxon.create.not.accepted.status" |
+            translate}}</mat-radio-button
+          >
+        </mat-radio-group>
+        <symbiota2-expansion-panel
+          *ngIf="!isAccepted"
+          label='{{"taxon.status.accepted.editor.dialog.change.link" | translate}}'
+          expanded="true"
+        >
+          <mat-form-field class="name-autocomplete-full-width">
+            <mat-label>{{"taxon.create.accepted.name" | translate}}</mat-label>
+            <input
+              type="text"
+              placeholder='{{"taxon.status.accepted.editor.dialog.sciname.placeholder" | translate}}'
+              aria-label="String"
+              matInput
+              (keyup)="onKey($event)"
+              [formControl]="acceptedNameControl"
+              [matAutocomplete]="auto"
+              required
+            />
+            <mat-autocomplete
+              autoActiveFirstOption
+              #auto="matAutocomplete"
+              [displayWith]="getName"
+            >
+              <mat-option
+                *ngFor="let option of acceptedNameOptions"
+                [value]="option"
+              >
+                {{option.name}} <small>{{option.author}}</small>
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-error *ngIf="acceptedNameControl.invalid"
+            >{{"taxon.create.required.field.accepted" | translate}}</mat-error
+          >
+
+          <!-- explanation field start -->
+          <!-- <mat-label
+            >{{'taxon.taxon.editor.kingdomName' | translate}}</mat-label
+          > -->
+          &nbsp; &nbsp;
+          <mat-form-field appearance="fill">
+            <mat-label
+              >{{'taxon.create.unacceptability.reason' | translate}}</mat-label
+            >
+
+            <mat-select
+              [formControl]="kingdomNameControl"
+              required
+              (event)="orderFields($event)"
+            >
+              <mat-option *ngFor="let reason of reasons" [value]="reason">
+                {{reason}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="kingdomNameControl.invalid"
+              >{{someText | translate}}</mat-error
+            >
+          </mat-form-field>
+          <!-- explanation field end -->
+
+          <mat-form-field appearance="fill" [style.width.vw]="90">
+            <mat-label
+              >{{'taxon.taxon.editor.explanation' | translate}}</mat-label
+            >
+            <input
+              matInput
+              maxlength="100"
+              [value]="local_data.unacceptabilityReason"
+              [(ngModel)]="local_data.unacceptabilityReason"
+              [ngModelOptions]="{standalone: true}"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" [style.width.vw]="90">
+            <mat-label
+              >{{'taxon.taxon.editor.explanation.link' | translate}}</mat-label
+            >
+            <input
+              matInput
+              maxlength="100"
+              [value]="local_data.unacceptabilityReason"
+              [(ngModel)]="local_data.unacceptabilityReason"
+              [ngModelOptions]="{standalone: true}"
+            />
+          </mat-form-field>
+        </symbiota2-expansion-panel>
+        <br /><br />
+
+        <b
+          ><mat-label
+            >{{'taxon.taxon.editor.securityStatus' | translate}}</mat-label
+          ></b
+        >:&nbsp;
+        <mat-radio-group
+          name="securityStatus"
+          (change)="onSecurityStatusChange()"
+        >
+          <mat-radio-button name="securityStatus" value="y" checked
+            >{{"taxon.taxon.editor.locality.public" |
+            translate}}</mat-radio-button
+          >
+          &nbsp; &nbsp;
+          <mat-radio-button name="securityStatus" value="x" #hidden
+            >{{"taxon.taxon.editor.locality.hidden" |
+            translate}}</mat-radio-button
+          >
+        </mat-radio-group>
+        <br /><br />
+
+        <mat-checkbox
+          [(ngModel)]="unit1ind"
+          [ngModelOptions]="{standalone: true}"
+        >
+          <mat-label
+            >{{'taxon.taxon.editor.unitName1.indicator' | translate}}</mat-label
+          >
+        </mat-checkbox>
+        &nbsp; &nbsp;
+        <mat-form-field appearance="fill" [style.width.vw]="70">
+          <mat-label>{{'taxon.taxon.editor.unitName1' | translate}}</mat-label>
+          <input
+            matInput
+            maxlength="100"
+            [value]="local_data.unitName1"
+            [(ngModel)]="local_data.unitName1"
+            [ngModelOptions]="{standalone: true}"
+          />
+        </mat-form-field>
+        <br />
+        <mat-checkbox
+          [(ngModel)]="unit2ind"
+          [ngModelOptions]="{standalone: true}"
+        >
+          <mat-label
+            >{{'taxon.taxon.editor.unitName2.indicator' | translate}}</mat-label
+          >
+        </mat-checkbox>
+        &nbsp; &nbsp;
+
+        <mat-form-field appearance="fill" [style.width.vw]="70">
+          <mat-label>{{'taxon.taxon.editor.unitName2' | translate}}</mat-label>
+          <input
+            matInput
+            maxlength="100"
+            [value]="local_data.unitName2"
+            [(ngModel)]="local_data.unitName2"
+            [ngModelOptions]="{standalone: true}"
+          />
+        </mat-form-field>
+        <br />
+        <mat-checkbox
+          [(ngModel)]="unit3ind"
+          [ngModelOptions]="{standalone: true}"
+        >
+          <mat-label
+            >{{'taxon.taxon.editor.unitName3.indicator' | translate}}</mat-label
+          >
+        </mat-checkbox>
+        &nbsp; &nbsp;
+        <mat-form-field appearance="fill" [style.width.vw]="70">
+          <mat-label>{{'taxon.taxon.editor.unitName3' | translate}}</mat-label>
+          <input
+            matInput
+            maxlength="100"
+            [value]="local_data.unitName3"
+            [(ngModel)]="local_data.unitName3"
+            [ngModelOptions]="{standalone: true}"
+          />
+        </mat-form-field>
+        <br />
+
+        <!-- <mat-form-field appearance="fill">
+          <mat-label
+            >{{'taxon.taxon.editor.phyloSortSequence' | translate}}</mat-label
+          >
+          <input matInput [formControl]="sortSequence" />
+          <div
+            *ngIf="sortSequence.invalid && (sortSequence.dirty || sortSequence.touched)"
+          >
+            <mat-error *ngIf="sortSequence.invalid"
+              >Not a valid number</mat-error
+            >
+          </div>
+        </mat-form-field> -->
+
+        <!-- <br />
+        <mat-form-field appearance="fill">
+          <mat-label>{{'taxon.taxon.editor.status' | translate}}</mat-label>
+          <input
+            matInput
+            maxlength="100"
+            [value]="local_data.status"
+            [(ngModel)]="local_data.status"
+            [ngModelOptions]="{standalone: true}"
+          />
+        </mat-form-field> -->
+
+        <br />
+        <mat-form-field appearance="fill" [style.width.vw]="90">
+          <mat-label>{{'taxon.taxon.editor.source' | translate}}</mat-label>
+          <input
+            matInput
+            maxlength="100"
+            [value]="local_data.source"
+            [(ngModel)]="local_data.source"
+            [ngModelOptions]="{standalone: true}"
+          />
+        </mat-form-field>
+        <br />
+        <mat-form-field appearance="fill" [style.width.vw]="90">
+          <mat-label>{{'taxon.taxon.editor.notes' | translate}}</mat-label>
+          <input
+            matInput
+            maxlength="100"
+            [value]="local_data.notes"
+            [(ngModel)]="local_data.notes"
+            [ngModelOptions]="{standalone: true}"
+          />
+        </mat-form-field>
+        <br />
+        <mat-form-field appearance="fill" [style.width.vw]="90">
+          <mat-label>{{'taxon.taxon.editor.hybrid' | translate}}</mat-label>
+          <input
+            matInput
+            maxlength="100"
+            [value]="local_data.hybrid"
+            [(ngModel)]="local_data.hybrid"
+            [ngModelOptions]="{standalone: true}"
+          />
+        </mat-form-field>
+        <br />
+      </form>
     </div>
-
-    <div *ngIf="!userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
-        {{"taxonomy.uploader.lacks.edit.permission" | translate}}
-    </div>
-    <div *ngIf="userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
-        <div mat-dialog-content>
-            <form class="name-autocomplete-form">
-                <mat-form-field appearance="fill" [style.width.vw]="90">
-                    <mat-label>{{'taxon.taxon.editor.scientificName' | translate}}</mat-label>
-                    <!--
-                    <input matInput
-                           [value] = "local_data.scientificName"
-                           [(ngModel)]="scientificNameControl"
-                           [ngModelOptions]="{standalone: true}"
-                    required>
-                    -->
-                    <input matInput [formControl]='scientificNameControl' required>
-                    <mat-error *ngIf="scientificNameControl.invalid">{{"taxon.create.required.field.scientific.name" | translate}}</mat-error>
-                    <!--
-                    <div *ngIf="scientificNameControl.invalid && (scientificNameControl.dirty || scientificNameControl.touched)">
-                        <mat-error *ngIf="scientificNameControl.invalid">Scientific Name is required</mat-error>
-                    </div>
-                    -->
-                </mat-form-field>
-                <br/>
-                <mat-checkbox [(ngModel)]="unit1ind" [ngModelOptions]="{standalone: true}">
-                    <mat-label>{{'taxon.taxon.editor.unitName1.indicator' | translate}}</mat-label>
-                </mat-checkbox>
-                &nbsp; &nbsp;
-                <mat-form-field appearance="fill" [style.width.vw]="70">
-                    <mat-label>{{'taxon.taxon.editor.unitName1' | translate}}</mat-label>
-                    <input matInput
-                           maxlength="100"
-                           [value]="local_data.unitName1"
-                           [(ngModel)]="local_data.unitName1"
-                           [ngModelOptions]="{standalone: true}">
-                </mat-form-field>
-                <br/>
-                <mat-checkbox [(ngModel)]="unit2ind" [ngModelOptions]="{standalone: true}">
-                    <mat-label>{{'taxon.taxon.editor.unitName2.indicator' | translate}}</mat-label>
-                </mat-checkbox>
-                &nbsp; &nbsp;
-                <mat-form-field appearance="fill" [style.width.vw]="70">
-                    <mat-label>{{'taxon.taxon.editor.unitName2' | translate}}</mat-label>
-                    <input matInput
-                           maxlength="100"
-                           [value]="local_data.unitName2"
-                           [(ngModel)]="local_data.unitName2"
-                           [ngModelOptions]="{standalone: true}">
-                </mat-form-field>
-                <br/>
-                <mat-checkbox [(ngModel)]="unit3ind" [ngModelOptions]="{standalone: true}">
-                    <mat-label>{{'taxon.taxon.editor.unitName3.indicator' | translate}}</mat-label>
-                </mat-checkbox>
-                &nbsp; &nbsp;
-                <mat-form-field appearance="fill" [style.width.vw]="70">
-                    <mat-label>{{'taxon.taxon.editor.unitName3' | translate}}</mat-label>
-                    <input matInput
-                           maxlength="100"
-                           [value]="local_data.unitName3"
-                           [(ngModel)]="local_data.unitName3"
-                           [ngModelOptions]="{standalone: true}">
-                </mat-form-field>
-                <br/>
-                <mat-form-field appearance="fill">
-                    <mat-label>{{'taxon.taxon.editor.kingdomName' | translate}}</mat-label>
-                    <!--
-                    <mat-select [(ngModel)]="local_data.kingdomName" [ngModelOptions]="{standalone: true}" required>
-                    -->
-                    <mat-select [formControl]='kingdomNameControl' required>
-                        <mat-option *ngFor="let name of kingdomNames" [value]="name">
-                            {{name}}
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="kingdomNameControl.invalid">{{"taxon.create.required.field.kingdom.name" | translate}}</mat-error>
-                </mat-form-field>
-
-                <mat-form-field appearance="fill">
-                    <mat-label>{{'taxon.taxon.editor.rankName' | translate}}</mat-label>
-                    <!-- <mat-select [(ngModel)]="rankID" [ngModelOptions]="{standalone: true}"> -->
-                    <mat-select [formControl]='rankControl' required>
-                        <mat-option *ngFor="let rank of rankNames" [value]="rank.id">
-                            {{rank.name}}
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="rankControl.invalid">{{"taxon.create.required.field.rank" | translate}}</mat-error>
-                </mat-form-field>
-                <br/>
-                <mat-form-field appearance="fill" [style.width.vw]="90">
-                    <mat-label>{{'taxon.taxon.editor.author' | translate}}</mat-label>
-                    <input matInput
-                           maxlength="100"
-                           [value]="local_data.author"
-                           [(ngModel)]="local_data.author"
-                           [ngModelOptions]="{standalone: true}">
-                </mat-form-field>
-                <br/>
-                <mat-form-field appearance="fill" >
-                    <mat-label>{{'taxon.taxon.editor.phyloSortSequence' | translate}}</mat-label>
-                    <input matInput [formControl]='sortSequence'>
-                    <div *ngIf="sortSequence.invalid && (sortSequence.dirty || sortSequence.touched)">
-                        <mat-error *ngIf="sortSequence.invalid">Not a valid number</mat-error>
-                    </div>
-                </mat-form-field>
-
-                <br/>
-                <mat-form-field appearance="fill">
-                    <mat-label>{{'taxon.taxon.editor.status' | translate}}</mat-label>
-                    <input matInput
-                           maxlength="100"
-                           [value]="local_data.status"
-                           [(ngModel)]="local_data.status"
-                           [ngModelOptions]="{standalone: true}">
-                </mat-form-field>
-
-
-                <br/>
-                <mat-form-field appearance="fill" [style.width.vw]="90">
-                    <mat-label>{{'taxon.taxon.editor.source' | translate}}</mat-label>
-                    <input matInput
-                           maxlength="100"
-                           [value]="local_data.source"
-                           [(ngModel)]="local_data.source"
-                           [ngModelOptions]="{standalone: true}">
-                </mat-form-field>
-                <br/>
-                <mat-form-field appearance="fill" [style.width.vw]="90">
-                    <mat-label>{{'taxon.taxon.editor.notes' | translate}}</mat-label>
-                    <input matInput
-                           maxlength="100"
-                           [value]="local_data.notes"
-                           [(ngModel)]="local_data.notes"
-                           [ngModelOptions]="{standalone: true}">
-                </mat-form-field>
-                <br/>
-                <mat-form-field appearance="fill" [style.width.vw]="90">
-                    <mat-label>{{'taxon.taxon.editor.hybrid' | translate}}</mat-label>
-                    <input matInput
-                           maxlength="100"
-                           [value]="local_data.hybrid"
-                           [(ngModel)]="local_data.hybrid"
-                           [ngModelOptions]="{standalone: true}">
-                </mat-form-field>
-                <br/>
-                <b><mat-label>{{'taxon.taxon.editor.securityStatus' | translate}}</mat-label></b>:&nbsp;
-                <mat-radio-group name="securityStatus" (change)="onSecurityStatusChange()">
-                    <mat-radio-button name="securityStatus" value="y" checked>{{"taxon.taxon.editor.locality.public" | translate}}</mat-radio-button>
-                    &nbsp; &nbsp;
-                    <mat-radio-button name="securityStatus" value="x" #hidden>{{"taxon.taxon.editor.locality.hidden" | translate}}</mat-radio-button>
-                </mat-radio-group>
-                <br/>
-
-                <br/>
-                <b>{{"taxon.create.parent.taxon" | translate}}</b>:&nbsp;
-
-                <mat-form-field appearance="fill">
-                    <mat-label>{{"taxonomy.viewer.label.authority" | translate}}</mat-label>
-                    <mat-select field-class="symbiota2-field-class"
-                                placeholder='{{"taxonomy.viewer.label.authority" | translate}}'
-                                [(value)]="taxonomicAuthorityID"
-                                (selectionChange)="authorityChangeAction()">
-                        <mat-option *ngFor="let authority of taxonomicAuthorityList"
-                                    [value]="authority.id" >{{ authority.name }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-
-                <mat-form-field class="name-autocomplete-full-width">
-                    <mat-label *ngIf='kindOfName == "Scientific"'>{{"taxon.create.parent.taxon" | translate}}</mat-label>
-                    <!-- (keypress)="onKey($event)" -->
-                    <input *ngIf='kindOfName == "Scientific"' type="text"
-                           placeholder='{{"taxon.status.parent.editor.dialog.parent.taxon.placeholder" | translate}}'
-                           aria-label="String"
-                           matInput
-                           (keyup)="onKey($event)"
-                           [formControl]="nameControl"
-                           [matAutocomplete]="auto" required>
-                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="getName">
-                        <mat-option *ngFor="let option of nameOptions" [value]="option">
-                            {{option.name}} <small>{{option.author}}</small>
-                        </mat-option>
-                    </mat-autocomplete>
-                    <mat-error *ngIf="nameControl.invalid">{{"taxon.create.required.field.parent" | translate}}</mat-error>
-                </mat-form-field>
-
-
-                <br/>
-                <b><mat-label>{{'taxon.create.acceptance.status' | translate}}</mat-label></b>:&nbsp;
-                <mat-radio-group name="acceptance" (change)="onAcceptedChange()">
-                    <mat-radio-button name="acceptance" value="1" checked>{{"taxon.create.accepted.status" | translate}}</mat-radio-button>
-                    &nbsp; &nbsp;
-                    <mat-radio-button name="acceptance" value="0" #hidden>{{"taxon.create.not.accepted.status" | translate}}</mat-radio-button>
-                </mat-radio-group>
-                <symbiota2-expansion-panel *ngIf="!isAccepted" label='{{"taxon.status.accepted.editor.dialog.change.link" | translate}}' expanded='true'>
-                    <mat-form-field class="name-autocomplete-full-width">
-                        <mat-label>{{"taxon.create.accepted.name" | translate}}</mat-label>
-                        <input type="text"
-                               placeholder='{{"taxon.status.accepted.editor.dialog.sciname.placeholder" | translate}}'
-                               aria-label="String"
-                               matInput
-                               (keyup)="onKey($event)"
-                               [formControl]="acceptedNameControl"
-                               [matAutocomplete]="auto" required>
-                        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="getName">
-                            <mat-option *ngFor="let option of acceptedNameOptions" [value]="option">
-                                {{option.name}} <small>{{option.author}}</small>
-                            </mat-option>
-                        </mat-autocomplete>
-                    </mat-form-field>
-                    <mat-error *ngIf="acceptedNameControl.invalid">{{"taxon.create.required.field.accepted" | translate}}</mat-error>
-                    <mat-form-field appearance="fill" [style.width.vw]="90">
-                        <mat-label>{{'taxon.create.unacceptability.reason' | translate}}</mat-label>
-                        <input matInput
-                               maxlength="100"
-                               [value]="local_data.unacceptabilityReason"
-                               [(ngModel)]="local_data.unacceptabilityReason"
-                               [ngModelOptions]="{standalone: true}">
-                    </mat-form-field>
-                </symbiota2-expansion-panel>
-            </form>
-        </div>
-        <br/><br/>
-        <div mat-dialog-actions>
-            <button mat-button (click)="doSave()" [disabled]="(!isAccepted && acceptedNameControl.invalid) || nameControl.invalid || rankControl.invalid || scientificNameControl.invalid || kingdomNameControl.invalid || sortSequence.invalid" mat-flat-button color="primary">{{'taxon.editor.dialog.save' | translate}}</button>
-            <!--
+    <br /><br />
+    <div mat-dialog-actions>
+      <button
+        mat-button
+        (click)="doSave()"
+        [disabled]="(!isAccepted && acceptedNameControl.invalid) || nameControl.invalid || rankControl.invalid || scientificNameControl.invalid || kingdomNameControl.invalid || sortSequence.invalid"
+        mat-flat-button
+        color="primary"
+      >
+        {{'taxon.editor.dialog.save' | translate}}
+      </button>
+      <!--
                     <button mat-button (click)="doSave()" mat-flat-button color="primary">{{'taxon.editor.dialog.save' | translate}}</button>
             -->
-            &nbsp;
-            <button mat-button (click)="doClear()" mat-flat-button color="warn">{{'taxon.editor.dialog.clear' | translate}}</button>
-        </div>
+      &nbsp;
+      <button mat-button (click)="doClear()" mat-flat-button color="warn">
+        {{'taxon.editor.dialog.clear' | translate}}
+      </button>
     </div>
+  </div>
 </div>

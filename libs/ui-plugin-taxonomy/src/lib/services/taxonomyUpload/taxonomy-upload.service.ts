@@ -56,7 +56,8 @@ export class TaxonomyUploadService {
         private readonly api: ApiClientService,
         private readonly alerts: AlertService,
         private readonly user: UserService,
-        private readonly taxonomicAuthorityService: TaxonomicAuthorityService
+        private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
+        private readonly taxaService: TaxonService
     ) {
         this.taxonomicAuthorityID = this.taxonomicAuthorityService.getAuthorityID()
     }
