@@ -44,3 +44,7 @@ testem.log
 Thumbs.db
 /oldCode/**
 /oldCode/image-old-not-used-search/
+
+/apps/ui/src/environments/environment.ts
+cloudKey.txt
+environment.ts
