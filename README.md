@@ -14,6 +14,18 @@ This project was uses [Nx](https://nx.dev), [Angular](https://angular.io), and [
 
 [Tutorial on writing a Symbiota2 UI page](./docs/tutorials/simpleWebPage.md)
 
+How to get an instance running on a Linux box:
+
+1. Install docker (`sudo apt install docker-compose`)
+2. Install nodeJS and manager (`sudo apt install npm`)
+3. Clone Symbiota2 (`git clone https://gitlab.com/willpearse/symbiota2.git`; `sudo apt install git` if Git isn't installed)
+4. Install nx development environment (`npm i npx`)
+5. Start Symbiota dependencies (`sudo docker-compose up -d`)
+6. Launch npm environment (`npx`)
+7. Launch Symbviota front-end server (`nx serve ui`)
+8. Go to the web-address that now appears in your terminal window. Congratulations! You're running Symbiota2!
+
+
 ## Environment
 
 Any variable without a default is required for the Symbiota2 API to run. 
