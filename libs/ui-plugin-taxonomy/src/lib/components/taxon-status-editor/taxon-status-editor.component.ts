@@ -121,12 +121,13 @@ export class TaxonStatusEditorComponent implements OnInit {
         this.taxonomicAuthorityService.findAll()
             .subscribe((authorities) => {
                 this.allTaxonomicAuthorityList = authorities
+                this.allTaxonomicAuthorityList.forEach((authority) => {
+                    if (authority.isPrimay) {
+                        this.currentAuthorityID = authority.id
+                    }
+                })
             })
-        this.taxonomicAuthorityList.forEach((authority) => {
-            if (authority.isPrimay) {
-                this.currentAuthorityID = authority.id
-            }
-        })
+
     }
 
     /*
@@ -158,6 +159,9 @@ export class TaxonStatusEditorComponent implements OnInit {
                                 this.taxonomicAuthorityList.unshift(authority)
                             }
                         })
+                        // Trigger the binding in the UI
+                        const temp = this.taxonomicAuthorityList
+                        this.taxonomicAuthorityList = temp
                     }
                     // Sort the taxonomic list
                     this.taxonomicAuthorityList.sort(function (a, b) {

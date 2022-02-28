@@ -1,4 +1,7 @@
 <div id='main'>
+    <div *ngIf="!userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
+        {{"image.add.lacks.edit.permission" | translate}}
+    </div>
     <div *ngIf="userCanEdit" class='my2'>
 
         <!-- Configure kind of upload -->
@@ -161,9 +164,7 @@
             </button>
         </div>
     </div>
-    <div *ngIf="!userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
-        {{"image.add.lacks.edit.permission" | translate}}
-    </div>
+
 
 
 </div>

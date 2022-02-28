@@ -1,0 +1,23 @@
+
+<div id='main'>
+    <div *ngIf="!userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
+        {{"taxon.delete.lacks.permission" | translate}}
+    </div>
+    <div *ngIf="userCanEdit" class='my2'>
+        <symbiota2-expansion-panel label="{{'taxon.delete.label' | translate}}">
+            <div *ngIf='children.length > 0'>
+                {{'taxon.delete.has.children.message' | translate}}
+                <ul *ngFor='let child of children'>
+                    <li><a href='{{editorRoute}}/{{child.taxon.id}}'>{{child.taxon.scientificName}}</a></li>
+                </ul>
+            </div>
+            <div *ngIf='children.length == 0'>
+                <div color='warn'>{{'taxon.delete.warning.message' | translate}}</div>
+                <br/>
+                <button mat-button (click)="deleteTaxon(null)" mat-raised-button color="warn">
+                    {{'taxon.delete.button' | translate}}
+                </button>
+            </div>
+        </symbiota2-expansion-panel>
+    </div>
+</div>
