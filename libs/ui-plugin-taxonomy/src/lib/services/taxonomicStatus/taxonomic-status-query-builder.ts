@@ -32,10 +32,6 @@ export class TaxonomicStatusQueryBuilder {
         return new FindOneBuilder(this.baseUrl)
     }
 
-    findInConflict(): FindInConflictBuilder {
-        return new FindInConflictBuilder(this.baseUrl)
-    }
-
     create(): CreateOneBuilder {
         return new CreateOneBuilder(this.baseUrl);
     }
@@ -155,21 +151,6 @@ class FindOneBuilder extends TaxonomicStatusQueryBuilder {
     build(): string {
         // Should have all of these to work
         this.url.pathname += `/${this._id}/${this._authorityId}/${this._acceptedId}`
-        return super.build()
-    }
-}
-
-class FindInConflictBuilder extends TaxonomicStatusQueryBuilder {
-    protected _authorityId: number
-
-    authorityId(id: number): FindInConflictBuilder {
-        this._authorityId = id
-        return this;
-    }
-
-    build(): string {
-        // Should have all of these to work
-        this.url.pathname += `/inConflict/${this._authorityId}`
         return super.build()
     }
 }

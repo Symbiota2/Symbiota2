@@ -1,19 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TaxonomyUploadPage } from './taxonomy-upload-page.component';
+
+import { OccurrenceUploadComponent } from './upload.component';
 
 describe('UploadComponent', () => {
-  let component: TaxonomyUploadPage;
-  let fixture: ComponentFixture<TaxonomyUploadPage>;
+  let component: OccurrenceUploadComponent;
+  let fixture: ComponentFixture<OccurrenceUploadComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TaxonomyUploadPage ]
+      declarations: [ OccurrenceUploadComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TaxonomyUploadPage);
+    fixture = TestBed.createComponent(OccurrenceUploadComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

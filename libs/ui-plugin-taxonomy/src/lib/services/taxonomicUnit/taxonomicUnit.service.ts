@@ -20,7 +20,6 @@ interface FindAllParams {
 export class TaxonomicUnitService {
     private jwtToken = this.user.currentUser.pipe(map((user) => user.token))
     static ranksLookup
-    static nameToRankID
 
     constructor(
         private readonly alerts: AlertService,
@@ -28,22 +27,12 @@ export class TaxonomicUnitService {
         private readonly apiClient: ApiClientService,
         private readonly appConfig: AppConfigService)
     {
-        this.initialize()
-    }
-
-    private async initialize() {
-        await this.findAll().subscribe((units) => {
-            if (!TaxonomicUnitService.ranksLookup) {
-                TaxonomicUnitService.ranksLookup = new Map()
-                TaxonomicUnitService.nameToRankID = new Map()
-                units.forEach((unit) => {
-                    const key = unit.rankID + unit.kingdomName
-                    TaxonomicUnitService.ranksLookup.set(key,unit.rankName)
-                    if (!TaxonomicUnitService.nameToRankID.has(unit.rankName)) {
-                        TaxonomicUnitService.nameToRankID.set(unit.rankName, unit.rankID)
-                    }
-                })
-            }
+        this.findAll().subscribe((units) => {
+            TaxonomicUnitService.ranksLookup = new Map()
+            units.forEach((unit) => {
+                const key = unit.rankID + unit.kingdomName
+                TaxonomicUnitService.ranksLookup.set(key,unit.rankName)
+            })
         })
     }
 
@@ -55,9 +44,15 @@ export class TaxonomicUnitService {
         return TaxonomicUnitService.ranksLookup
     }
 
-    public getRankIDForName() {
-        return TaxonomicUnitService.nameToRankID
+    /*
+    public lookupRankName(rankID, kingdomName) {
+        const key = rankID + kingdomName
+        console.log("lookup " + key)
+        return TaxonomicUnitService.ranksLookup.has(key)?
+            TaxonomicUnitService.ranksLookup.get(key)
+            : 'unknown'
     }
+     */
 
     public getUrl() {
         const apiBaseUrl = this.appConfig.apiUri()

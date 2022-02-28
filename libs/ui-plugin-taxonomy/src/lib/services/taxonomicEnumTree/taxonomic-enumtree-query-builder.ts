@@ -44,10 +44,6 @@ export class TaxonomicEnumTreeQueryBuilder {
         return new MoveBuilder(this.baseUrl);
     }
 
-    rebuild(): RebuildBuilder {
-        return new RebuildBuilder(this.baseUrl);
-    }
-
     delete(): DeleteOneBuilder {
         return new DeleteOneBuilder(this.baseUrl);
     }
@@ -99,22 +95,6 @@ class MoveBuilder extends TaxonomicEnumTreeQueryBuilder {
         this.url.searchParams.append(Q_PARAM_PARENTID, this._parentId.toString())
         this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityId.toString())
         this.url.pathname += `/move`
-        return super.build();
-    }
-}
-
-
-class RebuildBuilder extends TaxonomicEnumTreeQueryBuilder {
-    protected _authorityId: number
-
-    authorityId(id: number): RebuildBuilder {
-        this._authorityId = id
-        return this
-    }
-
-    build(): string {
-        this.url.pathname += `/rebuildTree/`
-        this.url.pathname += this._authorityId.toString()
         return super.build();
     }
 }

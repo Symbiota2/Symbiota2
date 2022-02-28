@@ -109,10 +109,6 @@
 
             <mat-tree #tree [dataSource]="dataSource" [treeControl]="treeControl" class="example-tree">
                 <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
-                    <ng-template #italicizeName><a [routerLink]="['/taxon/profile', node.taxonID]" class='taxonlink'><i>{{node.name}}</i></a> <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small></ng-template>
-                    <ng-template #normalName><a [routerLink]="['/taxon/profile', node.taxonID]" class='taxonlink'>{{node.name}}</a> <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small></ng-template>
-                    <ng-template #italicizeSynonym><a [routerLink]="['/taxon/profile', node.taxonID]" class='taxonlink'>[<i>{{node.name}}</i>]</a> <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small></ng-template>
-                    <ng-template #normalSynonym><a [routerLink]="['/taxon/profile', node.taxonID]" class='taxonlink'>[{{node.name}}]</a> <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small></ng-template>
                     <li>
                     <span *ngIf='!isSynonym(node)'>
                     <button *ngIf='isNotExpanded(node)' mat-icon-button matTreeNodeToggle
@@ -120,35 +116,37 @@
                         <mat-icon class="mat-icon-rtl-mirror">
                             {{treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right'}}
                         </mat-icon>
-                        &nbsp; &nbsp; <div *ngIf="node.rankID >= genusRankID; then italicizeName else normalName"></div>
+                        &nbsp; &nbsp; <a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>{{node.name}}</a>
+                        <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small>
                     </button>
-                    <span *ngIf='!isNotExpanded(node)'> &nbsp; &nbsp; <div *ngIf="node.rankID >= genusRankID; then italicizeName else normalName"></div>
-                        </span>
+                    <span *ngIf='!isNotExpanded(node)'> &nbsp; &nbsp; <a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>{{node.name}}</a>
+                        <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small></span>
                     </span>
                         <span *ngIf='isSynonym(node)'>
-                     &nbsp; &nbsp; <div *ngIf="node.rankID >= genusRankID; then italicizeSynonym else normalSynonym"></div>
+                     &nbsp; &nbsp; <a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>[{{node.name}}]</a>
+                        <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small>
                     </span>
                     </li>
                 </mat-tree-node>
 
                 <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
-                    <ng-template #italicizeName><a [routerLink]="['/taxon/profile', node.taxonID]" class='taxonlink'><i>{{node.name}}</i></a> <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small></ng-template>
-                    <ng-template #normalName><a [routerLink]="['/taxon/profile', node.taxonID]" class='taxonlink'>{{node.name}}</a> <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small></ng-template>
                     <li *ngIf='isNotExpanded(node)'>
                         <button *ngIf='isNotExpanded(node)' mat-icon-button matTreeNodeToggle
                                 (click)="loadChildren(node)">
                             <mat-icon class="mat-icon-rtl-mirror">
                                 {{treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right'}}
                             </mat-icon>
-                            &nbsp; &nbsp; <div *ngIf="node.rankID >= genusRankID; then italicizeName else normalName"></div>
+                            &nbsp; &nbsp; <a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>{{node.name}}</a>
+                            <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small>
                         </button>
                         <ul>
                             <ng-container matTreeNodeOutlet></ng-container>
                         </ul>
                     </li>
                     <li *ngIf='!isNotExpanded(node)'>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div *ngIf="node.rankID >= genusRankID; then italicizeName else normalName"></div>
-                        <ul>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a [routerLink]="['/taxon/profile', node.taxonID]" target="_blank" class='taxonlink'>{{node.name}}</a>
+                        <small *ngIf='includeAuthors'>&nbsp;{{node.author}}</small>
+                        <ul >
                             <ng-container matTreeNodeOutlet></ng-container>
                         </ul>
                     </li>
