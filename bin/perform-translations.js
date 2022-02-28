@@ -7,33 +7,20 @@ const glob = require("glob");
 
 // Creates a client
 const symbiotaKey = fs.readFileSync("cloudKey.txt").toString('utf-8');
-console.log(symbiotaKey);
 
-
-/*function translateJsons(languages, languagePrefixes) {
-  //console.log("Languages dict", languages)
-  let enPaths = languages["en.json"]
-  var index = 0
-  enPaths.forEach(path => {
-    console.log("Translating using en path ", index, path);
-
-    index++;
-  });
-  //console.log(enPaths);
-}*/
 
 function translateJson(enContents, targetLangPath) {
   //Parse the english Json
   const contents = fs.readFileSync(targetLangPath).toString();
   try {
     const contentsJson = JSON.parse(contents);
-    console.log("DOING TRANSLATE IG")
+    console.log("DOING TRANSLATE")
   }
   catch (e) {
     console.log("Translate json errored", e)
     throw `Invalid JSON at ${targetLangPath}: ${e}`;
   }
-  //console.log(enPaths);
+  console.log(Object.keys(enContents));
 }
 
 async function translateText() {
@@ -113,19 +100,18 @@ enPaths.forEach(path => {
   console.log("Translating using en path ", index, path);
   var langIndex = 1;
   let currEnPath = enPaths[index];
-  console.log("Attempting to read English json at path: ", currEnPath)
+  //console.log("Attempting to read English json at path: ", currEnPath)
   //Parse the english Json
   const contents = fs.readFileSync(currEnPath).toString();
-  console.log("Contents: ", contents)
+  //console.log("Contents: ", contents)
   try {
     const enContentsJson = JSON.parse(contents);
-    console.log("Did we get here?")
     //If we can read the english json at the directory, commence translations.
     Object.keys(languages).forEach(langKey => {
       if (langKey != "en.json") {
         let targetLangPath = languages[langKey][index];
-        console.log("LangKey: ", langKey);
-        console.log("Lang Json Paths", langIndex, languages[langKey][0]);
+        //    console.log("LangKey: ", langKey);
+        //    console.log("Lang Json Paths", langIndex, languages[langKey][0]);
         translateJson(enContentsJson, targetLangPath)
       }
     })
