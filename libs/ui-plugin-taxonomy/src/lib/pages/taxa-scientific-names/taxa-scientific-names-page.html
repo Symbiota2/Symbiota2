@@ -73,7 +73,16 @@
     </symbiota2-expansion-panel>
   </div> -->
 
-  <!-- Taxonomy -->
+  <!-- Add a new name -->
+  <div>
+    <h1>
+      <button mat-stroked-button routerLink="/taxon/create">
+        {{ "taxon.create.add.new.name" | translate }}
+      </button>
+    </h1>
+  </div>
+
+  <!-- Edit existing name -->
   <div class="expansion-panel">
     <symbiota2-expansion-panel
       label='{{"taxonomy.editor.entry.edit.title" | translate}}'
@@ -148,13 +157,5 @@
         </mat-selection-list>
       </symbiota2-expansion-panel>
     </symbiota2-expansion-panel>
-  </div>
-
-  <div>
-    <h1>
-      <button mat-stroked-button routerLink="/taxon/create">
-        {{ "taxon.create.add.new.name" | translate }}
-      </button>
-    </h1>
   </div>
 </div>
