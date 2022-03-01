@@ -14,24 +14,34 @@ function translateJson(enContents, languages, jsonFileIndex) {
   const targetLangPrefixes = ['ar', 'de', 'es', 'fa', 'fr', 'hi', 'it', 'ja', 'pt', 'ru', 'ur', 'zh'];
   //console.log("About to read languages: ", languages);
   const contents = fs.readFileSync(languages['es.json'][jsonFileIndex]).toString();
-  const englishKeys = Object.keys(enContents);
+  const enKeys = Object.keys(enContents);
+  let enVals = Object.values(enContents);
+  /*console.log("Encontents: ", enContents)
+  console.log("Enkeys: ", enKeys)
+  console.log("Envalues: ", enVals)
+  */
   targetLangPrefixes.forEach(langPrefix => {
-    let langKey = langPrefix + ".json";
-    console.log("Lang Prefix curr: ", langPrefix);
-    console.log("LangKey curr: ", langKey);
-    console.log("Lang Prefix currPath: ", languages[langKey][jsonFileIndex]);
+    try {
+      let langKey = langPrefix + ".json";
+      const targetContents = fs.readFileSync(languages[langKey][jsonFileIndex]).toString();
+      const contentsJson = JSON.parse(contents);
+      console.log("DOING TRANSLATE")
+      //Translate to our target language, denoted by the current prefix.
+      translateText(enVals, langPrefix).then(function (result) {
+        console.log("Resulting translation: ", result);
+      });
+
+    }
+    catch (e) {
+      console.log("Translate json errored", e)
+      throw `Error in translateJson(): ${e}`;
+    }
+
   })
-  try {
-    const contentsJson = JSON.parse(contents);
-    console.log("DOING TRANSLATE")
-  }
-  catch (e) {
-    console.log("Translate json errored", e)
-    throw `Error in translateJson(): ${e}`;
-  }
+
 }
 
-async function translateText() {
+async function translateText(text, target) {
   // Translates the text into the target language. "text" can be a string for
   // translating a single piece of text, or an array of strings for translating
   // multiple texts.
@@ -41,6 +51,7 @@ async function translateText() {
   translations.forEach((translation, i) => {
     console.log(`${text[i]} => (${target}) ${translation}`);
   });
+  return translations;
 }
 
 
@@ -70,6 +81,7 @@ const pluginPattern = path.resolve(
 
 const languages = {};
 const outDir = path.resolve(__dirname, "..", "apps", "ui", "src", "assets", "i18n");
+//There was a json in ui-common that only had an english translation, so it was breaking the script.
 const extraEnDir = path.resolve(__dirname, "..", "libs", "ui-common")
 const outDirApps = path.resolve(__dirname, "..", "apps");
 console.log("OutDir: ", outDir);
