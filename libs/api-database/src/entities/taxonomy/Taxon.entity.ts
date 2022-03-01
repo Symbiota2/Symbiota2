@@ -1,12 +1,14 @@
 import {
     Column,
-    Entity, getConnection,
+    Entity,
+    getConnection,
     Index,
     JoinColumn,
     ManyToOne,
     OneToMany,
     OneToOne,
-    PrimaryGeneratedColumn, Repository
+    PrimaryGeneratedColumn,
+    Repository,
 } from 'typeorm';
 import { Unknown } from '../unknown-taxon';
 import { TaxonMap } from './TaxonMap.entity';
@@ -41,7 +43,8 @@ import {
     DWC_FIELD_TAXON_ACCEPTED_NAME_USAGE,
     DWC_FIELD_RECORD_DYNAMIC_PROPS,
     DWC_FIELD_TAXON_CLASS,
-    DWC_FIELD_TAXON_FAMILY, DWC_FIELD_TAXON_GENUS,
+    DWC_FIELD_TAXON_FAMILY,
+    DWC_FIELD_TAXON_GENUS,
     DWC_FIELD_TAXON_ID,
     DWC_FIELD_TAXON_KINGDOM,
     DWC_FIELD_TAXON_ORDER,
@@ -50,18 +53,21 @@ import {
     DWC_FIELD_TAXON_REMARKS,
     DWC_FIELD_TAXON_SCIENTIFIC_NAME,
     DWC_FIELD_TAXON_SCIENTIFIC_NAME_AUTHORSHIP,
-    DWC_FIELD_TAXON_STATUS, DWC_TERM_TAXON,
+    DWC_FIELD_TAXON_STATUS,
+    DWC_TERM_TAXON,
     DwCField,
     DwCID,
     DwCRecord,
-    dwcRecordType
+    dwcRecordType,
 } from '@symbiota2/dwc';
 import { TaxonomicUnit } from './TaxonomicUnit.entity';
 import { KGProperty, KGType } from '@symbiota2/knowledgeGraph';
 
 @DwCRecord(DWC_TERM_TAXON)
 @KGType('taxon:Taxon')
-@Index('sciname_unique', ['scientificName', 'rankID', 'author'], { unique: true })
+@Index('sciname_unique', ['scientificName', 'rankID', 'author'], {
+    unique: true,
+})
 @Index('rankid_index', ['rankID'])
 @Index('idx_taxacreated', ['initialTimestamp'])
 @Index(['lastModifiedUID'])
@@ -69,7 +75,7 @@ import { KGProperty, KGType } from '@symbiota2/knowledgeGraph';
 @Entity('taxa')
 export class Taxon extends EntityProvider {
     static get DWC_TYPE(): string {
-        return dwcRecordType(Taxon)
+        return dwcRecordType(Taxon);
     }
 
     @DwCID()
@@ -77,7 +83,7 @@ export class Taxon extends EntityProvider {
     @PrimaryGeneratedColumn({ type: 'int', name: 'TID', unsigned: true })
     id: number;
 
-    @KGProperty("biol:kingdom")
+    @KGProperty('biol:kingdom')
     @Column('varchar', { name: 'kingdomName', nullable: true, length: 45 })
     kingdomName: string;
 
@@ -150,7 +156,7 @@ export class Taxon extends EntityProvider {
         name: 'SecurityStatus',
         comment: '0 = no security; 1 = hidden locality',
         unsigned: true,
-        default: () => '\'0\'',
+        default: () => "'0'",
     })
     securityStatus: number;
 
@@ -200,13 +206,22 @@ export class Taxon extends EntityProvider {
     )
     occurrenceTypes: Promise<OccurrenceType[]>;
 
-    @OneToMany(() => TaxaNestedTreeEntry, (taxanestedtree) => taxanestedtree.taxon)
+    @OneToMany(
+        () => TaxaNestedTreeEntry,
+        (taxanestedtree) => taxanestedtree.taxon
+    )
     nestedTaxonTrees: Promise<TaxaNestedTreeEntry[]>;
 
-    @OneToMany(() => TaxonVernacular, (taxavernaculars) => taxavernaculars.taxon)
+    @OneToMany(
+        () => TaxonVernacular,
+        (taxavernaculars) => taxavernaculars.taxon
+    )
     vernacularNames: Promise<TaxonVernacular[]>;
 
-    @OneToMany(() => DynamicChecklistTaxonLink, (fmdyncltaxalink) => fmdyncltaxalink.taxon)
+    @OneToMany(
+        () => DynamicChecklistTaxonLink,
+        (fmdyncltaxalink) => fmdyncltaxalink.taxon
+    )
     dynamicChecklistLinks: Promise<DynamicChecklistTaxonLink[]>;
 
     @OneToMany(() => CharacteristicDescription, (kmdescr) => kmdescr.taxon)
@@ -218,7 +233,10 @@ export class Taxon extends EntityProvider {
     @OneToMany(() => UserTaxonomy, (usertaxonomy) => usertaxonomy.taxon)
     userTaxonomies: Promise<UserTaxonomy[]>;
 
-    @OneToMany(() => OccurrenceGeoIndex, (omoccurgeoindex) => omoccurgeoindex.taxon)
+    @OneToMany(
+        () => OccurrenceGeoIndex,
+        (omoccurgeoindex) => omoccurgeoindex.taxon
+    )
     occurrenceGeoIndices: Promise<OccurrenceGeoIndex[]>;
 
     @OneToMany(
@@ -239,7 +257,10 @@ export class Taxon extends EntityProvider {
     @OneToMany(() => TaxonomicStatus, (taxstatus) => taxstatus.acceptedTaxon)
     acceptedTaxonStatuses: Promise<TaxonomicStatus[]>;
 
-    @OneToMany(() => GlossaryTaxonLink, (glossarytaxalink) => glossarytaxalink.taxon)
+    @OneToMany(
+        () => GlossaryTaxonLink,
+        (glossarytaxalink) => glossarytaxalink.taxon
+    )
     glossaryTaxonLinks: Promise<GlossaryTaxonLink[]>;
 
     @OneToMany(() => TraitTaxonLink, (tmtraittaxalink) => tmtraittaxalink.taxon)
@@ -248,10 +269,16 @@ export class Taxon extends EntityProvider {
     @OneToMany(() => TaxaEnumTreeEntry, (taxaenumtree) => taxaenumtree.taxon)
     taxaEnumEntries: Promise<TaxaEnumTreeEntry[]>;
 
-    @OneToMany(() => TaxaEnumTreeEntry, (taxaenumtree) => taxaenumtree.parentTaxon)
+    @OneToMany(
+        () => TaxaEnumTreeEntry,
+        (taxaenumtree) => taxaenumtree.parentTaxon
+    )
     childTaxaEnumEntries: Promise<TaxaEnumTreeEntry[]>;
 
-    @OneToMany(() => ChecklistTaxonLink, (fmchklsttaxalink) => fmchklsttaxalink.taxon)
+    @OneToMany(
+        () => ChecklistTaxonLink,
+        (fmchklsttaxalink) => fmchklsttaxalink.taxon
+    )
     checklistLinks: Promise<ChecklistTaxonLink[]>;
 
     @OneToMany(
@@ -260,19 +287,22 @@ export class Taxon extends EntityProvider {
     )
     occurrenceAssociations: Promise<OccurrenceAssociation[]>;
 
-    @OneToMany(() => ImageAnnotation, (imageannotations) => imageannotations.taxon)
+    @OneToMany(
+        () => ImageAnnotation,
+        (imageannotations) => imageannotations.taxon
+    )
     imageAnnotations: Promise<ImageAnnotation[]>;
 
     @OneToMany(() => TaxonLink, (taxalinks) => taxalinks.taxon)
     taxonLinks: Promise<TaxonLink[]>;
 
-    @OneToMany(
-        () => Occurrence,
-        (omoccurrences) => omoccurrences.taxon
-    )
+    @OneToMany(() => Occurrence, (omoccurrences) => omoccurrences.taxon)
     occurrences: Promise<Occurrence[]>;
 
-    @OneToMany(() => TaxonDescriptionBlock, (taxadescrblock) => taxadescrblock.taxon)
+    @OneToMany(
+        () => TaxonDescriptionBlock,
+        (taxadescrblock) => taxadescrblock.taxon
+    )
     taxonDescriptionBlocks: Promise<TaxonDescriptionBlock[]>;
 
     @ManyToOne(() => User, (users) => users.modifiedTaxa, {
@@ -282,11 +312,18 @@ export class Taxon extends EntityProvider {
     @JoinColumn([{ name: 'modifiedUid', referencedColumnName: 'uid' }])
     lastModifiedUser: Promise<User>;
 
-    @OneToMany(() => CharacteristicTaxonLink, (kmchartaxalink) => kmchartaxalink.taxon)
+    @OneToMany(
+        () => CharacteristicTaxonLink,
+        (kmchartaxalink) => kmchartaxalink.taxon
+    )
     characteristicLinks: Promise<CharacteristicTaxonLink[]>;
 
-    async lookupAncestor(taxonRepo: Repository<Taxon>, rankID: number): Promise<Taxon> {
-        return await taxonRepo.createQueryBuilder('t')
+    async lookupAncestor(
+        taxonRepo: Repository<Taxon>,
+        rankID: number
+    ): Promise<Taxon> {
+        return await taxonRepo
+            .createQueryBuilder('t')
             .select()
             .innerJoin(TaxaEnumTreeEntry, 'te', 't.id = te.parentTaxonID')
             .where('te.taxonID = :taxonID', { taxonID: this.id })
@@ -295,13 +332,16 @@ export class Taxon extends EntityProvider {
             .getOne();
     }
 
-    async setAncestor(taxaEnumRepo: Repository<TaxaEnumTreeEntry>, ancestor: Taxon) {
+    async setAncestor(
+        taxaEnumRepo: Repository<TaxaEnumTreeEntry>,
+        ancestor: Taxon
+    ) {
         const oldAncestorLink = await taxaEnumRepo.findOne({
             relations: ['parentTaxon'],
             where: {
                 taxonID: this.id,
-                'parentTaxon.rankID': ancestor.rankID
-            }
+                'parentTaxon.rankID': ancestor.rankID,
+            },
         });
         console.log(JSON.stringify(oldAncestorLink));
     }
@@ -310,16 +350,20 @@ export class Taxon extends EntityProvider {
         const db = getConnection();
         const taxonRepo = db.getRepository(Taxon);
 
-        const ancestor = await taxonRepo.createQueryBuilder('pt')
+        const ancestor = await taxonRepo
+            .createQueryBuilder('pt')
             .select(['pt.scientificName'])
             .innerJoin(TaxaEnumTreeEntry, 'te', 'pt.id = te.parentTaxonID')
             .innerJoin(Taxon, 't', 'te.taxonID = t.id')
-            .innerJoin(TaxonomicUnit, 'parentRank', 'pt.rankID = parentRank.rankID')
-            .where('t.id = :taxonID', { taxonID: this.id })
-            .andWhere(
-                'LOWER(parentRank.rankName) = :rankName',
-                { rankName: ancestorRankName.toLocaleLowerCase() }
+            .innerJoin(
+                TaxonomicUnit,
+                'parentRank',
+                'pt.rankID = parentRank.rankID'
             )
+            .where('t.id = :taxonID', { taxonID: this.id })
+            .andWhere('LOWER(parentRank.rankName) = :rankName', {
+                rankName: ancestorRankName.toLocaleLowerCase(),
+            })
             .cache(30000)
             .groupBy('pt.scientificName')
             .getOne();
@@ -336,7 +380,7 @@ export class Taxon extends EntityProvider {
         const taxonUnitRepo = db.getRepository(TaxonomicUnit);
         return await taxonUnitRepo.findOne({
             kingdomName: this.kingdomName,
-            rankID: this.rankID
+            rankID: this.rankID,
         });
     }
 
@@ -345,7 +389,7 @@ export class Taxon extends EntityProvider {
         const taxonUnitRepo = db.getRepository(TaxonomicUnit);
         const rank = await taxonUnitRepo.findOne({
             kingdomName: this.kingdomName,
-            rankName: rankName
+            rankName: rankName,
         });
         if (!rank) {
             throw new Error(
@@ -400,10 +444,15 @@ export class Taxon extends EntityProvider {
         const db = getConnection();
         const taxonRepo = db.getRepository(Taxon);
 
-        const acceptedTaxon = await taxonRepo.createQueryBuilder('t')
+        const acceptedTaxon = await taxonRepo
+            .createQueryBuilder('t')
             .select(['acceptedTaxon.scientificName'])
             .innerJoin(TaxonomicStatus, 's', 's.taxonID = t.id')
-            .innerJoin(Taxon, 'acceptedTaxon', 's.taxonIDAccepted = acceptedTaxon.id')
+            .innerJoin(
+                Taxon,
+                'acceptedTaxon',
+                's.taxonIDAccepted = acceptedTaxon.id'
+            )
             .where('t.id = :taxonID', { taxonID: this.id })
             .orderBy('s.sortSequence')
             .getOne();
