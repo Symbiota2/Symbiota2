@@ -1,5 +1,5 @@
 /* Structure */
-#main{
+#main {
     margin: 1rem;
 }
 
@@ -7,6 +7,10 @@
     // display: flex;
     // flex-direction: column;
     // min-width: 300px;
+}
+
+h1 span {
+    font-size: 1rem;
 }
 
 .example-container .mat-form-field + .mat-form-field {
@@ -24,7 +28,7 @@
     margin: 4pt;
 }
 
-table{
+table {
     width: 100%;
 }
 
@@ -85,7 +89,7 @@ table{
 }
 
 .editor-button {
-    margin: 4pt
+    margin: 4pt;
 }
 
 #buttons {
@@ -100,7 +104,6 @@ table{
         margin-left: 0;
     }
 }
-
 
 .expansion-panel {
     margin-top: 1rem;
