@@ -8,7 +8,6 @@ import { TranslateService } from '@ngx-translate/core'
 import { MatDialog } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 
-
 @Component({
     selector: 'taxonomy-upload-problem-ranks',
     templateUrl: './taxonomy-upload-problem-ranks-page.html',
@@ -29,7 +28,7 @@ export class TaxonomyUploadProblemRanksPage implements OnInit {
     Called when Angular starts
      */
     ngOnInit() {
-        this.taxaService.getProblemAcceptedNames().subscribe((names) => {
+        this.taxaService.getProblemRanks().subscribe((names) => {
             this.names = names
         })
 

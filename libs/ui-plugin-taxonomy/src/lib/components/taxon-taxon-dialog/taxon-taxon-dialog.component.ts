@@ -41,7 +41,7 @@ export class TaxonTaxonDialogComponent {
         this.unitName1 = this.local_data.unitName1;
         this.unitName2 = this.local_data.unitName2;
         this.unitName3 = this.local_data.unitName3;
-        
+
         console.log(' status ' + this.isPublic);
         this.action = this.local_data.action;
         this.sortSequence = new FormControl(this.local_data.phyloSortSequence, [
@@ -88,7 +88,7 @@ export class TaxonTaxonDialogComponent {
     }
 
     doAction() {
-        this.local_data.phyloSortSequence = this.sortSequence;
+        //this.local_data.phyloSortSequence = this.sortSequence;
         this.local_data.rankID = this.rankID;
         this.dialogRef.close({ event: this.action, data: this.local_data });
     }

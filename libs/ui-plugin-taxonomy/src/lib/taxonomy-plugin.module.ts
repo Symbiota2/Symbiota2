@@ -40,10 +40,12 @@ import {
     TaxonEditorPageComponent,
     TaxonomyUploadPage,
     TaxaEditorEntryPage,
+    TaxaUtilsEntryPage,
     TaxonomyUploadProblemRanksPage,
     TaxonomyFieldMapSelectComponent,
     TaxonomyConfirmDialogComponent,
     TaxonomyUploadProblemParentNamesPage,
+    TaxaScientificNamesPage
 } from './pages';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -61,6 +63,7 @@ import {
     TaxonImageAddComponent,
     TaxonImageGridComponent,
     TaxonStatusParentEditorDialogComponent,
+    TaxonDeleteEditorComponent
 } from './components';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -80,6 +83,7 @@ import {
     TAXON_CREATE_ROUTE,
     TAXON_EDITOR_ROUTE,
     TAXON_PROFILE_ROUTE,
+    TAXA_UTILS_ENTRY_ROUTE,
 } from './routes';
 import {
     TaxonomyUploadService,
@@ -92,7 +96,6 @@ import {
     TaxonDescriptionStatementService,
     TaxonomicUnitService,
 } from './services';
-import { TaxaScientificNamesPage } from './pages/taxa-scientific-names/taxa-scientific-names-page';
 
 @NgModule({
     imports: [
@@ -136,6 +139,7 @@ import { TaxaScientificNamesPage } from './pages/taxa-scientific-names/taxa-scie
         TaxonomyUploadProblemRanksPage,
         TaxaProfilerEntryPage,
         TaxaEditorEntryPage,
+        TaxaUtilsEntryPage,
         TaxaScientificNamesPage,
         TaxaViewerPageComponent,
         TaxonCreatePageComponent,
@@ -156,6 +160,7 @@ import { TaxaScientificNamesPage } from './pages/taxa-scientific-names/taxa-scie
         TaxonStatusAcceptedEditorDialogComponent,
         TaxonStatusEditorComponent,
         TaxonStatusParentEditorDialogComponent,
+        TaxonDeleteEditorComponent,
     ],
     providers: [
         TaxonService,
@@ -180,6 +185,8 @@ import { TaxaScientificNamesPage } from './pages/taxa-scientific-names/taxa-scie
         TaxaViewerPageComponent,
         TaxonCreatePageComponent,
         TaxonEditorPageComponent,
+        TaxaUtilsEntryPage,
+        TaxaScientificNamesPage,
         TaxonomyUploadFieldMapPage,
         TaxonomyFieldMapSelectComponent,
         TaxonomyConfirmDialogComponent,
@@ -195,6 +202,7 @@ import { TaxaScientificNamesPage } from './pages/taxa-scientific-names/taxa-scie
         TaxonStatusAcceptedEditorDialogComponent,
         TaxonStatusEditorComponent,
         TaxonStatusParentEditorDialogComponent,
+        TaxonDeleteEditorComponent,
     ],
 })
 export class TaxonomyPlugin extends SymbiotaUiPlugin {
@@ -233,6 +241,10 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
             {
                 path: TAXA_PROFILER_ROUTE,
                 component: TaxaProfilerEntryPage,
+            },
+            {
+                path: TAXA_UTILS_ENTRY_ROUTE,
+                component: TaxaUtilsEntryPage
             },
             {
                 path: TAXA_UPLOADER_ROUTE,
@@ -290,6 +302,25 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
                 name:
                     'core.layout.header.topnav.taxonomy.scientific.alternative.taxonomies',
             },
+            {
+                url: `/${TAXA_VIEWER_ROUTE}`,
+                name: "core.layout.header.topnav.taxonomy.viewer.link"
+            },
+            {
+                url: `/${TAXON_CREATE_ROUTE}`,
+                name: "core.layout.header.topnav.taxon.create.link"
+            },
+
+            {
+                url: `/${TAXA_UPLOADER_ROUTE}`,
+                name: "core.layout.header.topnav.taxonomy.uploader.link"
+            },
+
+            {
+                url: `/${TAXA_UTILS_ENTRY_ROUTE}`,
+                name: "core.layout.header.topnav.taxonomy.utils.link"
+            },
+
             // {
             //     url: `/${TAXA_VIEWER_ROUTE}`,
             //     name: "core.layout.header.topnav.taxonomy.viewer.link"

@@ -28,6 +28,7 @@ import { Image, ImageFolderUpload, Taxon, TaxonomyUpload } from '@symbiota2/api-
 import { ImageInputDto } from './dto/ImageInputDto';
 import { ImageAndTaxonDto } from './dto/ImageAndTaxonDto';
 import path from 'path';
+import { DeleteResult } from 'typeorm';
 
 type File = Express.Multer.File
 const fsPromises = fs.promises;
@@ -283,23 +284,43 @@ export class ImageController {
         return image
     }
 
-    @Delete('upload/:id')
+    @Delete('taxonID/:taxonID')
     @ApiOperation({
-        summary: "Delete an image by ID"
+        summary: "Delete an image by a given taxonID"
     })
-    @HttpCode(HttpStatus.NO_CONTENT)
+    @HttpCode(HttpStatus.OK)
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @ApiResponse({ status: HttpStatus.NO_CONTENT })
-    async deleteByID(@Req() request: AuthenticatedRequest, @Param('id') id: number): Promise<void> {
+    @ApiResponse({ status: HttpStatus.OK })
+    async deleteByTaxonID(@Req() request: AuthenticatedRequest, @Param('taxonID') id: number): Promise<DeleteResult> {
         if (!this.canEdit(request)) {
             throw new ForbiddenException()
         }
 
-        const block = await this.myService.deleteByID(id)
-        if (!block) {
+        const result = await this.myService.deleteByTaxonID(id)
+
+        // Succeeds even if nothing deleted
+        return result
+    }
+
+    @Delete(':id')
+    @ApiOperation({
+        summary: "Delete an image by ID"
+    })
+    @HttpCode(HttpStatus.OK)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiResponse({ status: HttpStatus.OK })
+    async deleteByID(@Req() request: AuthenticatedRequest, @Param('id') id: number): Promise<boolean> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const image = await this.myService.deleteByID(id)
+        if (!image) {
             throw new NotFoundException()
         }
+        return image
     }
 
     @Post('zipUpload')

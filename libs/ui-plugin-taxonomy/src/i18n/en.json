@@ -178,7 +178,7 @@
     "taxon.description.editor.add.statement.button.label": "Add Statement",
 
     "taxon.taxon.editor.taxon.rankName": "Taxon rank",
-    "taxon.taxon.editor.kingdomName": "Kingdom",
+    "taxon.taxon.editor.kingdomName": "Kingdom Name",
     "taxon.taxon.editor.rankID": "Rank ID",
     "taxon.taxon.editor.rankName": "Rank",
     "taxon.taxon.editor.new.rankName": "Rank of new name",

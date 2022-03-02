@@ -29,7 +29,6 @@ export class TaxonEditorPageComponent implements OnInit {
     blocks: TaxonDescriptionBlockListItem[] = [];
 
     constructor(
-        //private readonly userService: UserService,  // TODO: needed for species hiding
         private readonly taxaService: TaxonService,
         private readonly taxonomicStatusService: TaxonomicStatusService,
         private readonly taxonVernacularService: TaxonVernacularService,

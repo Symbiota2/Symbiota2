@@ -48,6 +48,7 @@ export class TaxonStatusEditorComponent implements OnInit {
     currentParentName = "unknown parent"
     currentParentID = null
     currentIsAccepted = false
+    currentInConflict = false
     currentAcceptedID = null
     currentSynonyms = []
     currentAcceptedName = "unknown name"
@@ -174,12 +175,25 @@ export class TaxonStatusEditorComponent implements OnInit {
                 })
                 // Run through the authorities
                 statusMap.forEach((statusList, authorityID) => {
-                    if (statusList.length > 1) {
-                        // In conflict! [TODO Add in conflict processing, basically should never happen]
-                    } else if (statusList.length == 0) {
-                        // database is corrupt [TODO how to fix corrupt data?]
+                    if (statusList.length == 0) {
+                        // Database is corrupt
                     } else {
-                        const myStatus = statusList[0]
+                        let myStatus
+                        if (statusList.length > 1) {
+                            // In conflict!
+                            this.currentInConflict = true
+                            // Choose the status to be the synonym
+                            myStatus = statusList[0]
+                            if (myStatus.taxonID == myStatus.taxonIDAccepted) {
+                                myStatus = statusList[1]
+                            }
+                            this.currentAcceptedID = myStatus.taxonIDAccepted
+                        } else {
+                            // Not in conflict
+                            this.currentInConflict = false
+                            myStatus = statusList[0]
+                        }
+
                         // Find the name of the accepted and parent taxons
                         this.taxaService.findByID(myStatus.taxonIDAccepted).subscribe((acceptedTaxon) => {
                             this.acceptedName.set(myStatus.taxonAuthorityID,acceptedTaxon.scientificName)
@@ -277,6 +291,40 @@ export class TaxonStatusEditorComponent implements OnInit {
         })
     }
 
+    // Presumes status is in conflict, remove the synonym
+    resolveConflictedAsAccepted() {
+        console.log("resolving as accepted " + this.taxonID + " " + this.currentAuthorityID + " " + this.currentAcceptedID)
+        this.taxonomicStatusService.delete(this.taxonID, this.currentAuthorityID, this.currentAcceptedID)
+            .subscribe((status) => {
+                if (status) {
+                    // It has been updated in the database
+                    this.showMessage("taxon.status.editor.updated.in.conflict.accepted")
+                } else {
+                    // [TODO fix since Error occurred]
+                    this.showError("taxon.status.editor.updated.in.conflict.accepted.error")
+                }
+                // Reload the taxon
+                this.loadTaxonStatus(+this.taxonID)
+            })
+    }
+
+    // Presumes status is in conflict, remove the accepted
+    resolveConflictedAsSynonym() {
+        this.taxonomicStatusService.delete(this.taxonID, this.currentAuthorityID, this.taxonID)
+            .subscribe((status) => {
+                if (status) {
+                    // It has been updated in the database
+                    this.showMessage("taxon.status.editor.updated.in.conflict.synonym")
+                } else {
+                    // [TODO fix since Error occurred]
+                    this.showError("taxon.status.editor.updated.in.conflict.synonym.error")
+                }
+                // Reload the taxon
+                this.loadTaxonStatus(+this.taxonID)
+            })
+    }
+
+    // Presumes not in conflict
     updateToAccepted() {
         this.taxonomicStatusService
             .updateToAccepted(this.taxonID, this.currentAuthorityID)

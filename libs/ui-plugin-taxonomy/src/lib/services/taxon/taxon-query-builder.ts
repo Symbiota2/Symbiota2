@@ -168,7 +168,7 @@ class UploadBuilder extends TaxonQueryBuilder {
     }
 
     build(): string {
-        this.url.pathname = `${this.url.pathname}/upload`;
+        this.url.pathname = `${this.url.pathname}`;
         if (this._id) {
             this.url.pathname += `/${this._id}`;
         }
@@ -304,7 +304,7 @@ class FindOneWithSynonymsBuilder extends TaxonQueryBuilder {
 
 class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
     _withImages: boolean = false
-    _rankID : number
+    _rankID : string
     _kingdomName : string
 
     constructor(apiBaseUrl: string) {
@@ -318,8 +318,8 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
         return this
     }
 
-    rankID(authorityID : string): FindAllScientificNamesBuilder {
-        this._authorityID = authorityID
+    rankID(rankID : string): FindAllScientificNamesBuilder {
+        this._rankID = rankID
         return this
     }
 
@@ -360,13 +360,13 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
         }
         if (this._rankID) {
-            this.url.searchParams.append(Q_PARAM_RANKID, this._authorityID)
+            this.url.searchParams.append(Q_PARAM_RANKID, this._rankID)
         }
         if (this._partialName) {
             this.url.searchParams.append(Q_PARAM_PARTIALNAME, this._partialName)
         }
         if (this._kingdomName) {
-            this.url.searchParams.append(Q_PARAM_KINGDOMNAME, this._partialName)
+            this.url.searchParams.append(Q_PARAM_KINGDOMNAME, this._kingdomName)
         }
         if (this._withImages) {
             this.url.searchParams.append(Q_PARAM_WITHIMAGES, "yes")

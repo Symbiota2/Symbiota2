@@ -13,10 +13,9 @@ export const TAXON_EDITOR_ROUTE = TAXON_EDITOR_ROUTE_PREFIX + '/:taxonID';
 export const TAXON_CREATE_ROUTE = 'taxon/create';
 export const TAXON_PROFILE_ROUTE_PREFIX = 'taxon/profile';
 export const TAXON_PROFILE_ROUTE = TAXON_PROFILE_ROUTE_PREFIX + '/:taxonID';
+export const TAXA_UTILS_ENTRY_ROUTE = "taxonomy/utils"
 
 export const TAXA_UPLOAD_COMPLETE_ROUTE = 'taxonomy/uploadComplete';
-export const TAXA_UPLOAD_PROBLEM_ACCEPTED_NAMES_ROUTE =
-    'taxonomy/upload/problemAcceptedNames';
-export const TAXA_UPLOAD_PROBLEM_PARENT_NAMES_ROUTE =
-    'taxonomy/upload/problemParentNames';
+export const TAXA_UPLOAD_PROBLEM_ACCEPTED_NAMES_ROUTE = 'taxonomy/upload/problemAcceptedNames';
+export const TAXA_UPLOAD_PROBLEM_PARENT_NAMES_ROUTE = 'taxonomy/upload/problemParentNames';
 export const TAXA_UPLOAD_PROBLEM_RANKS_ROUTE = 'taxonomy/upload/problemRanks';
