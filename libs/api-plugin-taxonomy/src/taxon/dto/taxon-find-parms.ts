@@ -6,7 +6,7 @@ import { BaseFindAllParams } from '@symbiota2/api-common'
 export class TaxonFindCommonParams extends BaseFindAllParams {
     static readonly DEFAULT_LIMIT = 5
     static readonly DEFAULT_OFFSET = 0
-    static readonly MAX_LIMIT = 15
+    static readonly MAX_LIMIT = 1000
 
     @Min(0)
     @Max(TaxonFindCommonParams.MAX_LIMIT)

@@ -12,7 +12,7 @@ import { join as pathJoin } from 'path';
 import { createReadStream } from 'fs';
 import { Collection, Occurrence } from '@symbiota2/api-database';
 import ReadableStream = NodeJS.ReadableStream;
-import { getKGProperty, KGRecordType, KnowledgeGraphBuilder } from '@symbiota2/knowledgeGraph';
+import { getKGProperty, getKGPropertyList, KGRecordType, KnowledgeGraphBuilder } from '@symbiota2/knowledgeGraph';
 
 interface CreateGraphOpts {
     publish?: boolean;
@@ -88,13 +88,16 @@ export class KnowledgeGraphService {
     }
 
     async createKnowledgeGraph(graphID: number, opts = KnowledgeGraphService.DEFAULT_CREATE_ARCHIVE_OPTS): Promise<string> {
+        console.log("creating " + graphID)
         const graphName = await this.knowledgeGraphName(graphID);
+        console.log("graph name is " + graphName)
         const tags = {
             graphID: graphID.toString(),
             public: opts.publish.toString()
         };
-
+        console.log("have tags")
         const db = getConnection();
+        console.log("got connection")
         db.entityMetadatas.forEach((entityMeta) => {
             const recordType = KGRecordType(entityMeta.target);
             // console.log("Meta " + entityMeta.name + " " + recordType)
@@ -104,7 +107,13 @@ export class KnowledgeGraphService {
                 for (let key in propertyMap) {
                     const propertyType = getKGProperty(entityMeta.target, key)
                     if (propertyType) {
-                        console.log(key + " " + propertyType)
+                        console.log("KG Property " + key + " " + propertyType)
+                    }
+                }
+                for (let key in propertyMap) {
+                    const propertyType = getKGPropertyList(entityMeta.target, key)
+                    if (propertyType) {
+                        console.log("KG Property List " + key + " " + propertyType)
                     }
                 }
                 //console.log(propertyMap.keys().length)
