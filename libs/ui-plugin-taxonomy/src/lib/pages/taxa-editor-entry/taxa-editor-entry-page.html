@@ -136,7 +136,7 @@
         *ngIf="possibleTaxons.length > 1"
         label='{{"taxonomy.viewer.label.choose.taxon" | translate}}'
       >
-        <mat-selection-list [multiple]="false">
+        <mat-selection-list #selected [multiple]="false" (selectionChange)="onSelection(selected.selectedOptions.selected[0].value)">
           <mat-list-option
             *ngFor="let txn of possibleTaxons"
             [value]="txn.taxonID"

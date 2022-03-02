@@ -296,6 +296,7 @@ export class TaxaEditorEntryPage implements OnInit {
     selectedSciname(event) {
         this.onSubmit();
     }
+
     /*
     Called when the taxon is chosen to display
      */
@@ -309,6 +310,17 @@ export class TaxaEditorEntryPage implements OnInit {
             this.nameListCheck(sname);
         } else {
             this.findCommonAncestors(this.nameControl.value);
+        }
+    }
+
+    onSelection(taxon) {
+        console.log(taxon)
+        if (taxon) {
+            this.nameFound = true;
+            this.followLink(+taxon);
+        } else {
+            // Should never get here
+            this.nameFound = false;
         }
     }
 

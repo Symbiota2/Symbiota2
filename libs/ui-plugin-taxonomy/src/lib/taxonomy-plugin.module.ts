@@ -307,6 +307,10 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
                 name: "core.layout.header.topnav.taxonomy.viewer.link"
             },
             {
+                url: `/${TAXA_EDITOR_ROUTE}`,
+                name: "core.layout.header.topnav.taxonomy.editor.link"
+            },
+            {
                 url: `/${TAXON_CREATE_ROUTE}`,
                 name: "core.layout.header.topnav.taxon.create.link"
             },

@@ -89,8 +89,6 @@ export class TaxonTaxonEditorComponent implements OnInit {
         this.taxaService.findByID(taxonID).subscribe((item) => {
             this.taxon = item;
             this.dataSource = this.taxon;
-            console.log(this.taxon);
-            console.log(this.dataSource);
             const key = item.rankID + item.kingdomName;
             //this.rankName = this.taxonomicUnitService.lookupRankName(item.rankID,item.kingdomName)
             this.ranksIDtoName = this.taxonomicUnitService.getRanksLookup();

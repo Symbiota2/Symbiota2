@@ -57,7 +57,6 @@ export class TaxonEditorPageComponent implements OnInit {
     */
     loadProfile(taxonID: number) {
         this.taxaService.findByID(taxonID).subscribe((taxon) => {
-            console.log(taxon);
             this.taxon = taxon;
             this.taxonName = taxon.scientificName;
             this.taxonAuthor = taxon.author;

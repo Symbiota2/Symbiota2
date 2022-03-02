@@ -40,6 +40,7 @@ export class TaxonDeleteEditorComponent implements OnInit {
         private readonly taxonomicStatusService: TaxonomicStatusService,
         //private readonly taxonVernacularService: TaxonVernacularService,
         //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
+        private readonly imageService, ImageService,
         private readonly alertService: AlertService,
         private router: Router,
         private formBuilder: FormBuilder,
@@ -73,6 +74,7 @@ export class TaxonDeleteEditorComponent implements OnInit {
             })
     }
 
+    /*
     openDialog(action, obj) {
         obj.action = action
         const dialogRef = (action == 'Delete') ?
@@ -87,12 +89,18 @@ export class TaxonDeleteEditorComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result.event == 'Update') {
-                this.deleteTaxon(result.data)
+                this.deleteTaxon()
             }
         })
     }
+     */
 
-    deleteTaxon(obj) {
+    deleteTaxon() {
+        // Will delete various things in order
+        // First delete images
+        this.imageService.deleteByTaxonID(this.taxonID).subscribe((result) => {
+
+        })
     }
 
     /*
