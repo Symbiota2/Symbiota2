@@ -16,6 +16,7 @@ import { filter } from 'rxjs/operators';
 import { TaxonListItem } from '../../dto/taxon-list-item';
 import { TaxonInputDto } from '../../dto/taxonInputDto';
 import { TAXON_EDITOR_ROUTE_PREFIX } from '../../routes';
+import { ImageService } from '@symbiota2/ui-plugin-image';
 
 @Component({
     selector: 'taxon-delete-editor',
@@ -40,7 +41,7 @@ export class TaxonDeleteEditorComponent implements OnInit {
         private readonly taxonomicStatusService: TaxonomicStatusService,
         //private readonly taxonVernacularService: TaxonVernacularService,
         //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
-        private readonly imageService, ImageService,
+        private readonly imageService: ImageService,
         private readonly alertService: AlertService,
         private router: Router,
         private formBuilder: FormBuilder,

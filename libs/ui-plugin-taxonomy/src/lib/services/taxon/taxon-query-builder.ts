@@ -3,7 +3,7 @@ import {
     Q_PARAM_AUTHORITYID,
     Q_PARAM_PARTIALNAME,
     Q_PARAM_SCIENTIFICNAME,
-    Q_PARAM_WITHIMAGES, Q_PARAM_KINGDOMNAME, Q_PARAM_RANKID
+    Q_PARAM_WITHIMAGES, Q_PARAM_KINGDOMNAME, Q_PARAM_RANKID, Q_PARAM_LIMIT
 } from '../../../constants';
 import { TaxonDescriptionBlockQueryBuilder } from '../taxonDescriptionBlock/taxonDescriptionBlock-query-builder';
 
@@ -306,6 +306,7 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
     _withImages: boolean = false
     _rankID : string
     _kingdomName : string
+    _limit : string
 
     constructor(apiBaseUrl: string) {
         super(apiBaseUrl)
@@ -313,6 +314,10 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
         this.url = new URL(`${apiBaseUrl}/taxon/scientificNames`)
     }
 
+    limit(number): FindAllScientificNamesBuilder {
+        this._limit = number
+        return this
+    }
     authorityID(authorityID : string): FindAllScientificNamesBuilder {
         this._authorityID = authorityID
         return this
@@ -356,6 +361,9 @@ class FindAllScientificNamesBuilder extends TaxonQueryBuilder {
     }
 
     build(): string {
+        if (this._limit) {
+            this.url.searchParams.append(Q_PARAM_LIMIT, this._limit)
+        }
         if (this._authorityID) {
             this.url.searchParams.append(Q_PARAM_AUTHORITYID, this._authorityID)
         }

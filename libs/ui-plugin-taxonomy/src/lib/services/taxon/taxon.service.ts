@@ -67,9 +67,10 @@ export class TaxonService {
         return this.apiClient.send<any, TaxonIDAuthorNameItem[]>(query)
     }
 
-    findAllScientificNamesWithImages(partialName, authorityID?): Observable<TaxonIDAndNameItem[]> {
+    findAllScientificNamesWithImages(partialName, limit, authorityID?): Observable<TaxonIDAndNameItem[]> {
         const qb = this.createQueryBuilder()
             .findAllScientificNames()
+            .limit(limit)
             .withImages()
             .authorityID(authorityID)
             .partialName(partialName)
