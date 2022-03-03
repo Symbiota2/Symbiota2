@@ -1,17 +1,64 @@
-<div id="main" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="3rem">
+<div
+    id="main"
+    fxLayout="column"
+    fxLayoutAlign="center center"
+    fxLayoutGap="1rem"
+>
     <img
-    id="logo"
-    src="../../../assets/images/layout/logo_green.png"
-    alt="{{
-        'core.layout.header.banner.symbiota_logo_alt_text'
-            | translate
-    }}"
-/>
-    <h3 *ngIf="title">
-        {{ "core.layout.home.title_line" | translate: { "title": title } }}
-    </h3>
+        id="logo"
+        src="../../../assets/images/layout/tpt_logo.png"
+        alt="{{
+            'core.layout.header.banner.symbiota_logo_alt_text' | translate
+        }}"
+    />
+    <h1 *ngIf="title">
+        {{ 'core.layout.home.title_line' | translate: { title: title } }}
+    </h1>
 
-    <p>{{ "core.layout.home.para_one" | translate }}</p>
+    <p>{{ 'core.layout.home.para_one' | translate }}</p>
 
-    <p>{{ "core.layout.home.para_two" | translate }}</p>
+    <p>{{ 'core.layout.home.para_two' | translate }}</p>
+
+    <div>
+        <p>{{ 'core.layout.home.resource_list_header' | translate }}</p>
+        <ul>
+            <li>
+                <a href="https://parasitetracker.org/">
+                    {{ 'core.layout.home.resource_link_one' | translate }}
+                </a>
+            </li>
+            <li>
+                <a
+                    href="https://blog.notesfromnature.org/2020/04/02/introducing-the-the-terrestrial-parasite-tracker-project-tpt/"
+                >
+                    {{ 'core.layout.home.resource_link_two' | translate }}
+                </a>
+            </li>
+            <li>
+                <a
+                    href="https://www.wuwm.com/podcast/lake-effect-segments/2019-09-18/milwaukee-public-museum-receives-4-3-million-for-large-scale-terrestrial-parasite-tracker"
+                >
+                    {{ 'core.layout.home.resource_link_three' | translate }}
+                </a>
+            </li>
+            <li>
+                <a
+                    href="https://www.purdue.edu/newsroom/releases/2019/Q3/purdue-leading-effort-to-digitize-north-american-parasite-collections.html"
+                >
+                    {{ 'core.layout.home.resource_link_four' | translate }}
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <p>
+            {{ 'core.layout.home.help_para_start' | translate }}
+            <a
+                href="https://www.zooniverse.org/projects/md68135/notes-from-nature-terrestrial-parasite-tracker"
+            >
+                {{ 'core.layout.home.help_para_link' | translate }}
+            </a>
+            {{ 'core.layout.home.help_para_end' | translate }}
+        </p>
+    </div>
 </div>
