@@ -32,11 +32,10 @@
                     }}"
                 />
             </a>
-
             <symbiota2-navbar-menu
-                *ngFor='let category of (linkCategories() | async)'
-                [title]='category'
-                [items]='categoryLinks(category) | async'
+                *ngFor="let category of linkCategories() | async"
+                [title]="category"
+                [items]="categoryLinks(category) | async"
             >
             </symbiota2-navbar-menu>
 
@@ -45,37 +44,77 @@
                 {{ link.name | translate }}
             </a>
             -->
-            <button mat-button [matMenuTriggerFor]="symbiota">
-                {{ 'core.layout.header.topnav.symbiota_link' | translate }}
+            <button mat-button [matMenuTriggerFor]="resources">
+                {{ 'core.layout.header.topnav.resources_dropdown' | translate }}
             </button>
-            <mat-menu #symbiota="matMenu">
+            <mat-menu #resources="matMenu">
                 <a
                     mat-menu-item
-                    href="http://symbiota.org/docs/"
+                    href="https://parasitetracker.org/"
                     target="_blank"
                 >
                     {{
-                        'core.layout.header.topnav.symbiota_docs_link'
+                        'core.layout.header.topnav.resource_link_one'
                             | translate
                     }}
                 </a>
                 <a
                     mat-menu-item
-                    href="http://symbiota.org/docs/symbiota-introduction/symbiota-help-pages/"
+                    href="https://github.com/njdowdy/tpt-taxonomy"
+                    target="_blank"
+                >
+                    {{
+                        'core.layout.header.topnav.resource_link_two'
+                            | translate
+                    }}
+                </a>
+                <a
+                    mat-menu-item
+                    href="https://www.globalbioticinteractions.org/parasitetracker/"
+                    target="_blank"
+                >
+                    {{
+                        'core.layout.header.topnav.resource_link_three'
+                            | translate
+                    }}
+                </a>
+                <a
+                    mat-menu-item
+                    href="https://www.zooniverse.org/projects/md68135/notes-from-nature-terrestrial-parasite-tracker"
+                    target="_blank"
+                >
+                    {{
+                        'core.layout.header.topnav.resource_link_four'
+                            | translate
+                    }}
+                </a>
+                <a
+                    mat-menu-item
+                    href="https://entcollnet.github.io/BugFlow/"
+                    target="_blank"
+                >
+                    {{
+                        'core.layout.header.topnav.resource_link_five'
+                            | translate
+                    }}
+                </a>
+                <a
+                    mat-menu-item
+                    href="https://scan-bugs.org/portal/"
+                    target="_blank"
+                >
+                    {{
+                        'core.layout.header.topnav.resource_link_six'
+                            | translate
+                    }}
+                </a>
+                <a
+                    mat-menu-item
+                    href="https://symbiota.org/help-resources/"
                     target="_blank"
                 >
                     {{
                         'core.layout.header.topnav.symbiota_help_link'
-                            | translate
-                    }}
-                </a>
-                <a
-                    mat-menu-item
-                    href="http://symbiota.org/docs/google-group/"
-                    target="_blank"
-                >
-                    {{
-                        'core.layout.header.topnav.symbiota_google_group_link'
                             | translate
                     }}
                 </a>
