@@ -13,3 +13,5 @@ export * from './taxonomy-upload/taxonomy-upload-problem-ranks/taxonomy-upload-p
 export * from './taxonomy-upload/field-map/taxonomy-field-map-select-component/taxonomy-field-map-select.component'
 export * from './taxonomy-upload/field-map/taxonomy-confirm-dialog-component/taxonomy-confirm-dialog.component'
 export * from './taxa-utils-entry/taxa-utils-entry-page'
+export * from './taxa-scientific-names/taxa-scientific-names-page'
+

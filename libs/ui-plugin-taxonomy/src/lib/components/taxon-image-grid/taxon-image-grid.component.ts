@@ -209,7 +209,7 @@ export class TaxonImageGridComponent implements OnInit {
             return name
         } else {
             if (!this.imageAPIUrl) {
-                this.imageAPIUrl = this.apiClient.apiRoot() + "/" + IMAGE_API_BASE  + "/imglib/"
+                this.imageAPIUrl = this.apiClient.apiRoot() + "/" + IMAGE_API_BASE + "/imglib/"
             }
             return this.imageAPIUrl + encodeURIComponent(name)
         }

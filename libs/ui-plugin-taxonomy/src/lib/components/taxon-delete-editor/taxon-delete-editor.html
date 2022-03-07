@@ -1,4 +1,3 @@
-
 <div id='main'>
     <div *ngIf="!userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
         {{"taxon.delete.lacks.permission" | translate}}
@@ -14,7 +13,7 @@
             <div *ngIf='children.length == 0'>
                 <div color='warn'>{{'taxon.delete.warning.message' | translate}}</div>
                 <br/>
-                <button mat-button (click)="deleteTaxon(null)" mat-raised-button color="warn">
+                <button mat-button (click)="deleteTaxon()" mat-raised-button color="warn">
                     {{'taxon.delete.button' | translate}}
                 </button>
             </div>

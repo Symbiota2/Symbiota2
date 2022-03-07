@@ -78,7 +78,7 @@ export class TaxaUtilsEntryPage implements OnInit {
     public loadAuthorities() {
         this.taxonomicAuthorityService.findAll()
             .subscribe((authorities) => {
-            this.taxonomicAuthorityList = authorities
+                this.taxonomicAuthorityList = authorities
                 this.taxonomicAuthorityList.sort(function (a, b) {
                     return (a.id > b.id ? 1 : -1)
                 })
@@ -87,12 +87,12 @@ export class TaxaUtilsEntryPage implements OnInit {
                         this.taxonomicAuthorityID = authority.id
                     }
                 })
-        })
+            })
     }
 
     doRebuildTree() {
         this.taxonomicEnumTreeService.rebuildTree(this.taxonomicAuthorityID).subscribe((item) => {
-          // [TODO - report error if did not return a result]
+            // [TODO - report error if did not return a result]
         })
     }
 

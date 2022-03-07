@@ -65,6 +65,7 @@ export class TaxaViewerPageComponent implements OnInit {
     genusRankID = 1000 // Will be initialized by constructor
     nameToRankID
 
+
     constructor(
         private readonly taxaService: TaxonService,
         private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,

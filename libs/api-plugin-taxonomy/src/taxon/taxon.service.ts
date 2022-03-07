@@ -97,7 +97,7 @@ export class TaxonService extends BaseService<Taxon>{
 
         // Don't limit if it has filters
         if (limit && !(qParams.id || qParams.scientificName)) {
-            // qb.take(limit)
+            qb.take(limit)
         }
 
         if (offset && !(qParams.id || qParams.scientificName)) {
@@ -109,20 +109,6 @@ export class TaxonService extends BaseService<Taxon>{
         }
 
         return qb.getMany()
-
-            /*
-        } else {
-            // Can use nested relations
-            return (qParams.id)?
-                await this.taxonRepo.find({
-                    // No limit or offset if we have a list of ids
-                    // take: limit,
-                    // skip: offset,
-                    where: { id: In(params.id) }})
-                : await this.taxonRepo.find({
-                    take: limit,
-                    skip: offset })
-        }*/
     }
 
     /**

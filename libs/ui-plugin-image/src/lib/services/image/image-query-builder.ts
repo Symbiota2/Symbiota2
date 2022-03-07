@@ -93,16 +93,25 @@ class CreateOneBuilder extends ImageQueryBuilder {
     }
 }
 
+// Can delete by image id or by taxonid but not both!
 class DeleteOneBuilder extends ImageQueryBuilder {
     protected _id: number;
+    protected _taxonID: number;
 
     id(id: number): DeleteOneBuilder {
         this._id = id
         return this;
     }
 
+    taxonID(id: number): DeleteOneBuilder {
+        this._taxonID = id
+        return this;
+    }
+
     build(): string {
-        if (this._id) {
+        if (this._taxonID) {
+            this.url.pathname += `taxonID/${this._taxonID}`
+        } else if (this._id) {
             this.url.pathname += `/${this._id}`
         }
         return super.build()

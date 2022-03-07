@@ -36,10 +36,10 @@ interface TaxonNode {
 
 @Component({
     selector: 'taxa-editor-entry-page',
-    templateUrl: './taxa-editor-entry-page.html',
-    styleUrls: ['./taxa-editor-entry-page.scss'],
+    templateUrl: './taxa-scientific-names-page.html',
+    styleUrls: ['./taxa-scientific-names-page.scss'],
 })
-export class TaxaEditorEntryPage implements OnInit {
+export class TaxaScientificNamesPage implements OnInit {
     nameControl = new FormControl();
     nameOptions: TaxonIDAuthorNameItem[] = [];
     hasAuthors = false;
@@ -296,7 +296,6 @@ export class TaxaEditorEntryPage implements OnInit {
     selectedSciname(event) {
         this.onSubmit();
     }
-
     /*
     Called when the taxon is chosen to display
      */
@@ -310,17 +309,6 @@ export class TaxaEditorEntryPage implements OnInit {
             this.nameListCheck(sname);
         } else {
             this.findCommonAncestors(this.nameControl.value);
-        }
-    }
-
-    onSelection(taxon) {
-        console.log(taxon)
-        if (taxon) {
-            this.nameFound = true;
-            this.followLink(+taxon);
-        } else {
-            // Should never get here
-            this.nameFound = false;
         }
     }
 

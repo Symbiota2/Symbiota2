@@ -305,6 +305,39 @@ export class ImageService {
     }
 
     /**
+     * sends request to api to delete image records using a taxon ID
+     * @param taxonID - the id of the taxon to delete images of
+     * @returns Observable of response from api casted as `string`
+     * @returns `of(null)` if image does not exist or does not have editing permission or api errors
+     */
+    deleteByTaxonID(taxonID): Observable<string> {
+        const url = this.createQueryBuilder()
+            .delete()
+            .taxonID(taxonID)
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .delete()
+                    .addJwtAuth(token)
+                    .build()
+
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((blockJson) => {
+                        return "success"
+                    })
+                )
+            })
+        )
+    }
+
+    /**
      * sends request to api to delete an image record
      * @param id - the id of the image to delete
      * @returns Observable of response from api casted as `string`

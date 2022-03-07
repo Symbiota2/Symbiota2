@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Brackets, In, Repository } from 'typeorm';
+import { Brackets, DeleteResult, In, Repository } from 'typeorm';
 import { BaseService } from '@symbiota2/api-common'
 import { Image, ImageFolderUpload, Taxon, TaxonomyUpload, TaxonomyUploadFieldMap } from '@symbiota2/api-database';
 import { ImageFindAllParams } from './dto/image-find-all.input.dto'
@@ -253,7 +253,14 @@ export class ImageService extends BaseService<Image>{
         return null;
     }
 
-
+    /**
+     * Delete image records using a taxonID
+     * @return number The created data or null (not found)
+     */
+    async deleteByTaxonID(taxonID: number): Promise<DeleteResult> {
+        const image = await this.myRepository.delete({ taxonID: taxonID})
+        return image
+    }
 
     async fromFileToStorageService(originalname: string, filename: string, mimetype: string): Promise<void> {
         const readStream = fs.createReadStream(ImageService.imageUploadFolder + filename)

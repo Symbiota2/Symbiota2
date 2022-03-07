@@ -103,7 +103,6 @@ class MoveBuilder extends TaxonomicEnumTreeQueryBuilder {
     }
 }
 
-
 class RebuildBuilder extends TaxonomicEnumTreeQueryBuilder {
     protected _authorityId: number
 

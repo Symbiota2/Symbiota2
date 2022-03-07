@@ -8,7 +8,6 @@ import { TranslateService } from '@ngx-translate/core'
 import { MatDialog } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 
-
 @Component({
     selector: 'taxonomy-upload-problem-ranks',
     templateUrl: './taxonomy-upload-problem-ranks-page.html',

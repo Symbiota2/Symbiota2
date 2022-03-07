@@ -333,6 +333,7 @@ export class TaxonStatusEditorComponent implements OnInit {
                     // It has been updated in the database
                     this.showMessage("taxon.status.editor.updated.change.accepted")
                 } else {
+                    // [TODO fix since Error occurred]
                     this.showError("taxon.status.editor.updated.change.accepted.error")
                 }
                 // Reload the taxon
@@ -348,6 +349,7 @@ export class TaxonStatusEditorComponent implements OnInit {
                     // It has been updated in the database
                     this.showMessage("taxon.status.editor.updated.ring")
                 } else {
+                    // [TODO fix since Error occurred]
                     this.showError("taxon.status.editor.updated.ring.error")
                 }
                 // Reload the taxon
@@ -367,6 +369,7 @@ export class TaxonStatusEditorComponent implements OnInit {
                 // Move in taxa enum tree
                 this.taxonomicEnumTreeService.move(+this.taxonID, parentTaxonID, this.currentAuthorityID).subscribe((enumTree) => {
                     if (!enumTree) {
+                        // [TODO fix since Error occurred]
                         this.showError("taxon.status.editor.updated.move.error")
                     }
                     // Update the parent to the new parent
