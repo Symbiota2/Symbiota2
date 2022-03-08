@@ -143,7 +143,6 @@ async function runTranslations() {
       //console.log(`Error: ${e}`);
       throw `Invalid JSON in main foreach: ${e}`;
     }
-    index++;
   }
 }
 
@@ -164,7 +163,8 @@ async function translateJson(enContents, languages, jsonFileIndex, targetLangPre
 
   const enKeys = Object.keys(enContents);
   let enVals = Object.values(enContents);
-
+  const enValLength = enVals.length
+  console.log("Envals length", enValLength);
   for (let prefixIndex = 0; prefixIndex < targetLangPrefixes.length; prefixIndex++) {
     try {
       let langPrefix = targetLangPrefixes[prefixIndex];
@@ -173,10 +173,33 @@ async function translateJson(enContents, languages, jsonFileIndex, targetLangPre
       //const contentsJson = JSON.parse(targetContents);
       //Translate to our target language, denoted by the current prefix.
       let langObj = {};
-      const translations = await translateText(enVals, langPrefix, translate);
+      //Note: this assumes the length of a json will not exceed 256
+      let translations = []
+
+      if (enValLength > 128) {
+        let currIndex = 0
+        while ((currIndex + 128) < enValLength) {
+          //console.log("Slicing", currIndex, " : ", currIndex + 127);
+          //Get the next 128 elements to send
+          let currEnVals = enVals.slice(currIndex, (currIndex + 127));
+          const currTranslations = await translateText(currEnVals, langPrefix, translate);
+          translations.push.apply(translations, currTranslations)
+          currIndex += 128
+        }
+        //We no longer have 128 elements to send, slice from here to length
+        let finalEnVals = enVals.slice(currIndex, enValLength);
+        const finalTranslations = await translateText(finalEnVals, langPrefix, translate);
+        translations.push.apply(translations, finalTranslations);
+      }
+
+      else {
+        translations = await translateText(enVals, langPrefix, translate);
+      }
+
       //Once we get the resulting translations, add them to the json.
       let index = 0;
       const langFilePath = languages[langKey][jsonFileIndex];
+      console.log("TRANSLATIONS: ", translations)
       translations.forEach(translatedVal => {
         langObj[enKeys[index]] = translatedVal;
         index++;
@@ -209,7 +232,7 @@ async function translateText(text, target, translate) {
   //translations = Array.isArray(translations) ? translations : [translations];
   console.log('Translations:');
   translations.forEach((translation, i) => {
-    console.log(`${text[i]} => (${target}) ${translation}`);
+    //console.log(`${text[i]} => (${target}) ${translation}`);
   });
   return translations;
 }
