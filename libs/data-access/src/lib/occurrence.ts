@@ -6,7 +6,8 @@ export enum ApiTaxonSearchCriterion {
     scientificName = 'scientificName',
     family = 'family',
     higherTaxonomy = 'higherTaxonomy',
-    commonName = 'commonName'
+    commonName = 'commonName',
+    taxonID = 'taxonID'
 }
 
 export interface ApiOccurrenceFindAllParams {

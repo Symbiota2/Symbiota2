@@ -192,6 +192,43 @@ export class TaxonomicEnumTreeService {
     }
 
     /**
+     * sends request to api to delete all the taxonomic enum tree records associated with a TaxonID
+     * @param id - the id of the taxon
+     * @returns Observable of response from api casted as `string`
+     * @returns `of(null)` if block does not exist or does not have editing permission or api errors
+     */
+    deleteByTaxonID(id): Observable<string> {
+        const url = this.createQueryBuilder()
+            .deleteByTaxonID()
+            .id(id)
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .delete()
+                    .addJwtAuth(token)
+                    .build()
+
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((blockJson) => {
+                        //API returns null on success so return something else to signal "success"
+                        if (blockJson === null) {
+                            return null
+                        }
+                        return "success"
+                    })
+                )
+            })
+        )
+    }
+
+    /**
      * Rebuild the enum tree within the context of a taxa authority id
      * @param authorityID - the taxonomic authority under which the rebuild should happen
      * @returns Observable of response from api casted as `TaxonomicEnumTreeListItem`

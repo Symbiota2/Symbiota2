@@ -1,32 +1,16 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import {
-    Occurrence,
-    OccurrenceUploadFieldMap,
-    Taxon
-} from '@symbiota2/api-database';
-import {
-    DeepPartial,
-    FindConditions,
-    FindManyOptions, IsNull, Not,
-    Repository
-} from 'typeorm';
+import { Occurrence, OccurrenceUpload, OccurrenceUploadFieldMap, Taxon } from '@symbiota2/api-database';
+import { DeepPartial, Repository } from 'typeorm';
 import { FindAllParams } from './dto/find-all-input.dto';
-import {
-    ApiCollectionListItem, ApiOccurrence,
-    ApiTaxonSearchCriterion
-} from '@symbiota2/data-access';
+import { ApiCollectionListItem, ApiOccurrence, ApiTaxonSearchCriterion } from '@symbiota2/data-access';
 import { Geometry } from 'wkx';
 import { InjectQueue } from '@nestjs/bull';
 import { QUEUE_ID_OCCURRENCE_UPLOAD_CLEANUP } from '../queues/occurrence-upload-cleanup.queue';
 import { Queue } from 'bull';
 import { OccurrenceUploadCleanupJob } from '../queues/occurrence-upload-cleanup.processor';
-import { OccurrenceUpload } from '@symbiota2/api-database';
 import { QUEUE_ID_OCCURRENCE_UPLOAD } from '../queues/occurrence-upload.queue';
 import { OccurrenceUploadJob } from '../queues/occurrence-upload.processor';
-import { csvIterator } from '@symbiota2/api-common';
-import { DwcArchiveBuilder } from '@symbiota2/dwc';
-import { v4 as uuid4 } from 'uuid';
-import { join as pathJoin } from 'path';
+import { BaseService, csvIterator } from '@symbiota2/api-common';
 
 type _OccurrenceFindAllItem = Pick<Occurrence, 'id' | 'catalogNumber' | 'taxonID' | 'scientificName' | 'latitude' | 'longitude'>;
 type OccurrenceFindAllItem = _OccurrenceFindAllItem & { collection: ApiCollectionListItem };
@@ -89,6 +73,12 @@ export class OccurrenceService {
         if (findAllOpts.taxonSearchCriterion && findAllOpts.taxonSearchStr) {
             const searchStr = `${ findAllOpts.taxonSearchStr }%`;
             switch (findAllOpts.taxonSearchCriterion) {
+                case ApiTaxonSearchCriterion.taxonID:
+                    qb.andWhere(
+                        'o.taxonID = :taxonID',
+                        {taxonID: searchStr}
+                    )
+                    break;
                 case ApiTaxonSearchCriterion.familyOrSciName:
                     qb.andWhere(
                         '(o.scientificName LIKE :sciNameOrFamily or o.family LIKE :sciNameOrFamily)',
@@ -403,5 +393,14 @@ export class OccurrenceService {
 
     async startUpload(uid: number, collectionID: number, uploadID: number): Promise<void> {
         await this.uploadQueue.add({ uid, collectionID, uploadID });
+    }
+
+    /**
+     * @param id The database ID of the resource
+     * @return boolean Whether the resource was found and deleted
+     */
+    async deleteByID(id: number): Promise<boolean> {
+        const result = await this.occurrenceRepo.delete(id);
+        return result.affected > 0;
     }
 }

@@ -95,6 +95,8 @@ import {
     TaxonDescriptionBlockService,
     TaxonDescriptionStatementService,
     TaxonomicUnitService,
+    TaxonLinkService,
+    TaxonResourceLinkService,
 } from './services';
 
 @NgModule({
@@ -172,6 +174,8 @@ import {
         TaxonomicAuthorityService,
         TaxonomicUnitService,
         TaxonomyUploadService,
+        TaxonLinkService,
+        TaxonResourceLinkService,
     ],
     entryComponents: [
         TaxaEditorEntryPage,

@@ -1,19 +1,24 @@
 import { Observable, of } from 'rxjs';
-import { ApiClientService, AppConfigService } from '@symbiota2/ui-common';
-import { map } from 'rxjs/operators';
+import { ApiClientService, AppConfigService, UserService } from '@symbiota2/ui-common';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { TaxonResourceLinkQueryBuilder } from './taxonResourceLink-query-builder';
-import { TaxonomicAuthorityListItem } from '../../dto/taxonomicAuthority-list-item';
+import { TaxonResourceLinkListItem } from '../../dto/taxonResourceLink-list-item';
 
 interface FindAllParams {
-    taxonIDs: number[]
+    taxonIDs?: number[]
+    ids?: number[]
     limit?: number
+    offset?: number
 }
 
 @Injectable()
 export class TaxonResourceLinkService {
+    private jwtToken = this.user.currentUser.pipe(map((user) => user.token))
+
     constructor(
         private readonly apiClient: ApiClientService,
+        private readonly user: UserService,
         private readonly appConfig: AppConfigService) { }
 
     private createQueryBuilder(): TaxonResourceLinkQueryBuilder {
@@ -22,27 +27,28 @@ export class TaxonResourceLinkService {
 
     public getUrl() {
         const apiBaseUrl = this.appConfig.apiUri()
-        const x = new URL(`${apiBaseUrl}/taxonVernacular`)
+        const x = new URL(`${apiBaseUrl}/taxonResourceLink`)
         return this.apiClient.apiRoot()
     }
 
 
-    findAll(params?: FindAllParams): Observable<TaxonomicAuthorityListItem[]> {
+    findAll(params?: FindAllParams): Observable<TaxonResourceLinkListItem[]> {
         const url = this.createQueryBuilder()
             .findAll()
-            .taxonIDs(params? params.taxonIDs : [])
+            .ids(params?.ids? params.ids : [])
+            .taxonIDs(params?.taxonIDs? params.taxonIDs : [])
             .build()
 
         const query = this.apiClient.queryBuilder(url).get().build();
         return this.apiClient.send<any, Record<string, unknown>[]>(query)
             .pipe(
-                map((authorities) => authorities.map((o) => {
-                    return TaxonomicAuthorityListItem.fromJSON(o);
+                map((links) => links.map((o) => {
+                    return TaxonResourceLinkListItem.fromJSON(o);
                 }))
             );
     }
 
-    findByID(id: number): Observable<TaxonomicAuthorityListItem> {
+    findByID(id: number): Observable<TaxonResourceLinkListItem> {
         const url = this.createQueryBuilder()
             .findOne()
             .id(id)
@@ -50,8 +56,40 @@ export class TaxonResourceLinkService {
 
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, Record<string, unknown>>(query)
-            .pipe(map((o) => TaxonomicAuthorityListItem.fromJSON(o)))
+            .pipe(map((o) => TaxonResourceLinkListItem.fromJSON(o)))
+    }
 
+    /**
+     * sends request to api to delete a taxon resource link record
+     * @param id - the id of the taxon resource link to delete
+     * @returns Observable of response from api casted as `string`
+     * @returns `of(null)` if taxon does not exist or does not have editing permission or api errors
+     */
+    delete(id): Observable<string> {
+        const url = this.createQueryBuilder()
+            .delete()
+            .id(id)
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .delete()
+                    .addJwtAuth(token)
+                    .build()
+
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((blockJson) => {
+                        return "success"
+                    })
+                )
+            })
+        )
     }
 
 }

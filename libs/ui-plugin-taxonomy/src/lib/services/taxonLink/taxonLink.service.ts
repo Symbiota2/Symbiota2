@@ -1,79 +1,53 @@
 import { Observable, of } from 'rxjs';
-import { AlertService, ApiClientService, AppConfigService, UserService } from '@symbiota2/ui-common';
+import { ApiClientService, AppConfigService, UserService } from '@symbiota2/ui-common';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { Injectable } from '@angular/core'
-import { ImageTagQueryBuilder } from './imageTag-query-builder'
-import { ImageTagListItem } from '../../dto';
+import { Injectable } from '@angular/core';
+import { TaxonLinkQueryBuilder } from './taxonLink-query-builder';
+import { TaxonLinkListItem } from '../../dto/taxonLink-list-item';
 
 interface FindAllParams {
-    imageIDs?: number[]
+    taxonIDs?: number[]
     ids?: number[]
     limit?: number
     offset?: number
 }
 
 @Injectable()
-export class ImageTagService {
+export class TaxonLinkService {
     private jwtToken = this.user.currentUser.pipe(map((user) => user.token))
-    // private readonly _currentUpload = new BehaviorSubject<ApiTaxonomyUpload>(null)
-    private creatorUID = null
 
     constructor(
-        private readonly alerts: AlertService,
         private readonly apiClient: ApiClientService,
         private readonly user: UserService,
-        private readonly appConfig: AppConfigService)
-    {
-        //Fill in the current user id
-        this.user.currentUser.subscribe((user) => {
-            if (user) {
-                this.creatorUID = user.uid
-            }
-        })
-    }
+        private readonly appConfig: AppConfigService) { }
 
-    private createQueryBuilder(): ImageTagQueryBuilder {
-        return new ImageTagQueryBuilder(this.appConfig.apiUri());
+    private createQueryBuilder(): TaxonLinkQueryBuilder {
+        return new TaxonLinkQueryBuilder(this.appConfig.apiUri());
     }
 
     public getUrl() {
         const apiBaseUrl = this.appConfig.apiUri()
-        const x = new URL(`${apiBaseUrl}/image/tag`)
+        const x = new URL(`${apiBaseUrl}/taxonLink`)
         return this.apiClient.apiRoot()
     }
 
-    findAll(params?: FindAllParams): Observable<ImageTagListItem[]> {
-        const qb = this.createQueryBuilder()
+    findAll(params?: FindAllParams): Observable<TaxonLinkListItem[]> {
+        const url = this.createQueryBuilder()
             .findAll()
-
-        if (params.ids) {
-            qb.ids(params.ids)
-        }
-
-        if (params.imageIDs) {
-            qb.imageIds(params.imageIDs)
-        }
-
-        if (params.offset) {
-            qb.offset(params.offset)
-        }
-
-        if (params.limit) {
-            qb.limit(params.limit)
-        }
-
-        const url = qb.build()
+            .ids(params?.ids? params.ids : [])
+            .taxonIDs(params?.taxonIDs? params.taxonIDs : [])
+            .build()
 
         const query = this.apiClient.queryBuilder(url).get().build();
         return this.apiClient.send<any, Record<string, unknown>[]>(query)
             .pipe(
-                map((descriptions) => descriptions.map((o) => {
-                    return ImageTagListItem.fromJSON(o);
+                map((links) => links.map((o) => {
+                    return TaxonLinkListItem.fromJSON(o);
                 }))
-            )
+            );
     }
 
-    findByID(id: number): Observable<ImageTagListItem> {
+    findByID(id: number): Observable<TaxonLinkListItem> {
         const url = this.createQueryBuilder()
             .findOne()
             .id(id)
@@ -81,15 +55,15 @@ export class ImageTagService {
 
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, Record<string, unknown>>(query)
-            .pipe(map((o) => ImageTagListItem.fromJSON(o)))
+            .pipe(map((o) => TaxonLinkListItem.fromJSON(o)))
 
     }
 
     /**
-     * sends request to api to delete an image record
-     * @param id - the id of the image to delete
+     * sends request to api to delete a taxon resource link record
+     * @param id - the id of the taxon resource link to delete
      * @returns Observable of response from api casted as `string`
-     * @returns `of(null)` if image does not exist or does not have editing permission or api errors
+     * @returns `of(null)` if taxon does not exist or does not have editing permission or api errors
      */
     delete(id): Observable<string> {
         const url = this.createQueryBuilder()
@@ -117,5 +91,4 @@ export class ImageTagService {
             })
         )
     }
-
 }

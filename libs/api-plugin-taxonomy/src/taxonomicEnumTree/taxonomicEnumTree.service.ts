@@ -199,6 +199,29 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
     }
 
     /**
+     * Delete all the enum tree records using a taxon id
+     * @param taxonID The id of the taxon
+     * @return TaxaEnumTreeEntry A fake enum tree entry if good else null (not found or api error)
+     */
+    async deleteByTaxonID(taxonID: number): Promise<TaxaEnumTreeEntry> {
+        // Delete the taxonID's taxaEnum tree entries
+        const deleteResult = await this.enumTreeRepository.delete({
+            taxonID: taxonID
+        })
+        const deleteResult2 = await this.enumTreeRepository.delete({
+            parentTaxonID: taxonID
+        })
+
+        if (deleteResult.affected > 0 || deleteResult2.affected > 0) {
+            // return an empty taxonomic status
+            return new TaxaEnumTreeEntry()
+        }
+        return null
+    }
+
+
+
+    /**
      * Modify the taxa enum tree by moving a taxon within the tree.
      * Delete from the tree the records for the taxon and its descendants
      * Insert into the tree the records for where the taxon moved to and

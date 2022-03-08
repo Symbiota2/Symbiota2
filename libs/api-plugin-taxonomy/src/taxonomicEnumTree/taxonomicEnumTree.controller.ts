@@ -10,7 +10,7 @@ import {
     Delete,
     NotFoundException,
     Patch,
-    SerializeOptions, UseGuards
+    SerializeOptions, UseGuards, Req, ForbiddenException
 } from '@nestjs/common';
 import { TaxonomicEnumTreeService } from './taxonomicEnumTree.service';
 import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
@@ -20,10 +20,10 @@ import {
 import { TaxonomicEnumTreeFindAllParams } from './dto/taxonomicEnumTree-find-all.input.dto';
 import { TaxonDto } from '../taxon/dto/TaxonDto';
 import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
-import { TaxonDescriptionBlock } from '@symbiota2/api-database';
+import { TaxonDescriptionBlock, TaxonomicStatus } from '@symbiota2/api-database';
 import { TaxonomicEnumTreeMoveTaxonParams } from './dto/taxonomicEnumTreeQueryParams';
 import { TaxonAndAcceptedStatusesDto } from '../taxon/dto/TaxonAndAcceptedStatusesDto';
-import { JwtAuthGuard } from '@symbiota2/api-auth';
+import { AuthenticatedRequest, JwtAuthGuard } from '@symbiota2/api-auth';
 
 @ApiTags('TaxonomicEnumTree')
 @Controller('taxonomicEnumTree')
@@ -171,6 +171,25 @@ export class TaxonomicEnumTreeController {
             throw new NotFoundException()
         }
         return new TaxonomicEnumTreeDto(enumTree)
+    }
+
+    @Delete('taxonID/:id')
+    @ApiOperation({
+        summary: "Delete the enum records for a taxonID"
+    })
+    @HttpCode(HttpStatus.OK)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiResponse({ status: HttpStatus.OK, type: TaxonomicEnumTreeDto })
+    async deleteByTaxonID(
+        @Req() request: AuthenticatedRequest,
+        @Param('id') id: number,
+    ): Promise<TaxonomicEnumTreeDto> {
+        const status = await this.myService.deleteByTaxonID(id)
+        if (!status) {
+            throw new NotFoundException()
+        }
+        return new TaxonomicEnumTreeDto(status)
     }
 
 }

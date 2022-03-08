@@ -1,7 +1,7 @@
 import {
     BadRequestException,
     Body,
-    Controller,
+    Controller, Delete, ForbiddenException,
     Get,
     HttpCode,
     HttpStatus,
@@ -13,6 +13,7 @@ import {
     UseInterceptors
 } from '@nestjs/common';
 import {
+    ApiBearerAuth,
     ApiBody,
     ApiExtraModels, ApiOperation, ApiProperty,
     ApiQuery,
@@ -218,5 +219,21 @@ export class OccurrenceController {
             query.collectionID,
             uploadID
         );
+    }
+
+    @Delete(':id')
+    @ApiOperation({
+        summary: "Delete an occurrence by ID"
+    })
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiResponse({ status: HttpStatus.NO_CONTENT })
+    async deleteByID(@Req() request: AuthenticatedRequest, @Param('id') id: number): Promise<void> {
+        // Delete the taxon
+        const occ = await this.occurrenceService.deleteByID(id);
+        if (!occ) {
+            throw new NotFoundException();
+        }
     }
 }
