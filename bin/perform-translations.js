@@ -3,7 +3,7 @@
  * Usage: Input one or more folder names (max of 4) out of the following supported translation folders
  * ui-plugin-collection
  * ui-plugin-image
- * ui-plugin-occurence
+ * ui-plugin-occurrence
  * ui-plugin-taxonomy
  */
 //Import libraries
@@ -25,7 +25,7 @@ if (process.platform == "win32") {
 console.log("Platform dirname: ", dirName);
 
 if (process.argv.length < 3) {
-  throw new Error("Please input a plugin directory name to translate. Valid names: ui-plugin-collection, ui-plugin-image, ui-plugin-occurence, ui-plugin-taxonomy")
+  throw new Error("Please input a plugin directory name to translate. Valid names: ui-plugin-collection, ui-plugin-image, ui-plugin-occurrence, ui-plugin-taxonomy, all.")
 }
 
 //Run the main script.
@@ -68,55 +68,64 @@ async function runTranslations() {
   );
 
   const langPathsObj = {
-    'ui-plugin-collection': path.resolve(dirName, "..", 'libs', 'ui-plugin-collection', 'src', 'i18n'),
-    'ui-plugin-image': path.resolve(dirName, "..", 'libs', 'ui-plugin-image', 'src', 'i18n'),
-    'ui-plugin-occurence': path.resolve(dirName, "..", 'libs', 'ui-plugin-occurence', 'src', 'i18n'),
-    'ui-plugin-taxonomy': path.resolve(dirName, "..", 'libs', 'ui-plugin-taxonomy', 'src', 'i18n'),
+    'ui-plugin-collection': path.resolve(dirName, "..", 'libs', 'ui-plugin-collection', 'src', 'i18n', '*.json'),
+    'ui-plugin-image': path.resolve(dirName, "..", 'libs', 'ui-plugin-image', 'src', 'i18n', '*.json'),
+    'ui-plugin-occurrence': path.resolve(dirName, "..", 'libs', 'ui-plugin-occurrence', 'src', 'i18n', '*.json'),
+    'ui-plugin-taxonomy': path.resolve(dirName, "..", 'libs', 'ui-plugin-taxonomy', 'src', 'i18n', '*.json'),
   }
+
   let selectedDirs = []
-  for (let i = 2; i < process.argv.length; i++) {
-    let currDir = langPathsObj[process.argv[i]]
-    if (currDir == undefined) {
-      throw new Error("Please input a valid plugin directory name. Valid names: ui-plugin-collection, ui-plugin-image, ui-plugin-occurence, ui-plugin-taxonomy");
-    }
-
-    selectedDirs.push(currDir);
-
+  if (process.argv.includes("all")) {
+    Object.keys(langPathsObj).forEach((key) => {
+      selectedDirs.push(langPathsObj[key])
+    })
   }
-
+  else {
+    for (let i = 2; i < process.argv.length; i++) {
+      let currDir = langPathsObj[process.argv[i]]
+      if (currDir == undefined) {
+        throw new Error("Please input a valid plugin directory name. Valid names: ui-plugin-collection, ui-plugin-image, ui-plugin-occurrence, ui-plugin-taxonomy, all.");
+      }
+      selectedDirs.push(currDir);
+    }
+  }
   console.log("Selected Dirs", selectedDirs);
-  throw new Error("DOnezo");
-
 
   const languages = {};
   const outDir = path.resolve(dirName, "..", "apps", "ui", "src", "assets", "i18n");
   //There was a json in ui-common that only had an english translation, so it was breaking the script.
   const extraEnDir = path.resolve(dirName, "..", "libs", "ui-common")
   const outDirApps = path.resolve(dirName, "..", "apps");
+  const targetLangPrefixes = [];
   //console.log("Dirname", dirName);
   // libs\ui-plugin-collection
 
   //Builds the object representing all the language json files.
-  [srcPattern, pluginPattern].forEach((pattern) => {
+  selectedDirs.forEach((pattern) => {
     glob.sync(pattern)
       .filter((file) => !file.startsWith(outDirApps))
       .filter((file) => !file.startsWith(extraEnDir))
       .forEach((file) => {
         const baseName = path.basename(file);
         const langKeys = Object.keys(languages);
-        console.log("Path: ", path.dirname(file))
+        const langPrefix = baseName.replace(".json", '')
+        //console.log("Path: ", path.dirname(file))
         //console.log("BaseName: ", baseName.toString())
         if (!langKeys.includes(baseName)) {
           languages[baseName] = [];
         }
         languages[baseName].push(file);
+        if (langPrefix != 'en' && !targetLangPrefixes.includes(langPrefix))
+          targetLangPrefixes.push(langPrefix);
+
       });
   });
 
   let enPaths = languages["en.json"];
   console.log("EnPaths: ", enPaths);
+  console.log("TargetLangPrefixes: ", targetLangPrefixes);
 
-  throw new Error("Done");
+
   //Compare each english path (file) to each other language file and translate
   for (let index = 0; index < enPaths.length; index++) {
     let currEnPath = enPaths[index];
@@ -127,7 +136,7 @@ async function runTranslations() {
     try {
       const enContentsObj = JSON.parse(contents);
       //console.log("Calling translateJson with languages: ", languages);
-      await translateJson(enContentsObj, languages, index)
+      await translateJson(enContentsObj, languages, index, targetLangPrefixes);
     }
     catch (e) {
       //console.log("Could not read json at path: ", currEnPath, " continuing to next directory.");
@@ -144,15 +153,15 @@ async function runTranslations() {
  * @param {Object} languages Object containing the json objects for all languages besides english
  * @param {Integer} jsonFileIndex Integer representing the current set of json files (the directory) 
  */
-async function translateJson(enContents, languages, jsonFileIndex) {
+async function translateJson(enContents, languages, jsonFileIndex, targetLangPrefixes) {
   // Creates a client
   const symbiotaKey = fs.readFileSync("cloudKey.txt").toString('utf-8');
   //Make sure you have the key file needed to use the API stored locally! Find it on GCloud.
   //This allows us to use a generic API key instead of an application service account for authentication.
   const translate = new Translate({ key: symbiotaKey });
 
-  //Parse the english Json
-  const targetLangPrefixes = ['ar', 'de', 'es', 'fa', 'fr', 'hi', 'it', 'ja', 'pt', 'ru', 'ur', 'zh'];
+
+
   const enKeys = Object.keys(enContents);
   let enVals = Object.values(enContents);
 
