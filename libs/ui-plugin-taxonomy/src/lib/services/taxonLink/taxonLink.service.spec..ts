@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TaxonResourceLinkService } from './taxonResourceLink.service';
+import { TaxonLinkService } from './taxonLink.service';
 
-describe('TaxonService', () => {
-    let service: TaxonResourceLinkService
+describe('TaxonLinkService', () => {
+    let service: TaxonLinkService
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(TaxonResourceLinkService);
+        service = TestBed.inject(TaxonLinkService);
     })
 
     it('should be created', () => {

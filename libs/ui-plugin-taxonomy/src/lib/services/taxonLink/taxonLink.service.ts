@@ -2,8 +2,8 @@ import { Observable, of } from 'rxjs';
 import { ApiClientService, AppConfigService, UserService } from '@symbiota2/ui-common';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { TaxonResourceLinkQueryBuilder } from './taxonResourceLink-query-builder';
-import { TaxonResourceLinkListItem } from '../../dto/taxonResourceLink-list-item';
+import { TaxonLinkQueryBuilder } from './taxonLink-query-builder';
+import { TaxonLinkListItem } from '../../dto/taxonLink-list-item';
 
 interface FindAllParams {
     taxonIDs?: number[]
@@ -13,7 +13,7 @@ interface FindAllParams {
 }
 
 @Injectable()
-export class TaxonResourceLinkService {
+export class TaxonLinkService {
     private jwtToken = this.user.currentUser.pipe(map((user) => user.token))
 
     constructor(
@@ -21,18 +21,17 @@ export class TaxonResourceLinkService {
         private readonly user: UserService,
         private readonly appConfig: AppConfigService) { }
 
-    private createQueryBuilder(): TaxonResourceLinkQueryBuilder {
-        return new TaxonResourceLinkQueryBuilder(this.appConfig.apiUri());
+    private createQueryBuilder(): TaxonLinkQueryBuilder {
+        return new TaxonLinkQueryBuilder(this.appConfig.apiUri());
     }
 
     public getUrl() {
         const apiBaseUrl = this.appConfig.apiUri()
-        const x = new URL(`${apiBaseUrl}/taxonResourceLink`)
+        const x = new URL(`${apiBaseUrl}/taxonLink`)
         return this.apiClient.apiRoot()
     }
 
-
-    findAll(params?: FindAllParams): Observable<TaxonResourceLinkListItem[]> {
+    findAll(params?: FindAllParams): Observable<TaxonLinkListItem[]> {
         const url = this.createQueryBuilder()
             .findAll()
             .ids(params?.ids? params.ids : [])
@@ -43,12 +42,12 @@ export class TaxonResourceLinkService {
         return this.apiClient.send<any, Record<string, unknown>[]>(query)
             .pipe(
                 map((links) => links.map((o) => {
-                    return TaxonResourceLinkListItem.fromJSON(o);
+                    return TaxonLinkListItem.fromJSON(o);
                 }))
             );
     }
 
-    findByID(id: number): Observable<TaxonResourceLinkListItem> {
+    findByID(id: number): Observable<TaxonLinkListItem> {
         const url = this.createQueryBuilder()
             .findOne()
             .id(id)
@@ -56,7 +55,8 @@ export class TaxonResourceLinkService {
 
         const query = this.apiClient.queryBuilder(url).get().build()
         return this.apiClient.send<any, Record<string, unknown>>(query)
-            .pipe(map((o) => TaxonResourceLinkListItem.fromJSON(o)))
+            .pipe(map((o) => TaxonLinkListItem.fromJSON(o)))
+
     }
 
     /**
@@ -91,5 +91,4 @@ export class TaxonResourceLinkService {
             })
         )
     }
-
 }

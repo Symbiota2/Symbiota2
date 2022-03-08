@@ -19,11 +19,22 @@ export class TaxonResourceLinkService extends BaseService<TaxonResourceLink>{
     Can also limit the number fetched and use an offset.
      */
     async findAll(params?: TaxonResourceLinkFindAllParams): Promise<TaxonResourceLink[]> {
-        const { limit, offset, ...qParams } = params;
+        const { limit, offset, ...qParams } = params
 
-        return await (qParams.id)?
-            this.myRepository.find({take: limit, skip: offset, where: { id: In(params.id)}})
-            : this.myRepository.find({take: limit, skip: offset})
+        if (qParams.id) {
+            if (qParams.taxonID) {
+                return await this.myRepository.find({take: limit, skip: offset, where: { id: In(params.id), taxonID: In(params.taxonID)}})
+            } else {
+                return await this.myRepository.find({take: limit, skip: offset, where: { id: In(params.id)}})
+            }
+        } else {
+            if (qParams.taxonID) {
+                return await this.myRepository.find({take: limit, skip: offset, where: { taxonID: In(params.taxonID)}})
+            } else {
+                this.myRepository.find({take: limit, skip: offset})
+            }
+        }
+        return []
     }
 
     /*

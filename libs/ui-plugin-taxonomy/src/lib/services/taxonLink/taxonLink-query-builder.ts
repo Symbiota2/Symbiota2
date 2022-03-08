@@ -1,7 +1,7 @@
 import { Q_PARAM_TAXAIDS, Q_PARAM_TAXONIDS } from '../../../constants';
-import { TaxonQueryBuilder } from '../taxon/taxon-query-builder';
+import { TaxonResourceLinkQueryBuilder } from '../taxonResourceLink/taxonResourceLink-query-builder';
 
-export class TaxonResourceLinkQueryBuilder {
+export class TaxonLinkQueryBuilder {
     protected baseUrl: string
     protected namesUrl: URL
     protected nameUrl: URL
@@ -9,7 +9,7 @@ export class TaxonResourceLinkQueryBuilder {
 
     constructor(apiBaseUrl: string) {
         this.baseUrl = apiBaseUrl
-        this.url = new URL(`${apiBaseUrl}/taxonResourceLink`)
+        this.url = new URL(`${apiBaseUrl}/taxonLink`)
     }
 
     findAll(): FindAllBuilder {
@@ -30,7 +30,7 @@ export class TaxonResourceLinkQueryBuilder {
 }
 
 
-class FindOneBuilder extends TaxonResourceLinkQueryBuilder {
+class FindOneBuilder extends TaxonLinkQueryBuilder {
     protected taxonID: number = null
 
     id(id: number): FindOneBuilder {
@@ -44,7 +44,7 @@ class FindOneBuilder extends TaxonResourceLinkQueryBuilder {
     }
 }
 
-class FindAllBuilder extends TaxonResourceLinkQueryBuilder {
+class FindAllBuilder extends TaxonLinkQueryBuilder {
     protected _taxonIDs: number[] = []
     protected _ids: number[] = []
 
@@ -68,10 +68,9 @@ class FindAllBuilder extends TaxonResourceLinkQueryBuilder {
 
         return super.build();
     }
-
 }
 
-class DeleteOneBuilder extends TaxonResourceLinkQueryBuilder {
+class DeleteOneBuilder extends TaxonLinkQueryBuilder {
     protected _id: number;
 
     id(id: number): DeleteOneBuilder {

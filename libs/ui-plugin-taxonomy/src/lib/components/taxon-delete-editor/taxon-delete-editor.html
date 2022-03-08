@@ -26,6 +26,8 @@
                         <li *ngIf='blockIdsToDelete.length>0'>{{blockIdsToDelete.length}} {{'taxon.delete.blocks.label' | translate}}</li>
                         <li *ngIf='descriptionIdsToDelete.length>0'>{{descriptionIdsToDelete.length}} {{'taxon.delete.descriptions.label' | translate}}</li>
                         <li *ngIf='commonNameIdsToDelete.length>0'>{{commonNameIdsToDelete.length}} {{'taxon.delete.common.names.label' | translate}}</li>
+                        <li *ngIf='taxonLinkIdsToDelete.length>0'>{{taxonLinkIdsToDelete.length}} {{'taxon.delete.links.label' | translate}}</li>
+                        <li *ngIf='taxonResourceLinkIdsToDelete.length>0'>{{taxonResourceLinkIdsToDelete.length}} {{'taxon.delete.resource.links.label' | translate}}</li>
                     </ul>
                     <br/>
                     <button mat-button (click)="deleteTaxon()" mat-raised-button color="warn">

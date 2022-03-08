@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    TaxonDescriptionBlockService, TaxonDescriptionStatementService,
+    TaxonDescriptionBlockService, TaxonDescriptionStatementService, TaxonLinkService,
     TaxonomicEnumTreeService, TaxonomicStatusService,
-    TaxonomicUnitService,
+    TaxonomicUnitService, TaxonResourceLinkService,
     TaxonService, TaxonVernacularService
 } from '../../services';
 import { ApiTaxonSearchCriterion } from '@symbiota2/data-access';
@@ -48,6 +48,8 @@ export class TaxonDeleteEditorComponent implements OnInit {
     statusesToDelete = []
     descriptionIdsToDelete = []
     commonNameIdsToDelete = []
+    taxonLinkIdsToDelete = []
+    taxonResourceLinkIdsToDelete = []
 
     constructor(
         private readonly userService: UserService,
@@ -57,6 +59,8 @@ export class TaxonDeleteEditorComponent implements OnInit {
         private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
         private readonly taxonomicStatusService: TaxonomicStatusService,
         private readonly taxonVernacularService: TaxonVernacularService,
+        private readonly taxonLinkService: TaxonLinkService,
+        private readonly taxonResourceLinkService: TaxonResourceLinkService,
         private readonly occurrenceService: OccurrenceService,
         private readonly occurrenceSearchResultService: OccurrenceSearchResults,
         private readonly imageService: ImageService,
@@ -167,6 +171,20 @@ export class TaxonDeleteEditorComponent implements OnInit {
             })
         })
 
+        // Delete the links
+        this.taxonLinkIdsToDelete.forEach((id) => {
+            this.taxonLinkService.delete(id).subscribe((result) => {
+
+            })
+        })
+
+        // Delete the resource links
+        this.taxonResourceLinkIdsToDelete.forEach((id) => {
+            this.taxonResourceLinkService.delete(id).subscribe((result) => {
+
+            })
+        })
+
         // Delete taxa enum tree
         this.taxonomicEnumTreeService.deleteByTaxonID(+this.taxonID).subscribe((result) => {
 
@@ -190,6 +208,8 @@ export class TaxonDeleteEditorComponent implements OnInit {
         this.statusesToDelete = []
         this.descriptionIdsToDelete = []
         this.commonNameIdsToDelete = []
+        this.taxonLinkIdsToDelete = []
+        this.taxonResourceLinkIdsToDelete = []
 
         // Find images to delete
         this.imageService.findByTaxonIDs([+this.taxonID]).subscribe((images) => {
@@ -236,6 +256,20 @@ export class TaxonDeleteEditorComponent implements OnInit {
         this.taxonomicStatusService.findAll({taxonomicAuthorityID: null, taxonIDs: [+this.taxonID]}).subscribe((statuses) => {
             statuses.forEach((status) => {
                 this.statusesToDelete.push(status)
+            })
+        })
+
+        // Find the links
+        this.taxonLinkService.findAll({taxonIDs: [+this.taxonID]}).subscribe((links) => {
+            links.forEach((link) => {
+                this.taxonLinkIdsToDelete.push(link.id)
+            })
+        })
+
+        // Find the resource links
+        this.taxonResourceLinkService.findAll({taxonIDs: [+this.taxonID]}).subscribe((links) => {
+            links.forEach((link) => {
+                this.taxonResourceLinkIdsToDelete.push(link.id)
             })
         })
 

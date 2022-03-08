@@ -1,4 +1,5 @@
 export const Q_PARAM_TAXAIDS = 'id[]'
+export const Q_PARAM_TAXONIDS = 'taxonID[]'
 export const Q_PARAM_TAXAID = 'taxonID'
 export const Q_PARAM_RANKID = 'rankID'
 export const Q_PARAM_PARENTID = 'parentTaxonID'
