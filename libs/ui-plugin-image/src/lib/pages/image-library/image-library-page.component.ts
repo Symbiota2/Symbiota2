@@ -39,7 +39,6 @@ export class ImageLibraryPageComponent implements OnInit {
         this.prefix = null
         this.currentRoute.paramMap.subscribe(params => {
             const maybeLevel = params.get('level')
-            console.log("maybe level is " + maybeLevel)
             if (maybeLevel) {
                 if (maybeLevel == 'Genus' || maybeLevel == 'Family') {
                     this.level = maybeLevel
@@ -57,14 +56,12 @@ export class ImageLibraryPageComponent implements OnInit {
                 }
 
             }
-            console.log("level is " + this.level)
             this.taxonomicUnitService.findAll().subscribe((units) => {
                 this.ranksNameLookup = new Map()
                 units.forEach((unit) => {
                     const key = unit.rankID + unit.kingdomName
                     this.ranksNameLookup.set(unit.rankName, unit.rankID)
                 })
-                console.log("loading names ")
                 this.loadNames(this.ranksNameLookup.get(this.level), null, this.prefix, this.descendant)
             })
         })
@@ -78,11 +75,9 @@ export class ImageLibraryPageComponent implements OnInit {
     loadNames(rankID : number, kingdomName : string, prefix: string, descendant: number) {
         const partialName = prefix ? prefix : ''
         if (descendant) {
-            console.log("have descendant" + descendant + " " + this.ranksNameLookup.get("Species"))
             const myNames = []
             this.taxonomicEnumTreeService.findDescendantsByRank(descendant,this.ranksNameLookup.get("Species"))
                 .subscribe((items) => {
-                    console.log("items " + items.length)
                     items.forEach((item) =>{
                         const pair = new TaxonIDAndNameItem()
                         pair.name = item.taxon.scientificName
@@ -94,9 +89,7 @@ export class ImageLibraryPageComponent implements OnInit {
             })
         }
         else {
-            console.log("Donw here ")
             this.taxonService.findScientificNames(partialName,rankID, kingdomName).subscribe((myNames) => {
-                console.log("found names " + myNames.length)
                 this.names = myNames.sort((a,b) =>
                     a.name > b.name ? 1 : -1)
             })

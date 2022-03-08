@@ -22,9 +22,20 @@ export class ImageTagService extends BaseService<ImageTag>{
     async findAll(params?: ImageTagFindAllParams): Promise<ImageTag[]> {
         const { limit, offset, ...qParams } = params;
 
-        return await (qParams.id)?
-            this.myRepository.find({take: limit, skip: offset, where: { id: In(params.id)}})
-            : this.myRepository.find({take: limit, skip: offset})
+        if (qParams.id) {
+            if (qParams.imageId) {
+                return await this.myRepository.find({where: { id: In(params.id), imageID: In(params.imageId)}})
+            } else {
+                return await this.myRepository.find({where: { id: In(params.id)}})
+            }
+        } else {
+            if (qParams.imageId) {
+                return await this.myRepository.find({where: { imageID: In(params.imageId)}})
+            } else {
+                return await this.myRepository.find({take: limit, skip: offset})
+            }
+        }
+        return []
     }
 
     /*

@@ -10,12 +10,13 @@ import {
     Delete,
     NotFoundException,
     Patch,
-    UseInterceptors, UploadedFile, BadRequestException
+    UseInterceptors, UploadedFile, BadRequestException, UseGuards, Req, ForbiddenException
 } from '@nestjs/common';
 import { ImageTagService } from './imageTag.service'
-import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger'
+import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ImageTagDto } from './dto/ImageTagDto'
 import { ImageTagFindAllParams } from './dto/image-tag-find-all.input.dto'
+import { AuthenticatedRequest, JwtAuthGuard, TokenService } from '@symbiota2/api-auth';
 
 @ApiTags('ImageTag')
 @Controller('imageTag')
@@ -26,7 +27,7 @@ export class ImageTagController {
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: ImageTagDto, isArray: true })
     @ApiOperation({
-        summary: "Retrieve a list of image tag records.  Can use a list of image tag ids to filter the records, and a limit and/or offset."
+        summary: "Retrieve a list of image tag records.  Can use a list of image tag ids and/or a list of image ids to filter the records.  Limit and/or offset only apply if no ids are used."
     })
     async findAll(@Query() findAllParams: ImageTagFindAllParams): Promise<ImageTagDto[]> {
         const imageTags = await this.myService.findAll(findAllParams)
@@ -49,6 +50,33 @@ export class ImageTagController {
         }
         const dto = new ImageTagDto(image)
         return dto
+    }
+
+    @Delete(':id')
+    @ApiOperation({
+        summary: "Delete an image tag by ID"
+    })
+    @HttpCode(HttpStatus.OK)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiResponse({ status: HttpStatus.OK })
+    async deleteByID(@Req() request: AuthenticatedRequest, @Param('id') id: number): Promise<boolean> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const image = await this.myService.deleteByID(id)
+        if (!image) {
+            throw new NotFoundException()
+        }
+        return image
+    }
+
+    private canEdit(request) {
+        // SuperAdmins and TaxonProfileEditors have editing privileges
+        const isSuperAdmin = TokenService.isSuperAdmin(request.user)
+        const isEditor = false // TokenService.isImageEditor(request.user)
+        return isSuperAdmin || isEditor
     }
 
 }

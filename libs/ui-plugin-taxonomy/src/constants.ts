@@ -8,3 +8,5 @@ export const Q_PARAM_SCIENTIFICNAME = 'scientificName'
 export const Q_PARAM_KINGDOMNAME = 'kingdomName'
 export const Q_PARAM_WITHIMAGES = 'withImages'
 export const Q_PARAM_LIMIT = 'limit'
+export const Q_PARAM_OFFSET = 'offset'
+

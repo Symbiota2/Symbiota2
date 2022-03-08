@@ -23,6 +23,10 @@ export class OccurrenceQueryBuilder {
         return new CreateOneBuilder(this.baseUrl);
     }
 
+    delete(): DeleteOneBuilder {
+        return new DeleteOneBuilder(this.baseUrl);
+    }
+
     upload(): UploadBuilder {
         return new UploadBuilder(this.baseUrl);
     }
@@ -43,6 +47,22 @@ class CreateOneBuilder extends OccurrenceQueryBuilder {
     build(): string {
         this.url.searchParams.set('collectionID', this._collectionID.toString());
         return super.build();
+    }
+}
+
+class DeleteOneBuilder extends OccurrenceQueryBuilder {
+    protected _id: number;
+
+    id(id: number): DeleteOneBuilder {
+        this._id = id
+        return this;
+    }
+
+    build(): string {
+        if (this._id) {
+            this.url.pathname += `/${this._id}`
+        }
+        return super.build()
     }
 }
 
@@ -106,9 +126,11 @@ class FindAllBuilder extends OccurrenceQueryBuilder {
             }
         }
 
-        this._collectionIDs.forEach((id) => {
-            this.url.searchParams.append(Q_PARAM_COLLID, id.toString());
-        });
+        if (this._collectionIDs?.length > 0) {
+            this._collectionIDs.forEach((id) => {
+                this.url.searchParams.append(Q_PARAM_COLLID, id.toString());
+            });
+        }
 
         return super.build();
     }

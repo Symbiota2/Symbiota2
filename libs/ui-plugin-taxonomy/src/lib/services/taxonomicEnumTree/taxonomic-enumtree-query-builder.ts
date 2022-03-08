@@ -40,6 +40,10 @@ export class TaxonomicEnumTreeQueryBuilder {
         return new CreateOneBuilder(this.baseUrl);
     }
 
+    deleteByTaxonID(): DeleteByTaxonIDBuilder {
+        return new DeleteByTaxonIDBuilder(this.baseUrl);
+    }
+
     move(): MoveBuilder {
         return new MoveBuilder(this.baseUrl);
     }
@@ -129,6 +133,22 @@ class DeleteOneBuilder extends TaxonomicEnumTreeQueryBuilder {
     build(): string {
         if (this._id) {
             this.url.pathname += `/${this._id}`
+        }
+        return super.build()
+    }
+}
+
+class DeleteByTaxonIDBuilder extends TaxonomicEnumTreeQueryBuilder {
+    protected _id: number
+
+    id(id: number): DeleteByTaxonIDBuilder {
+        this._id = id
+        return this;
+    }
+
+    build(): string {
+        if (this._id) {
+            this.url.pathname += `/taxonID/${this._id}`
         }
         return super.build()
     }
