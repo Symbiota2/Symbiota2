@@ -199,7 +199,7 @@ async function translateJson(enContents, languages, jsonFileIndex, targetLangPre
       //Once we get the resulting translations, add them to the json.
       let index = 0;
       const langFilePath = languages[langKey][jsonFileIndex];
-      console.log("TRANSLATIONS: ", translations)
+      //console.log("TRANSLATIONS FOR PATH ", langFilePath, ": ", translations)
       translations.forEach(translatedVal => {
         langObj[enKeys[index]] = translatedVal;
         index++;
@@ -207,14 +207,14 @@ async function translateJson(enContents, languages, jsonFileIndex, targetLangPre
       //Export to JSON string and then to json file
       //Passing 4 for the third parameter pretty prints. 
       const langJSON = JSON.stringify(langObj, null, 4);
-      fs.writeFileSync("demo/" + langKey, langJSON);
+      fs.writeFileSync(langFilePath, langJSON, { flag: 'w' });
     }
     catch (e) {
       console.log("Translate json errored", e)
     }
   }
   //Exit demo, comment this to demonstrate all translations if desired. 
-  throw new Error("Exiting demo.");
+  //throw new Error("Exiting demo.");
 }
 
 /**
@@ -232,7 +232,7 @@ async function translateText(text, target, translate) {
   //translations = Array.isArray(translations) ? translations : [translations];
   console.log('Translations:');
   translations.forEach((translation, i) => {
-    //console.log(`${text[i]} => (${target}) ${translation}`);
+    console.log(`${text[i]} => (${target}) ${translation}`);
   });
   return translations;
 }
