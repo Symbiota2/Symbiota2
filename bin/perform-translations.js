@@ -1,11 +1,14 @@
 
 /**
- * Usage: Input one or more folder names (max of 4) out of the following supported translation folders
+ * Usage: Input one or more folder names (max of 4) or 'all' out of the following supported translation folders
+ * Options:
  * ui-plugin-collection
  * ui-plugin-image
  * ui-plugin-occurrence
  * ui-plugin-taxonomy
+ * all
  */
+
 //Import libraries
 const { Translate } = require('@google-cloud/translate').v2;
 
@@ -17,6 +20,7 @@ const dirName = __dirname
 
 //If running on Windows, change the path to windows style slashes
 //Universal regex replace as replaceAll is not defined for this nodejs version.
+//TODO: Why does path.resolve not work properly for this script on Windows still?
 if (process.platform == "win32") {
   console.log("Platform is windows");
   dirName.replace('///g', "\\");
@@ -29,14 +33,7 @@ if (process.argv.length < 3) {
 }
 
 //Run the main script.
-
 runTranslations().catch(console.error)
-
-
-
-
-
-
 
 
 /**
@@ -47,26 +44,6 @@ runTranslations().catch(console.error)
  * libs/ui-plugin-taxonomy/src/i18n
  */
 async function runTranslations() {
-  const srcPattern = path.resolve(
-    dirName,
-    "..",
-    "apps",
-    "ui",
-    "src",
-    "**",
-    "i18n",
-    "*.json"
-  );
-
-  const pluginPattern = path.resolve(
-    dirName,
-    "..",
-    "libs",
-    "**",
-    "i18n",
-    "*.json"
-  );
-
   const langPathsObj = {
     'ui-plugin-collection': path.resolve(dirName, "..", 'libs', 'ui-plugin-collection', 'src', 'i18n', '*.json'),
     'ui-plugin-image': path.resolve(dirName, "..", 'libs', 'ui-plugin-image', 'src', 'i18n', '*.json'),
@@ -92,10 +69,8 @@ async function runTranslations() {
   console.log("Selected Dirs", selectedDirs);
 
   const languages = {};
-  const outDir = path.resolve(dirName, "..", "apps", "ui", "src", "assets", "i18n");
   //There was a json in ui-common that only had an english translation, so it was breaking the script.
-  const extraEnDir = path.resolve(dirName, "..", "libs", "ui-common")
-  const outDirApps = path.resolve(dirName, "..", "apps");
+
   const targetLangPrefixes = [];
   //console.log("Dirname", dirName);
   // libs\ui-plugin-collection
@@ -103,8 +78,6 @@ async function runTranslations() {
   //Builds the object representing all the language json files.
   selectedDirs.forEach((pattern) => {
     glob.sync(pattern)
-      .filter((file) => !file.startsWith(outDirApps))
-      .filter((file) => !file.startsWith(extraEnDir))
       .forEach((file) => {
         const baseName = path.basename(file);
         const langKeys = Object.keys(languages);
@@ -158,9 +131,6 @@ async function translateJson(enContents, languages, jsonFileIndex, targetLangPre
   //Make sure you have the key file needed to use the API stored locally! Find it on GCloud.
   //This allows us to use a generic API key instead of an application service account for authentication.
   const translate = new Translate({ key: symbiotaKey });
-
-
-
   const enKeys = Object.keys(enContents);
   let enVals = Object.values(enContents);
   const enValLength = enVals.length
@@ -179,7 +149,6 @@ async function translateJson(enContents, languages, jsonFileIndex, targetLangPre
       if (enValLength > 128) {
         let currIndex = 0
         while ((currIndex + 128) < enValLength) {
-          //console.log("Slicing", currIndex, " : ", currIndex + 127);
           //Get the next 128 elements to send
           let currEnVals = enVals.slice(currIndex, (currIndex + 127));
           const currTranslations = await translateText(currEnVals, langPrefix, translate);
@@ -213,8 +182,6 @@ async function translateJson(enContents, languages, jsonFileIndex, targetLangPre
       console.log("Translate json errored", e)
     }
   }
-  //Exit demo, comment this to demonstrate all translations if desired. 
-  //throw new Error("Exiting demo.");
 }
 
 /**
