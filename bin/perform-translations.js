@@ -15,18 +15,6 @@ const { Translate } = require('@google-cloud/translate').v2;
 const path = require("path");
 const fs = require("fs");
 const glob = require("glob");
-const dirName = __dirname
-
-
-//If running on Windows, change the path to windows style slashes
-//Universal regex replace as replaceAll is not defined for this nodejs version.
-//TODO: Why does path.resolve not work properly for this script on Windows still?
-if (process.platform == "win32") {
-  console.log("Platform is windows");
-  dirName.replace('///g', "\\");
-}
-
-console.log("Platform dirname: ", dirName);
 
 if (process.argv.length < 3) {
   throw new Error("Please input a plugin directory name to translate. Valid names: ui-plugin-collection, ui-plugin-image, ui-plugin-occurrence, ui-plugin-taxonomy, all.")
@@ -45,10 +33,10 @@ runTranslations().catch(console.error)
  */
 async function runTranslations() {
   const langPathsObj = {
-    'ui-plugin-collection': path.resolve(dirName, "..", 'libs', 'ui-plugin-collection', 'src', 'i18n', '*.json'),
-    'ui-plugin-image': path.resolve(dirName, "..", 'libs', 'ui-plugin-image', 'src', 'i18n', '*.json'),
-    'ui-plugin-occurrence': path.resolve(dirName, "..", 'libs', 'ui-plugin-occurrence', 'src', 'i18n', '*.json'),
-    'ui-plugin-taxonomy': path.resolve(dirName, "..", 'libs', 'ui-plugin-taxonomy', 'src', 'i18n', '*.json'),
+    'ui-plugin-collection': path.resolve(__dirname, "..", 'libs', 'ui-plugin-collection', 'src', 'i18n', '*.json'),
+    'ui-plugin-image': path.resolve(__dirname, "..", 'libs', 'ui-plugin-image', 'src', 'i18n', '*.json'),
+    'ui-plugin-occurrence': path.resolve(__dirname, "..", 'libs', 'ui-plugin-occurrence', 'src', 'i18n', '*.json'),
+    'ui-plugin-taxonomy': path.resolve(__dirname, "..", 'libs', 'ui-plugin-taxonomy', 'src', 'i18n', '*.json'),
   }
 
   let selectedDirs = []
@@ -69,11 +57,7 @@ async function runTranslations() {
   console.log("Selected Dirs", selectedDirs);
 
   const languages = {};
-  //There was a json in ui-common that only had an english translation, so it was breaking the script.
-
   const targetLangPrefixes = [];
-  //console.log("Dirname", dirName);
-  // libs\ui-plugin-collection
 
   //Builds the object representing all the language json files.
   selectedDirs.forEach((pattern) => {
