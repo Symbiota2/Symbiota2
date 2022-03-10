@@ -17,7 +17,6 @@
     <button *ngIf='userCanEdit' style='float:right' mat-icon-button>
         <mat-icon color="primary" (click)="goToLink(taxonID)">edit</mat-icon>
     </button>
-    <!-- <button appearance='fill' (click)="goToLink(taxonID)">{{"taxon.editor.link.label" | translate}}</button> -->
     <mat-tab-group *ngIf="blocks.length > 0" mat-align-tabs="start">
         <mat-tab color="primary" *ngFor='let block of blocks' label='{{block.caption}}'>
             <symbiota2-expansion-panel label='{{block.taxon.scientificName}}'>
@@ -25,7 +24,7 @@
                     <tr>
                         <td>
                             <a *ngIf='image' href='image/details/{{image.id}}'>
-                                <img src="http://openherbarium.org{{image.thumbnailUrl}}"/>
+                                <img [src]="localize(image.thumbnailUrl)"/>
                             </a>
                             <span *ngIf='!image'>{{"taxon.profile.no.image" | translate}}</span>
                             <br/>

@@ -1,8 +1,8 @@
 import { Component, Inject, Optional } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { FormControl, Validators } from '@angular/forms'
-import { ImageInfo } from '../image-details-editor/image-details-editor.component';
 import { TaxonomicUnitService } from '../../../../../ui-plugin-taxonomy/src/lib/services';
+import { ImageInfo } from '../../pages/image-details/image-details-page.component';
 
 @Component({
     selector: 'image-details-editor-dialog-box',
@@ -13,9 +13,6 @@ export class ImageDetailsEditorDialogComponent {
 
     public action : string
     public local_data
-    // public rankNamesMap = new Map()
-    // public rankNames = []
-    // public rankID
     sortSequence
     constructor(
         public dialogRef: MatDialogRef<ImageDetailsEditorDialogComponent>,
@@ -32,29 +29,11 @@ export class ImageDetailsEditorDialogComponent {
     }
 
     ngOnInit() {
-        /*
-        this.rankNamesMap = new Map()
-        this.taxonomicUnitService.findAll().subscribe((ranks) => {
-            ranks.forEach((rank) => {
-                if (rank.kingdomName == this.local_data.kingdomName) {
-                    this.rankNamesMap.set(rank.rankID, {name: rank.rankName, id: rank.rankID})
-                }
-                if (rank.rankID = this.local_data.rankID) {
-                    this.rankID = rank.rankID
-                }
-            })
-            const keys =[ ...this.rankNamesMap.keys() ].sort((a,b) => a-b)
-            keys.forEach((key) => {
-                this.rankNames.push(this.rankNamesMap.get(key))
-            })
-        })
-         */
 
     }
 
     doAction(){
-        this.local_data.sortSequence = this.sortSequence
-        // this.local_data.rankID = this.rankID
+        //this.local_data.sortSequence = this.sortSequence
         this.dialogRef.close({event:this.action,data:this.local_data})
     }
 

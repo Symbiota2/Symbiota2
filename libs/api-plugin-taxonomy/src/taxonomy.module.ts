@@ -22,12 +22,12 @@ import { TaxonDescriptionStatementController } from './taxonDescriptionStatement
 import { TaxonDescriptionStatementService } from './taxonDescriptionStatement/taxonDescriptionStatement.service';
 import { TaxonLinkService } from './taxonLink/taxonLink.service';
 import { TaxonLinkController } from './taxonLink/taxonLink.controller';
-import { TaxonProfilePublicationImageLinkController } from './taxonProfilePublicationImageLink/taxonProfilePublicationImageLink.controller';
-import { TaxonProfilePublicationImageLinkService } from './taxonProfilePublicationImageLink/taxonProfilePublicationImageLink.service';
-import { TaxonProfilePublicationDescriptionLinkController } from './taxonProfilePublicationDescriptionLink/taxonProfilePublicationDescriptionLink.controller';
-import { TaxonProfilePublicationDescriptionLinkService } from './taxonProfilePublicationDescriptionLink/taxonProfilePublicationDescriptionLink.service';
-import { TaxonProfilePublicationService } from './taxonProfilePublication/taxonProfilePublication.service';
-import { TaxonProfilePublicationController } from './taxonProfilePublication/taxonProfilePublication.controller';
+//import { TaxonProfilePublicationImageLinkController } from './taxonProfilePublicationImageLink/taxonProfilePublicationImageLink.controller';
+//import { TaxonProfilePublicationImageLinkService } from './taxonProfilePublicationImageLink/taxonProfilePublicationImageLink.service';
+//import { TaxonProfilePublicationDescriptionLinkController } from './taxonProfilePublicationDescriptionLink/taxonProfilePublicationDescriptionLink.controller';
+//import { TaxonProfilePublicationDescriptionLinkService } from './taxonProfilePublicationDescriptionLink/taxonProfilePublicationDescriptionLink.service';
+//import { TaxonProfilePublicationService } from './taxonProfilePublication/taxonProfilePublication.service';
+//import { TaxonProfilePublicationController } from './taxonProfilePublication/taxonProfilePublication.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { promises as fsPromises } from 'fs';
 import { join as pathJoin } from 'path';
@@ -86,9 +86,9 @@ import { StorageModule } from '@symbiota2/api-storage';
         TaxonomyUploadCleanupProcessor,
         TaxonomyUploadProcessor,
         TaxonLinkService,
-        TaxonProfilePublicationService,
-        TaxonProfilePublicationImageLinkService,
-        TaxonProfilePublicationDescriptionLinkService,
+        //TaxonProfilePublicationService,
+        //TaxonProfilePublicationImageLinkService,
+        //TaxonProfilePublicationDescriptionLinkService,
         TaxonResourceLinkService,
     ],
     controllers: [
@@ -101,9 +101,9 @@ import { StorageModule } from '@symbiota2/api-storage';
         TaxonDescriptionBlockController,
         TaxonDescriptionStatementController,
         TaxonLinkController,
-        TaxonProfilePublicationController,
-        TaxonProfilePublicationImageLinkController,
-        TaxonProfilePublicationDescriptionLinkController,
+        //TaxonProfilePublicationController,
+        //TaxonProfilePublicationImageLinkController,
+        //TaxonProfilePublicationDescriptionLinkController,
         TaxonResourceLinkController
     ],
     exports: [
@@ -116,9 +116,9 @@ import { StorageModule } from '@symbiota2/api-storage';
         TaxonDescriptionBlockService,
         TaxonDescriptionStatementService,
         TaxonLinkService,
-        TaxonProfilePublicationService,
-        TaxonProfilePublicationImageLinkService,
-        TaxonProfilePublicationDescriptionLinkService,
+        //TaxonProfilePublicationService,
+        //TaxonProfilePublicationImageLinkService,
+        //TaxonProfilePublicationDescriptionLinkService,
         TaxonResourceLinkService
     ]
 })

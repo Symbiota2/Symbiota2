@@ -17,17 +17,21 @@ import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nes
 import { ImageDto } from './dto/ImageDto'
 import { ImageFindAllParams } from './dto/image-find-all.input.dto'
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiFileInput } from '@symbiota2/api-common'
+import { ApiFileInput, getCSVFields } from '@symbiota2/api-common';
+import fs, { createReadStream } from 'fs';
 import { Express } from 'express';
 import { PhotographerNameAndIDDto } from './dto/PhotographerNameAndIDDto';
 import { ImageSearchParams } from './dto/ImageSearchParams';
 import { AuthenticatedRequest, JwtAuthGuard, TokenService } from '@symbiota2/api-auth';
 import { TaxonDto } from '../../../api-plugin-taxonomy/src/taxon/dto/TaxonDto';
-import { Image, Taxon } from '@symbiota2/api-database';
+import { Image, ImageFolderUpload, Taxon, TaxonomyUpload } from '@symbiota2/api-database';
 import { ImageInputDto } from './dto/ImageInputDto';
 import { ImageAndTaxonDto } from './dto/ImageAndTaxonDto';
+import path from 'path';
+import { DeleteResult } from 'typeorm';
 
 type File = Express.Multer.File
+const fsPromises = fs.promises;
 
 @ApiTags('Image')
 @Controller('image')
@@ -160,7 +164,7 @@ export class ImageController {
         summary: "Retrieve an image from the image library using the filename it was stored under."
     })
     async getFile(@Param('fileName') fileName : string, @Res() res): Promise<any> {
-        res.sendFile(fileName, { root: "." + ImageService.imageLibraryFolder});
+        res.sendFile(fileName, { root: ImageService.imageLibraryFolder});
     }
 
     @Post('imglib')
@@ -190,7 +194,7 @@ export class ImageController {
         if (!file.mimetype.startsWith('image/')) {
             throw new BadRequestException('Invalid Image');
         }
-        return await this.myService.fromFileToLocalStorage(file.originalname, file.filename, file.mimetype)
+        return await this.myService.fromFileToLocalStorage(file.originalname, path.join(ImageService.imageUploadFolder,file.filename), file.mimetype)
     }
 
     @Post('upload/storage/single')
@@ -280,23 +284,95 @@ export class ImageController {
         return image
     }
 
-    @Delete('upload/:id')
+    @Delete('taxonID/:taxonID')
     @ApiOperation({
-        summary: "Delete an image by ID"
+        summary: "Delete an image by a given taxonID"
     })
-    @HttpCode(HttpStatus.NO_CONTENT)
+    @HttpCode(HttpStatus.OK)
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @ApiResponse({ status: HttpStatus.NO_CONTENT })
-    async deleteByID(@Req() request: AuthenticatedRequest, @Param('id') id: number): Promise<void> {
+    @ApiResponse({ status: HttpStatus.OK })
+    async deleteByTaxonID(@Req() request: AuthenticatedRequest, @Param('taxonID') id: number): Promise<DeleteResult> {
         if (!this.canEdit(request)) {
             throw new ForbiddenException()
         }
 
-        const block = await this.myService.deleteByID(id)
-        if (!block) {
+        const result = await this.myService.deleteByTaxonID(id)
+
+        // Succeeds even if nothing deleted
+        return result
+    }
+
+    @Delete(':id')
+    @ApiOperation({
+        summary: "Delete an image by ID"
+    })
+    @HttpCode(HttpStatus.OK)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiResponse({ status: HttpStatus.OK })
+    async deleteByID(@Req() request: AuthenticatedRequest, @Param('id') id: number): Promise<boolean> {
+        if (!this.canEdit(request)) {
+            throw new ForbiddenException()
+        }
+
+        const image = await this.myService.deleteByID(id)
+        if (!image) {
             throw new NotFoundException()
         }
+        return image
     }
+
+    @Post('zipUpload')
+    @HttpCode(HttpStatus.CREATED)
+    @UseInterceptors(FileInterceptor('file'))
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({
+        summary: "Upload a zipped folder of images"
+    })
+    @ApiFileInput('file')
+    async uploadZipFile(@UploadedFile() file: File): Promise<ImageFolderUpload> {
+        let upload: ImageFolderUpload
+
+        if (!file) {
+            throw new BadRequestException('File not specified');
+        }
+
+        console.log(" mime is " + file.mimetype)
+        if (file.mimetype.startsWith('application/zip') ||
+            file.mimetype.startsWith('application/x-zip-compressed')) {
+            //const headers = await getCSVFields(file.path);
+
+            upload = await this.myService.createUpload(
+                path.resolve(file.path),
+                file.mimetype
+            );
+        }
+        else {
+            await fsPromises.unlink(file.path);
+            throw new BadRequestException('Unsupported file type: .zip file is supported');
+        }
+
+        return upload;
+    }
+
+    @Post('zipUpload/:id/start')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({
+        summary: 'Starts a pre-configured upload of an image folder'
+    })
+    async startUpload(
+        @Param('id') uploadID: number,
+        @Req() request: AuthenticatedRequest) {
+
+        await this.myService.startUpload(
+            request.user.uid,
+            uploadID
+        );
+    }
+
 
 }

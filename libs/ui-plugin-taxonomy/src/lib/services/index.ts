@@ -8,6 +8,8 @@ export * from './taxonomicUnit/taxonomicUnit.service'
 export * from './taxonResourceLink/taxonResourceLink.service'
 export * from './taxonVernacular/taxonVernacular.service'
 export * from './taxonomyUpload/taxonomy-upload.service'
+export * from './taxonLink/taxonLink.service'
+export * from './taxonResourceLink/taxonResourceLink.service'
 
 
 

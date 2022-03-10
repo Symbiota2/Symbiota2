@@ -1,28 +1,53 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { Brackets, In, Repository } from 'typeorm';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Brackets, DeleteResult, In, Repository } from 'typeorm';
 import { BaseService } from '@symbiota2/api-common'
-import { Image, Taxon } from '@symbiota2/api-database';
+import { Image, ImageFolderUpload, Taxon, TaxonomyUpload, TaxonomyUploadFieldMap } from '@symbiota2/api-database';
 import { ImageFindAllParams } from './dto/image-find-all.input.dto'
 import { Express } from 'express';
 import { StorageService } from '@symbiota2/api-storage';
 import * as fs from 'fs';
 import { ImageSearchParams } from './dto/ImageSearchParams';
+import { InjectQueue } from '@nestjs/bull';
+import {
+    QUEUE_ID_TAXONOMY_UPLOAD,
+    QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP,
+    TaxonomyUploadCleanupJob, TaxonomyUploadJob
+} from '@symbiota2/api-plugin-taxonomy';
+import { Queue } from 'bull';
+import { QUEUE_ID_IMAGE_FOLDER_UPLOAD_CLEANUP } from '../queues/image-folder-upload-cleanup.queue';
+import { ImageFolderUploadCleanupJob } from '../queues/image-folder-upload-cleanup.processor';
+import { AppConfigService } from '@symbiota2/api-config';
+import { QUEUE_ID_IMAGE_FOLDER_UPLOAD } from '../queues/image-folder-upload.queue';
+import { ImageFolderUploadJob } from '../queues/image-folder-upload.processor';
+import path from 'path';
 const imageThumbnail = require('image-thumbnail')
 
 type File = Express.Multer.File
 
 @Injectable()
 export class ImageService extends BaseService<Image>{
-    private static readonly S3_PREFIX = 'image'
-    public static readonly imageUploadFolder = '/data/uploads/images/'
-    public static readonly imageLibraryFolder = '/imglib/'
+    public static readonly S3_PREFIX = 'image'
+    public static readonly imageUploadFolder = 'data/uploads/images/'
+    public static imageLibraryFolder = 'imglib/'
+    public static readonly dataFolderPath = "data/uploads/images"
+    public static readonly skippedImagesDueToTooManyMatches = ImageService.dataFolderPath + "/skippedTooManyMatches"
+    public static readonly skippedImagesDueToNoMatch = ImageService.dataFolderPath + "/skippedNoMatch"
+    private readonly logger = new Logger(ImageService.name)
 
     constructor(
         @Inject(Image.PROVIDER_ID)
         private readonly myRepository: Repository<Image>,
+        @Inject(ImageFolderUpload.PROVIDER_ID)
+        private readonly uploadRepo: Repository<ImageFolderUpload>,
+        @InjectQueue(QUEUE_ID_IMAGE_FOLDER_UPLOAD_CLEANUP)
+        private readonly uploadCleanupQueue: Queue<ImageFolderUploadCleanupJob>,
+        @InjectQueue(QUEUE_ID_IMAGE_FOLDER_UPLOAD)
+        private readonly uploadQueue: Queue<ImageFolderUploadJob>,
+        private readonly appConfig: AppConfigService,
         private readonly storageService: StorageService)
     {
         super(myRepository)
+        ImageService.imageLibraryFolder = this.appConfig.imageLibrary()
     }
 
     public static s3Key(objectName: string): string {
@@ -191,56 +216,6 @@ export class ImageService extends BaseService<Image>{
         return await qb.getMany()
     }
 
-    /* Search
-    Can limit the list by a list of ids.
-    Can also limit the number fetched and use an offset.
-
-    async imageSearch(params?: ImageSearchParams): Promise<Image[]> {
-        const { limit, offset, ...qParams } = params;
-
-        let qb = this.myRepository.createQueryBuilder('image')
-            .select()
-            .innerJoinAndSelect("image.taxon", "taxon")
-            .where('true')
-        if (params?.limit) {
-            qb = qb.limit(limit)
-        }
-        if (params?.offset) {
-            qb = qb.offset(offset)
-        }
-        if (qParams.taxaid) {
-            qb = qb.andWhere("image.taxonID IN (:...taxaIDs)",
-                    { taxaIDs: qParams.taxaid })
-        }
-        if (qParams.type) {
-            qb = qb.andWhere("image.type IN (:...imageTypes)",
-                    { imageTypes: qParams.type })
-        }
-        if (qParams.photographer) {
-            qb = qb.andWhere("image.photographerName IN (:...photographers)",
-                    { photographers: qParams.photographer })
-        }
-        if (qParams.key) {
-            qb = qb.leftJoinAndSelect("image.tags", "tags")
-                .andWhere("tags.keyValueStr IN (:...tagKeys)",
-                    { tagKeys: qParams.key })
-        }
-        if (qParams.country || qParams.province) {
-            qb = qb.leftJoinAndSelect("image.occurrence", "occurrence")
-            if (qParams.country) {
-                qb = qb.andWhere("occurrence.country IN (:...countries)",
-                    { countries: qParams.country })
-            }
-            if (qParams.province) {
-                qb = qb.andWhere("occurrence.stateProvince IN (:...provinces)",
-                    { provinces: qParams.province })
-            }
-        }
-        return await qb.getMany()
-    }
-
-     */
-
     /*
     Fetch all of the images using taxon ids.
     Can limit the list by a list of ids.
@@ -278,10 +253,17 @@ export class ImageService extends BaseService<Image>{
         return null;
     }
 
-
+    /**
+     * Delete image records using a taxonID
+     * @return number The created data or null (not found)
+     */
+    async deleteByTaxonID(taxonID: number): Promise<DeleteResult> {
+        const image = await this.myRepository.delete({ taxonID: taxonID})
+        return image
+    }
 
     async fromFileToStorageService(originalname: string, filename: string, mimetype: string): Promise<void> {
-        const readStream = fs.createReadStream("." + ImageService.imageUploadFolder + filename)
+        const readStream = fs.createReadStream(ImageService.imageUploadFolder + filename)
 
         await this.storageService.putObject(
             ImageService.s3Key(filename),
@@ -296,7 +278,7 @@ export class ImageService extends BaseService<Image>{
         try {
 
             // Create thumbnail
-            const thumbnail = await imageThumbnail("." + ImageService.imageUploadFolder + filename)
+            const thumbnail = await imageThumbnail(filename)
             // Get file name and extension
             const re = /(?:\.([^.]+))?$/
             const extension = re.exec(originalname)[0]
@@ -305,17 +287,61 @@ export class ImageService extends BaseService<Image>{
                 const orig = originalname.substr(0, originalname.length - extension.length)
                 thumbnailName = orig + "_tn" + extension
             }
-            fs.writeFileSync("." + ImageService.imageLibraryFolder + thumbnailName, thumbnail)
+            fs.writeFileSync(path.join(ImageService.imageLibraryFolder,thumbnailName), thumbnail)
 
-            fs.rename("." + ImageService.imageUploadFolder + filename, "." + ImageService.imageLibraryFolder + originalname, (err) => {
-                if (err) throw err
+            // Move image to image library folder
+            fs.copyFile(filename, path.join(ImageService.imageLibraryFolder,originalname), (err) => {
+                if (err) {
+                    this.logger.error("Error copying uploaded image to image library folder " + err)
+                    throw err
+                }
             })
+            // Let's not unlink as it will be cleaned up later
+            /*
+            fs.unlink(filename, (err) => {
+                if (err) {
+                    this.logger.error("Error deleting uploaded image " + err)
+                    throw err
+                }
+            })
+             */
 
         } catch (err) {
+            this.logger.error("Error processing thumbnail " + err)
             throw err
         }
 
-        return [ImageService.imageLibraryFolder + originalname, ImageService.imageLibraryFolder + thumbnailName]
+        return [path.join(ImageService.imageLibraryFolder,originalname), path.join(ImageService.imageLibraryFolder,thumbnailName)]
+    }
+
+    /**
+     * Creates a new upload in the database
+     * @param filePath The path to the file containing occurrences
+     * @param mimeType The mimeType of the file
+     */
+    async createUpload(filePath: string, mimeType: string): Promise<ImageFolderUpload> {
+        let upload = this.uploadRepo.create({ filePath: filePath, mimeType: mimeType, status: ""});
+        upload = await this.uploadRepo.save(upload);
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        await this.uploadCleanupQueue.add({
+            id: upload.id,
+            deleteAfter: tomorrow,
+        });
+
+        return upload;
+    }
+
+    async startUpload(uid: number, uploadID: number): Promise<void> {
+        await this.uploadQueue.add({
+            uid: uid,
+            uploadID: uploadID,
+            imageUpdates : [],
+            skippedImagesDueToNoMatch : [],
+            skippedImagesDueToTooManyMatches: []
+        })
     }
 
 }

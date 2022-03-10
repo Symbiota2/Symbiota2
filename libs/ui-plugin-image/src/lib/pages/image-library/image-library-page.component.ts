@@ -23,7 +23,6 @@ export class ImageLibraryPageComponent implements OnInit {
     ranksNameLookup
 
     constructor(
-        //private readonly userService: UserService,  // TODO: needed?
         private readonly taxonService: TaxonService,
         private readonly taxonomicUnitService: TaxonomicUnitService,
         private readonly taxonomicEnumTreeService: TaxonomicEnumTreeService,
@@ -77,7 +76,7 @@ export class ImageLibraryPageComponent implements OnInit {
         const partialName = prefix ? prefix : ''
         if (descendant) {
             const myNames = []
-            this.taxonomicEnumTreeService.findDescendantsByRank(descendant,this.ranksNameLookup("Species"))
+            this.taxonomicEnumTreeService.findDescendantsByRank(descendant,this.ranksNameLookup.get("Species"))
                 .subscribe((items) => {
                     items.forEach((item) =>{
                         const pair = new TaxonIDAndNameItem()

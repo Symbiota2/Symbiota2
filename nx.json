@@ -36,6 +36,7 @@
     "api-plugin-geography": { "tags": [] },
     "ui-plugin-geography": { "tags": [] },
     "dwc": { "tags": [] },
+      "knowledgeGraph": { "tags": [] },
     "api-email": { "tags": [] },
     "api-storage": { "tags": [] },
     "api-dwc": { "tags": [] }

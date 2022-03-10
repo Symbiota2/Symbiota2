@@ -79,6 +79,40 @@ export class OccurrenceService {
         )
     }
 
+    /**
+     * sends request to api to delete an occurrence record
+     * @param id - the id of the record to delete
+     * @returns Observable of response from api casted as `string`
+     * @returns `of(null)` if occurrence record does not exist or does not have editing permission or api errors
+     */
+    delete(id): Observable<string> {
+        const url = this.createUrlBuilder()
+            .delete()
+            .id(id)
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .delete()
+                    .addJwtAuth(token)
+                    .build()
+
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((blockJson) => {
+                        return "success"
+                    })
+                )
+            })
+        )
+    }
+
+
     private createUrlBuilder(): OccurrenceQueryBuilder {
         return new OccurrenceQueryBuilder(this.appConfig.apiUri());
     }

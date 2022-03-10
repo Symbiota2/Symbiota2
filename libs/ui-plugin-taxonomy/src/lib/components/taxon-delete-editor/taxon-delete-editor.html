@@ -1,0 +1,40 @@
+<div id='main'>
+    <div *ngIf="!userCanEdit" class='my2' fxLayout='row' fxLayoutGap='1rem'>
+        {{"taxon.delete.lacks.permission" | translate}}
+    </div>
+    <div *ngIf="userCanEdit" class='my2'>
+        <symbiota2-expansion-panel label="{{'taxon.delete.label' | translate}}">
+            <div *ngIf='children.length > 0'>
+                {{'taxon.delete.has.children.message' | translate}}
+                <ul *ngFor='let child of children'>
+                    <li><a href='{{editorRoute}}/{{child.taxon.id}}'>{{child.taxon.scientificName}}</a></li>
+                </ul>
+            </div>
+            <div *ngIf='children.length == 0'>
+                <div *ngIf='!prepared'>
+                    <button mat-button (click)="prepareToDeleteTaxon()" mat-raised-button color="warn">
+                        {{'taxon.prepare.delete.button' | translate}}
+                    </button>
+                </div>
+                <div *ngIf='prepared'>
+                    <div color='warn'>{{'taxon.delete.warning.message' | translate}}</div>
+                    <ul>
+                        <li > {{'taxon.delete.taxon.label' | translate}}</li>
+                        <li *ngIf='imageIdsToDelete.length>0'>{{imageIdsToDelete.length}} {{'taxon.delete.images.label' | translate}}</li>
+                        <li *ngIf='imageTagIdsToDelete.length>0'>{{imageTagIdsToDelete.length}} {{'taxon.delete.image.tags.label' | translate}}</li>
+                        <li *ngIf='occurrenceIdsToDelete.length>0'>{{occurrenceIdsToDelete.length}} {{'taxon.delete.occurrences.label' | translate}}</li>
+                        <li *ngIf='blockIdsToDelete.length>0'>{{blockIdsToDelete.length}} {{'taxon.delete.blocks.label' | translate}}</li>
+                        <li *ngIf='descriptionIdsToDelete.length>0'>{{descriptionIdsToDelete.length}} {{'taxon.delete.descriptions.label' | translate}}</li>
+                        <li *ngIf='commonNameIdsToDelete.length>0'>{{commonNameIdsToDelete.length}} {{'taxon.delete.common.names.label' | translate}}</li>
+                        <li *ngIf='taxonLinkIdsToDelete.length>0'>{{taxonLinkIdsToDelete.length}} {{'taxon.delete.links.label' | translate}}</li>
+                        <li *ngIf='taxonResourceLinkIdsToDelete.length>0'>{{taxonResourceLinkIdsToDelete.length}} {{'taxon.delete.resource.links.label' | translate}}</li>
+                    </ul>
+                    <br/>
+                    <button mat-button (click)="deleteTaxon()" mat-raised-button color="warn">
+                        {{'taxon.delete.button' | translate}}
+                    </button>
+                </div>
+            </div>
+        </symbiota2-expansion-panel>
+    </div>
+</div>

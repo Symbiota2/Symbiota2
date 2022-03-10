@@ -73,7 +73,6 @@ export class ImageDetailsEditorComponent implements OnInit {
         private readonly taxonomicUnitService: TaxonomicUnitService,
         private readonly imageService: ImageService,
         private readonly taxonStatusService: TaxonomicStatusService,
-        //private readonly taxonomicAuthorityService: TaxonomicAuthorityService,
         private readonly alertService: AlertService,
         private router: Router,
         private formBuilder: FormBuilder,
@@ -89,6 +88,7 @@ export class ImageDetailsEditorComponent implements OnInit {
      */
     ngOnInit() {
 
+        console.log(" initializing ")
         this.currentRoute.paramMap.subscribe(params => {
             this.imageID = params.get('imageID')
             // Load the profile
@@ -107,6 +107,7 @@ export class ImageDetailsEditorComponent implements OnInit {
     Load the image details
     */
     loadImage(imageID: number) {
+        console.log(" loading image ")
         this.imageService.findByID(imageID).subscribe((image) => {
             this.image = image
             this.taxonStatusService.findAll({taxonIDs : [this.image.taxonID], taxonomicAuthorityID: 1}).subscribe((taxonomicStatuses) => {
@@ -148,6 +149,7 @@ export class ImageDetailsEditorComponent implements OnInit {
     }
 
     updateData(obj) {
+        console.log(" updating ")
         // Copy data to current state
         this.image.caption = obj.caption
         this.image.photographerName = obj.photographerName
@@ -164,6 +166,8 @@ export class ImageDetailsEditorComponent implements OnInit {
         a.id = this.taxonID
         a.initialTimestamp = new Date()
         const newImage = new ImageInputDto(a)
+
+        console.log(" image is " + JSON.stringify(newImage))
 
         this.imageService
             .update(newImage)

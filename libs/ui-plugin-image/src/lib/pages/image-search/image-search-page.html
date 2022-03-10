@@ -228,7 +228,7 @@
                     <mat-grid-list cols='{{data.length > 5? 5 : data.length}}' rowHeight='150px' gutterSize='5'>
                         <mat-grid-tile  *ngFor="let image of data">
                             <a [routerLink]="['/' + imageDetailsRoute, image.id]" class='imagelink'>
-                                <img height="100" [src]="localize(image.url)">
+                                <img height="100" [src]="localize(image.thumbnailUrl)">
                             </a>
                             <mat-grid-tile-footer style='background-color:white; justify-content:center'>
                                 <a [routerLink]="['/' + imageDetailsRoute, image.id]" style='text-align:center'>

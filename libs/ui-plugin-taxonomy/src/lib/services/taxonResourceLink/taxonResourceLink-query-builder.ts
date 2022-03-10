@@ -1,4 +1,5 @@
-import { Q_PARAM_TAXAIDS } from '../../../constants';
+import { Q_PARAM_TAXAIDS, Q_PARAM_TAXONIDS } from '../../../constants';
+import { TaxonQueryBuilder } from '../taxon/taxon-query-builder';
 
 export class TaxonResourceLinkQueryBuilder {
     protected baseUrl: string
@@ -17,6 +18,10 @@ export class TaxonResourceLinkQueryBuilder {
 
     findOne(): FindOneBuilder {
         return new FindOneBuilder(this.baseUrl)
+    }
+
+    delete(): DeleteOneBuilder {
+        return new DeleteOneBuilder(this.baseUrl);
     }
 
     build(): string {
@@ -40,7 +45,13 @@ class FindOneBuilder extends TaxonResourceLinkQueryBuilder {
 }
 
 class FindAllBuilder extends TaxonResourceLinkQueryBuilder {
-    protected _taxonIDs: number[] = [];
+    protected _taxonIDs: number[] = []
+    protected _ids: number[] = []
+
+    ids(ids: number[]): FindAllBuilder {
+        this._ids = ids
+        return this
+    }
 
     taxonIDs(ids: number[]): FindAllBuilder {
         this._taxonIDs = ids
@@ -48,10 +59,30 @@ class FindAllBuilder extends TaxonResourceLinkQueryBuilder {
     }
 
     build(): string {
+        this._ids.forEach((id) => {
+            this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString())
+        })
         this._taxonIDs.forEach((id) => {
-            this.url.searchParams.append(Q_PARAM_TAXAIDS, id.toString());
+            this.url.searchParams.append(Q_PARAM_TAXONIDS, id.toString())
         })
 
         return super.build();
+    }
+
+}
+
+class DeleteOneBuilder extends TaxonResourceLinkQueryBuilder {
+    protected _id: number;
+
+    id(id: number): DeleteOneBuilder {
+        this._id = id
+        return this;
+    }
+
+    build(): string {
+        if (this._id) {
+            this.url.pathname += `/${this._id}`
+        }
+        return super.build()
     }
 }

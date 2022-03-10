@@ -14,6 +14,8 @@ export const ENV_DB_PORT = 'DATABASE_PORT';
 export const ENV_DB_NAME = 'DATABASE_NAME';
 export const ENV_DB_PATH = 'DATABASE_PATH';
 
+export const ENV_IMAGE_LIBRARY = 'IMAGE_LIBRARY'
+
 export const ENV_REDIS_HOST = 'REDIS_HOST';
 export const ENV_REDIS_PORT = 'REDIS_PORT';
 
@@ -44,6 +46,10 @@ export const DEFAULT_DB_HOST = '127.0.0.1';
 export const DEFAULT_DB_PORT = '3306';
 export const DEFAULT_DB_NAME = 'symbiota';
 export const DEFAULT_DB_PATH = ':memory:';
+
+//export const DEFAULT_IMAGE_LIBRARY = 'C:\\Users\\Curt\\Dropbox\\imglib'
+export const DEFAULT_IMAGE_LIBRARY = 'D:\\Dropbox\\imglib'
+//export const DEFAULT_IMAGE_LIBRARY = '/var/lib/openherb'
 
 export const DEFAULT_REDIS_HOST = '127.0.0.1';
 export const DEFAULT_REDIS_PORT = '6379';
@@ -88,6 +94,9 @@ export default function configBuilder(): Record<string, string> {
 
         // Protect routes
         [ENV_ENABLE_AUTH]: process.env[ENV_ENABLE_AUTH] || DEFAULT_ENABLE_AUTH,
+
+        // Images
+        [ENV_IMAGE_LIBRARY]: process.env[ENV_IMAGE_LIBRARY] || DEFAULT_IMAGE_LIBRARY,
 
         // Redis
         [ENV_REDIS_HOST]: process.env[ENV_REDIS_HOST] || DEFAULT_REDIS_HOST,

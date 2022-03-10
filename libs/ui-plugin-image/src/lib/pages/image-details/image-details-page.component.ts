@@ -11,10 +11,42 @@ import {
 import { ImageService } from '../../services';
 import { ImageListItem, ImageInputDto } from '../../dto';
 import { filter } from 'rxjs/operators';
-import { AlertService, UserService } from '@symbiota2/ui-common';
+import { AlertService, ApiClientService, UserService } from '@symbiota2/ui-common';
 import { ImageDetailsEditorDialogComponent } from '../../components';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
+import { IMAGE_API_BASE } from '../../routes';
+
+
+export interface ImageInfo {
+    id: number
+    taxonID: number | null
+    url: string
+    thumbnailUrl: string
+    originalUrl: string
+    archiveUrl: string
+    photographerName: string
+    photographerUID: number | null
+    type: string
+    format: string
+    caption: string
+    owner: string
+    sourceUrl: string
+    referenceUrl: string
+    copyright: string
+    rights: string
+    accessRights: string
+    locality: string
+    occurrenceID: number | null
+    notes: string
+    anatomy: string
+    username: string
+    sourceIdentifier: string
+    mediaMD5: string
+    dynamicProperties: string
+    sortSequence: number
+    initialTimestamp: Date
+}
 
 @Component({
     selector: 'image-details',
@@ -31,6 +63,8 @@ export class ImageDetailsPageComponent implements OnInit {
     userID : number = null
     userCanEdit: boolean = false
 
+    imageAPIUrl = null
+
     constructor(
         private readonly userService: UserService,
         private readonly taxonService: TaxonService,
@@ -41,6 +75,7 @@ export class ImageDetailsPageComponent implements OnInit {
         private formBuilder: FormBuilder,
         private readonly translate: TranslateService,
         public dialog: MatDialog,
+        private readonly apiClient: ApiClientService,
         private currentRoute: ActivatedRoute
     ) { }
 
@@ -68,17 +103,8 @@ export class ImageDetailsPageComponent implements OnInit {
     loadImage(imageID: number) {
         this.imageService.findByID(imageID).subscribe((image) => {
             this.image = image
-            this.taxonStatusService.findAll({taxonIDs : [this.image.taxonID], taxonomicAuthorityID: 1}).subscribe((taxonomicStatuses) => {
-                let authoritySet = false
-                taxonomicStatuses.forEach((taxonomicStatus) => {
-                    if (!authoritySet) {
-                        this.taxonomicStatus = taxonomicStatus
-                        this.taxon = taxonomicStatus.taxon
-                    }
-                    if (taxonomicStatus.taxonID == taxonomicStatus.taxonIDAccepted) {
-                        authoritySet = true
-                    }
-                })
+            this.taxonService.findByID(this.image.taxonID).subscribe((txn) => {
+                this.taxon = txn
             })
         })
      }
@@ -125,6 +151,10 @@ export class ImageDetailsPageComponent implements OnInit {
         a.initialTimestamp = new Date()
         const newImage = new ImageInputDto(a)
 
+        newImage.sortSequence = 50
+        console.log(" image is " + JSON.stringify(newImage))
+
+
         this.imageService
             .update(newImage)
             .subscribe((image)=> {
@@ -154,5 +184,19 @@ export class ImageDetailsPageComponent implements OnInit {
         this.translate.get(s).subscribe((r)  => {
             this.alertService.showMessage(r)
         })
+    }
+
+    localize(name) {
+        const re = new RegExp('^(?:[a-z]+:)?//', 'i')
+        if (re.test(name)) {
+            // We have an external url
+            return name
+        } else {
+            if (!this.imageAPIUrl) {
+                this.imageAPIUrl = this.apiClient.apiRoot() + "/" + IMAGE_API_BASE  + "/imglib/"
+            }
+            return this.imageAPIUrl + encodeURIComponent(name)
+        }
+
     }
 }

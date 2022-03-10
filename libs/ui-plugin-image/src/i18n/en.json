@@ -2,6 +2,7 @@
     "plugins.image.name": "Images",
     "core.layout.header.topnav.image_search_link" : "Search",
     "core.layout.header.topnav.image_library_link" : "Library",
+    "core.layout.header.topnav.image_folder_upload_link" : "Upload Folder",
     "core.layout.header.topnav.image_contributors_search_link" : "Contributors Search",
     "image.library.title": "Species with Images",
     "image.library.intro": "This page provides a complete list to taxa that have images. Use the controls below to browse and search for images by family, genus, or species.",
@@ -37,6 +38,12 @@
     "image.add.image.keep.message" : "Keep a large version of the image, when applicable",
     "image.add.image.keep.message.note" : "Note: upload image size can not be greater than 2MB",
     "image.add.lacks.edit.permission" : "User does not have permission to add an image.",
+
+    "image.folder.uploader.title": "Upload Image Folder",
+    "image.folder.uploader.upload.button": "Upload Image Folder",
+    "image.folder.uploader.lacks.edit.permission" : "User does not have permission to upload image folder.",
+    "image.folder.upload.complete.title" : "Image Folder Upload Complete",
+    "image.folder.uploader.complete.button" : "Check for Problems in Upload",
 
     "image.search.title": "Image Search",
     "image.search.options.label" : "Search options",

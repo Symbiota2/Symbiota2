@@ -1,5 +1,5 @@
 import {
-    BehaviorSubject, combineLatest, ReplaySubject
+    BehaviorSubject, combineLatest, Observable, ReplaySubject
 } from 'rxjs';
 import {
     ApiOccurrenceFindAllParams, ApiOccurrenceList,
@@ -9,6 +9,7 @@ import { ApiClientService, AppConfigService } from '@symbiota2/ui-common';
 import { OccurrenceQueryBuilder } from './occurrence-query-builder';
 import { catchError, map } from 'rxjs/operators';
 import { OccurrenceList } from '../dto/occurrence-list';
+import { OccurrenceListItem } from '../dto/occurrence-list-item'
 
 type FindAllParams = Partial<Omit<ApiOccurrenceFindAllParams, "limit" | "offset">>;
 interface PageParams {
@@ -46,6 +47,49 @@ export class OccurrenceSearchResults {
 
     clear(): void {
         this._occurrences.next(new OccurrenceList({ count: 0, data: [] }));
+    }
+
+    findAll(params: FindAllParams) /*: Observable<OccurrenceListItem[]> */ {
+        let url = new OccurrenceQueryBuilder(this.appConfig.apiUri()).findAll()
+            .collectionIDs(params.collectionID)
+
+        for (const key of Object.keys(params)) {
+            if (key !== 'collectionID') {
+                url = url.queryParam(key as any, params[key]);
+            }
+        }
+
+        const query = this.api.queryBuilder(url.build()).get().build();
+        this.api.send<unknown, ApiOccurrenceList>(query)
+            .pipe(
+                catchError((e) => {
+                    console.error(e);
+                    return [];
+                }),
+                map((occurrences) => new OccurrenceList(occurrences))
+            ).subscribe((occurrences) => {
+            this._occurrences.next(occurrences);
+        });
+
+        return this._occurrences
+
+        /*
+        return this.api.send<any, Record<string, unknown>[]>(query)
+        //return this.api.send<unknown, OccurrenceList>(query)
+            .pipe(
+                catchError((e) => {
+                    console.error(e);
+                    return [];
+                }),
+                //map((occurrences) => new OccurrenceList(occurrences))
+        map((occurrences) => occurrences.map((o) => {
+                return new OccurrenceListItem(o)
+            })
+                // OccurrenceListItem
+            )
+            )
+
+         */
     }
 
     private _updateOccurrences(params: FindAllParams, page: PageParams) {

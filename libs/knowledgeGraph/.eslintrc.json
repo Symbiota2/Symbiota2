@@ -5,7 +5,7 @@
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "parserOptions": {
-        "project": ["libs/dwc/tsconfig.*?.json"]
+        "project": ["libs/knowledgeGraph/tsconfig.*?.json"]
       },
       "rules": {}
     },

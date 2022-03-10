@@ -123,6 +123,7 @@ export class ImageSearchPageComponent implements OnInit {
     nameFound = false
     looking = false
     possibleTaxons  = []
+    TAXONS_LIMIT = 2000 // Maximum number of taxons on a page
 
     submitted = false
 
@@ -364,7 +365,7 @@ export class ImageSearchPageComponent implements OnInit {
             //        this.nameOptions = names
             //    })
         } else {
-            this.taxaService.findAllScientificNamesWithImages(partialName, this.taxonomicAuthorityID)
+            this.taxaService.findAllScientificNamesWithImages(partialName, this.TAXONS_LIMIT, this.taxonomicAuthorityID)
                 .subscribe((names) => {
                     this.nameOptions = names
                 })
@@ -497,9 +498,9 @@ export class ImageSearchPageComponent implements OnInit {
             return name
         } else {
             if (!this.imageAPIUrl) {
-                this.imageAPIUrl = this.apiClient.apiRoot() + "/" + IMAGE_API_BASE + "/"
+                this.imageAPIUrl = this.apiClient.apiRoot() + "/" + IMAGE_API_BASE  + "/imglib/"
             }
-            return this.imageAPIUrl + name
+            return this.imageAPIUrl + encodeURIComponent(name)
         }
 
     }

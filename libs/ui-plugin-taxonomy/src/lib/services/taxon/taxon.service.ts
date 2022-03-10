@@ -67,9 +67,10 @@ export class TaxonService {
         return this.apiClient.send<any, TaxonIDAuthorNameItem[]>(query)
     }
 
-    findAllScientificNamesWithImages(partialName, authorityID?): Observable<TaxonIDAndNameItem[]> {
+    findAllScientificNamesWithImages(partialName, limit, authorityID?): Observable<TaxonIDAndNameItem[]> {
         const qb = this.createQueryBuilder()
             .findAllScientificNames()
+            .limit(limit)
             .withImages()
             .authorityID(authorityID)
             .partialName(partialName)
@@ -85,6 +86,20 @@ export class TaxonService {
             .rankID(rankID)
             .kingdomName(kingdomName)
             .authorityID(authorityID)
+            .partialName(partialName)
+
+        const url = qb.build()
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, TaxonIDAndNameItem[]>(query)
+    }
+
+    findScientificNamesWithImages(partialName, rankID, kingdomName, authorityID?): Observable<TaxonIDAndNameItem[]> {
+        const qb = this.createQueryBuilder()
+            .findAllScientificNames()
+            .rankID(rankID)
+            .kingdomName(kingdomName)
+            .authorityID(authorityID)
+            .withImages()
             .partialName(partialName)
 
         const url = qb.build()

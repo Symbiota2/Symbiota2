@@ -25,6 +25,7 @@ import { MatDatepickerModule } from "@angular/material/datepicker";
 import { FlexModule } from "@angular/flex-layout";
 import { MatTreeModule } from '@angular/material/tree';
 import {
+    ImageFolderUploadService,
     ImageService,
     ImageTagKeyService,
     ImageTagService
@@ -35,15 +36,26 @@ import { MatRadioModule } from '@angular/material/radio';
 import {
     ImageDisplayPage,
     ImageLibraryPageComponent,
-    ImageDetailsPageComponent, ImageSearchPageComponent
+    ImageDetailsPageComponent,
+    ImageSearchPageComponent,
+    ImageFolderUploadPage,
+    ImageFolderUploadProblemImagesPage,
+    ImageFolderUploadCompletePage
 } from './pages';
 // import { FilterPipe } from './pages/image-search/filter.pipe';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { ImageDetailsEditorComponent, ImageDetailsEditorDialogComponent } from './components';
+import { ImageDetailsEditorDialogComponent } from './components';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatChipsModule } from '@angular/material/chips';
 import { CollectionPlugin } from '@symbiota2/ui-plugin-collection';
+import {
+    IMAGE_DETAILS_ROUTE,
+    IMAGE_DISPLAY_ROUTE, IMAGE_FOLDER_UPLOAD_COMPLETE_ROUTE,
+    IMAGE_FOLDER_UPLOAD_ROUTE,
+    IMAGE_LIBRARY_ROUTE,
+    IMAGE_SEARCH_ROUTE
+} from './routes';
 
 @NgModule({
     imports: [
@@ -82,32 +94,39 @@ import { CollectionPlugin } from '@symbiota2/ui-plugin-collection';
         ImageSearchPageComponent,
         ImageLibraryPageComponent,
         ImageDetailsPageComponent,
-        ImageDetailsEditorComponent,
         ImageDetailsEditorDialogComponent,
-        ImageDisplayPage
+        ImageDisplayPage,
+        ImageFolderUploadPage,
+        ImageFolderUploadProblemImagesPage,
+        ImageFolderUploadCompletePage
 //        FilterPipe
     ],
     providers: [
         ImageService,
         ImageTagKeyService,
         ImageTagService,
+        ImageFolderUploadService,
     ],
     entryComponents: [
         ImageSearchPageComponent,
         ImageLibraryPageComponent,
         ImageDisplayPage,
         ImageDetailsPageComponent,
-        ImageDetailsEditorComponent,
-        ImageDetailsEditorDialogComponent
+        ImageDetailsEditorDialogComponent,
+        ImageFolderUploadPage,
+        ImageFolderUploadProblemImagesPage,
+        ImageFolderUploadCompletePage
     ]
 })
 export class ImagePlugin extends SymbiotaUiPlugin {
     static readonly PLUGIN_NAME = 'plugins.image.name';
 
-    private static IMAGE_LIBRARY_ROUTE = "images/library/:level"
-    private static IMAGE_DETAILS_ROUTE = "image/details/:imageID"
-    private static IMAGE_SEARCH_ROUTE = "image/search"
-    private static IMAGE_DISPLAY_ROUTE = "image/display"
+    private static MY_IMAGE_LIBRARY_ROUTE = IMAGE_LIBRARY_ROUTE
+    private static MY_IMAGE_DETAILS_ROUTE = IMAGE_DETAILS_ROUTE
+    private static MY_IMAGE_SEARCH_ROUTE = IMAGE_SEARCH_ROUTE
+    private static MY_IMAGE_DISPLAY_ROUTE = IMAGE_DISPLAY_ROUTE
+    private static MY_IMAGE_FOLDER_UPLOAD_ROUTE = IMAGE_FOLDER_UPLOAD_ROUTE
+    private static MY_IMAGE_FOLDER_UPLOAD_COMPLETE_ROUTE = IMAGE_FOLDER_UPLOAD_COMPLETE_ROUTE
 
     constructor() {
         super();
@@ -116,20 +135,28 @@ export class ImagePlugin extends SymbiotaUiPlugin {
     static routes(): Route[] {
         return [
             {
-                path: ImagePlugin.IMAGE_LIBRARY_ROUTE,
+                path: ImagePlugin.MY_IMAGE_LIBRARY_ROUTE,
                 component: ImageLibraryPageComponent
             },
             {
-                path: ImagePlugin.IMAGE_DETAILS_ROUTE,
+                path: ImagePlugin.MY_IMAGE_DETAILS_ROUTE,
                 component: ImageDetailsPageComponent
             },
             {
-                path: ImagePlugin.IMAGE_SEARCH_ROUTE,
+                path: ImagePlugin.MY_IMAGE_SEARCH_ROUTE,
                 component: ImageSearchPageComponent
             },
             {
-                path: ImagePlugin.IMAGE_DISPLAY_ROUTE,
+                path: ImagePlugin.MY_IMAGE_FOLDER_UPLOAD_ROUTE,
+                component: ImageFolderUploadPage
+            },
+            {
+                path: ImagePlugin.MY_IMAGE_DISPLAY_ROUTE,
                 component: ImageDisplayPage
+            },
+            {
+                path: ImagePlugin.MY_IMAGE_FOLDER_UPLOAD_COMPLETE_ROUTE,
+                component: ImageFolderUploadCompletePage
             },
         ];
     }
@@ -137,12 +164,16 @@ export class ImagePlugin extends SymbiotaUiPlugin {
     static navBarLinks(): NavBarLink[] {
         return [
             {
-                url: `/${ImagePlugin.IMAGE_LIBRARY_ROUTE}`,
+                url: `/${ImagePlugin.MY_IMAGE_LIBRARY_ROUTE}`,
                 name: "core.layout.header.topnav.image_library_link"
             },
             {
-                url: `/${ImagePlugin.IMAGE_SEARCH_ROUTE}`,
+                url: `/${ImagePlugin.MY_IMAGE_SEARCH_ROUTE}`,
                 name: "core.layout.header.topnav.image_search_link"
+            },
+            {
+                url: `/${ImagePlugin.MY_IMAGE_FOLDER_UPLOAD_ROUTE}`,
+                name: "core.layout.header.topnav.image_folder_upload_link"
             },
         ]
         }

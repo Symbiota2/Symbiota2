@@ -3,11 +3,13 @@ import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { JwtKeyService } from './jwt-key/jwt-key.service';
 import { JwtKeyModule } from './jwt-key/jwt-key.module';
 
-async function jwtModuleFactory(jwtKey: JwtKeyService): Promise<JwtModuleOptions> {
+async function jwtModuleFactory(
+    jwtKey: JwtKeyService
+): Promise<JwtModuleOptions> {
     return {
         secret: await jwtKey.getOrCreateKey(),
-        signOptions: { expiresIn: '5m' }
-    }
+        signOptions: { expiresIn: '1d' },
+    };
 }
 
 /**
@@ -19,7 +21,7 @@ async function jwtModuleFactory(jwtKey: JwtKeyService): Promise<JwtModuleOptions
         JwtModule.registerAsync({
             imports: [JwtKeyModule],
             useFactory: jwtModuleFactory,
-            inject: [JwtKeyService]
+            inject: [JwtKeyService],
         }),
         JwtKeyModule,
     ],

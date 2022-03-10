@@ -4,13 +4,19 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import {
-    TaxonomicEnumTreeService, TaxonomicAuthorityService,
-    TaxonomicStatusService, TaxonomicUnitService,
-    TaxonService, TaxonVernacularService
+    TaxonomicEnumTreeService,
+    TaxonomicAuthorityService,
+    TaxonomicStatusService,
+    TaxonomicUnitService,
+    TaxonService,
+    TaxonVernacularService,
 } from '../../services';
-import { BehaviorSubject } from 'rxjs'
-import { TranslateService } from '@ngx-translate/core'
-import { TAXON_EDITOR_ROUTE_PREFIX, TAXON_PROFILE_ROUTE_PREFIX } from '../../routes';
+import { BehaviorSubject } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
+import {
+    TAXON_EDITOR_ROUTE_PREFIX,
+    TAXON_PROFILE_ROUTE_PREFIX,
+} from '../../routes';
 import { TaxonListItem, TaxonIDAuthorNameItem } from '../../dto';
 
 /**
@@ -20,12 +26,12 @@ import { TaxonListItem, TaxonIDAuthorNameItem } from '../../dto';
  * The synonym flag is set if this is a synonym
  */
 interface TaxonNode {
-    name: string
-    taxonID: number
-    author: string
-    expanded?: boolean
-    synonym?: boolean
-    children?: TaxonNode[]
+    name: string;
+    taxonID: number;
+    author: string;
+    expanded?: boolean;
+    synonym?: boolean;
+    children?: TaxonNode[];
 }
 
 @Component({
@@ -33,32 +39,30 @@ interface TaxonNode {
     templateUrl: './taxa-editor-entry-page.html',
     styleUrls: ['./taxa-editor-entry-page.scss'],
 })
-
 export class TaxaEditorEntryPage implements OnInit {
-    nameControl = new FormControl()
-    nameOptions: TaxonIDAuthorNameItem[] = []
-    hasAuthors = false
-    includeAuthors = false
-    language = "none"
-    kindOfName = "Scientific"
-    languageList = []
-    taxonomicAuthorityList = []
-    taxonomicAuthorityID = 1 // Default set in nginit
+    nameControl = new FormControl();
+    nameOptions: TaxonIDAuthorNameItem[] = [];
+    hasAuthors = false;
+    includeAuthors = false;
+    language = 'none';
+    kindOfName = 'Scientific';
+    languageList = [];
+    taxonomicAuthorityList = [];
+    taxonomicAuthorityID = 1; // Default set in nginit
     treeControl = new NestedTreeControl<TaxonNode>((node) => node.children);
-    dataSource = new MatTreeNestedDataSource<TaxonNode>()
-    dataChange = new BehaviorSubject<TaxonNode[]>([])
-    public taxa = []
-    public names = []
-    private isLoading = false
-    isNotExpanded = ( node: TaxonNode) =>
-        !node.expanded //&& !!node.children && node.children.length > 0;
-    isSynonym = ( node: TaxonNode) => node.synonym
+    dataSource = new MatTreeNestedDataSource<TaxonNode>();
+    dataChange = new BehaviorSubject<TaxonNode[]>([]);
+    public taxa = [];
+    public names = [];
+    private isLoading = false;
+    isNotExpanded = (node: TaxonNode) => !node.expanded; //&& !!node.children && node.children.length > 0;
+    isSynonym = (node: TaxonNode) => node.synonym;
     hasNestedChild = (_: number, nodeData: TaxonNode) =>
-        nodeData.children !== undefined ? nodeData.children.length > 0 : false
-    private taxon: TaxonListItem
-    nameFound = false
-    looking = false
-    possibleTaxons  = []
+        nodeData.children !== undefined ? nodeData.children.length > 0 : false;
+    private taxon: TaxonListItem;
+    nameFound = false;
+    looking = false;
+    possibleTaxons = [];
 
     constructor(
         //private readonly userService: UserService,  // TODO: needed for species hiding
@@ -73,7 +77,7 @@ export class TaxaEditorEntryPage implements OnInit {
         private currentRoute: ActivatedRoute,
         private readonly translate: TranslateService
     ) {
-        this.dataSource.data = []
+        this.dataSource.data = [];
     }
 
     /*
@@ -81,33 +85,33 @@ export class TaxaEditorEntryPage implements OnInit {
     */
     ngOnInit() {
         // Load the authorities
-        this.loadAuthorities()
+        this.loadAuthorities();
 
         // Get the common languages for display in the menu
-        this.loadVernacularLanguages()
+        this.loadVernacularLanguages();
     }
 
     nameFor(option) {
-        return this.hasAuthors? option.split(' -')[0] : option
+        return this.hasAuthors ? option.split(' -')[0] : option;
     }
 
     authorFor(option) {
-        return this.hasAuthors? option.split(' -')[1] : ""
+        return this.hasAuthors ? option.split(' -')[1] : '';
     }
 
     /*
     The vernacular language menu has a new choice
      */
     languageChangeAction(language) {
-        this.looking = false
-        this.language = language
+        this.looking = false;
+        this.language = language;
     }
 
     /*
     Taxonomic authority has a new value
      */
     authorityChangeAction() {
-        this.looking = false
+        this.looking = false;
         // If the authority changes...
     }
 
@@ -115,11 +119,11 @@ export class TaxaEditorEntryPage implements OnInit {
     Reload the names as needed
      */
     loadNames(partialName) {
-        this.looking = false
+        this.looking = false;
         if (this.kindOfName == 'Scientific') {
-            this.loadScientificNames(partialName)
+            this.loadScientificNames(partialName);
         } else {
-            this.loadCommonNames(partialName)
+            this.loadCommonNames(partialName);
         }
     }
 
@@ -127,18 +131,18 @@ export class TaxaEditorEntryPage implements OnInit {
     Called when the choice of scientific vs. common is changed
      */
     configureChangeAction() {
-        this.nameOptions = []
-        this.nameControl.setValue("")
+        this.nameOptions = [];
+        this.nameControl.setValue('');
     }
 
     /*
     Reload the names as a user types
      */
     onKey(event) {
-        this.looking = false
+        this.looking = false;
         if (event.target.value) {
-            const partialName = event.target.value
-            this.loadNames(partialName)
+            const partialName = event.target.value;
+            this.loadNames(partialName);
         }
     }
 
@@ -146,92 +150,99 @@ export class TaxaEditorEntryPage implements OnInit {
     Load the taxa authorities
      */
     public loadAuthorities() {
-        this.taxonomicAuthorityService.findAll()
-            .subscribe((authorities) => {
-            this.taxonomicAuthorityList = authorities
-        })
+        this.taxonomicAuthorityService.findAll().subscribe((authorities) => {
+            this.taxonomicAuthorityList = authorities;
+        });
         this.taxonomicAuthorityList.sort(function (a, b) {
-            return (a.id > b.id ? 1 : -1)
-        })
+            return a.id > b.id ? 1 : -1;
+        });
         this.taxonomicAuthorityList.forEach((authority) => {
             if (authority.isPrimay) {
-                this.taxonomicAuthorityID = authority.id
+                this.taxonomicAuthorityID = authority.id;
             }
-        })
+        });
     }
 
     /*
     Load the kingdoms -- currently not implemented or used
      */
-    public loadKingdoms() {
-
-    }
+    public loadKingdoms() {}
 
     /*
     Load the languages for vernacular names
      */
     public loadVernacularLanguages() {
-        this.taxonVernacularService.findAllLanguages(this.taxonomicAuthorityID)
+        this.taxonVernacularService
+            .findAllLanguages(this.taxonomicAuthorityID)
             .subscribe((language) => {
-            this.languageList = language
-        })
+                this.languageList = language;
+            });
     }
 
     /*
     Load the common names using the chosen language
      */
     public loadCommonNames(partialName) {
-        const language = this.language
+        const language = this.language;
 
         // If the language is not set, load all of the common names
-        if (this.language == "none") {
-            this.taxonVernacularService.findAllCommonNames(partialName, this.taxonomicAuthorityID)
+        if (this.language == 'none') {
+            this.taxonVernacularService
+                .findAllCommonNames(partialName, this.taxonomicAuthorityID)
                 .subscribe((names) => {
-                this.nameOptions = names
-            })
+                    this.nameOptions = names;
+                });
         } else {
-            this.taxonVernacularService.findAllCommonNamesByLanguage(language, partialName, this.taxonomicAuthorityID)
+            this.taxonVernacularService
+                .findAllCommonNamesByLanguage(
+                    language,
+                    partialName,
+                    this.taxonomicAuthorityID
+                )
                 .subscribe((names) => {
-                this.nameOptions = names
-            })
+                    this.nameOptions = names;
+                });
         }
-
     }
 
     /*
     Load Scientific names that start with partialName into a list
      */
     public loadScientificNames(partialName) {
-        this.nameOptions= []
-        this.taxaService.findAllScientificNames(partialName, this.taxonomicAuthorityID)
+        this.nameOptions = [];
+        this.taxaService
+            .findAllScientificNames(partialName, this.taxonomicAuthorityID)
             .subscribe((names) => {
-                this.nameOptions = names
-            })
+                this.nameOptions = names;
+            });
     }
 
     /*
     Goto the given page
      */
     private followLink(taxonID: number) {
-        this.router.navigateByUrl(TAXON_EDITOR_ROUTE_PREFIX+'/'+taxonID.toString())
+        this.router.navigateByUrl(
+            TAXON_EDITOR_ROUTE_PREFIX + '/' + taxonID.toString()
+        );
     }
 
     private findCommonAncestors(name: string) {
-        this.looking = true
+        this.looking = true;
 
         // Look up the common name first
         this.taxonVernacularService
             .findByCommonName(name, this.taxonomicAuthorityID)
             .subscribe((items) => {
                 if (items.length == 0) {
-                    this.nameFound = false
+                    this.nameFound = false;
                 } else if (items.length > 2) {
-                    this.nameFound = true
+                    this.nameFound = true;
                     // Need to build a list of taxons to select
                     // lookup its name by tid
-                    this.possibleTaxons = []
+                    this.possibleTaxons = [];
                     items.forEach((item) => {
-                        this.taxaService.findByID(item.taxonID, this.taxonomicAuthorityID)
+                        this.taxaService
+                            .findByID(item.taxonID, this.taxonomicAuthorityID)
                             .subscribe((taxon) => {
                                 // Found a synonym, add it to the list of synonyms
                                 const taxonItem: TaxonNode = {
@@ -240,31 +251,31 @@ export class TaxaEditorEntryPage implements OnInit {
                                     author: taxon.author,
                                     expanded: false,
                                     synonym: false,
-                                    children: []
-                                }
-                              this.possibleTaxons.push(taxonItem)
-                            })
-                    })
+                                    children: [],
+                                };
+                                this.possibleTaxons.push(taxonItem);
+                            });
+                    });
                 } else {
                     // Found one
-                    const item = items[0]
+                    const item = items[0];
                     if (item) {
-                        this.nameFound = true
-                        const tid = item.taxonID
+                        this.nameFound = true;
+                        const tid = item.taxonID;
 
                         // lookup its name by tid
-                        this.taxaService.findByID(tid, this.taxonomicAuthorityID)
+                        this.taxaService
+                            .findByID(tid, this.taxonomicAuthorityID)
                             .subscribe((taxonRec) => {
-
                                 // Go find the ancestors for this name
-                                this.followLink(taxonRec.id)
-                            })
+                                this.followLink(taxonRec.id);
+                            });
                     } else {
                         // Only if list has a null value, which is not possible?
-                        this.nameFound = false
+                        this.nameFound = false;
                     }
                 }
-        })
+            });
     }
 
     /*
@@ -272,50 +283,65 @@ export class TaxaEditorEntryPage implements OnInit {
      */
     private refreshTree() {
         // Cache the current tree
-        const tree = this.dataSource.data
+        const tree = this.dataSource.data;
         // Trigger a change to the tree
-        this.dataSource.data = []
+        this.dataSource.data = [];
         // Trigger another change, redraw cached tree
-        this.dataSource.data = tree
+        this.dataSource.data = tree;
     }
 
     /*
     Called when the taxon is chosen to display
     */
     selectedSciname(event) {
-        this.onSubmit()
+        this.onSubmit();
     }
+
     /*
     Called when the taxon is chosen to display
      */
     onSubmit(): void {
-        this.nameFound = true
-        this.dataSource.data = []
+        this.nameFound = true;
+        this.dataSource.data = [];
         if (this.kindOfName == 'Scientific') {
-            const sname = this.hasAuthors? this.nameControl.value.split(' -')[0] : this.nameControl.value
-            this.nameListCheck(sname)
+            const sname = this.hasAuthors
+                ? this.nameControl.value.split(' -')[0]
+                : this.nameControl.value;
+            this.nameListCheck(sname);
         } else {
-            this.findCommonAncestors(this.nameControl.value)
+            this.findCommonAncestors(this.nameControl.value);
         }
+    }
 
+    onSelection(taxon) {
+        console.log(taxon)
+        if (taxon) {
+            this.nameFound = true;
+            this.followLink(+taxon);
+        } else {
+            // Should never get here
+            this.nameFound = false;
+        }
     }
 
     nameListCheck(sciname) {
-        this.looking = true
+        this.looking = true;
         // Look up the scientific name first
-        this.taxaService.findByScientificName(sciname.trim(), this.taxonomicAuthorityID)
+        this.taxaService
+            .findByScientificName(sciname.trim(), this.taxonomicAuthorityID)
             .subscribe((taxons) => {
                 if (!taxons) {
                     // No name found
-                    this.nameFound = false
+                    this.nameFound = false;
                 } else if (taxons.length > 1) {
                     // Found several names
-                    this.nameFound = true
+                    this.nameFound = true;
                     // Need to build a list of taxons to select
                     // lookup its name by tid
-                    this.possibleTaxons = []
+                    this.possibleTaxons = [];
                     taxons.forEach((item) => {
-                        this.taxaService.findByID(item.id, this.taxonomicAuthorityID)
+                        this.taxaService
+                            .findByID(item.id, this.taxonomicAuthorityID)
                             .subscribe((taxon) => {
                                 // Found a synonym, add it to the list of synonyms
                                 const taxonItem: TaxonNode = {
@@ -324,22 +350,22 @@ export class TaxaEditorEntryPage implements OnInit {
                                     author: taxon.author,
                                     expanded: false,
                                     synonym: false,
-                                    children: []
-                                }
-                                this.possibleTaxons.push(taxonItem)
-                            })
-                    })
+                                    children: [],
+                                };
+                                this.possibleTaxons.push(taxonItem);
+                            });
+                    });
                 } else {
                     // Found one
-                    const taxon = taxons[0]
+                    const taxon = taxons[0];
                     if (taxon) {
-                        this.nameFound = true
-                        this.followLink(+taxon.id)
+                        this.nameFound = true;
+                        this.followLink(+taxon.id);
                     } else {
                         // Should never get here
-                        this.nameFound = false
+                        this.nameFound = false;
                     }
                 }
-            })
+            });
     }
 }

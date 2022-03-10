@@ -20,14 +20,13 @@ import {
 import { TaxonService } from './taxon.service';
 import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { TaxonDto } from './dto/TaxonDto';
-import { TaxonIDandNameDto } from './dto/TaxonIDandNameDto';
 import {
     AuthenticatedRequest,
     JwtAuthGuard,
     SuperAdminGuard,
     TokenService
 } from '@symbiota2/api-auth';
-import { Occurrence, Taxon, TaxonomyUpload } from '@symbiota2/api-database';
+import { Taxon, TaxonomyUpload } from '@symbiota2/api-database';
 import { TaxonInputDto } from './dto/TaxonInputDto';
 import { TaxonomicStatusDto } from '../taxonomicStatus/dto/TaxonomicStatusDto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -336,6 +335,7 @@ export class TaxonController {
             throw new ForbiddenException()
         }
 
+        // Delete the taxon
         const block = await this.taxa.deleteByID(id);
         if (!block) {
             throw new NotFoundException();
@@ -345,6 +345,7 @@ export class TaxonController {
     @Post('upload')
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor('file'))
+    @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @ApiOperation({
         summary: "Upload a CSV file containing a taxonomy"
@@ -381,30 +382,6 @@ export class TaxonController {
         return upload;
     }
 
-    /*
-    @Get('upload/results')
-    @ApiOperation({ summary: 'Retrieve the problem accepted names from the most recent upload' })
-    async getStream(@Param('kind') kind: number) : Promise<string> {
-        if (kind == 1) {
-            return this.taxa.getProblemParentNames()
-        }
-
-        const key = dataFolderPath + "/problemParentNames"
-        return JSON.stringify(await this.taxa.getStream(key))
-        //return (await this.taxa.getStream(key)).toString()
-    }
-
-    @Get('upload/stream')
-    @ApiOperation({ summary: 'Retrieve the problem accepted names from the most recent upload' })
-    async getStream() : Promise<string> {
-      const dataFolderPath = "taxon/data/uploads/taxa"
-      const key = dataFolderPath + "/problemParentNames"
-        return JSON.stringify(await this.taxa.getStream(key))
-        //return (await this.taxa.getStream(key)).toString()
-    }
-
-     */
-
     @Get('upload/results/:kind')
     @ApiOperation({ summary: 'Retrieve the potential problems in the upload. You must choose by kind of problem by setting the "kind" field. Potential choices are 1 (problem rows), 2 (problem accepted names), 3 (problem parent names), and 4 (problem ranks).' })
     async getresults(@Param('kind') kind: number) : Promise<string[]> {
@@ -420,32 +397,6 @@ export class TaxonController {
             throw new BadRequestException(" The kind is out of the range 1 to 4 it is " + kind)
         }
     }
-
-    /*
-    @Get('upload/problemRows')
-    @ApiOperation({ summary: 'Retrieve the problem rows in the upload' })
-    async getUploadProblemRows() : Promise<string[]> {
-        return this.taxa.getProblemUploadRows()
-    }
-
-    @Get('upload/problemAcceptedNames')
-    @ApiOperation({ summary: 'Retrieve the problem accepted names from the most recent upload' })
-    async getUploadProblemAcceptedNames(): Promise<string[]> {
-        return this.taxa.getProblemAcceptedNames()
-    }
-
-    @Get('upload/problemParentNames')
-    @ApiOperation({ summary: 'Retrieve the problem parent names from the most recent upload' })
-    async getUploadProblemParentNames(): Promise<string[]> {
-        return this.taxa.getProblemParentNames()
-    }
-
-    @Get('upload/problemAcceptedNames')
-    @ApiOperation({ summary: 'Retrieve the problem ranks from the most recent upload' })
-    async getUploadProblemRanks(): Promise<string[]> {
-        return this.taxa.getProblemRanks()
-    }
-     */
 
     @Get('upload/:id')
     @ApiOperation({ summary: 'Retrieve an upload by its ID' })
@@ -495,28 +446,6 @@ export class TaxonController {
             body.fieldMap["RankName"])
 
         return problemsFound
-
-        /*
-        const csvUniqueIDs = await this.taxa.countCSVNonNull(
-            upload.filePath,
-            body.uniqueIDField
-        )
-
-        const dbUniqueIDField = body.fieldMap[body.uniqueIDField];
-        const dbUniqueIDs = await this.taxa.countTaxons(
-            //query.collectionID,
-            1, // [TODO fix]
-            dbUniqueIDField,
-            csvUniqueIDs.uniqueValues
-        );
-
-        const newTaxonCount = csvUniqueIDs.uniqueValues.length - dbUniqueIDs;
-        return {
-            newRecords: newTaxonCount,
-            updatedRecords: dbUniqueIDs,
-            nullRecords: csvUniqueIDs.nulls
-        };
-         */
     }
 
     @Post('upload/:id/:authorityID/start')

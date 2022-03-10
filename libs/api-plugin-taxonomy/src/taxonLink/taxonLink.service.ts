@@ -19,15 +19,26 @@ export class TaxonLinkService extends BaseService<TaxonLink>{
     Can also limit the number fetched and use an offset.
      */
     async findAll(params?: TaxonLinkFindAllParams): Promise<TaxonLink[]> {
-        const { limit, offset, ...qParams } = params;
+        const { limit, offset, ...qParams } = params
 
-        return await (qParams.id)?
-            this.myRepository.find({take: limit, skip: offset, where: { id: In(params.id)}})
-            : this.myRepository.find({take: limit, skip: offset})
+        if (qParams.id) {
+            if (qParams.taxonID) {
+                return await this.myRepository.find({take: limit, skip: offset, where: { id: In(params.id), taxonID: In(params.taxonID)}})
+            } else {
+                return await this.myRepository.find({take: limit, skip: offset, where: { id: In(params.id)}})
+            }
+        } else {
+            if (qParams.taxonID) {
+                return await this.myRepository.find({take: limit, skip: offset, where: { taxonID: In(params.taxonID)}})
+            } else {
+                this.myRepository.find({take: limit, skip: offset})
+            }
+        }
+        return []
     }
 
     /*
-    TODO: Not sure if this is implemented correctly.
+    Create a taxon link record
      */
     async create(data: Partial<TaxonLink>): Promise<TaxonLink> {
         const taxon = this.myRepository.create(data);
@@ -35,7 +46,7 @@ export class TaxonLinkService extends BaseService<TaxonLink>{
     }
 
     /*
-    TODO: Implement
+    Update a taxon link record
      */
     async updateByID(id: number, data: Partial<TaxonLink>): Promise<TaxonLink> {
         const updateResult = await this.myRepository.update({ id }, data);

@@ -1,4 +1,5 @@
 export const Q_PARAM_TAXAIDS = 'id[]'
+export const Q_PARAM_TAXONIDS = 'taxonID[]'
 export const Q_PARAM_TAXAID = 'taxonID'
 export const Q_PARAM_RANKID = 'rankID'
 export const Q_PARAM_PARENTID = 'parentTaxonID'
@@ -7,3 +8,6 @@ export const Q_PARAM_PARTIALNAME = 'partialName'
 export const Q_PARAM_SCIENTIFICNAME = 'scientificName'
 export const Q_PARAM_KINGDOMNAME = 'kingdomName'
 export const Q_PARAM_WITHIMAGES = 'withImages'
+export const Q_PARAM_LIMIT = 'limit'
+export const Q_PARAM_OFFSET = 'offset'
+

@@ -132,6 +132,15 @@ export class ImageService {
             }))
     }
 
+    getProblemUploadFolderImages(): Observable<string[]> {
+        const url = this.createQueryBuilder()
+            //.problemAcceptedNames()
+            .build()
+
+        const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, string[]>(query)
+    }
+
     imageSearch(
         collectionIDs: number[],
         scientificNames: string[],
@@ -184,12 +193,13 @@ export class ImageService {
         const query = this.apiClient.queryBuilder(url).get().build();
         return this.apiClient.send<any, Record<string, unknown>[]>(query)
             .pipe(
-                map((descriptions) => descriptions.map((o) => {
+                map((images) => images.map((o) => {
                     return ImageListItem.fromJSON(o);
                 }))
             );
     }
 
+    /*
     findDescriptions(tid): Observable<ImageListItem[]> {
         const url = this.createQueryBuilder()
             .findDescriptions()
@@ -204,6 +214,7 @@ export class ImageService {
                 }))
             );
     }
+     */
 
     findByID(id: number): Observable<ImageListItem> {
         const url = this.createQueryBuilder()
@@ -291,6 +302,39 @@ export class ImageService {
             })
         )
 
+    }
+
+    /**
+     * sends request to api to delete image records using a taxon ID
+     * @param taxonID - the id of the taxon to delete images of
+     * @returns Observable of response from api casted as `string`
+     * @returns `of(null)` if image does not exist or does not have editing permission or api errors
+     */
+    deleteByTaxonID(taxonID): Observable<string> {
+        const url = this.createQueryBuilder()
+            .delete()
+            .taxonID(taxonID)
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .delete()
+                    .addJwtAuth(token)
+                    .build()
+
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((blockJson) => {
+                        return "success"
+                    })
+                )
+            })
+        )
     }
 
     /**
