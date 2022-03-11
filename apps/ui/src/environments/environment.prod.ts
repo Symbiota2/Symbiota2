@@ -1,6 +1,6 @@
 export const environment = {
     production: true,
-    apiUrl: "https://api.s2.parasitetracker.org/api/v1",
+    apiUrl: "BACKEND URL GOES HERE",
     defaultLanguage: "en",
     appTitle: "Symbiota 2 Demo",
     recaptchaSiteKey: "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",

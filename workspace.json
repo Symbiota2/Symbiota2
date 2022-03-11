@@ -114,8 +114,7 @@
           "configurations": {
             "production": {
               "browserTarget": "ui:build:production",
-              "liveReload": false,
-              "allowedHosts": ["s2.parasitetracker.org"]
+              "liveReload": false
             }
           }
         },
