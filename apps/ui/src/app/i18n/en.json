@@ -17,6 +17,7 @@
 	"core.layout.header.topnav.new_account_link": "New Account",
 	"core.layout.header.topnav.search_collections_link": "Search Collections",
 	"core.layout.header.topnav.search_link": "Search",
+	"core.layout.header.topnav.search.host_associations": "Host Associations",
 	"core.layout.header.topnav.sitemap_link": "Sitemap",
 	"core.layout.header.topnav.spatial_search_link": "Spatial Search",
 	"core.layout.header.topnav.symbiota_docs_link": "Symbiota",

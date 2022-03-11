@@ -1,0 +1,82 @@
+import { NavBarLink } from "@symbiota2/ui-common";
+import { ROUTE_COLLECTION_LIST } from "@symbiota2/ui-plugin-collection";
+import { IMAGE_SEARCH_ROUTE } from "libs/ui-plugin-image/src/lib/routes";
+import { ROUTE_SEARCH_OCCURRENCES, ROUTE_SPATIAL_MODULE } from "libs/ui-plugin-occurrence/src/lib/routes";
+import { TAXA_VIEWER_ROUTE } from "libs/ui-plugin-taxonomy/src/lib/routes";
+
+export const customLinksStart: Map<string, NavBarLink[]> = new Map<string, NavBarLink[]>([
+    ['core.layout.header.topnav.search_dropdown', [
+        <NavBarLink>{
+            name: 'plugins.occurrence.name',
+            url: ROUTE_SEARCH_OCCURRENCES ,
+        },
+        <NavBarLink>{
+            name: 'plugins.image.name',
+            url: IMAGE_SEARCH_ROUTE,
+        },
+        <NavBarLink>{
+            name: 'plugins.collection.name',
+            url: ROUTE_COLLECTION_LIST,
+        },
+        <NavBarLink>{
+            name: 'plugins.occurrence.spatialModule.navbar',
+            url: ROUTE_SPATIAL_MODULE,
+        },
+        <NavBarLink>{
+            name: "core.layout.header.topnav.search.host_associations",
+            url: 'https://www.globalbioticinteractions.org/parasitetracker/',
+        },
+    ]],
+    ['core.layout.header.topnav.tools_dropdown', [
+        <NavBarLink>{
+            name: 'Dynamic CheckList (wip)',
+            url: "",
+        },
+        <NavBarLink>{
+            name: 'plugins.occurrence.spatialModule.navbar',
+            url: ROUTE_SPATIAL_MODULE,
+        },
+        <NavBarLink>{
+            name: 'core.layout.header.topnav.taxonomy.viewer.link',
+            url: TAXA_VIEWER_ROUTE,
+        },
+        <NavBarLink>{
+            name: 'Host Map (wip)',
+            url: "",
+        },
+    ]],
+
+]);
+
+export const customLinksEnd: Map<string, NavBarLink[]> = new Map<string, NavBarLink[]>([
+    ['core.layout.header.topnav.resources_dropdown', [
+        <NavBarLink>{
+            name: 'core.layout.header.topnav.resource_link_one',
+            url: 'https://parasitetracker.org/',
+        },
+        <NavBarLink>{
+            name: 'core.layout.header.topnav.resource_link_two',
+            url: 'https://github.com/njdowdy/tpt-taxonomy',
+        },
+        <NavBarLink>{
+            name: 'core.layout.header.topnav.resource_link_three',
+            url: 'https://www.globalbioticinteractions.org/parasitetracker/',
+        },
+        <NavBarLink>{
+            name: 'core.layout.header.topnav.resource_link_four',
+            url: 'https://www.zooniverse.org/projects/md68135/notes-from-nature-terrestrial-parasite-tracker',
+        },
+        <NavBarLink>{
+            name: 'core.layout.header.topnav.resource_link_five',
+            url: 'https://entcollnet.github.io/BugFlow/',
+        },
+        <NavBarLink>{
+            name: 'core.layout.header.topnav.resource_link_six',
+            url: 'https://scan-bugs.org/portal/',
+        },
+        <NavBarLink>{
+            name: 'core.layout.header.topnav.symbiota_help_link',
+            url: 'https://symbiota.org/help-resources/',
+        },
+    ]]
+]);

@@ -40,8 +40,6 @@ import {
     CollectionRoleInput,
     CollectionRoleOutput,
 } from '../dto/CollectionRole.dto';
-import { log } from 'console';
-import { copyFile } from 'fs';
 
 interface FindAllParams {
     id?: number | number[];

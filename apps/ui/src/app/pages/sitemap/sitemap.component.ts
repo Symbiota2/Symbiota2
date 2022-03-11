@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 /**
- * TODO: Do we need a sitemap? It's 2021 :-D
+ * TODO: Do we need a sitemap? It's 2022 :-D
  */
 @Component({
     selector: 'symbiota2-sitemap',

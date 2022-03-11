@@ -34,6 +34,11 @@ import { ForgotUsernamePage } from './pages/forgot-username/forgot-username.comp
 import { NotificationDialog } from './components/navbar/notification-dialog/notification-dialog.component';
 import { ImagePlugin } from '@symbiota2/ui-plugin-image';
 import { NavbarMenuComponent } from './components/navbar-menu/navbar-menu.component';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -65,6 +70,11 @@ const PLUGINS = [
         NavbarMenuComponent,
     ],
     imports: [
+        MatToolbarModule,
+        MatButtonModule,
+        MatSidenavModule,
+        MatIconModule,
+        MatListModule,
         AlertModule,
         AppConfigModule.configure(environment),
         AppRoutingModule,
