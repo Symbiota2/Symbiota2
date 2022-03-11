@@ -22,10 +22,6 @@ export const customLinksStart: Map<string, NavBarLink[]> = new Map<string, NavBa
             name: 'plugins.occurrence.spatialModule.navbar',
             url: ROUTE_SPATIAL_MODULE,
         },
-        <NavBarLink>{
-            name: "core.layout.header.topnav.search.host_associations",
-            url: 'https://www.globalbioticinteractions.org/parasitetracker/',
-        },
     ]],
     ['core.layout.header.topnav.tools_dropdown', [
         <NavBarLink>{
@@ -50,26 +46,6 @@ export const customLinksStart: Map<string, NavBarLink[]> = new Map<string, NavBa
 
 export const customLinksEnd: Map<string, NavBarLink[]> = new Map<string, NavBarLink[]>([
     ['core.layout.header.topnav.resources_dropdown', [
-        <NavBarLink>{
-            name: 'core.layout.header.topnav.resource_link_one',
-            url: 'https://parasitetracker.org/',
-        },
-        <NavBarLink>{
-            name: 'core.layout.header.topnav.resource_link_two',
-            url: 'https://github.com/njdowdy/tpt-taxonomy',
-        },
-        <NavBarLink>{
-            name: 'core.layout.header.topnav.resource_link_three',
-            url: 'https://www.globalbioticinteractions.org/parasitetracker/',
-        },
-        <NavBarLink>{
-            name: 'core.layout.header.topnav.resource_link_four',
-            url: 'https://www.zooniverse.org/projects/md68135/notes-from-nature-terrestrial-parasite-tracker',
-        },
-        <NavBarLink>{
-            name: 'core.layout.header.topnav.resource_link_five',
-            url: 'https://entcollnet.github.io/BugFlow/',
-        },
         <NavBarLink>{
             name: 'core.layout.header.topnav.resource_link_six',
             url: 'https://scan-bugs.org/portal/',
