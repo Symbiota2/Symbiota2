@@ -1,6 +1,6 @@
 export const environment = {
     production: true,
-    apiUrl: "BACKEND URL GOES HERE",
+    apiUrl: "https://api.s2.parasitetracker.org/api/v1",
     defaultLanguage: "en",
     appTitle: "Terrestrial Parasite Tracker",
     recaptchaSiteKey: "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
