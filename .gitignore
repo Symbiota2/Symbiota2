@@ -44,3 +44,5 @@ testem.log
 Thumbs.db
 /oldCode/**
 /oldCode/image-old-not-used-search/
+
+cloudKey.txt
