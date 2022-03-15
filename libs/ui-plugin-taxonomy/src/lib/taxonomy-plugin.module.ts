@@ -26,6 +26,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FlexModule } from '@angular/flex-layout';
 import { MatTreeModule } from '@angular/material/tree';
 
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
@@ -132,6 +134,7 @@ import {
         MatGridListModule,
         MatExpansionModule,
         MatPaginatorModule,
+        CKEditorModule,
     ],
     declarations: [
         TaxonomyUploadPage,
