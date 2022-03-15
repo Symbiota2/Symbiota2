@@ -143,6 +143,22 @@ where angular can serve them.
 
 Run `npm run i18n:clean` to delete all merged translation files.
 
+Symbiota2 has support for refreshing all translations using the Google Translate API provided by Google Cloud. 
+
+1. Acquire the API key to use the Google Cloud instance and place it into a file named "cloudKey.txt" in the bin directory of symbiota.
+
+2. Run `node perform-translations.js <plugin directory names>` where plugin directory names is a list of one or more of the following options:
+  
+    - ui-plugin-collection
+    - ui-plugin-image
+    - ui-plugin-occurrence
+    - ui-plugin-taxonomy
+    - all
+
+Example command to translate the ui-plugin-collection and ui-plugin-image i18n files: 
+
+`node perform-translations.js ui-plugin-collection ui-plugin-image`
+
 ## Build
 
 Run `ng build ui` to build the UI. 
