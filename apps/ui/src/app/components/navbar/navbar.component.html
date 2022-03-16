@@ -1,27 +1,35 @@
-<div id="navbar">
-    <div id="side-nav-toggle" fxFlex fxLayoutAlign="start center" fxHide.gt-sm>
-        <button mat-icon-button>
-            <mat-icon>menu</mat-icon>
-        </button>
-        <a routerLink="/" class="invisible-btn">
-            <img
-                id="logo-btn"
-                src="./assets/images/layout/logo_white.png"
-                alt="{{
-                    'core.layout.header.banner.symbiota_logo_alt_text'
-                        | translate
-                }}"
-            />
-        </a>
-    </div>
-    <div
-        id="left-links"
-        fxFlex
-        fxLayout
-        fxLayoutAlign="start center"
-        fxHide.lt-md
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav
+        #drawer
+        class="sidenav"
+        fixedInViewport
+        [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+        [mode]="(isHandset$ | async) ? 'over' : 'side'"
     >
-        <div fxLayout fxLayoutGap="0.5rem" fxLayoutAlign="center center">
+        <mat-toolbar>{{
+            'core.layout.header.topnav.home_link' | translate
+        }}</mat-toolbar>
+        <mat-nav-list fxLayout="column">
+            <ng-template *ngTemplateOutlet="login"></ng-template>
+            <symbiota2-navbar-menu
+                *ngFor="let category of linkCategories() | async"
+                [title]="category"
+                [items]="categoryLinks(category) | async"
+            >
+            </symbiota2-navbar-menu>
+        </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <mat-toolbar color="primary">
+            <button
+                type="button"
+                aria-label="Toggle sidenav"
+                mat-icon-button
+                (click)="drawer.toggle()"
+                *ngIf="isHandset$ | async"
+            >
+                <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+            </button>
             <a routerLink="/" class="invisible-btn">
                 <img
                     id="logo-btn"
@@ -32,163 +40,170 @@
                     }}"
                 />
             </a>
-
-            <symbiota2-navbar-menu
-                *ngFor='let category of (linkCategories() | async)'
-                [title]='category'
-                [items]='categoryLinks(category) | async'
-            >
-            </symbiota2-navbar-menu>
-
-            <!--
-            <a mat-button *ngFor="let link of pluginLinks" routerLink="{{ link.url }}">
-                {{ link.name | translate }}
-            </a>
-            -->
-            <button mat-button [matMenuTriggerFor]="symbiota">
-                {{ 'core.layout.header.topnav.symbiota_link' | translate }}
-            </button>
-            <mat-menu #symbiota="matMenu">
-                <a
-                    mat-menu-item
-                    href="http://symbiota.org/docs/"
-                    target="_blank"
+            <div id="navbar">
+                <div
+                    id="left-links"
+                    fxFlex
+                    fxLayout
+                    fxLayoutAlign="start center"
+                    fxHide.lt-md
                 >
-                    {{
-                        'core.layout.header.topnav.symbiota_docs_link'
-                            | translate
-                    }}
-                </a>
-                <a
-                    mat-menu-item
-                    href="http://symbiota.org/docs/symbiota-introduction/symbiota-help-pages/"
-                    target="_blank"
-                >
-                    {{
-                        'core.layout.header.topnav.symbiota_help_link'
-                            | translate
-                    }}
-                </a>
-                <a
-                    mat-menu-item
-                    href="http://symbiota.org/docs/google-group/"
-                    target="_blank"
-                >
-                    {{
-                        'core.layout.header.topnav.symbiota_google_group_link'
-                            | translate
-                    }}
-                </a>
-            </mat-menu>
-        </div>
-    </div>
-    <div fxLayoutAlign="end center" fxHide.xs>
-        <ng-container *ngIf="currentUser | async as user; else loginMenu">
-            <div id="user-menu">
-                <button mat-button [matMenuTriggerFor]="userMenu">
-                    {{
-                        'core.layout.header.topnav.welcome_line'
-                            | translate: { firstName: user.firstName }
-                    }}
-                    <mat-icon>expand_more</mat-icon>
-                </button>
-                <mat-menu #userMenu="matMenu">
-                    <a [routerLink]="ROUTE_PROFILE" mat-menu-item>
-                        {{
-                            'core.layout.header.topnav.my_profile_link'
-                                | translate
-                        }}
-                    </a>
-                    <button mat-menu-item (click)="onLogout()">
-                        {{
-                            'core.layout.header.topnav.logout_link' | translate
-                        }}
-                    </button>
-                </mat-menu>
-            </div>
-
-            <div
-                *ngIf="{
-                    notifications: notifications | async,
-                    count: notificationCount | async
-                } as notificationData"
-            >
-                <button
-                    mat-icon-button
-                    [matMenuTriggerFor]="notificationMenu"
-                    [disabled]="notificationData.count === 0"
-                >
-                    <mat-icon
-                        id="notification-icon"
-                        matBadgePosition="below after"
-                        matBadgeColor="accent"
-                        matBadgeSize="small"
-                        [matBadge]="notificationData.count"
-                        [matBadgeHidden]="notificationData.count === 0"
-                    >
-                        notifications
-                    </mat-icon>
-                </button>
-                <mat-menu #notificationMenu="matMenu">
                     <div
-                        mat-menu-item
-                        class="notification"
-                        *ngFor="let n of notificationData.notifications"
-                        (click)="onNotificationClicked(n)"
+                        fxLayout
+                        fxLayoutGap="0.5rem"
+                        fxLayoutAlign="center center"
                     >
-                        <p class="createdAt">
-                            <ng-container
-                                *ngIf="isToday(n.createdAt); else notToday"
+                        <symbiota2-navbar-menu
+                            *ngFor="let category of linkCategories() | async"
+                            [title]="category"
+                            [items]="categoryLinks(category) | async"
+                        >
+                        </symbiota2-navbar-menu>
+                    </div>
+                </div>
+                <div fxLayoutAlign="end center" fxHide.xs>
+                    <ng-template *ngTemplateOutlet="login"></ng-template>
+                    <ng-template #login>
+                        <ng-container
+                            *ngIf="currentUser$ | async as user; else loginMenu"
+                        >
+                            <div id="user-menu">
+                                <button
+                                    mat-button
+                                    [matMenuTriggerFor]="userMenu"
+                                >
+                                    {{
+                                        'core.layout.header.topnav.welcome_line'
+                                            | translate
+                                                : { firstName: user.firstName }
+                                    }}
+                                    <mat-icon>expand_more</mat-icon>
+                                </button>
+                                <mat-menu #userMenu="matMenu">
+                                    <a
+                                        [routerLink]="ROUTE_PROFILE"
+                                        mat-menu-item
+                                    >
+                                        {{
+                                            'core.layout.header.topnav.my_profile_link'
+                                                | translate
+                                        }}
+                                    </a>
+                                    <button mat-menu-item (click)="onLogout()">
+                                        {{
+                                            'core.layout.header.topnav.logout_link'
+                                                | translate
+                                        }}
+                                    </button>
+                                </mat-menu>
+                            </div>
+
+                            <div
+                                *ngIf="{
+                                    notifications: notifications | async,
+                                    count: notificationCount | async
+                                } as notificationData"
                             >
-                                {{ n.createdAt | date: 'shortTime' }}
-                            </ng-container>
-                            <ng-template #notToday>
-                                {{ n.createdAt | date: 'longDate' }}
-                            </ng-template>
-                        </p>
-                        <p>{{ n.message }}</p>
-                        <mat-divider></mat-divider>
-                    </div>
-                    <div id="notification-actions">
-                        <button mat-flat-button (click)="clearNotifications()">
-                            Clear all
-                        </button>
-                    </div>
-                </mat-menu>
+                                <button
+                                    mat-icon-button
+                                    [matMenuTriggerFor]="notificationMenu"
+                                    [disabled]="notificationData.count === 0"
+                                >
+                                    <mat-icon
+                                        id="notification-icon"
+                                        matBadgePosition="below after"
+                                        matBadgeColor="accent"
+                                        matBadgeSize="small"
+                                        [matBadge]="notificationData.count"
+                                        [matBadgeHidden]="
+                                            notificationData.count === 0
+                                        "
+                                    >
+                                        notifications
+                                    </mat-icon>
+                                </button>
+                                <mat-menu #notificationMenu="matMenu">
+                                    <div
+                                        mat-menu-item
+                                        class="notification"
+                                        *ngFor="
+                                            let n of notificationData.notifications
+                                        "
+                                        (click)="onNotificationClicked(n)"
+                                    >
+                                        <p class="createdAt">
+                                            <ng-container
+                                                *ngIf="
+                                                    isToday(n.createdAt);
+                                                    else notToday
+                                                "
+                                            >
+                                                {{
+                                                    n.createdAt
+                                                        | date: 'shortTime'
+                                                }}
+                                            </ng-container>
+                                            <ng-template #notToday>
+                                                {{
+                                                    n.createdAt
+                                                        | date: 'longDate'
+                                                }}
+                                            </ng-template>
+                                        </p>
+                                        <p>{{ n.message }}</p>
+                                        <mat-divider></mat-divider>
+                                    </div>
+                                    <div id="notification-actions">
+                                        <button
+                                            mat-flat-button
+                                            (click)="clearNotifications()"
+                                        >
+                                            Clear all
+                                        </button>
+                                    </div>
+                                </mat-menu>
+                            </div>
+                        </ng-container>
+                    </ng-template>
+
+                    <ng-template #loginMenu>
+                        <div fxLayoutGap="0.5rem">
+                            <button mat-button (click)="onLogin()">
+                                {{
+                                    'core.layout.header.topnav.login_link'
+                                        | translate
+                                }}
+                            </button>
+                        </div>
+                    </ng-template>
+
+                    <mat-divider vertical id="divider"></mat-divider>
+
+                    <mat-select
+                        id="lang-select"
+                        [ngModel]="currentLang"
+                        (ngModelChange)="useLanguage($event)"
+                    >
+                        <mat-select-trigger>
+                            <mat-icon>translate</mat-icon>
+                        </mat-select-trigger>
+                        <mat-option value="en">English</mat-option>
+                        <mat-option value="ar">Arabic</mat-option>
+                        <mat-option value="zh">Chinese</mat-option>
+                        <mat-option value="fa">Farsi</mat-option>
+                        <mat-option value="fr">French</mat-option>
+                        <mat-option value="de">German</mat-option>
+                        <mat-option value="hi">Hindi</mat-option>
+                        <mat-option value="it">Italian</mat-option>
+                        <mat-option value="ja">Japanese</mat-option>
+                        <mat-option value="pt">Portuguese</mat-option>
+                        <mat-option value="ru">Russian</mat-option>
+                        <mat-option value="es">Spanish</mat-option>
+                        <mat-option value="ur">Urdu</mat-option>
+                    </mat-select>
+                </div>
             </div>
-        </ng-container>
-
-        <ng-template #loginMenu>
-            <div fxLayoutGap="0.5rem">
-                <button mat-button (click)="onLogin()">
-                    {{ 'core.layout.header.topnav.login_link' | translate }}
-                </button>
-            </div>
-        </ng-template>
-
-        <mat-divider vertical id="divider"></mat-divider>
-
-        <mat-select
-            id="lang-select"
-            [ngModel]="currentLang"
-            (ngModelChange)="useLanguage($event)"
-        >
-            <mat-select-trigger>
-                <mat-icon>translate</mat-icon>
-            </mat-select-trigger>
-            <mat-option value="en">English</mat-option>
-            <mat-option value="ar">Arabic</mat-option>
-            <mat-option value="zh">Chinese</mat-option>
-            <mat-option value="fa">Farsi</mat-option>
-            <mat-option value="fr">French</mat-option>
-            <mat-option value="de">German</mat-option>
-            <mat-option value="hi">Hindi</mat-option>
-            <mat-option value="it">Italian</mat-option>
-            <mat-option value="ja">Japanese</mat-option>
-            <mat-option value="pt">Portuguese</mat-option>
-            <mat-option value="ru">Russian</mat-option>
-            <mat-option value="es">Spanish</mat-option>
-            <mat-option value="ur">Urdu</mat-option>
-        </mat-select>
-    </div>
-</div>
+        </mat-toolbar>
+        <ng-content> </ng-content>
+    </mat-sidenav-content>
+</mat-sidenav-container>

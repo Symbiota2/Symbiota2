@@ -9,7 +9,7 @@ export const environment = {
     // Base URL for the backend
     apiUrl: "http://127.0.0.1:8080/api/v1",
     defaultLanguage: "en",
-    appTitle: "",
+    appTitle: "Symbiota 2 Demo",
     recaptchaSiteKey: "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
     // For mapping functionality
     tilesUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",

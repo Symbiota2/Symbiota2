@@ -5,7 +5,7 @@
     "core.layout.header.topnav.taxonomy.scientific.descriptions": "Descriptions",
     "core.layout.header.topnav.taxonomy.scientific.common.names": "Common names",
     "core.layout.header.topnav.taxonomy.scientific.alternative.taxonomies": "Alternative taxonomies",
-    "core.layout.header.topnav.taxonomy.viewer.link": "View",
+    "core.layout.header.topnav.taxonomy.viewer.link": "Taxonomy Explorer",
     "core.layout.header.topnav.taxonomy.editor.link": "Edit Taxon",
     "core.layout.header.topnav.taxonomy.profiler.link": "Profile Taxon",
     "core.layout.header.topnav.taxonomy.uploader.link": "Upload",

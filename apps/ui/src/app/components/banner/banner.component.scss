@@ -1,8 +1,18 @@
 #banner-container {
-    padding: 0.75rem;
     text-align: center;
+    padding: 0;
+    margin: 0;
+    display: block;
+}
+
+a {
+    line-height: 0px; 
+    display: block;
 }
 
 #banner-logo {
+            display: block;
     height: 10rem;
+    padding: 0px;
+    margin: 0px;
 }
