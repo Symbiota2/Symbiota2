@@ -1,6 +1,7 @@
 import { Component, Inject, Optional } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { StatementInfo } from '../taxon-description-editor/taxon-description-editor.component'
+import * as DecoupledEditor from '@ckeditor/ckeditor5-build-classic'
 
 @Component({
     selector: 'taxon-description-statement-dialog-box',
@@ -12,6 +13,9 @@ export class TaxonDescriptionStatementDialogComponent {
     public action : string
     public local_data : any
     public element
+    public editor = DecoupledEditor;
+    public newStatement;
+
 
     constructor(
         public dialogRef: MatDialogRef<TaxonDescriptionStatementDialogComponent>,
@@ -19,6 +23,7 @@ export class TaxonDescriptionStatementDialogComponent {
         @Optional() @Inject(MAT_DIALOG_DATA) public data: StatementInfo) {
         this.local_data = {...data}
         this.action = this.local_data.action
+        this.newStatement = this.local_data.statement
     }
 
     doAction(){

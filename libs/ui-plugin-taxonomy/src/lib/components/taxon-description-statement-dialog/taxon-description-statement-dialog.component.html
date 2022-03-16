@@ -38,7 +38,12 @@
         </div>
         <div fxLayout="row wrap">
             <div class="form-field w-8">
-                <mat-form-field>
+                <mat-label>{{'taxon.description.editor.statement.statement' | translate}}</mat-label>
+                <ckeditor [editor]="editor" data={{local_data.statement}} 
+                          [(ngModel)]="local_data.statement" [ngModelOptions]="{standalone: true}">
+                </ckeditor>
+                <mat-form-field style="display:none">
+
                     <mat-label>{{'taxon.description.editor.statement.statement' | translate}}</mat-label>
                     <textarea matInput
                               cdkTextareaAutosize

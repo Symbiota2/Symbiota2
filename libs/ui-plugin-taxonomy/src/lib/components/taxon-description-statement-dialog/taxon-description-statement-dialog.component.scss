@@ -25,6 +25,10 @@ div.form-field {
     flex-basis: fit-content;
 }
 
+form.form-field:last-child {
+    padding-bottom: 5rem;
+}
+
 @for $i from 1 through 9 {
     .w-#{$i} {
         flex-basis: #{$i * 10} + '%';
