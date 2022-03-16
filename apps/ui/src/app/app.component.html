@@ -1,23 +1,21 @@
+
 <!-- Navbar -->
-<symbiota2-navbar id="navbar" [ngClass]="navbarSticky?'sticky':'noSticky'"></symbiota2-navbar>
-<mat-card id="app">
-    <mat-card-content fxLayout="column" fxLayoutAlign="start stretch">
+<symbiota2-navbar id="navbar" [ngClass]="navbarSticky ? 'sticky' : 'noSticky'">
+    <mat-card id="app">
+        <mat-card-content fxLayout="column" fxLayoutAlign="start stretch">
+            <!-- Page display area -->
+            <div id="router-outlet" fxFlex="1 1">
+                <router-outlet></router-outlet>
+            </div>
 
+            <!-- Footer -->
+            <div id="site-footer" fxHide.xs>
+                <app-footer></app-footer>
+            </div>
+        </mat-card-content>
+    </mat-card>
 
-
-        <!-- Page display area -->
-        <div id="router-outlet" fxFlex="1 1">
-            <router-outlet></router-outlet>
-        </div>
-
-        <!-- Footer -->
-        <div id="site-footer" fxHide.xs>
-            <app-footer></app-footer>
-        </div>
-    </mat-card-content>
-</mat-card>
-
-<!-- Loading overlay -->
-<symbiota2-loading-overlay
-    [isLoading]="isLoading">
-</symbiota2-loading-overlay>
+    <!-- Loading overlay -->
+    <symbiota2-loading-overlay [isLoading]="isLoading">
+    </symbiota2-loading-overlay>
+</symbiota2-navbar>

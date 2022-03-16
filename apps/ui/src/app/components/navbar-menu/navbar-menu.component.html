@@ -1,6 +1,17 @@
-<button mat-button [matMenuTriggerFor]='navbarItems'>{{ title | translate }}</button>
-<mat-menu #navbarItems='matMenu'>
-    <a *ngFor='let link of items' mat-menu-item [routerLink]=link.url>
-        {{ link.name | translate }}
-    </a>
+<button mat-button [matMenuTriggerFor]="navbarItems">
+    {{ title | translate }}
+</button>
+<mat-menu #navbarItems="matMenu">
+    <ng-container *ngFor="let link of items">
+        <ng-container *ngIf="isStringURL(link.url); else route">
+            <a mat-menu-item href="{{link.url}}">
+                {{ link.name | translate }}
+            </a>
+        </ng-container>
+        <ng-template #route>
+            <a mat-menu-item [routerLink]="link.url">
+                {{ link.name | translate }}
+            </a>
+        </ng-template>
+    </ng-container>
 </mat-menu>

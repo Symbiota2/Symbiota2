@@ -182,11 +182,11 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
         return [
             {
                 url: `/${ROUTE_SEARCH_OCCURRENCES}`,
-                name: "Occurrence Search"
+                name: "plugins.occurrence.search.navbar"
             },
             {
                 url: `/${ROUTE_SPATIAL_MODULE}`,
-                name: "Spatial module"
+                name: "plugins.occurrence.spatialModule.navbar"
             }
         ];
     }
