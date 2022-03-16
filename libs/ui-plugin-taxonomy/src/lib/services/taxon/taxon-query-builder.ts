@@ -5,7 +5,6 @@ import {
     Q_PARAM_SCIENTIFICNAME,
     Q_PARAM_WITHIMAGES, Q_PARAM_KINGDOMNAME, Q_PARAM_RANKID, Q_PARAM_LIMIT
 } from '../../../constants';
-import { TaxonDescriptionBlockQueryBuilder } from '../taxonDescriptionBlock/taxonDescriptionBlock-query-builder';
 
 export class TaxonQueryBuilder {
     protected baseUrl: string
@@ -62,6 +61,10 @@ export class TaxonQueryBuilder {
 
     upload(): UploadBuilder {
         return new UploadBuilder(this.baseUrl);
+    }
+
+    uploadFile(): UploadFileBuilder {
+        return new UploadFileBuilder(this.baseUrl);
     }
 
     build(): string {
@@ -125,6 +128,32 @@ class ProblemParentNamesBuilder extends TaxonQueryBuilder {
 class ProblemRanksBuilder extends TaxonQueryBuilder {
     build(): string {
         this.url.pathname = `${this.url.pathname}/upload/results/4`;
+        return super.build();
+    }
+}
+
+class UploadFileBuilder extends TaxonQueryBuilder {
+    private _id: number = null;
+    private _authID: number = null
+
+    id(id: number): UploadFileBuilder {
+        this._id = id;
+        return this;
+    }
+
+    authorityID(id: number): UploadFileBuilder {
+        this._authID = id;
+        return this;
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/upload`;
+        if (this._id) {
+            this.url.pathname += `/${this._id}`;
+        }
+        if (this._authID) {
+            this.url.pathname += `/${this._authID}`;
+        }
         return super.build();
     }
 }

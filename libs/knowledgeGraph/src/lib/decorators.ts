@@ -11,7 +11,7 @@ const KGRecordIDKey = Symbol(`${KG_META_PREFIX}:recordID`);
  * @param url The URI identifier
  */
 export function KGType(url: string) {
-    return Reflect.metadata(KGRecordTypeKey, url);
+    return Reflect.metadata(KGRecordTypeKey, url)
 }
 
 /**
@@ -20,8 +20,8 @@ export function KGType(url: string) {
  */
 export function KGProperty(url: string) {
     return function(instance, propertyName) {
-        const metaKey = `${KG_FIELD_PREFIX}:${propertyName}`;
-        return Reflect.defineMetadata(metaKey, url, instance.constructor);
+        const metaKey = `${KG_FIELD_PREFIX}:${propertyName}`
+        return Reflect.defineMetadata(metaKey, url, instance.constructor)
     }
 }
 
