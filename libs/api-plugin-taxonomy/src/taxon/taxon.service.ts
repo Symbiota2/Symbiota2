@@ -20,7 +20,7 @@ import { QUEUE_ID_TAXONOMY_UPLOAD } from '../queues/taxonomy-upload.queue';
 import { TaxonomyUploadJob } from '../queues/taxonomy-upload.processor';
 import fs, { createReadStream } from 'fs';
 import { StorageService } from '@symbiota2/api-storage';
-import { ElasticsearchRepository } from './elasticsearch.repository';
+//import { ElasticsearchRepository } from './elasticsearch.repository';
 
 @Injectable()
 export class TaxonService extends BaseService<Taxon>{
@@ -43,7 +43,7 @@ export class TaxonService extends BaseService<Taxon>{
 
     constructor(
         @Inject(Taxon.PROVIDER_ID)
-        private readonly taxonRepo: ElasticsearchRepository,
+        private readonly taxonRepo: Repository<Taxon>,
         @Inject(TaxonomicUnit.PROVIDER_ID)
         private readonly rankRepo: Repository<TaxonomicUnit>,
         @Inject(TaxonVernacular.PROVIDER_ID)
