@@ -17,7 +17,7 @@ import { CommonModule } from '@angular/common';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MaterialModule } from './material.module';
 import { HomePage } from './pages/home/home.component';
-import { SitemapPage } from './pages/sitemap/sitemap.component';
+import { Sitemap } from './components/sitemap/sitemap.component';
 import { UserProfilePage } from './pages/user-profile/user-profile.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { LoginDialog } from './components/login-dialog/login-dialog.component';
@@ -39,6 +39,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
+import { SitemapUnorderedListComponent } from './components/sitemap-unordered-list/sitemap-unordered-list.component';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -55,7 +56,7 @@ const PLUGINS = [
     declarations: [
         AppComponent,
         HomePage,
-        SitemapPage,
+        Sitemap,
         UserProfilePage,
         NavbarComponent,
         LoginDialog,
@@ -68,6 +69,7 @@ const PLUGINS = [
         ForgotUsernamePage,
         NotificationDialog,
         NavbarMenuComponent,
+        SitemapUnorderedListComponent,
     ],
     imports: [
         MatToolbarModule,
