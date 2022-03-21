@@ -1,9 +1,15 @@
-<div id="maindiv" fxLayout="row" layout-wrap>
+<div id="maindiv" fxLayout="row" fxLayoutAlign="space-evenly" layout-wrap>
     <ng-container *ngFor="let category of categories$ | async">
         <symbiota2-sitemap-unordered-list [categoryTitle]="category"
             [categoryLinks]="getCategoryLinks(category) | async">
         </symbiota2-sitemap-unordered-list>
-
+    </ng-container>
+    <ng-container *ngIf="!isSuperAdmin() | async">
+        <ng-container *ngFor="let adminLink of displayAdminLinks">
+            <symbiota2-sitemap-unordered-list [categoryTitle]="adminLink" [categoryLinks]="displayAdminLinks">
+            </symbiota2-sitemap-unordered-list>
+        </ng-container>
 
     </ng-container>
+
 </div>
