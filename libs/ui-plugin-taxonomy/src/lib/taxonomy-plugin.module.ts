@@ -26,8 +26,6 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FlexModule } from '@angular/flex-layout';
 import { MatTreeModule } from '@angular/material/tree';
 
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
@@ -100,6 +98,7 @@ import {
     TaxonLinkService,
     TaxonResourceLinkService,
 } from './services';
+import { QuillModule } from 'ngx-quill';
 
 @NgModule({
     imports: [
@@ -134,7 +133,7 @@ import {
         MatGridListModule,
         MatExpansionModule,
         MatPaginatorModule,
-        CKEditorModule,
+        QuillModule,
     ],
     declarations: [
         TaxonomyUploadPage,
