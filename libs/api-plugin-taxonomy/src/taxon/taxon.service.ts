@@ -20,6 +20,7 @@ import { QUEUE_ID_TAXONOMY_UPLOAD } from '../queues/taxonomy-upload.queue';
 import { TaxonomyUploadJob } from '../queues/taxonomy-upload.processor';
 import fs, { createReadStream } from 'fs';
 import { StorageService } from '@symbiota2/api-storage';
+//import { ElasticsearchRepository } from './elasticsearch.repository';
 
 @Injectable()
 export class TaxonService extends BaseService<Taxon>{
@@ -242,19 +243,6 @@ export class TaxonService extends BaseService<Taxon>{
             qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
         }
         return await qb.getMany()
-            /*
-        } else {
-            return (qParams.id)?
-                await this.taxonRepo.find({
-                    select: ["scientificName","id","author"],
-                    where: { id: In(params.id) },
-                    take: TaxonFindAllParams.MAX_LIMIT})
-                : await this.taxonRepo.find({
-                    select: ["scientificName","id","author"],
-                    take: TaxonFindAllParams.MAX_LIMIT
-                })
-        }
-             */
     }
 
     /**

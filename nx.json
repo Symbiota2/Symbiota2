@@ -1,9 +1,14 @@
 {
   "npmScope": "symbiota2",
-  "affected": { "defaultBase": "master" },
+  "affected": {
+    "defaultBase": "master"
+  },
   "implicitDependencies": {
     "workspace.json": "*",
-    "package.json": { "dependencies": "*", "devDependencies": "*" },
+    "package.json": {
+      "dependencies": "*",
+      "devDependencies": "*"
+    },
     "tsconfig.base.json": "*",
     "tslint.json": "*",
     ".eslintrc.json": "*",
@@ -12,33 +17,90 @@
   "tasksRunnerOptions": {
     "default": {
       "runner": "@nrwl/workspace/tasks-runners/default",
-      "options": { "cacheableOperations": ["build", "lint", "test", "e2e"] }
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e"]
+      }
     }
   },
   "projects": {
-    "api": { "tags": [] },
-    "ui": { "tags": [] },
-    "ui-e2e": { "tags": [], "implicitDependencies": ["ui"] },
-    "ui-common": { "tags": [] },
-    "ui-plugin-occurrence": { "tags": [] },
-    "ui-plugin-collection": { "tags": [] },
-    "ui-plugin-taxonomy": { "tags": [] },
-    "ui-plugin-image": { "tags": [] },
-    "api-common": { "tags": [] },
-    "api-config": { "tags": [] },
-    "api-database": { "tags": [] },
-    "api-auth": { "tags": [] },
-    "api-plugin-collection": { "tags": [] },
-    "api-plugin-occurrence": { "tags": [] },
-    "api-plugin-image": { "tags": [] },
-    "api-plugin-taxonomy": { "tags": [] },
-    "data-access": { "tags": [] },
-    "api-plugin-geography": { "tags": [] },
-    "ui-plugin-geography": { "tags": [] },
-    "dwc": { "tags": [] },
-      "knowledgeGraph": { "tags": [] },
-    "api-email": { "tags": [] },
-    "api-storage": { "tags": [] },
-    "api-dwc": { "tags": [] }
+    "api": {
+      "tags": []
+    },
+    "ui": {
+      "tags": []
+    },
+    "ui-e2e": {
+      "tags": [],
+      "implicitDependencies": ["ui"]
+    },
+    "ui-common": {
+      "tags": []
+    },
+    "ui-plugin-occurrence": {
+      "tags": []
+    },
+    "ui-plugin-collection": {
+      "tags": []
+    },
+    "ui-plugin-taxonomy": {
+      "tags": []
+    },
+    "ui-plugin-image": {
+      "tags": []
+    },
+    "api-common": {
+      "tags": []
+    },
+    "api-config": {
+      "tags": []
+    },
+    "api-database": {
+      "tags": []
+    },
+    "api-auth": {
+      "tags": []
+    },
+    "api-plugin-collection": {
+      "tags": []
+    },
+    "api-plugin-occurrence": {
+      "tags": []
+    },
+    "api-plugin-image": {
+      "tags": []
+    },
+    "api-plugin-taxonomy": {
+      "tags": []
+    },
+    "data-access": {
+      "tags": []
+    },
+    "api-plugin-geography": {
+      "tags": []
+    },
+    "ui-plugin-geography": {
+      "tags": []
+    },
+    "dwc": {
+      "tags": []
+    },
+    "knowledgeGraph": {
+      "tags": []
+    },
+    "api-email": {
+      "tags": []
+    },
+    "api-storage": {
+      "tags": []
+    },
+    "api-dwc": {
+      "tags": []
+    },
+    "ui-plugin-checklist": {
+      "tags": []
+    },
+    "api-plugin-checklist": {
+      "tags": []
+    }
   }
 }
