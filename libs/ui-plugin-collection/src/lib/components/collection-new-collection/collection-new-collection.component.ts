@@ -19,14 +19,14 @@ import { ViewportScroller } from '@angular/common';
 
 @Component({
     selector: 'symbiota2-collection-new-collection',
-    templateUrl: './collection-new-collection.component.html',
+    templateUrl: './create-collection-form.component.html',
     styleUrls: ['./collection-new-collection.component.scss'],
 })
 export class CollectionNewCollectionComponent implements OnInit {
     inst$: Observable<Institution[]>;
     categories$: Observable<ApiCollectionCategoryOutput[]>;
 
-    newCollectionForm = this.fb.group({
+    createCollectionForm = this.fb.group({
         collectionName: [
             '',
             Validators.required,
@@ -73,13 +73,14 @@ export class CollectionNewCollectionComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
+        //FIXME:
         this.categories$ = this.collectionService.categories;
         this.inst$ = this.institutionService.getInstitutions();
     }
 
     onSubmit(): void {
         var newCollection = new CollectionInputDto(
-            this.newCollectionForm.value
+            this.createCollectionForm.value
         );
         this.collectionService
             .createNewCollection(newCollection)
@@ -110,7 +111,7 @@ export class CollectionNewCollectionComponent implements OnInit {
             if (inst !== null) {
                 this.inst$ = this.institutionService.getInstitutions().pipe(
                     tap((_) => {
-                        this.newCollectionForm
+                        this.createCollectionForm
                             .get('institutionID')
                             .setValue(String(inst.id));
                     })
@@ -124,31 +125,31 @@ export class CollectionNewCollectionComponent implements OnInit {
     }
 
     populate(): void {
-        this.newCollectionForm
+        this.createCollectionForm
             .get('collectionName')
             .setValue('Northern Arizona University Pinecone Collection');
-        this.newCollectionForm.get('code').setValue('NAUPC');
-        this.newCollectionForm.get('institutionID').setValue('3');
-        this.newCollectionForm
+        this.createCollectionForm.get('code').setValue('NAUPC');
+        this.createCollectionForm.get('institutionID').setValue('3');
+        this.createCollectionForm
             .get('description')
             .setValue('we collect pinecones');
-        this.newCollectionForm
+        this.createCollectionForm
             .get('homepage')
             .setValue('https://nau.edu.cefns/pinecones');
-        this.newCollectionForm.get('contact').setValue('John');
-        this.newCollectionForm.get('email').setValue('John@nau.edu');
-        this.newCollectionForm.get('latitude').setValue('35.1878');
-        this.newCollectionForm.get('longitude').setValue('-111.6528');
-        this.newCollectionForm
+        this.createCollectionForm.get('contact').setValue('John');
+        this.createCollectionForm.get('email').setValue('John@nau.edu');
+        this.createCollectionForm.get('latitude').setValue('35.1878');
+        this.createCollectionForm.get('longitude').setValue('-111.6528');
+        this.createCollectionForm
             .get('license')
             .setValue('https://opensource.org/licenses/MIT');
-        this.newCollectionForm.get('aggregators').setValue(true);
-        this.newCollectionForm
+        this.createCollectionForm.get('aggregators').setValue(true);
+        this.createCollectionForm
             .get('icon')
             .setValue(
                 'https://www.collinsdictionary.com/images/full/pinecone_112344086.jpg'
             );
-        this.newCollectionForm.get('type').setValue('General Observations');
-        this.newCollectionForm.get('management').setValue('snapshot');
+        this.createCollectionForm.get('type').setValue('General Observations');
+        this.createCollectionForm.get('management').setValue('snapshot');
     }
 }

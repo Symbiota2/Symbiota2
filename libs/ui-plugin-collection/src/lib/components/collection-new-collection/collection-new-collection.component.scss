@@ -1,48 +1,44 @@
-@import "apps/ui/src/styles.scss";
+@import 'apps/ui/src/styles.scss';
 
 .container {
-    
     left: 0;
     right: 0;
     background-color: white;
 }
 
-::ng-deep.primary{
+::ng-deep.primary {
     background: $primaryColor;
 }
 
-.sidenav{
+.sidenav {
     display: flex;
     align-items: flex-end;
     justify-content: end;
     width: 200px;
-
-    
 }
 
-.navList{
+.navList {
     list-style: none;
     padding-right: 1rem;
     font-weight: light;
     font-size: large;
-    li{
-        
+    li {
         color: grey;
         margin-top: 1rem;
         justify-content: flex-end !important;
         text-align: end !important;
     }
 
-    li:hover{
+    li:hover {
         color: $primaryColor;
     }
 
-    li:active{
+    li:active {
         color: $primaryColor;
     }
 }
 
-::ng-deep.mat-list-item.mat-list-item-content{
+::ng-deep.mat-list-item.mat-list-item-content {
     justify-content: end !important;
 }
 
@@ -50,40 +46,93 @@
     margin-left: 13rem;
 }
 
-#description{
+#description {
     resize: none;
     outline: none;
 }
 
-.mat-icon{
+.mat-icon {
     padding-right: 1rem;
-    height:36px !important;
-    width:36px !important;
-    font-size:36px !important;
+    height: 36px !important;
+    width: 36px !important;
+    font-size: 36px !important;
     font-family: 'Material Icons' !important;
 }
 
-.medium-input{
+.medium-input {
     max-width: 248px;
 }
 
-.title{
+.title {
     font-size: 28px !important;
-    color:rgb(80, 80, 80);
+    color: rgb(80, 80, 80);
 }
 
-.collectionCard{
+.collectionCard {
     transition: none !important;
     box-shadow: none !important;
 }
 
-.contact{
+.contact {
     transition: none !important;
     box-shadow: none !important;
-   // background-color: palevioletred;
+    // background-color: palevioletred;
 }
-.submit-button{
+.submit-button {
     margin-top: 2rem !important;
     margin-left: 1rem !important;
     height: 4rem;
+}
+
+/////////////////////SECTION:create-collection-form.component.scss/////////////////////
+
+.s2-field {
+    //background-color: antiquewhite;
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+    padding: 8px;
+}
+
+.s2-checkbox-fields {
+    background-color: antiquewhite;
+}
+
+#create-inst{
+    border-bottom: 1px solid gray;
+    border-radius: 0px;
+}
+
+mat-form-field.mat-form-field {
+    font-size: small;
+    border-color: black;
+}
+
+mat-form-field.small-field {
+    width: 112px;
+}
+
+::ng-deep .mat-form-field-outline-start {
+    border-radius: 18px 0 0 18px !important;
+    min-width: 18px !important;
+}
+
+::ng-deep .mat-form-field-outline-end {
+    border-radius: 0 18px 18px 0 !important;
+}
+
+::ng-deep {
+    .mat-form-field-appearance-outline .mat-form-field-outline {
+        color: grey;
+    }
+}
+
+.outline {
+    border-style: solid;
+    border-color: grey;
+    border-width: 1px;
+    border-radius: 24px;
+}
+
+.no-padding{
+    padding: 0px;
 }
