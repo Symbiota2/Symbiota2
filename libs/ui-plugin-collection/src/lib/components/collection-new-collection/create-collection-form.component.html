@@ -236,7 +236,7 @@
                     </mat-card-subtitle>
                     <mat-form-field appearance="outline">
                         <mat-select
-                            formControlName="categoryID"
+                            formControlName="institutionID"
                             placeholder="{{
                                 'collection.create_collection.institution.select.menu'
                                     | translate
@@ -302,7 +302,7 @@
         </mat-card-subtitle>
         <mat-form-field appearance="outline">
             <mat-select
-                formControlName="categoryID"
+                formControlName="management"
                 placeholder="{{
                     'collection.create_collection.management.menu' | translate
                 }}"
@@ -376,7 +376,7 @@
         <mat-form-field appearance="outline">
             <input
                 matInput
-                formControlName="homePage"
+                formControlName="rights"
                 placeholder="{{
                     'collection.create_collection.license.example' | translate
                 }}"
@@ -424,7 +424,7 @@
                         .hasError('required')
                 "
             >
-                latitude is <strong> required </strong>
+                {{ "collection.create_collection.coordinates.latitude.error.required" | translate }}
             </mat-error>
             <mat-error
                 *ngIf="
