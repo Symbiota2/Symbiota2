@@ -64,7 +64,7 @@ export class NavbarComponent implements OnInit {
         //Check if superAdmin
         this.currentUser$.subscribe(res => {
             this.user = res;
-            if (this.user /*&& res.isSuperAdmin()*/) {
+            if (this.user && res.isSuperAdmin()) {
                 // create new categories
                 this.pluginLinks$ = this.pluginLinks$.pipe(
                     map((navMap: Map<string, NavBarLink[]>) => {
@@ -97,22 +97,22 @@ export class NavbarComponent implements OnInit {
             });
         });
 
-        // create new categories
-        this.pluginLinks$ = this.pluginLinks$.pipe(
-            map((navMap: Map<string, NavBarLink[]>) => {
-                //add custom navbar elements
-                return new Map<string, NavBarLink[]>([
-                    ...customLinksStart.entries(),
-                    ...navMap.entries(),
-                    ...customLinksEnd.entries(),
-                ]);
-            })
-        );
-
-        // get plugin categories
-        this.linkCategories().subscribe((categories) => {
-            // get category links
-        });
+        /* // create new categories
+         this.pluginLinks$ = this.pluginLinks$.pipe(
+             map((navMap: Map<string, NavBarLink[]>) => {
+                 //add custom navbar elements
+                 return new Map<string, NavBarLink[]>([
+                     ...customLinksStart.entries(),
+                     ...navMap.entries(),
+                     ...customLinksEnd.entries(),
+                 ]);
+             })
+         );
+ 
+         // get plugin categories
+         this.linkCategories().subscribe((categories) => {
+             // get category links
+         });*/
 
 
 
