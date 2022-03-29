@@ -33,6 +33,7 @@ import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.comp
 import { ForgotUsernamePage } from './pages/forgot-username/forgot-username.component';
 import { NotificationDialog } from './components/navbar/notification-dialog/notification-dialog.component';
 import { ImagePlugin } from '@symbiota2/ui-plugin-image';
+import { ChecklistPlugin } from '@symbiota2/ui-plugin-checklist';
 import { NavbarMenuComponent } from './components/navbar-menu/navbar-menu.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
@@ -45,7 +46,8 @@ const PLUGINS = [
     CollectionPlugin,
     OccurrencePlugin,
     TaxonomyPlugin,
-    ImagePlugin
+    ImagePlugin,
+    ChecklistPlugin,
 ];
 
 /**
