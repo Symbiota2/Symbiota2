@@ -50,7 +50,6 @@ import { CollectionFieldComponent } from './components/collection-field/collecti
 import { CollectionListPage } from './pages/collection-list-page/collection-list-page.component';
 import { CollectionCardComponent } from './components/collection-card/collection-card.component';
 import { CollectionEditorComponent } from './components/collection-editor/collection-editor.component';
-import { CollectionEditorDialogComponent } from './components/collection-editor-dialog/collection-editor-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { CollectionNewCollectionComponent } from './components/collection-new-collection/collection-new-collection.component';
 import { CollectionNewPage } from './pages/collection-new-page/collection-new-page.component';
@@ -80,7 +79,6 @@ import { DwcDownloadLinkComponent } from './components/dwc-download-link/dwc-dow
         CollectionListPage,
         CollectionCardComponent,
         CollectionEditorComponent,
-        CollectionEditorDialogComponent,
         CollectionNewPage,
         CollectionNewCollectionComponent,
         InstitutionNewComponent,
