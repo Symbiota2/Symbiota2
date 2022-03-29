@@ -70,6 +70,7 @@
   "collection.create_collection.coordinates.longitude.error.invalid": "please enter valid longitude",
   "collection.create_collection.description.label": "Description",
   "collection.create_collection.description.hint": "About the collection.",
+  "collection.create_collection.description.example": "What is your collection about?",
   "collection.create_collection.administrator.label": "Collection Administrator",
   "collection.create_collection.administrator.hint": "Contact info for the main administrator for the collection.",
   "collection.create_collection.administrator.name.label": "Name",
