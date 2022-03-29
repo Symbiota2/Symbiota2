@@ -103,7 +103,6 @@ export class CollectionNewCollectionComponent implements OnInit {
 
     onSubmit(): void {
         //create collection input dto from valid fields in form
-        this.createCollectionForm.get('institutionID').enable();
 
         var newCollection = new CollectionInputDto(
             this.createCollectionForm.value
@@ -116,20 +115,24 @@ export class CollectionNewCollectionComponent implements OnInit {
         var iName = this.createCollectionForm.get('institutionName').value;
         var iCode = this.createCollectionForm.get('institutionCode').value;
 
-        //create institution if option selected
+        //create institution if option selected then create collection
         if (instOptionValue === 'create') {
             this.institutionService
                 .createInstitution(
                     new InstitutionInputDto({ name: iName, code: iCode })
                 )
-                .pipe(tap((inst) => (newCollection.institutionID = inst.id)));
+                .pipe(tap((inst) => (newCollection.institutionID = inst.id)))
+                .subscribe((_) => this.createCollection(newCollection));
+        } else if (instOptionValue === 'select') { // if not just create collection
+            this.createCollection(newCollection);
         }
+    }
 
+    private createCollection(newCollection: CollectionInputDto) {
         this.collectionService
             .createNewCollection(newCollection)
             .subscribe((collection) => {
                 if (!!collection) {
-
                     this.alertService.showMessage('New Collection Created');
                     this.rt.navigate([
                         '/' +
