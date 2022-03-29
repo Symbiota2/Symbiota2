@@ -10,8 +10,8 @@ export class ImgFallbackDirective {
 
   constructor(private el: ElementRef) { }
 
-  @HostListener('error') onError() {
+  @HostListener('error')
+  onError() {
     this.el.nativeElement.src = this.DEFAULT_ICON_PATH
-    
   }
 }

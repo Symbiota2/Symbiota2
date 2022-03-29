@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { DEFAULT_BREAKPOINTS } from '@angular/flex-layout';
 import { ROUTE_COLLECTION_PROFILE } from '../../routes';
 import { CollectionService } from '../../services/collection.service';
 
@@ -9,13 +10,14 @@ import { CollectionService } from '../../services/collection.service';
 })
 export class CollectionLogoComponent implements OnInit{
 
+    readonly ROUTE_COLLECTION_PROFILE = ROUTE_COLLECTION_PROFILE;
+
+    readonly DEFAULT_ICON_PATH = "assets/images/default_av.png"
+
     @Input() collectionID = -1;
     @Input() src = "";
     @Input() size = "2.5rem";
 
-    readonly ROUTE_COLLECTION_PROFILE = ROUTE_COLLECTION_PROFILE;
-
-    readonly DEFAULT_ICON_PATH = "assets/images/default_av.png"
 
     constructor(private readonly collectionService: CollectionService){
     }
@@ -23,12 +25,13 @@ export class CollectionLogoComponent implements OnInit{
     ngOnInit(): void {
         if(this.src == "" && this.collectionID > 0){
             this.collectionService.getCollection(this.collectionID).subscribe(collection => {
-                this.src = collection.icon;
+                if(!! collection.icon)
+                {
+                    this.src = collection.icon;
+                } else {
+                    this.src = this.DEFAULT_ICON_PATH;
+                }
             })
-        }
-
-        if(this.src == ""){
-            this.src = this.DEFAULT_ICON_PATH;
         }
     }
 
