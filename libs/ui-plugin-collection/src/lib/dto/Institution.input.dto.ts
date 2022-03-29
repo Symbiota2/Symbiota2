@@ -5,17 +5,17 @@ export class InstitutionInputDto implements ApiInstitutionInput {
         Object.assign(this, data);
     }
 
-    code: string
-    name: string
-    address1: string
-    address2: string
-    city: string
-    stateProvince: string
-    postalCode: string
-    country: string
-    phone: string
-    contact: string
-    email: string
-    url: string
-    notes: string
+    code: string;
+    name: string;
+    address1: string;
+    address2: string;
+    city: string;
+    stateProvince: string;
+    postalCode: string;
+    country: string;
+    phone: string;
+    contact: string;
+    email: string;
+    url: string;
+    notes: string;
 }
