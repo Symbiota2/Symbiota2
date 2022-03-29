@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Validators, FormBuilder} from '@angular/forms';
+import { Validators, FormBuilder } from '@angular/forms';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
 import { CollectionService } from '../../services/collection.service';
 import { AlertService } from '@symbiota2/ui-common';
 import { map, tap } from 'rxjs/operators';
-import { Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 import { Institution } from '@symbiota2/api-database';
 import { InstitutionService } from '../../services/institution.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,6 +14,10 @@ import { ROUTE_COLLECTION_PROFILE } from '../../routes';
 import { CollectionAsyncValidators } from '../../validators/CollectionValidators';
 import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 import { ViewportScroller } from '@angular/common';
+import { InstitutionAsyncValidators } from '../../validators/InstitutionValidators';
+import { format } from 'path';
+import { InstitutionInputDto } from '../../dto/Institution.input.dto';
+import { icon } from 'leaflet';
 
 //TODO: add back end and db support for additional fields
 
@@ -26,6 +30,8 @@ export class CollectionNewCollectionComponent implements OnInit {
     inst$: Observable<Institution[]>;
     categories$: Observable<ApiCollectionCategoryOutput[]>;
 
+    instOption: 'create' | 'select' = 'create';
+
     createCollectionForm = this.fb.group({
         collectionName: [
             '',
@@ -37,9 +43,19 @@ export class CollectionNewCollectionComponent implements OnInit {
             Validators.required,
             CollectionAsyncValidators.codeTaken(this.collectionService),
         ],
+        institutionName: [
+            '',
+            Validators.required,
+            InstitutionAsyncValidators.nameTaken(this.institutionService),
+        ],
+        institutionCode: [
+            '',
+            Validators.required,
+            InstitutionAsyncValidators.codeTaken(this.institutionService),
+        ],
         institutionID: ['', Validators.required],
         fullDescription: [''],
-        homePage: ['', ],
+        homePage: [''],
         role: [''],
         contact: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
@@ -56,10 +72,11 @@ export class CollectionNewCollectionComponent implements OnInit {
         ],
         categoryID: ['', Validators.required],
         rights: ['', Validators.required],
-        aggregators: [false],
+        aggregators: [true],
         icon: [''],
         type: ['', Validators.required],
         management: ['', Validators.required],
+        instOption: ['select'],
     });
 
     constructor(
@@ -73,22 +90,47 @@ export class CollectionNewCollectionComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        //FIXME:
         this.categories$ = this.collectionService.categories;
         this.inst$ = this.institutionService.getInstitutions();
+
+        // listen to instOption to toggle inst select/create disabled status
+        this.createCollectionForm
+            .get('instOption')
+            .valueChanges.subscribe((option) => this.onToggleInst(option));
+        // setting default toggle to select institution
+        this.onToggleInst('select');
     }
 
     onSubmit(): void {
+        //create collection input dto from valid fields in form
+        this.createCollectionForm.get('institutionID').enable();
+
         var newCollection = new CollectionInputDto(
             this.createCollectionForm.value
         );
+
+        //get inst option to choose to create a new institution or not
+        var instOptionValue = this.createCollectionForm.get('instOption').value;
+
+        // name and code of to be created institution from form
+        var iName = this.createCollectionForm.get('institutionName').value;
+        var iCode = this.createCollectionForm.get('institutionCode').value;
+
+        //create institution if option selected
+        if (instOptionValue === 'create') {
+            this.institutionService
+                .createInstitution(
+                    new InstitutionInputDto({ name: iName, code: iCode })
+                )
+                .pipe(tap((inst) => (newCollection.institutionID = inst.id)));
+        }
+
         this.collectionService
             .createNewCollection(newCollection)
             .subscribe((collection) => {
                 if (!!collection) {
 
-                    this.alertService.showMessage("New Collection Created");
-
+                    this.alertService.showMessage('New Collection Created');
                     this.rt.navigate([
                         '/' +
                             ROUTE_COLLECTION_PROFILE.replace(
@@ -97,31 +139,27 @@ export class CollectionNewCollectionComponent implements OnInit {
                             ),
                     ]);
                 } else {
-                    this.alertService.showError("Error: something went wrong creating new collection")
+                    this.alertService.showError(
+                        'Error: something went wrong creating your collection.'
+                    );
                 }
             });
     }
 
-    onAddNewInst(): void {
-        const dialog = this.dialog.open(InstitutionNewDialogComponent, {
-            width: '100vw',
-            disableClose: true,
-        });
-        dialog.afterClosed().subscribe((inst: Institution) => {
-            if (inst !== null) {
-                this.inst$ = this.institutionService.getInstitutions().pipe(
-                    tap((_) => {
-                        this.createCollectionForm
-                            .get('institutionID')
-                            .setValue(String(inst.id));
-                    })
-                );
-            }
-        });
-    }
-
     onClickScroll(elementId: string): void {
         this.viewportScroller.scrollToAnchor(elementId);
+    }
+
+    onToggleInst(option: 'select' | 'create') {
+        if (option === 'select') {
+            this.createCollectionForm.get('institutionName').disable();
+            this.createCollectionForm.get('institutionCode').disable();
+            this.createCollectionForm.get('institutionID').enable();
+        } else if (option === 'create') {
+            this.createCollectionForm.get('institutionID').disable();
+            this.createCollectionForm.get('institutionName').enable();
+            this.createCollectionForm.get('institutionCode').enable();
+        }
     }
 
     populate(): void {

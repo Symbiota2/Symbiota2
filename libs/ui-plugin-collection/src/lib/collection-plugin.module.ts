@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CollectionCheckboxSelectorComponent } from './components/collection-checkbox-selector/collection-checkbox-selector.component';
 import { MatTreeModule } from '@angular/material/tree';
 import {
@@ -97,6 +98,7 @@ import { DwcDownloadLinkComponent } from './components/dwc-download-link/dwc-dow
         DwcDownloadLinkComponent,
     ],
     imports: [
+        FormsModule,
         AppTranslationModule,
         MatTreeModule,
         MatIconModule,
