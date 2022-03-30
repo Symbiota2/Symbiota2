@@ -8,7 +8,7 @@ export const customLinksStart: Map<string, NavBarLink[]> = new Map<string, NavBa
     ['core.layout.header.topnav.search_dropdown', [
         <NavBarLink>{
             name: 'plugins.occurrence.name',
-            url: ROUTE_SEARCH_OCCURRENCES ,
+            url: ROUTE_SEARCH_OCCURRENCES,
         },
         <NavBarLink>{
             name: 'plugins.image.name',
@@ -52,6 +52,19 @@ export const customLinksEnd: Map<string, NavBarLink[]> = new Map<string, NavBarL
         },
         <NavBarLink>{
             name: 'core.layout.header.topnav.symbiota_help_link',
+            url: 'https://symbiota.org/help-resources/',
+        },
+    ]]
+]);
+
+export const superAdminLinks: Map<string, NavBarLink[]> = new Map<string, NavBarLink[]>([
+    ['core.layout.header.topnav.SuperAdmin_dropdown', [
+        <NavBarLink>{
+            name: 'Secret admin link.',
+            url: 'https://scan-bugs.org/portal/',
+        },
+        <NavBarLink>{
+            name: 'Test Admin Link.',
             url: 'https://symbiota.org/help-resources/',
         },
     ]]
