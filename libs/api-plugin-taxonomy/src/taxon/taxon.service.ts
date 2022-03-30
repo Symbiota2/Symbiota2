@@ -20,6 +20,7 @@ import { QUEUE_ID_TAXONOMY_UPLOAD } from '../queues/taxonomy-upload.queue';
 import { TaxonomyUploadJob } from '../queues/taxonomy-upload.processor';
 import fs, { createReadStream } from 'fs';
 import { StorageService } from '@symbiota2/api-storage';
+import path from 'path';
 //import { ElasticsearchRepository } from './elasticsearch.repository';
 
 @Injectable()
@@ -27,19 +28,19 @@ export class TaxonService extends BaseService<Taxon>{
     private static readonly S3_PREFIX = 'taxon';
     private static readonly UPLOAD_CHUNK_SIZE = 1024;
     private static readonly LOGGER = new Logger(TaxonService.name);
-    public static readonly dataFolderPath = "data/uploads/taxa"
-    public static readonly problemParentNamesPath = TaxonService.dataFolderPath + "/problemParentNames"
-    public static readonly problemAcceptedNamesPath = TaxonService.dataFolderPath + "/problemAcceptedNames"
-    public static readonly problemRanksPath = TaxonService.dataFolderPath + "/problemRanks"
-    public static readonly skippedTaxonsDueToMultipleMatchPath = TaxonService.dataFolderPath + "/taxonsMultipleMath"
-    public static readonly skippedTaxonsDueToMismatchRankPath = TaxonService.dataFolderPath + "/taxonsMismatch"
-    public static readonly skippedTaxonsDueToMissingNamePath = TaxonService.dataFolderPath + "/taxonsMissing"
+    public static readonly dataFolderPath = path.join("data", "uploads", "taxa")
+    public static readonly problemParentNamesPath = path.join(TaxonService.dataFolderPath, "problemParentNames")
+    public static readonly problemAcceptedNamesPath = path.join(TaxonService.dataFolderPath, "problemAcceptedNames")
+    public static readonly problemRanksPath = path.join(TaxonService.dataFolderPath, "problemRanks")
+    public static readonly skippedTaxonsDueToMultipleMatchPath = path.join(TaxonService.dataFolderPath, "taxonsMultipleMath")
+    public static readonly skippedTaxonsDueToMismatchRankPath = path.join(TaxonService.dataFolderPath, "taxonsMismatch")
+    public static readonly skippedTaxonsDueToMissingNamePath = path.join(TaxonService.dataFolderPath, "taxonsMissing")
 
     // list of all the updates to do to status records
-    public static readonly skippedStatusesDueToMultipleMatchPath = TaxonService.dataFolderPath + "/statusesMultipleMatch"
-    public static readonly skippedStatusesDueToAcceptedMismatchPath = TaxonService.dataFolderPath + "/statusesAcceptedMismatch"
-    public static readonly skippedStatusesDueToParentMismatchPath = TaxonService.dataFolderPath + "/statusesParentMismatch"
-    public static readonly skippedStatusesDueToTaxonMismatchPath = TaxonService.dataFolderPath + "/statusesTaxonMismatch"
+    public static readonly skippedStatusesDueToMultipleMatchPath = path.join(TaxonService.dataFolderPath, "statusesMultipleMatch")
+    public static readonly skippedStatusesDueToAcceptedMismatchPath = path.join(TaxonService.dataFolderPath, "statusesAcceptedMismatch")
+    public static readonly skippedStatusesDueToParentMismatchPath = path.join(TaxonService.dataFolderPath, "statusesParentMismatch")
+    public static readonly skippedStatusesDueToTaxonMismatchPath = path.join(TaxonService.dataFolderPath, "statusesTaxonMismatch")
 
     constructor(
         @Inject(Taxon.PROVIDER_ID)

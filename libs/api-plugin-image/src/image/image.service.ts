@@ -8,11 +8,6 @@ import { StorageService } from '@symbiota2/api-storage';
 import * as fs from 'fs';
 import { ImageSearchParams } from './dto/ImageSearchParams';
 import { InjectQueue } from '@nestjs/bull';
-import {
-    QUEUE_ID_TAXONOMY_UPLOAD,
-    QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP,
-    TaxonomyUploadCleanupJob, TaxonomyUploadJob
-} from '@symbiota2/api-plugin-taxonomy';
 import { Queue } from 'bull';
 import { QUEUE_ID_IMAGE_FOLDER_UPLOAD_CLEANUP } from '../queues/image-folder-upload-cleanup.queue';
 import { ImageFolderUploadCleanupJob } from '../queues/image-folder-upload-cleanup.processor';
@@ -20,18 +15,21 @@ import { AppConfigService } from '@symbiota2/api-config';
 import { QUEUE_ID_IMAGE_FOLDER_UPLOAD } from '../queues/image-folder-upload.queue';
 import { ImageFolderUploadJob } from '../queues/image-folder-upload.processor';
 import path from 'path';
+import { Client } from '@elastic/elasticsearch';
+const client = new Client({ node: 'http://localhost:9200'})
 const imageThumbnail = require('image-thumbnail')
+
 
 type File = Express.Multer.File
 
 @Injectable()
 export class ImageService extends BaseService<Image>{
     public static readonly S3_PREFIX = 'image'
-    public static readonly imageUploadFolder = 'data/uploads/images/'
-    public static imageLibraryFolder = 'imglib/'
-    public static readonly dataFolderPath = "data/uploads/images"
-    public static readonly skippedImagesDueToTooManyMatches = ImageService.dataFolderPath + "/skippedTooManyMatches"
-    public static readonly skippedImagesDueToNoMatch = ImageService.dataFolderPath + "/skippedNoMatch"
+    public static readonly imageUploadFolder = path.join("data", "uploads", "images")
+    public static imageLibraryFolder = path.join('imglib')
+    public static readonly dataFolderPath = path.join("data", "uploads", "images")
+    public static readonly skippedImagesDueToTooManyMatches = path.join(ImageService.dataFolderPath, "skippedTooManyMatches")
+    public static readonly skippedImagesDueToNoMatch = path.join(ImageService.dataFolderPath, "skippedNoMatch")
     private readonly logger = new Logger(ImageService.name)
 
     constructor(
@@ -123,9 +121,9 @@ export class ImageService extends BaseService<Image>{
     }
 
     /*
-    * Contributors Search
-    * Lots of filters
-    */
+* Contributors Search
+* Lots of filters
+*/
     async imageSearch(params?: ImageSearchParams): Promise<Image[]> {
         const { limit, offset, ...qParams } = params;
 
@@ -146,11 +144,6 @@ export class ImageService extends BaseService<Image>{
         if (qParams.sciname) {
             qb.andWhere("taxon.scientificName IN (:...scinames)",
                 { scinames: qParams.sciname })
-            /*
-            qParams.sciname.forEach((name) => {
-                qb.andWhere("taxon.scientificName LIKE :name", {name: name + '%'})
-            })
-             */
         }
         if (qParams.keyword) {
             qb.andWhere(new Brackets( qb => {
@@ -159,21 +152,11 @@ export class ImageService extends BaseService<Image>{
                     qb.orWhere("image.caption LIKE :word", {word: '%' + word + '%'})
                 })
             }))
-            /*
-            qParams.keyword.forEach((word) => {
-                qb.orWhere("image.caption LIKE :word", {word: '%' + word + '%'})
-            })
-             */
         }
         if (qParams.commonname) {
             qb.innerJoin("taxon.vernacularNames", "vernacular")
             qb.andWhere("vernacular.vernacularName IN (:...names)",
                 { names: qParams.commonname })
-            /*
-            qParams.commonname.forEach((name) => {
-                qb.andWhere('vernacular.vernacularName LIKE :name', {name: name + '%'})
-            })
-             */
         }
         if (qParams.type) {
             qb.andWhere("image.type IN (:...imageTypes)",
@@ -214,6 +197,38 @@ export class ImageService extends BaseService<Image>{
         }
         qb.orderBy('image.taxonID, image.occurrenceID')
         return await qb.getMany()
+    }
+
+    /*
+    * Elasticsearch update index
+    * Update the elastic search index
+    */
+    async updateElasticsearchIndex(params?: ImageSearchParams): Promise<String> {
+        const { limit, offset, ...qParams } = params;
+
+        let qb = this.myRepository.createQueryBuilder('image')
+            .select()
+            .innerJoinAndSelect("image.taxon", "taxon")
+            .where('true')
+        if (params?.limit) {
+            qb.limit(limit)
+        }
+        if (params?.offset) {
+            qb.offset(offset)
+        }
+        if (qParams.taxaid) {
+            qb = qb.andWhere("image.taxonID IN (:...taxaIDs)",
+                { taxaIDs: qParams.taxaid })
+        }
+            // qb.innerJoin("taxon.vernacularNames", "vernacular")
+
+            // qb = qb.leftJoinAndSelect("image.occurrence", "occurrence")
+
+
+            qb.leftJoinAndSelect("image.tags", "tags")
+
+        const images = qb.getMany()
+        return "success"
     }
 
     /*
