@@ -15,8 +15,8 @@ import { AppConfigService } from '@symbiota2/api-config';
 import { QUEUE_ID_IMAGE_FOLDER_UPLOAD } from '../queues/image-folder-upload.queue';
 import { ImageFolderUploadJob } from '../queues/image-folder-upload.processor';
 import path from 'path';
-import { Client } from '@elastic/elasticsearch';
-const client = new Client({ node: 'http://localhost:9200'})
+//import { Client } from '@elastic/elasticsearch';
+//const client = new Client({ node: 'http://localhost:9200'})
 const imageThumbnail = require('image-thumbnail')
 
 
