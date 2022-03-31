@@ -145,14 +145,14 @@ export class CollectionService {
     }
 
     /**
-     * sends a post request to api to create new collection using collectionData.
+     * sends a POST request to api to create new collection using collectionData.
      * Uses `UserService` to check if a super admin is logged in before sending request
      * @param collectionData partial data to be used to set values of new collection
      * @returns results of the post request as a `of(collection)`. if there is an api
      *  error this will return as `of(null)`. will also return `of(null)` if there isn't
      *  a super admin logged in
      */
-    createNewCollection(
+    createCollection(
         collectionData: Partial<CollectionInputDto>
     ): Observable<Collection> {
         return this.userService.currentUser.pipe(
@@ -171,7 +171,7 @@ export class CollectionService {
                     return this.api.send(req).pipe(
                         map((collection: ApiCollectionOutput) => {
                             if (!!collection) {
-                                //add collection to Category if it exists
+                                // add collection to Category if it exists
                                 this.addCollectionToCategory(
                                     collectionData.categoryID,
                                     collection.id
@@ -316,7 +316,7 @@ export class CollectionService {
     /**
      * refreshes categories in Observable `currentCategories` with latest from api
      */
-    refreshCategories() {
+    refreshCategories(){
         const req = this.api.queryBuilder(this.CATEGORY_BASE_URL).get().build();
 
         this.api
