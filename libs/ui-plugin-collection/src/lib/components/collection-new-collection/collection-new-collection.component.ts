@@ -3,21 +3,19 @@ import { Validators, FormBuilder } from '@angular/forms';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
 import { CollectionService } from '../../services/collection.service';
 import { AlertService } from '@symbiota2/ui-common';
-import { map, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Institution } from '@symbiota2/api-database';
 import { InstitutionService } from '../../services/institution.service';
 import { MatDialog } from '@angular/material/dialog';
-import { InstitutionNewDialogComponent } from '../institution-new-dialog/institution-new-dialog.component';
 import { Router } from '@angular/router';
 import { ROUTE_COLLECTION_PROFILE } from '../../routes';
 import { CollectionAsyncValidators } from '../../validators/CollectionValidators';
 import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 import { ViewportScroller } from '@angular/common';
 import { InstitutionAsyncValidators } from '../../validators/InstitutionValidators';
-import { format } from 'path';
 import { InstitutionInputDto } from '../../dto/Institution.input.dto';
-import { icon } from 'leaflet';
+import { Collection } from '../../dto/Collection.output.dto';
 
 //TODO: add back end and db support for additional fields
 
@@ -35,30 +33,30 @@ export class CollectionNewCollectionComponent implements OnInit {
     createCollectionForm = this.fb.group({
         collectionName: [
             '',
-            Validators.required,
+            [Validators.required, Validators.maxLength(150)],
             CollectionAsyncValidators.nameTaken(this.collectionService),
         ],
         collectionCode: [
             '',
-            Validators.required,
+            [Validators.required, Validators.maxLength(45)],
             CollectionAsyncValidators.codeTaken(this.collectionService),
         ],
         institutionName: [
             '',
-            Validators.required,
+            [Validators.required, Validators.maxLength(150)],
             InstitutionAsyncValidators.nameTaken(this.institutionService),
         ],
         institutionCode: [
             '',
-            Validators.required,
+            [Validators.required, Validators.maxLength(45)],
             InstitutionAsyncValidators.codeTaken(this.institutionService),
         ],
         institutionID: ['', Validators.required],
-        fullDescription: [''],
-        homePage: [''],
+        fullDescription: ['', Validators.maxLength(2000)],
+        homePage: ['', Validators.maxLength(250)],
         role: [''],
-        contact: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
+        contact: ['', [Validators.required, Validators.maxLength(250)],],
+        email: ['', [Validators.required, Validators.email, Validators.maxLength(45)]],
         role2: [''],
         contact2: [''],
         email2: ['', Validators.email],
@@ -73,10 +71,10 @@ export class CollectionNewCollectionComponent implements OnInit {
         categoryID: ['', Validators.required],
         rights: ['', Validators.required],
         aggregators: [true],
-        icon: [''],
-        type: ['', Validators.required],
-        management: ['', Validators.required],
-        instOption: ['select'],
+        icon: ['', Validators.maxLength(250)],
+        type: ['', Validators.required, Validators.maxLength(45)],
+        management: ['', Validators.required, Validators.maxLength(45)],
+        instOption: ['select']
     });
 
     constructor(
@@ -102,8 +100,8 @@ export class CollectionNewCollectionComponent implements OnInit {
     }
 
     onSubmit(): void {
-        //create collection input dto from valid fields in form
 
+        //create collection input dto from valid fields in form
         var newCollection = new CollectionInputDto(
             this.createCollectionForm.value
         );
@@ -121,17 +119,22 @@ export class CollectionNewCollectionComponent implements OnInit {
                 .createInstitution(
                     new InstitutionInputDto({ name: iName, code: iCode })
                 )
-                .pipe(tap((inst) => (newCollection.institutionID = inst.id)))
-                .subscribe((_) => this.createCollection(newCollection));
+                .subscribe(( inst: Institution) => {
+                    newCollection.institutionID = inst.id
+                    this.createCollection(newCollection);
+                })
+                    
         } else if (instOptionValue === 'select') { // if not just create collection
             this.createCollection(newCollection);
         }
     }
 
-    private createCollection(newCollection: CollectionInputDto) {
+    private createCollection(newCollection: CollectionInputDto){
+
         this.collectionService
-            .createNewCollection(newCollection)
-            .subscribe((collection) => {
+            .createCollection(newCollection)
+            .pipe(
+                map((collection) => {
                 if (!!collection) {
                     this.alertService.showMessage('New Collection Created');
                     this.rt.navigate([
@@ -146,7 +149,9 @@ export class CollectionNewCollectionComponent implements OnInit {
                         'Error: something went wrong creating your collection.'
                     );
                 }
-            });
+
+                return collection;
+            })).subscribe();
     }
 
     onClickScroll(elementId: string): void {
@@ -163,34 +168,5 @@ export class CollectionNewCollectionComponent implements OnInit {
             this.createCollectionForm.get('institutionName').enable();
             this.createCollectionForm.get('institutionCode').enable();
         }
-    }
-
-    populate(): void {
-        this.createCollectionForm
-            .get('collectionName')
-            .setValue('Northern Arizona University Pinecone Collection');
-        this.createCollectionForm.get('code').setValue('NAUPC');
-        this.createCollectionForm.get('institutionID').setValue('3');
-        this.createCollectionForm
-            .get('description')
-            .setValue('we collect pinecones');
-        this.createCollectionForm
-            .get('homepage')
-            .setValue('https://nau.edu.cefns/pinecones');
-        this.createCollectionForm.get('contact').setValue('John');
-        this.createCollectionForm.get('email').setValue('John@nau.edu');
-        this.createCollectionForm.get('latitude').setValue('35.1878');
-        this.createCollectionForm.get('longitude').setValue('-111.6528');
-        this.createCollectionForm
-            .get('license')
-            .setValue('https://opensource.org/licenses/MIT');
-        this.createCollectionForm.get('aggregators').setValue(true);
-        this.createCollectionForm
-            .get('icon')
-            .setValue(
-                'https://www.collinsdictionary.com/images/full/pinecone_112344086.jpg'
-            );
-        this.createCollectionForm.get('type').setValue('General Observations');
-        this.createCollectionForm.get('management').setValue('snapshot');
     }
 }

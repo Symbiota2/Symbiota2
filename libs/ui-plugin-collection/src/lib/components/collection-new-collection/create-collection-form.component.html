@@ -72,6 +72,18 @@
                             | translate
                     }}
                 </mat-error>
+                <mat-error
+                *ngIf="
+                    createCollectionForm
+                        .get('collectionName')
+                        .hasError('maxlength')
+                "
+            >
+                {{
+                    'collection.create_collection.error.max_length'
+                        | translate
+                }}
+            </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline" class="small-field">
                 <input
