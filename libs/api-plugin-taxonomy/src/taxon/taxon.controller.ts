@@ -358,7 +358,7 @@ export class TaxonController {
             throw new BadRequestException('File not specified');
         }
 
-        if (file.mimetype.startsWith('text/csv') || file.mimetype.startsWith('application/vnd.ms-excel')) {
+        if (true) {
             const headers = await getCSVFields(file.path);
             const headerMap = {};
             headers.forEach((h) => headerMap[h] = '');
