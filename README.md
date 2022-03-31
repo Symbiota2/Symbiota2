@@ -31,29 +31,49 @@ How to get an instance running on a Linux box:
 Any variable without a default is required for the Symbiota2 API to run. 
 For development, a [.env file](https://www.npmjs.com/package/dotenv) can be used.
 
-| Environment variable | Description | Default |
-| -------------------- | ----------- | ------- |
-| NODE_ENV | 'development' or 'production', determines log level, etc. | 'production'
-| APP_PORT | The port the the API server will run on | 8080 |
-| APP_DATA_DIR | The data directory for the API server | './data' |
-| DATABASE_TYPE | The scheme for the database uri | 'mariadb' |
-| DATABASE_HOST | The database host | '127.0.0.1' |
-| DATABASE_PORT | The database port | 3306 |
-| DATABASE_NAME | The name of the database on DATABASE_HOST | 'symbiota' |
-| DATABASE_USER | The user used to connection to DATABASE_NAME | 'root' |
-| DATABASE_PASSWORD | The password for DATABASE_USER | 'password' |
-| REDIS_HOST | The redis server to use for asynchronous job queues | '127.0.0.1' |
-| REDIS_PORT | The port for REDIS_HOST | 6379 |
-| SMTP_HOST | The smtp server to use for sending emails | '127.0.0.1' |
-| SMTP_PORT | The port to use on SMTP_HOST | 25 |
-| SMTP_USER | The optional user to use for authentication with SMTP_HOST | '' |
-| SMTP_PASSWORD | The optional password for SMTP_USER | '' |
-| SMTP_SENDER | The email address that emails will originate from | 'noreply@symbiota2.org' |
-| STORAGE_SERVER | The S3 server to use for backend storage | '127.0.0.1' |
-| STORAGE_USER | The AWS Access Key ID (or equivalent) to use for authentication with STORAGE_SERVER | 'symbiota2' |
-| STORAGE_PASSWORD | The AWS Secret Access Key (or equivalent) to use for authentication with STORAGE_SERVER | 'password' |
-| STORAGE_BUCKET | The S3 bucket to use on STORAGE_SERVER | 'symbiota2' |
-| ENABLE_AUTH | FOR DEBUGGING ONLY: Set to 0 to disable API authentication | 1 |
+| Environment variable                     | Description                                                                             | Default                      |
+|------------------------------------------|-----------------------------------------------------------------------------------------|------------------------------|
+| SYMBIOTA2_NODE_ENV                       | 'development' or 'production', determines log level, etc.                               | 'production'                 |
+| SYMBIOTA2_APP_PORT                       | The port the the API server will run on                                                 | 8080                         |
+| SYMBIOTA2_APP_DATA_DIR                   | The data directory for the API server                                                   | './data'                     |
+| SYMBIOTA2_DATABASE_TYPE                  | The scheme for the database uri                                                         | 'mariadb'                    |
+| SYMBIOTA2_DATABASE_HOST                  | The database host                                                                       | '127.0.0.1'                  |
+| SYMBIOTA2_DATABASE_PORT                  | The database port                                                                       | 3306                         |
+| SYMBIOTA2_DATABASE_VOLUME                | The database volume for the docker compose                                              | s2-db:/var/lib/mysql         |
+| SYMBIOTA2_DATABASE_NAME                  | The name of the database on DATABASE_HOST                                               | 'symbiota'                   |
+| SYMBIOTA2_DATABASE_USER                  | The user used to connection to DATABASE_NAME                                            | 'root'                       |
+| SYMBIOTA2_DATABASE_PASSWORD              | The password for DATABASE_USER                                                          | 'password'                   |
+| SYMBIOTA2_IMAGE_LIBRARY                  | Directory where the image library lives                                                 | 'imglib'                     |
+| SYMBIOTA2_REDIS_HOST                     | The redis server to use for asynchronous job queues                                     | '127.0.0.1'                  |
+| SYMBIOTA2_REDIS_PORT                     | The port for REDIS_HOST                                                                 | 6379                         |
+| SYMBIOTA2_ENABLE_ELASTICSEARCH           | Will Elasticsearch be used?                                                             | 1                            |
+| SYMBIOTA2_ELASTICSEARCH_VERSION          | Version of elasticsearch to use                                                         | "7.17.0"                     |
+| SYMBIOTA2_ELASTICSEARCH_DATA_FOLDER      | Where is Elasticsearch data stored?                                                     | "./elasticsearch/data"       |
+| SYMBIOTA2_ELASTICSEARCH_PORT             | Port for Elasticsearch                                                                  | 9200                         |
+| SYMBIOTA2_ELASTICSEARCH_USER             | Elasticsearch user                                                                      | elastic                      |
+| SYMBIOTA2_ELASTICSEARCH_PASSWORD         | Elasticsearch password (change this!)                                                   | hello                        |
+| SYMBIOTA2_ELASTICSEARCH_ENV_JAVA_OPTIONS | Set java options, such as memory use for Elasticsearch                                  | "ES_JAVA_OPTS=-Xmx4g -Xms4g" |
+| SYMBIOTA2_KIBANA_PORT                    | Port for Kibana                                                                         | 5601                         |
+| SYMBIOTA2_LOGSTASH_PORT                  | Port for Logstash                                                                       | 5600                         |
+| SYMBIOTA2_LOGSTASH_ENV_JAVA_OPTIONS      | Java options for Logstash                                                               | "-Xmx256m -Xms256m"          |
+| SYMBIOTA2_LOGSTASH_VERSION               | Version of Logstash to use                                                              | "7.16.3"                     |
+| SYMBIOTA2_LOGSTASH_FOLDER                | Folder for pipeline definitions                                                         | "./logstash"                 |
+| SYMBIOTA2_LOGSTASH_CONFIG_FOLDER         | Folder for logstash config                                                              | "./logstash/config"          |
+| SYMBIOTA2_MINIO_ROOT_USER                | Minio root password                                                                     | root                         |
+| SYMBIOTA2_MINIO_ROOT_PASSWORD            | Minio root password                                                                     | password                     |
+| SYMBIOTA2_S3_HOST                        | The server to use for S3                                                                | '127.0.0.1'                  |
+| SYMBIOTA2_S3_PORT1                       | A port to use on S3_HOST                                                                | 9000                         |
+| SYMBIOTA2_S3_PORT2                       | Another port to use on S3_HOST                                                          | 9001                         |
+| SYMBIOTA2_SMTP_HOST                      | The smtp server to use for sending emails                                               | '127.0.0.1'                  |
+| SYMBIOTA2_SMTP_PORT                      | The port to use on SMTP_HOST                                                            | 25                           |
+| SYMBIOTA2_SMTP_USER                      | The optional user to use for authentication with SMTP_HOST                              | ''                           |
+| SYMBIOTA2_SMTP_PASSWORD                  | The optional password for SMTP_USER                                                     | ''                           |
+| SYMBIOTA2_SMTP_SENDER                    | The email address that emails will originate from                                       | 'noreply@symbiota2.org'      |
+| SYMBIOTA2_STORAGE_SERVER                 | The S3 server to use for backend storage                                                | '127.0.0.1'                  |
+| SYMBIOTA2_STORAGE_USER                   | The AWS Access Key ID (or equivalent) to use for authentication with STORAGE_SERVER     | 'symbiota2'                  |
+| SYMBIOTA2_STORAGE_PASSWORD               | The AWS Secret Access Key (or equivalent) to use for authentication with STORAGE_SERVER | 'password'                   |
+| SYMBIOTA2_STORAGE_BUCKET                 | The S3 bucket to use on STORAGE_SERVER                                                  | 'symbiota2'                  |
+| SYMBIOTA2_ENABLE_AUTH                    | FOR DEBUGGING ONLY: Set to 0 to disable API authentication                              | 1                            |
 
 ## Overall architecture
 ![Architecture](./docs/app-architecture.png)

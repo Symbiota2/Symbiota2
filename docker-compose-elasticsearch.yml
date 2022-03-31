@@ -1,0 +1,126 @@
+
+services:
+  mariadb:
+    image: "mariadb:10.5"
+    container_name: s2-mariadb
+    environment:
+      TZ: "America/Phoenix"
+      MYSQL_ROOT_PASSWORD: ${SYMBIOTA2_DATABASE_PASSWORD:-password}
+    # To allow for big BLOB values; default is 64M
+    command: ["--max_allowed_packet=256M"]
+    volumes:
+      - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
+      - "${SYMBIOTA2_DATABASE_VOLUME:-s2-db:/var/lib/mysql}"
+    ports: ["${SYMBIOTA2_DATABASE_PORT:-3306}:3306"]
+
+  redis:
+    image: "redis:6"
+    container_name: s2-redis
+    command: "redis-server --appendonly yes"
+    volumes: ["redis:/data"]
+    ports: ["${SYMBIOTA2_REDIS_PORT:-6379}:6379"]
+
+  s3:
+    image: "quay.io/minio/minio:RELEASE.2021-09-24T00-24-24Z"
+    container_name: s2-storage
+    environment:
+      MINIO_ROOT_USER: ${SYMBIOTA2_MINIO_ROOT_USER:-symbiota2}
+      MINIO_ROOT_PASSWORD: ${SYMBIOTA2_MINIO_ROOT_PASSWORD:-password}
+    command: "server /data --console-address ':9001'"
+    volumes: ["s3:/data"]
+    ports:
+      - "${SYMBIOTA2_S3_HOST:-127.0.0.1}:${SYMBIOTA2_S3_PORT1:-9000}:9000"
+      - "${SYMBIOTA2_S3_HOST:-127.0.0.1}:${SYMBIOTA2_S3_PORT2:-9001}:9001"
+
+  create_certs:
+    container_name: create_certs
+    image: docker.elastic.co/elasticsearch/elasticsearch:${SYMBIOTA2_ELASTICSEARCH_VERSION:-7.17.0}
+    command: >
+      bash -c '
+        if [[ ! -f ./config/certificates/elastic-certificates.p12 ]]; then
+          bin/elasticsearch-certutil cert -out config/certificates/elastic-certificates.p12 -pass ""
+        fi;
+        chown -R 1000:0 /usr/share/elasticsearch/config/certificates
+      '
+    user: "0"
+    working_dir: /usr/share/elasticsearch
+    volumes:
+      - type: bind
+        source: ${SYMBIOTA2_ELASTICSEARCH_CONFIG_FOLDER:-./elasticsearch/config}
+        target: /usr/share/elasticsearch/config/certificates
+
+  elasticsearch:
+    depends_on: [create_certs]
+    image: docker.elastic.co/elasticsearch/elasticsearch:${SYMBIOTA2_ELASTICSEARCH_VERSION:-7.17.0}
+    container_name: s2-elasticsearch
+    volumes:
+      - type: bind
+        source: ${SYMBIOTA2_ELASTICSEARCH_DATA_FOLDER:-./elasticsearch/data}
+        target: /usr/share/elasticsearch/data
+      - type: bind
+        source: ${SYMBIOTA2_ELASTICSEARCH_CONFIG_FOLDER:-./elasticsearch/config}
+        target: /usr/share/elasticsearch/config/certificates
+
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=${SYMBIOTA2_ELASTICSEARCH_ENV_JAVA_OPTIONS:--Xmx4g -Xms4g}"
+      - xpack.security.enabled=true
+      - xpack.security.authc.api_key.enabled=true
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD="${SYMBIOTA2_ELASTICSEARCH_PASSWORD:-hello}"
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.keystore.path=/usr/share/elasticsearch/config/certificates/elastic-certificates.p12
+      - xpack.security.transport.ssl.truststore.path=/usr/share/elasticsearch/config/certificates/elastic-certificates.p12
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "${SYMBIOTA2_ELASTICSEARCH_PORT:-9200}:9200"
+
+  kibana:
+    depends_on: [elasticsearch]
+    image: docker.elastic.co/kibana/kibana:${SYMBIOTA2_ELASTICSEARCH_VERSION:-7.17.0}
+    container_name: s2-kibana
+    environment:
+      - ELASTICSEARCH_USERNAME="${SYMBIOTA2_ELASTICSEARCH_USER:-elastic}"
+      - ELASTICSEARCH_PASSWORD="${SYMBIOTA2_ELASTICSEARCH_PASSWORD:-hello}"
+    ports:
+      - "${SYMBIOTA2_KIBANA_PORT:-5601}:5601"
+
+  logstash:
+    depends_on: [elasticsearch]
+    image: docker.elastic.co/logstash/logstash:${SYMBIOTA2_LOGSTASH_VERSION:-7.16.3}
+    container_name: s2-logstash
+    volumes:
+      - type: bind
+        source: ${SYMBIOTA2_LOGSTASH_CONFIG_FOLDER:-./logstash/config}/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ${SYMBIOTA2_LOGSTASH_CONFIG_FOLDER:-./logstash/config}/pipelines.yml
+        target: /usr/share/logstash/config/pipelines.yml
+        read_only: true
+      - type: bind
+        source: ${SYMBIOTA2_LOGSTASH_FOLDER:-./logstash}/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+      - type: bind
+        source: ${SYMBIOTA2_LOGSTASH_FOLDER:-./logstash}/data
+        target: /var/lib/logstash/data
+    ports:
+      - "${SYMBIOTA2_LOGSTASH_PORT:-5600}:5600"
+    command: --config.reload.automatic
+    environment:
+      - "LS_JAVA_OPTS=${SYMBIOTA2_LOGSTASH_ENV_JAVA_OPTIONS:--Xmx256m -Xms256m}"
+
+volumes:
+  s2-db: { name: s2-db }
+  redis: { name: s2-redis }
+  s3: { name: s2-storage }
+  elasticsearch: { name: s2-elasticsearch }
+
+

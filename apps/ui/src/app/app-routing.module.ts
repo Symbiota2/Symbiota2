@@ -1,7 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Route } from "@angular/router";
 import { HomePage } from "./pages/home/home.component";
-import { SitemapPage } from "./pages/sitemap/sitemap.component";
 import { UserProfilePage } from './pages/user-profile/user-profile.component';
 import { CreateUserProfilePage } from './pages/create-user-profile/create-user-profile.component';
 import {
@@ -15,7 +14,6 @@ import { ForgotUsernamePage } from './pages/forgot-username/forgot-username.comp
 
 const defaultRoutes: Route[] = [
     { path: HomePage.ROUTE, component: HomePage },
-    { path: ROUTE_SITEMAP, component: SitemapPage },
     { path: ROUTE_USER_PROFILE, component: UserProfilePage },
     { path: ROUTE_USER_CREATE, component: CreateUserProfilePage },
     { path: ROUTE_FORGOT_PASSWORD, component: ForgotPasswordPage },
@@ -41,4 +39,4 @@ const defaultRoutes: Route[] = [
         RouterModule
     ]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
