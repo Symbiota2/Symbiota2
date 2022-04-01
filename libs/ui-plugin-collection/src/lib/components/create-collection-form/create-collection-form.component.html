@@ -1,0 +1,614 @@
+<form id="form" [formGroup]="createCollectionForm">
+    <mat-card id="icon" class="mat-elevation-z0 s2-field">
+        <div fxLayout="row" fxLayoutGap=".5rem">
+            <symbiota2-collection-logo
+                size="7rem"
+                src="{{ createCollectionForm.value.icon }}"
+            ></symbiota2-collection-logo>
+            <div fxLayout="column" fxLayoutAlign="space-between">
+                <mat-card-title>
+                    {{
+                        'collection.create_collection.icon_field.label'
+                            | translate
+                    }}
+                </mat-card-title>
+                <mat-card-subtitle>
+                    {{
+                        'collection.create_collection.icon_field.hint'
+                            | translate
+                    }}
+                </mat-card-subtitle>
+                <mat-form-field appearance="outline">
+                    <input
+                        matInput
+                        placeholder="{{
+                            'collection.create_collection.icon_field.example'
+                                | translate
+                        }}"
+                        formControlName="icon"
+                    />
+                </mat-form-field>
+            </div>
+        </div>
+    </mat-card>
+    <mat-card id="collection_name_code" class="mat-elevation-z0 s2-field">
+        <mat-card-title>
+            {{ 'collection.create_collection.name_code.label' | translate }}
+        </mat-card-title>
+        <mat-card-subtitle>
+            {{ 'collection.create_collection.name_code.hint' | translate }}
+        </mat-card-subtitle>
+        <div id="two-field-row" fxLayout="row" fxLayoutGap=".5rem">
+            <mat-form-field appearance="outline">
+                <input
+                    matInput
+                    placeholder="{{
+                        'collection.create_collection.name_code.name.example'
+                            | translate
+                    }}"
+                    formControlName="collectionName"
+                />
+                <mat-error
+                    *ngIf="
+                        createCollectionForm
+                            .get('collectionName')
+                            .hasError('required')
+                    "
+                >
+                    {{
+                        'collection.create_collection.name_code.name.error.required'
+                            | translate
+                    }}
+                </mat-error>
+                <mat-error
+                    *ngIf="
+                        createCollectionForm
+                            .get('collectionName')
+                            .hasError('nameTaken')
+                    "
+                >
+                    {{
+                        'collection.create_collection.name_code.name.error.taken'
+                            | translate
+                    }}
+                </mat-error>
+                <mat-error
+                *ngIf="
+                    createCollectionForm
+                        .get('collectionName')
+                        .hasError('maxlength')
+                "
+            >
+                {{
+                    'collection.create_collection.error.max_length'
+                        | translate
+                }}
+            </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="small-field">
+                <input
+                    matInput
+                    placeholder="{{
+                        'collection.create_collection.name_code.code.example'
+                            | translate
+                    }}"
+                    oninput="this.value = this.value.toUpperCase()"
+                    formControlName="collectionCode"
+                />
+                <mat-error
+                    *ngIf="
+                        createCollectionForm
+                            .get('collectionCode')
+                            .hasError('required')
+                    "
+                >
+                    {{
+                        'collection.create_collection.name_code.code.error.required'
+                            | translate
+                    }}
+                </mat-error>
+                <mat-error
+                    *ngIf="
+                        createCollectionForm
+                            .get('collectionCode')
+                            .hasError('codeTaken')
+                    "
+                >
+                    {{
+                        'collection.create_collection.name_code.code.error.taken'
+                            | translate
+                    }}
+                </mat-error>
+            </mat-form-field>
+        </div>
+    </mat-card>
+    <mat-card id="institution" class="mat-elevation-z0 s2-field">
+        <mat-card-title>
+            {{ 'collection.create_collection.institution.label' | translate }}
+        </mat-card-title>
+        <mat-card
+            class="mat-elevation-z0 s2-field outline"
+        >
+            <mat-radio-group formControlName="instOption" fxLayout="column">
+                <mat-radio-button value="create"></mat-radio-button>
+                <mat-card
+                    id="create-inst"
+                    class="mat-elevation-z0 s2-field no-padding"
+                >
+                    <mat-card-title>
+                        {{
+                            'collection.create_collection.institution.create.label'
+                                | translate
+                        }}
+                    </mat-card-title>
+                    <mat-card-subtitle>
+                        {{
+                            'collection.create_collection.institution.create.hint'
+                                | translate
+                        }}
+                    </mat-card-subtitle>
+                    <div id="two-field-row" fxLayout="row" fxLayoutGap=".5rem">
+                        <mat-form-field appearance="outline">
+                            <input
+                                matInput
+                                placeholder="{{
+                                    'collection.create_collection.institution.create.name.example'
+                                        | translate
+                                }}"
+                                formControlName="institutionName"
+                            />
+                            <mat-error
+                                *ngIf="
+                                    createCollectionForm
+                                        .get('institutionName')
+                                        .hasError('required')
+                                "
+                            >
+                                {{
+                                    'collection.create_collection.institution.create.name.error.required'
+                                        | translate
+                                }}
+                            </mat-error>
+                            <mat-error
+                                *ngIf="
+                                    createCollectionForm
+                                        .get('institutionName')
+                                        .hasError('nameTaken')
+                                "
+                            >
+                                {{
+                                    'collection.create_collection.institution.create.name.error.taken'
+                                        | translate
+                                }}
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field
+                            appearance="outline"
+                            class="small-field"
+                        >
+                            <input
+                                matInput
+                                placeholder="{{
+                                    'collection.create_collection.institution.create.code.example'
+                                        | translate
+                                }}"
+                                oninput="this.value = this.value.toUpperCase()"
+                                formControlName="institutionCode"
+                            />
+                            <mat-error
+                                *ngIf="
+                                    createCollectionForm
+                                        .get('institutionCode')
+                                        .hasError('required')
+                                "
+                            >
+                                {{
+                                    'collection.create_collection.institution.create.code.error.required'
+                                        | translate
+                                }}
+                            </mat-error>
+                            <mat-error
+                                *ngIf="
+                                    createCollectionForm
+                                        .get('institutionCode')
+                                        .hasError('codeTaken')
+                                "
+                            >
+                                {{
+                                    'collection.create_collection.institution.create.code.error.taken'
+                                        | translate
+                                }}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </mat-card>
+                <mat-radio-button value="select"> </mat-radio-button>
+                <mat-card
+                    id="select-inst"
+                    class="mat-elevation-z0 s2-field no-padding"
+                >
+                    <mat-card-title>
+                        {{
+                            'collection.create_collection.institution.select.label'
+                                | translate
+                        }}
+                    </mat-card-title>
+                    <mat-card-subtitle>
+                        {{
+                            'collection.create_collection.institution.select.hint'
+                                | translate
+                        }}
+                    </mat-card-subtitle>
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-select
+                            formControlName="institutionID"
+                            placeholder="{{
+                                'collection.create_collection.institution.select.menu'
+                                    | translate
+                            }}"
+                        >
+                            <mat-option
+                                *ngFor="let i of inst$ | async"
+                                value="{{ i.id }}"
+                                >({{ i.code }}) {{ i.name }}</mat-option
+                            >
+                        </mat-select>
+                        <mat-error
+                            *ngIf="
+                                createCollectionForm
+                                    .get('institutionID')
+                                    .hasError('required')
+                            "
+                        >
+                            {{
+                                'collection.create_collection.institution.select.error'
+                                    | translate
+                            }}
+                        </mat-error>
+                    </mat-form-field>
+                </mat-card>
+            </mat-radio-group>
+        </mat-card>
+    </mat-card>
+    <mat-card id="collection_type" class="mat-elevation-z0 s2-field">
+        <mat-card-title>
+            {{ 'collection.create_collection.type.label' | translate }}
+        </mat-card-title>
+        <mat-card-subtitle>
+            {{ 'collection.create_collection.type.hint' | translate }}
+        </mat-card-subtitle>
+        <mat-form-field appearance="outline">
+            <mat-select
+                formControlName="type"
+                placeholder="{{
+                    'collection.create_collection.type.menu' | translate
+                }}"
+            >
+                <mat-option value="Preserved Specimens">{{
+                    'collection.create_collection.type.option.preserved_specimen'
+                        | translate
+                }}</mat-option>
+                <mat-option value="General Observations">{{
+                    'collection.create_collection.type.option.general_observations'
+                        | translate
+                }}</mat-option>
+            </mat-select>
+            <mat-error
+                *ngIf="createCollectionForm.get('type').hasError('required')"
+            >
+                {{
+                    'collection.create_collection.type.error.required'
+                        | translate
+                }}
+            </mat-error>
+        </mat-form-field>
+    </mat-card>
+    <mat-card id="managment" class="mat-elevation-z0 s2-field">
+        <mat-card-title>
+            {{ 'collection.create_collection.management.label' | translate }}
+        </mat-card-title>
+        <mat-card-subtitle>
+            {{ 'collection.create_collection.management.hint' | translate }}
+        </mat-card-subtitle>
+        <mat-form-field appearance="outline">
+            <mat-select
+                formControlName="management"
+                placeholder="{{
+                    'collection.create_collection.management.menu' | translate
+                }}"
+            >
+                <!-- //TODO: api will handle populating collection types -->
+                <mat-option value="snapshot">{{
+                    'collection.create_collection.management.menu.option.snapshot'
+                        | translate
+                }}</mat-option>
+                <mat-option value="liveData">{{
+                    'collection.create_collection.management.menu.option.live_data'
+                        | translate
+                }}</mat-option>
+            </mat-select>
+            <mat-error
+                *ngIf="
+                    createCollectionForm.get('management').hasError('required')
+                "
+            >
+                {{
+                    'collection.create_collection.management.error.required'
+                        | translate
+                }}
+            </mat-error>
+        </mat-form-field>
+    </mat-card>
+    <mat-card id="category" class="mat-elevation-z0 s2-field">
+        <mat-card-title>
+            {{ 'collection.create_collection.category.label' | translate }}
+        </mat-card-title>
+        <mat-card-subtitle>
+            {{ 'collection.create_collection.category.hint' | translate }}
+        </mat-card-subtitle>
+        <mat-form-field appearance="outline">
+            <mat-select
+                formControlName="categoryID"
+                placeholder="{{
+                    'collection.create_collection.category.menu' | translate
+                }}"
+            >
+                <mat-option
+                    *ngFor="let cat of categories$ | async"
+                    [value]="cat.id"
+                    >{{ cat.category }}</mat-option
+                >
+            </mat-select>
+            <mat-error
+                *ngIf="
+                    createCollectionForm.get('categoryID').hasError('required')
+                "
+            >
+                {{ 'collection.create_collection.category.error' | translate }}
+            </mat-error>
+        </mat-form-field>
+    </mat-card>
+    <mat-card id="homepage" class="mat-elevation-z0 s2-field">
+        <mat-card-title>
+            {{ 'collection.create_collection.homepage.label' | translate }}
+        </mat-card-title>
+        <mat-card-subtitle>
+            {{ 'collection.create_collection.homepage.hint' | translate }}
+        </mat-card-subtitle>
+        <mat-form-field appearance="outline">
+            <input
+                matInput
+                formControlName="homePage"
+                placeholder="{{
+                    'collection.create_collection.homepage.example' | translate
+                }}"
+            />
+        </mat-form-field>
+    </mat-card>
+    <mat-card id="license" class="mat-elevation-z0 s2-field">
+        <mat-card-title>
+            {{ 'collection.create_collection.license.label' | translate }}
+        </mat-card-title>
+        <mat-card-subtitle>
+            {{ 'collection.create_collection.license.hint' | translate }}
+        </mat-card-subtitle>
+        <mat-form-field appearance="outline">
+            <input
+                matInput
+                formControlName="rights"
+                placeholder="{{
+                    'collection.create_collection.license.example' | translate
+                }}"
+            />
+            <mat-error
+                *ngIf="createCollectionForm.get('rights').hasError('required')"
+            >
+                {{ 'collection.create_collection.license.error' | translate }}
+            </mat-error>
+        </mat-form-field>
+    </mat-card>
+    <mat-card id="coordinates" class="mat-elevation-z0 s2-field">
+        <mat-card-title>
+            {{ 'collection.create_collection.coordinates.label' | translate }}
+        </mat-card-title>
+        <mat-card-subtitle>
+            {{ 'collection.create_collection.coordinates.hint' | translate }}
+        </mat-card-subtitle>
+        <div fxLayout="row" fxLayoutGap=".5rem" fxLayoutAlign="start center">
+            <h3>
+                {{
+                    'collection.create_collection.coordinates.latitude.label'
+                        | translate
+                }}
+            </h3>
+            <mat-form-field appearance="outline">
+                <input
+                    matInput
+                    type="number"
+                    step=".0001"
+                    formControlName="latitude"
+                    placeholder="{{
+                        'collection.create_collection.coordinates.latitude.example'
+                            | translate
+                    }}"
+                />
+                <mat-error
+                    *ngIf="
+                        createCollectionForm
+                            .get('latitude')
+                            .hasError('required')
+                    "
+                >
+                    {{
+                        'collection.create_collection.coordinates.latitude.error.required'
+                            | translate
+                    }}
+                </mat-error>
+                <mat-error
+                    *ngIf="
+                        createCollectionForm.get('latitude').hasError('min') ||
+                        createCollectionForm.get('latitude').hasError('max') ||
+                        createCollectionForm.get('latitude').hasError('number')
+                    "
+                >
+                    {{
+                        'collection.create_collection.coordinates.latitude.error.invalid'
+                            | translate
+                    }}
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div fxLayout="row" fxLayoutGap=".5rem" fxLayoutAlign="start center">
+            <h3>
+                {{
+                    'collection.create_collection.coordinates.longitude.label'
+                        | translate
+                }}
+            </h3>
+            <mat-form-field appearance="outline">
+                <input
+                    matInput
+                    type="number"
+                    step=".0001"
+                    formControlName="longitude"
+                    placeholder="{{
+                        'collection.create_collection.coordinates.longitude.example'
+                            | translate
+                    }}"
+                />
+                <mat-error
+                    *ngIf="
+                        createCollectionForm
+                            .get('longitude')
+                            .hasError('required')
+                    "
+                >
+                    {{
+                        'collection.create_collection.coordinates.longitude.error.required'
+                            | translate
+                    }}
+                </mat-error>
+                <mat-error
+                    *ngIf="
+                        createCollectionForm.get('longitude').hasError('min') ||
+                        createCollectionForm.get('longitude').hasError('max') ||
+                        createCollectionForm.get('longitude').hasError('number')
+                    "
+                >
+                    {{
+                        'collection.create_collection.coordinates.longitude.error.invalid'
+                            | translate
+                    }}
+                </mat-error>
+            </mat-form-field>
+        </div>
+    </mat-card>
+    <mat-card id="description" class="mat-elevation-z0 s2-field">
+        <mat-card-title>
+            {{ 'collection.create_collection.description.label' | translate }}
+        </mat-card-title>
+        <mat-card-subtitle>
+            {{ 'collection.create_collection.description.hint' | translate }}
+        </mat-card-subtitle>
+        <mat-form-field appearance="outline" class="full-width">
+            <textarea
+                id="description-text-area"
+                maxlength="2000"
+                rows="10"
+                matInput
+                formControlName="fullDescription"
+                placeholder="{{
+                    'collection.create_collection.description.example'
+                        | translate
+                }}"
+            ></textarea>
+        </mat-form-field>
+    </mat-card>
+    <mat-card id="administration" class="mat-elevation-z0 s2-field">
+        <mat-card-title>
+            {{ 'collection.create_collection.administrator.label' | translate }}
+        </mat-card-title>
+        <mat-card-subtitle>
+            {{ 'collection.create_collection.administrator.hint' | translate }}
+        </mat-card-subtitle>
+        <div fxLayout="row" fxLayoutGap=".5rem" fxLayoutAlign="start center">
+            <h3>
+                {{
+                    'collection.create_collection.administrator.name.label'
+                        | translate
+                }}
+            </h3>
+            <mat-form-field appearance="outline">
+                <input
+                    matInput
+                    formControlName="contact"
+                    placeholder="{{
+                        'collection.create_collection.administrator.name.example'
+                            | translate
+                    }}"
+                />
+                <mat-error
+                    *ngIf="
+                        createCollectionForm.get('contact').hasError('required')
+                    "
+                >
+                    {{
+                        'collection.create_collection.administrator.name.error'
+                            | translate
+                    }}
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div fxLayout="row" fxLayoutGap=".5rem" fxLayoutAlign="start center">
+            <h3>
+                {{
+                    'collection.create_collection.administrator.email.label'
+                        | translate
+                }}
+            </h3>
+            <mat-form-field appearance="outline">
+                <input
+                    matInput
+                    type="email"
+                    formControlName="email"
+                    placeholder="{{
+                        'collection.create_collection.administrator.email.example'
+                            | translate
+                    }}"
+                />
+                <mat-error
+                    *ngIf="
+                        createCollectionForm.get('email').hasError('required')
+                    "
+                >
+                    {{
+                        'collection.create_collection.administrator.email.error.required'
+                            | translate
+                    }}
+                </mat-error>
+                <mat-error
+                    *ngIf="createCollectionForm.get('email').hasError('email')"
+                >
+                    {{
+                        'collection.create_collection.administrator.email.error.invalid'
+                            | translate
+                    }}
+                </mat-error>
+            </mat-form-field>
+        </div>
+    </mat-card>
+    <mat-card-actions>
+        <button
+        id="submit"
+        class="submit-button"
+        mat-flat-button
+        color="primary"
+        type="submit"
+        (click)="onSubmit()"
+        [disabled]="!createCollectionForm.valid"
+        style="font-size: large"
+    >
+        {{ "collection.create_collection.submit.label" | translate }}
+    </button>
+    </mat-card-actions>
+</form>

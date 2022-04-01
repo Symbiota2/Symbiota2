@@ -11,14 +11,14 @@ import { CollectionInputDto } from '../dto/Collection.input.dto';
 
 export class CollectionAsyncValidators {
     static nameTaken(
-        collections: CollectionService,
+        collectionService: CollectionService,
         isEditing?: boolean
     ): AsyncValidatorFn {
         return (control: AbstractControl): Observable<ValidationErrors> => {
             if (isEditing) {
-                return collections.currentCollection.pipe(
+                return collectionService.currentCollection.pipe(
                     switchMap((collection) => {
-                        return collections
+                        return collectionService
                             .isNameTaken(
                                 control.value,
                                 collection.collectionName
@@ -32,7 +32,7 @@ export class CollectionAsyncValidators {
                     take(1)
                 );
             } else {
-                return collections
+                return collectionService
                     .isNameTaken(control.value)
                     .pipe(
                         map((result: boolean) =>
@@ -44,14 +44,14 @@ export class CollectionAsyncValidators {
     }
 
     static codeTaken(
-        collections: CollectionService,
+        collectionService: CollectionService,
         isEditing?: boolean
     ): AsyncValidatorFn {
         return (control: AbstractControl): Observable<ValidationErrors> => {
             if (isEditing) {
-                return collections.currentCollection.pipe(
+                return collectionService.currentCollection.pipe(
                     switchMap((collection) => {
-                        return collections
+                        return collectionService
                             .isCodeTaken(
                                 control.value,
                                 collection.collectionCode
@@ -65,7 +65,7 @@ export class CollectionAsyncValidators {
                     take(1)
                 );
             } else {
-                return collections
+                return collectionService
                     .isCodeTaken(control.value)
                     .pipe(
                         map((result: boolean) =>
@@ -84,8 +84,10 @@ export class CollectionAsyncValidators {
 
             return collection.pipe(
                 map((col) => {
+                    for (let [field, value] of Object.entries(collection)) {
+                    }
                     if (
-                        //Note: could be better way to do this haven't found one though
+                        //NOTE: could be better way to do this haven't found one though
                         updatedCollection.collectionName ===
                             col.collectionName &&
                         updatedCollection.collectionCode ===
