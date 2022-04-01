@@ -18,10 +18,10 @@ import { QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP } from '../queues/taxonomy-upload-clea
 import { TaxonomyUploadCleanupJob } from '../queues/taxonomy-upload-cleanup.processor';
 import { QUEUE_ID_TAXONOMY_UPLOAD } from '../queues/taxonomy-upload.queue';
 import { TaxonomyUploadJob } from '../queues/taxonomy-upload.processor';
-import fs, { createReadStream } from 'fs';
+//import fs, { createReadStream } from 'fs';
 import { StorageService } from '@symbiota2/api-storage';
 import path from 'path';
-import { ElasticsearchRepository } from './elasticsearch.repository';
+//import { ElasticsearchRepository } from './elasticsearch.repository';
 
 @Injectable()
 export class TaxonService extends BaseService<Taxon>{
