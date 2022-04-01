@@ -15,7 +15,6 @@ import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 import { ViewportScroller } from '@angular/common';
 import { InstitutionAsyncValidators } from '../../validators/InstitutionValidators';
 import { InstitutionInputDto } from '../../dto/Institution.input.dto';
-import { Collection } from '../../dto/Collection.output.dto';
 
 //TODO: add back end and db support for additional fields
 

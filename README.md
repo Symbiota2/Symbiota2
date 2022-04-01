@@ -69,7 +69,7 @@ For development, a [.env file](https://www.npmjs.com/package/dotenv) can be used
 | SYMBIOTA2_SMTP_USER                      | The optional user to use for authentication with SMTP_HOST                              | ''                           |
 | SYMBIOTA2_SMTP_PASSWORD                  | The optional password for SMTP_USER                                                     | ''                           |
 | SYMBIOTA2_SMTP_SENDER                    | The email address that emails will originate from                                       | 'noreply@symbiota2.org'      |
-| SYMBIOTA2_STORAGE_SERVER                 | The S3 server to use for backend storage                                                | '127.0.0.1'                  |
+| SYMBIOTA2_STORAGE_SERVER                 | The S3 server to use for backend storage                                                | http://127.0.0.1:9000                  |
 | SYMBIOTA2_STORAGE_USER                   | The AWS Access Key ID (or equivalent) to use for authentication with STORAGE_SERVER     | 'symbiota2'                  |
 | SYMBIOTA2_STORAGE_PASSWORD               | The AWS Secret Access Key (or equivalent) to use for authentication with STORAGE_SERVER | 'password'                   |
 | SYMBIOTA2_STORAGE_BUCKET                 | The S3 bucket to use on STORAGE_SERVER                                                  | 'symbiota2'                  |
