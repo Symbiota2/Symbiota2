@@ -5,15 +5,15 @@ import { filter } from 'rxjs/operators';
 import { ROUTE_COLLECTION_LIST, ROUTE_COLLECTION_PROFILE } from '../../routes';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
 import { CollectionService } from '../../services/collection.service';
-import { CollectionNewCollectionComponent } from '../../components/collection-new-collection/collection-new-collection.component';
+import { CollectionNewCollectionComponent } from '../../components/create-collection-form/create-collection-form.component';
 import { ThrowStmt } from '@angular/compiler';
 
 @Component({
     selector: 'symbiota2-collection-new-page',
-    templateUrl: './collection-new-page.component.html',
-    styleUrls: ['./collection-new-page.component.scss'],
+    templateUrl: './create-collection-page.component.html',
+    styleUrls: ['./create-collection-page.component.scss'],
 })
-export class CollectionNewPage implements OnInit {
+export class CollectionCreatePage implements OnInit {
     @ViewChild(CollectionNewCollectionComponent) form!: CollectionNewCollectionComponent; 
 
 

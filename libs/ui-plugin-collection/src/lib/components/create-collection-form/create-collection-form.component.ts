@@ -19,9 +19,9 @@ import { InstitutionInputDto } from '../../dto/Institution.input.dto';
 //TODO: add back end and db support for additional fields
 
 @Component({
-    selector: 'symbiota2-collection-new-collection',
+    selector: 'symbiota2-create-collection-form',
     templateUrl: './create-collection-form.component.html',
-    styleUrls: ['./collection-new-collection.component.scss'],
+    styleUrls: ['./create-collection-form.component.scss'],
 })
 export class CollectionNewCollectionComponent implements OnInit {
     inst$: Observable<Institution[]>;
