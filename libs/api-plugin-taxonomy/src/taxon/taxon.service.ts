@@ -8,7 +8,7 @@ import {
     TaxonomyUploadFieldMap,
     TaxonVernacular
 } from '@symbiota2/api-database';
-import { In, Like, Repository, Raw } from 'typeorm';
+import { In, Like, Repository, Raw, getCustomRepository } from 'typeorm';
 import { BaseService, csvIterator } from '@symbiota2/api-common';
 import { DwCArchiveParser, dwcCoreID, getDwcField, isDwCID } from '@symbiota2/dwc';
 import { TaxonFindAllParams, TaxonFindNamesParams } from './dto/taxon-find-parms';
@@ -21,7 +21,7 @@ import { TaxonomyUploadJob } from '../queues/taxonomy-upload.processor';
 import fs, { createReadStream } from 'fs';
 import { StorageService } from '@symbiota2/api-storage';
 import path from 'path';
-//import { ElasticsearchRepository } from './elasticsearch.repository';
+import { ElasticsearchRepository } from './elasticsearch.repository';
 
 @Injectable()
 export class TaxonService extends BaseService<Taxon>{
@@ -62,6 +62,7 @@ export class TaxonService extends BaseService<Taxon>{
         private readonly storageService: StorageService)
     {
         super(taxonRepo);
+        //this.taxonRepo = getCustomRepository(ElasticsearchRepository)
     }
 
     public static s3Key(objectName: string): string {
@@ -697,6 +698,7 @@ export class TaxonService extends BaseService<Taxon>{
         let nullRankNames = 0
         let totalRecords = 0
 
+        console.log("sciname field is " + sciNameField)
         try {
             for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
                 for (const row of batch) {
