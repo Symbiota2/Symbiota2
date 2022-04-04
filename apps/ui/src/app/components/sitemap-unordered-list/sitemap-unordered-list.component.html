@@ -1,0 +1,11 @@
+<div id="listdiv">
+    <ul>
+        <h1>{{categoryTitle | translate}}</h1>
+        <ng-container *ngFor="let categoryLink of categoryLinks">
+            <li>
+                <a href="{{categoryLink.url}}">{{categoryLink.name | translate}}</a>
+            </li>
+        </ng-container>
+    </ul>
+
+</div>

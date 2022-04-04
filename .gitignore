@@ -1,6 +1,6 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
-
 .env
+.env2
 data/
 
 **/node_modules/
@@ -46,3 +46,4 @@ Thumbs.db
 /oldCode/image-old-not-used-search/
 apps/ui/src/assets/images/layout/tpt_logo_old.png
 .gitignore
+cloudKey.txt

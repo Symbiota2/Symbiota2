@@ -59,10 +59,11 @@ export class TaxonomyUploadService {
         private readonly taxonomicAuthorityService: TaxonomicAuthorityService
     ) {
         this.taxonomicAuthorityID = this.taxonomicAuthorityService.getAuthorityID()
+        //this.taxonomicAuthorityID = 2;
     }
 
     setUploadID(id: number): void {
-        const url = this.createUrlBuilder().upload().id(id).build();
+        const url = this.createUrlBuilder().uploadFile().id(id).build();
 
         combineLatest([
             this.jwtToken,
@@ -120,7 +121,7 @@ export class TaxonomyUploadService {
 
     uploadFile(file: File): Observable<void> {
         const url = this.createUrlBuilder()
-            .upload()
+            .uploadFile()
             .build()
 
         const body = new FormData();
@@ -159,7 +160,7 @@ export class TaxonomyUploadService {
             //switchMap(([authorityID, token, upload]) => {
             switchMap(([token, upload]) => {
                 const url = this.createUrlBuilder()
-                    .upload()
+                    .uploadFile()
                     .id(upload.id)
                     .build();
 
@@ -195,7 +196,7 @@ export class TaxonomyUploadService {
             switchMap(([token, upload]) => {
             //switchMap(([collectionID, token, upload]) => {
                 let url = this.createUrlBuilder()
-                    .upload()
+                    .uploadFile()
                     .id(upload.id)
                     .authorityID(this.taxonomicAuthorityID)
                     .build()

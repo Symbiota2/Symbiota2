@@ -741,38 +741,38 @@
         }
       }
     },
-      "knowledgeGraph": {
-          "root": "libs/knowledgeGraph",
-          "sourceRoot": "libs/knowledgeGraph/src",
-          "projectType": "library",
-          "targets": {
-              "lint": {
-                  "executor": "@nrwl/linter:eslint",
-                  "options": {
-                      "lintFilePatterns": ["libs/knowledgeGraph/**/*.ts"]
-                  }
-              },
-              "test": {
-                  "executor": "@nrwl/jest:jest",
-                  "outputs": ["coverage/libs/knowledgeGraph"],
-                  "options": {
-                      "jestConfig": "libs/knowledgeGraph/jest.config.js",
-                      "passWithNoTests": true
-                  }
-              },
-              "build": {
-                  "executor": "@nrwl/node:package",
-                  "outputs": ["{options.outputPath}"],
-                  "options": {
-                      "outputPath": "dist/libs/knowledgeGraph",
-                      "tsConfig": "libs/knowledgeGraph/tsconfig.lib.json",
-                      "packageJson": "libs/knowledgeGraph/package.json",
-                      "main": "libs/knowledgeGraph/src/index.ts",
-                      "assets": ["libs/knowledgeGraph/*.md"]
-                  }
-              }
+    "knowledgeGraph": {
+      "root": "libs/knowledgeGraph",
+      "sourceRoot": "libs/knowledgeGraph/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/knowledgeGraph/**/*.ts"]
           }
-      },
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/knowledgeGraph"],
+          "options": {
+            "jestConfig": "libs/knowledgeGraph/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "executor": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/knowledgeGraph",
+            "tsConfig": "libs/knowledgeGraph/tsconfig.lib.json",
+            "packageJson": "libs/knowledgeGraph/package.json",
+            "main": "libs/knowledgeGraph/src/index.ts",
+            "assets": ["libs/knowledgeGraph/*.md"]
+          }
+        }
+      }
+    },
     "api-email": {
       "root": "libs/api-email",
       "sourceRoot": "libs/api-email/src",
@@ -835,26 +835,75 @@
           }
         }
       }
-    }
-  },
-  "cli": {
-    "defaultCollection": "@nrwl/nest"
-  },
-  "defaultProject": "api",
-  "generators": {
-    "@nrwl/angular:application": {
-      "style": "scss",
-      "linter": "eslint",
-      "unitTestRunner": "jest",
-      "e2eTestRunner": "cypress"
     },
-    "@nrwl/angular:library": {
-      "style": "scss",
-      "linter": "eslint",
-      "unitTestRunner": "jest"
+    "ui-plugin-checklist": {
+      "projectType": "library",
+      "root": "libs/ui-plugin-checklist",
+      "sourceRoot": "libs/ui-plugin-checklist/src",
+      "prefix": "symbiota2",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/angular:package",
+          "options": {
+            "tsConfig": "libs/ui-plugin-checklist/tsconfig.lib.json",
+            "project": "libs/ui-plugin-checklist/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "libs/ui-plugin-checklist/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/ui-plugin-checklist/src/**/*.ts",
+              "libs/ui-plugin-checklist/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/ui-plugin-checklist"],
+          "options": {
+            "jestConfig": "libs/ui-plugin-checklist/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     },
-    "@nrwl/angular:component": {
-      "style": "scss"
+    "api-plugin-checklist": {
+      "root": "libs/api-plugin-checklist",
+      "sourceRoot": "libs/api-plugin-checklist/src",
+      "projectType": "library",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/api-plugin-checklist",
+            "tsConfig": "libs/api-plugin-checklist/tsconfig.lib.json",
+            "packageJson": "libs/api-plugin-checklist/package.json",
+            "main": "libs/api-plugin-checklist/src/index.ts",
+            "assets": ["libs/api-plugin-checklist/*.md"]
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/api-plugin-checklist/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/api-plugin-checklist"],
+          "options": {
+            "jestConfig": "libs/api-plugin-checklist/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   }
 }

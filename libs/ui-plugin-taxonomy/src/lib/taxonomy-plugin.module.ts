@@ -98,6 +98,7 @@ import {
     TaxonLinkService,
     TaxonResourceLinkService,
 } from './services';
+import { QuillModule } from 'ngx-quill';
 
 @NgModule({
     imports: [
@@ -132,6 +133,7 @@ import {
         MatGridListModule,
         MatExpansionModule,
         MatPaginatorModule,
+        QuillModule,
     ],
     declarations: [
         TaxonomyUploadPage,

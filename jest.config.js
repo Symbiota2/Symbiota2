@@ -22,5 +22,7 @@ module.exports = {
     '<rootDir>/libs/api-email',
     '<rootDir>/libs/api-storage',
     '<rootDir>/libs/api-dwc',
+    '<rootDir>/libs/ui-plugin-checklist',
+    '<rootDir>/libs/api-plugin-checklist',
   ],
 };

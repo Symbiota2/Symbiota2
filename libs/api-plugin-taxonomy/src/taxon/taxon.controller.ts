@@ -345,8 +345,8 @@ export class TaxonController {
     @Post('upload')
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor('file'))
-    @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
+    //@ApiBearerAuth()
+    //@UseGuards(JwtAuthGuard)
     @ApiOperation({
         summary: "Upload a CSV file containing a taxonomy"
     })
@@ -358,7 +358,7 @@ export class TaxonController {
             throw new BadRequestException('File not specified');
         }
 
-        if (true) {
+        if (file.mimetype.startsWith('text/csv') || file.mimetype.startsWith('application/vnd.ms-excel')) {
             const headers = await getCSVFields(file.path);
             const headerMap = {};
             headers.forEach((h) => headerMap[h] = '');
@@ -437,13 +437,37 @@ export class TaxonController {
             throw new NotFoundException()
         }
 
+        let scinameField = ""
+        let parentField = ""
+        let acceptedField = ""
+        let rankField = ""
+        let kingdomField = ""
+        Object.keys(body.fieldMap).forEach((key:string)=>{
+            if (body.fieldMap[key] == "scientificName") {
+                scinameField = key
+            }
+            if (body.fieldMap[key] == "ParentTaxonName") {
+                parentField = key
+            }
+            if (body.fieldMap[key] == "AcceptedTaxonName") {
+                acceptedField = key
+            }
+            if (body.fieldMap[key] == "kingdomName") {
+                kingdomField = key
+            }
+            if (body.fieldMap[key] == "RankName") {
+                rankField = key
+            }
+            console.log(body.fieldMap[key]);
+        });
+
         const problemsFound = await this.taxa.taxonCheck(
             upload.filePath,
-            body.fieldMap["scientificName"],
-            body.fieldMap["ParentTaxonName"],
-            body.fieldMap["AcceptedTaxonName"],
-            body.fieldMap["kingdomName"],
-            body.fieldMap["RankName"])
+            scinameField,
+            parentField,
+            acceptedField,
+            kingdomField,
+            rankField)
 
         return problemsFound
     }

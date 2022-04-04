@@ -20,7 +20,8 @@ const ENABLED_PLUGINS = [
     ImageModule,
     TaxonomyModule,
     DwCModule,
-    KnowledgeGraphModule
+    KnowledgeGraphModule,
+    CollectionModule,
 ];
 
 /**

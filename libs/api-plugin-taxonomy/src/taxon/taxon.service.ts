@@ -8,7 +8,7 @@ import {
     TaxonomyUploadFieldMap,
     TaxonVernacular
 } from '@symbiota2/api-database';
-import { In, Like, Repository, Raw } from 'typeorm';
+import { In, Like, Repository, Raw, getCustomRepository } from 'typeorm';
 import { BaseService, csvIterator } from '@symbiota2/api-common';
 import { DwCArchiveParser, dwcCoreID, getDwcField, isDwCID } from '@symbiota2/dwc';
 import { TaxonFindAllParams, TaxonFindNamesParams } from './dto/taxon-find-parms';
@@ -18,27 +18,29 @@ import { QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP } from '../queues/taxonomy-upload-clea
 import { TaxonomyUploadCleanupJob } from '../queues/taxonomy-upload-cleanup.processor';
 import { QUEUE_ID_TAXONOMY_UPLOAD } from '../queues/taxonomy-upload.queue';
 import { TaxonomyUploadJob } from '../queues/taxonomy-upload.processor';
-import fs, { createReadStream } from 'fs';
+//import fs, { createReadStream } from 'fs';
 import { StorageService } from '@symbiota2/api-storage';
+import path from 'path';
+//import { ElasticsearchRepository } from './elasticsearch.repository';
 
 @Injectable()
 export class TaxonService extends BaseService<Taxon>{
     private static readonly S3_PREFIX = 'taxon';
     private static readonly UPLOAD_CHUNK_SIZE = 1024;
     private static readonly LOGGER = new Logger(TaxonService.name);
-    public static readonly dataFolderPath = "data/uploads/taxa"
-    public static readonly problemParentNamesPath = TaxonService.dataFolderPath + "/problemParentNames"
-    public static readonly problemAcceptedNamesPath = TaxonService.dataFolderPath + "/problemAcceptedNames"
-    public static readonly problemRanksPath = TaxonService.dataFolderPath + "/problemRanks"
-    public static readonly skippedTaxonsDueToMultipleMatchPath = TaxonService.dataFolderPath + "/taxonsMultipleMath"
-    public static readonly skippedTaxonsDueToMismatchRankPath = TaxonService.dataFolderPath + "/taxonsMismatch"
-    public static readonly skippedTaxonsDueToMissingNamePath = TaxonService.dataFolderPath + "/taxonsMissing"
+    public static readonly dataFolderPath = path.join("data", "uploads", "taxa")
+    public static readonly problemParentNamesPath = path.join(TaxonService.dataFolderPath, "problemParentNames")
+    public static readonly problemAcceptedNamesPath = path.join(TaxonService.dataFolderPath, "problemAcceptedNames")
+    public static readonly problemRanksPath = path.join(TaxonService.dataFolderPath, "problemRanks")
+    public static readonly skippedTaxonsDueToMultipleMatchPath = path.join(TaxonService.dataFolderPath, "taxonsMultipleMath")
+    public static readonly skippedTaxonsDueToMismatchRankPath = path.join(TaxonService.dataFolderPath, "taxonsMismatch")
+    public static readonly skippedTaxonsDueToMissingNamePath = path.join(TaxonService.dataFolderPath, "taxonsMissing")
 
     // list of all the updates to do to status records
-    public static readonly skippedStatusesDueToMultipleMatchPath = TaxonService.dataFolderPath + "/statusesMultipleMatch"
-    public static readonly skippedStatusesDueToAcceptedMismatchPath = TaxonService.dataFolderPath + "/statusesAcceptedMismatch"
-    public static readonly skippedStatusesDueToParentMismatchPath = TaxonService.dataFolderPath + "/statusesParentMismatch"
-    public static readonly skippedStatusesDueToTaxonMismatchPath = TaxonService.dataFolderPath + "/statusesTaxonMismatch"
+    public static readonly skippedStatusesDueToMultipleMatchPath = path.join(TaxonService.dataFolderPath, "statusesMultipleMatch")
+    public static readonly skippedStatusesDueToAcceptedMismatchPath = path.join(TaxonService.dataFolderPath, "statusesAcceptedMismatch")
+    public static readonly skippedStatusesDueToParentMismatchPath = path.join(TaxonService.dataFolderPath, "statusesParentMismatch")
+    public static readonly skippedStatusesDueToTaxonMismatchPath = path.join(TaxonService.dataFolderPath, "statusesTaxonMismatch")
 
     constructor(
         @Inject(Taxon.PROVIDER_ID)
@@ -60,6 +62,7 @@ export class TaxonService extends BaseService<Taxon>{
         private readonly storageService: StorageService)
     {
         super(taxonRepo);
+        //this.taxonRepo = getCustomRepository(ElasticsearchRepository)
     }
 
     public static s3Key(objectName: string): string {
@@ -242,19 +245,6 @@ export class TaxonService extends BaseService<Taxon>{
             qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
         }
         return await qb.getMany()
-            /*
-        } else {
-            return (qParams.id)?
-                await this.taxonRepo.find({
-                    select: ["scientificName","id","author"],
-                    where: { id: In(params.id) },
-                    take: TaxonFindAllParams.MAX_LIMIT})
-                : await this.taxonRepo.find({
-                    select: ["scientificName","id","author"],
-                    take: TaxonFindAllParams.MAX_LIMIT
-                })
-        }
-             */
     }
 
     /**
@@ -708,6 +698,7 @@ export class TaxonService extends BaseService<Taxon>{
         let nullRankNames = 0
         let totalRecords = 0
 
+        console.log("sciname field is " + sciNameField)
         try {
             for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
                 for (const row of batch) {
