@@ -1,0 +1,96 @@
+<div id="main">
+    <div>
+      <h1>{{ "checklist.create.create.new.checklist" | translate }}</h1>
+    </div>
+  
+    <!-- <div *ngIf="!userCanEdit" class="my2" fxLayout="row" fxLayoutGap="1rem">
+      {{"checklist.create.lacks.create.permission" | translate}}
+    </div> -->
+    <!-- <div *ngIf="userCanEdit" class="my2" fxLayout="row" fxLayoutGap="1rem"> -->
+      <div class="my2" fxLayout="row" fxLayoutGap="1rem">
+      <div mat-dialog-content>
+        <form class="example-form">
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Checklist name</mat-label>
+            <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
+                   placeholder="Checklist name">
+          </mat-form-field>
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Authors</mat-label>
+            <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
+                   placeholder="Checklist name">
+          </mat-form-field>
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Locality</mat-label>
+            <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
+                   placeholder="Checklist name">
+          </mat-form-field>
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Citation</mat-label>
+            <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
+                   placeholder="Checklist name">
+          </mat-form-field>
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Abstract</mat-label>
+            <textarea type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
+                   placeholder="Checklist name"></textarea>
+          </mat-form-field>
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Notes</mat-label>
+            <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
+                   placeholder="Checklist name">
+          </mat-form-field>
+          <mat-form-field style="width:auto" class="example-full-width" appearance="fill">
+            <mat-label>More Inclusive Reference Checklist</mat-label>
+            <mat-select>
+              <mat-option [value]="">
+                {{'some text'}}
+              </mat-option>
+              <mat-option [value]="">
+                {{'some text'}}
+              </mat-option>
+              <mat-option [value]="">
+                {{'some text'}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field> <br>
+          <mat-form-field style="width:27%;margin-right: 3%">
+            <mat-label>Latitude</mat-label>
+            <input matInput>
+          </mat-form-field>
+          <mat-form-field style="width:27%;margin-right:3%">
+            <mat-label>Longitude</mat-label>
+            <input matInput>
+          </mat-form-field>
+          <mat-form-field style="width:27%">
+            <mat-label>Pont radius (meter)</mat-label>
+            <input matInput>
+          </mat-form-field>
+          <br>
+
+          <mat-card class="example-card">
+            <mat-card-title-group>
+              <mat-card-title>Polygon footprint</mat-card-title>
+              <!-- <mat-card-subtitle>Small</mat-card-subtitle> -->
+              <img mat-card-sm-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" >
+            </mat-card-title-group>
+            <mat-card-content>
+              {{'Polygon footprint not defined Click globe to create polygon'}}
+            </mat-card-content>
+          </mat-card>
+
+          <section class="example-section" [formGroup]="toppings">
+            <h4>Select your toppings:</h4>
+            <p><mat-checkbox formControlName="pepperoni">Pepperoni</mat-checkbox></p>
+            <p><mat-checkbox formControlName="extracheese">Extra Cheese</mat-checkbox></p>
+            <p><mat-checkbox formControlName="mushroom">Mushroom</mat-checkbox></p>
+          </section>
+          
+          <section class="example-section" [formGroup]="toppings">
+            <h4>You chose:</h4>
+            {{toppings.value | json}}
+          </section>
+          
+        </form>
+    </div>
+  </div>
