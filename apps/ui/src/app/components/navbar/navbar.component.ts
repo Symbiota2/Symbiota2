@@ -62,9 +62,9 @@ export class NavbarComponent implements OnInit {
 
     ngOnInit(): void {
         //Check if superAdmin
-        this.currentUser$.subscribe(res => {
-            this.user = res;
-            if (this.user && res.isSuperAdmin()) {
+        this.currentUser$.subscribe(user => {
+            this.user = user;
+            if (this.user && user.isSuperAdmin()) {
                 // create new categories
                 this.pluginLinks$ = this.pluginLinks$.pipe(
                     map((navMap: Map<string, NavBarLink[]>) => {
