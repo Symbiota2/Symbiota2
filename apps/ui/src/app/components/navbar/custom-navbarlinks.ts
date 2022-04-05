@@ -58,14 +58,10 @@ export const customLinksEnd: Map<string, NavBarLink[]> = new Map<string, NavBarL
 ]);
 
 export const superAdminLinks: Map<string, NavBarLink[]> = new Map<string, NavBarLink[]>([
-    ['core.layout.header.topnav.SuperAdmin_dropdown', [
+    ['core.layout.header.topnav.superadmin_dropdown', [
         <NavBarLink>{
-            name: 'core.layout.header.topnav.userlist_link',
+            name: 'core.layout.header.topnav.userlist_link_one',
             url: 'https://scan-bugs.org/portal/',
-        },
-        <NavBarLink>{
-            name: 'core.layout.header.topnav.userperms_link',
-            url: 'https://symbiota.org/help-resources/',
-        },
+        }
     ]]
 ]);
