@@ -1,5 +1,9 @@
-<ul>
-    <mat-card id="usercard">
-        stuff
-    </mat-card>
-</ul>
+<div id="userListDiv">
+    <ul>
+        <ng-container *ngFor="let user of userList">
+            <mat-card id="usercard">
+                {{user.firstName}}
+            </mat-card>
+        </ng-container>
+    </ul>
+</div>

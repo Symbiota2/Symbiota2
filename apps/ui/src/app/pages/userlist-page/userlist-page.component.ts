@@ -27,7 +27,6 @@ export class UserlistPageComponent implements OnInit {
         const userList$ = this.userService.getUsers();
         userList$.subscribe(userList => {
           this.userList = userList;
-          console.log(userList);
         })
       }
     });
