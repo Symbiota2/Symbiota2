@@ -7,6 +7,7 @@ import csv from 'csv-parser';
 import xml2js from 'xml2js';
 import archiver from 'archiver';
 import { join as pathJoin, basename } from 'path';
+import * as readline from 'readline';
 
 const DEFAULT_ITER_ROWS = 1024;
 export type InsideTempDirCallback<T> = (string) => Promise<T>;
@@ -83,7 +84,15 @@ export async function* objectIterator<RowType>(filePath: string, bufSize = DEFAU
     let rowBuffer: RowType[] = []
     const stream = fs.createReadStream(filePath)
 
-    for await (const row of stream) {
+    const readStream = readline.createInterface({
+        input: stream,
+        crlfDelay: Infinity
+    });
+    // Note: we use the crlfDelay option to recognize all instances of CR LF
+    // ('\r\n') in input.txt as a single line break.
+
+    for await (const row of readStream) {
+
         const obj = JSON.parse(row)
         if (rowBuffer.length >= bufSize) {
             stream.pause()

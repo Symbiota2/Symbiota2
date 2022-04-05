@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CollectionCheckboxSelectorComponent } from './components/collection-checkbox-selector/collection-checkbox-selector.component';
 import { MatTreeModule } from '@angular/material/tree';
 import {
@@ -49,10 +50,9 @@ import { CollectionFieldComponent } from './components/collection-field/collecti
 import { CollectionListPage } from './pages/collection-list-page/collection-list-page.component';
 import { CollectionCardComponent } from './components/collection-card/collection-card.component';
 import { CollectionEditorComponent } from './components/collection-editor/collection-editor.component';
-import { CollectionEditorDialogComponent } from './components/collection-editor-dialog/collection-editor-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
-import { CollectionNewCollectionComponent } from './components/collection-new-collection/collection-new-collection.component';
-import { CollectionNewPage } from './pages/collection-new-page/collection-new-page.component';
+import { CollectionNewCollectionComponent } from './components/create-collection-form/create-collection-form.component';
+import { CollectionCreatePage } from './pages/create-collection-page/create-collection-page.component';
 import { InstitutionNewComponent } from './components/institution-new/institution-new.component';
 import { InstitutionNewDialogComponent } from './components/institution-new-dialog/institution-new-dialog.component';
 import { CollectionCommentPage } from './pages/collection-comment-page/collection-comment-page.component';
@@ -79,8 +79,7 @@ import { DwcDownloadLinkComponent } from './components/dwc-download-link/dwc-dow
         CollectionListPage,
         CollectionCardComponent,
         CollectionEditorComponent,
-        CollectionEditorDialogComponent,
-        CollectionNewPage,
+        CollectionCreatePage,
         CollectionNewCollectionComponent,
         InstitutionNewComponent,
         InstitutionNewDialogComponent,
@@ -97,6 +96,7 @@ import { DwcDownloadLinkComponent } from './components/dwc-download-link/dwc-dow
         DwcDownloadLinkComponent,
     ],
     imports: [
+        FormsModule,
         AppTranslationModule,
         MatTreeModule,
         MatIconModule,
@@ -142,7 +142,7 @@ export class CollectionPlugin extends SymbiotaUiPlugin {
         return [
             { path: ROUTE_COLLECTION_LIST, component: CollectionListPage },
             { path: ROUTE_COLLECTION_PROFILE, component: CollectionPage },
-            { path: ROUTE_COLLECTION_NEW, component: CollectionNewPage },
+            { path: ROUTE_COLLECTION_NEW, component: CollectionCreatePage },
             {
                 path: ROUTE_COLLECTION_COMMENTS,
                 component: CollectionCommentPage,

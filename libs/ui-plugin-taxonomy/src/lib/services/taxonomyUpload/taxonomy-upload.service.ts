@@ -59,6 +59,7 @@ export class TaxonomyUploadService {
         private readonly taxonomicAuthorityService: TaxonomicAuthorityService
     ) {
         this.taxonomicAuthorityID = this.taxonomicAuthorityService.getAuthorityID()
+        //this.taxonomicAuthorityID = 2;
     }
 
     setUploadID(id: number): void {

@@ -72,11 +72,6 @@ export class CollectionEditorComponent implements OnInit {
             type: ['', Validators.required],
             managementType: ['', Validators.required],
         },
-        {
-            asyncValidators: CollectionAsyncValidators.valuesChanged(
-                this.collectionService.currentCollection
-            ),
-        }
     );
 
     constructor(
@@ -88,14 +83,12 @@ export class CollectionEditorComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-
         this.categories$ = this.collectionService.categories;
 
         this.inst$ = this.institutionService.getInstitutions();
 
         this.subscriptions.add(
             this.collectionService.currentCollection.subscribe((collection) => {
-                
                 this.patchForm(collection);
             })
         );
@@ -115,33 +108,42 @@ export class CollectionEditorComponent implements OnInit {
     }
 
     patchForm(collection: Collection): void {
-        this.editCollectionForm
-            .get('collectionName')
-            .setValue(collection.collectionName);
-        this.editCollectionForm
-            .get('collectionCode')
-            .setValue(collection.collectionCode);
-        this.editCollectionForm
-            .get('institutionID')
-            .setValue(collection.institution.id);
-        this.editCollectionForm
-            .get('fullDescription')
-            .setValue(collection.fullDescription);
-        this.editCollectionForm.get('homePage').setValue(collection.homePage);
-        this.editCollectionForm.get('contact').setValue(collection.contact);
-        this.editCollectionForm.get('email').setValue(collection.email);
-        this.editCollectionForm
-            .get('latitude')
-            .setValue(collection.latitude.toString());
-        this.editCollectionForm
-            .get('longitude')
-            .setValue(collection.longitude.toString());
-        this.editCollectionForm.get('rights').setValue(collection.rights);
-        this.editCollectionForm.get('icon').setValue(collection.icon);
-        this.editCollectionForm.get('type').setValue(collection.type);
-        this.editCollectionForm
-            .get('managementType')
-            .setValue(collection.managementType);
+        for (let [field, value] of Object.entries(collection)) {
+            // get form field for value
+            let formField = this.editCollectionForm.get(field);
+
+            // if form field exists and there is data, populate the field.
+            if (!!formField && !!value) {
+                formField.setValue(value);
+            }
+        }
+        // this.editCollectionForm
+        //     .get('collectionName')
+        //     .setValue(collection.collectionName);
+        // this.editCollectionForm
+        //     .get('collectionCode')
+        //     .setValue(collection.collectionCode);
+        // this.editCollectionForm
+        //     .get('institutionID')
+        //     .setValue(collection.institution.id);
+        // this.editCollectionForm
+        //     .get('fullDescription')
+        //     .setValue(collection.fullDescription);
+        // this.editCollectionForm.get('homePage').setValue(collection.homePage);
+        // this.editCollectionForm.get('contact').setValue(collection.contact);
+        // this.editCollectionForm.get('email').setValue(collection.email);
+        // this.editCollectionForm
+        //     .get('latitude')
+        //     .setValue(collection.latitude.toString());
+        // this.editCollectionForm
+        //     .get('longitude')
+        //     .setValue(collection.longitude.toString());
+        // this.editCollectionForm.get('rights').setValue(collection.rights);
+        // this.editCollectionForm.get('icon').setValue(collection.icon);
+        // this.editCollectionForm.get('type').setValue(collection.type);
+        // this.editCollectionForm
+        //     .get('managementType')
+        //     .setValue(collection.managementType);
     }
 
     onAddNewInst(): void {

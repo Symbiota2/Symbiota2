@@ -12,8 +12,11 @@ import {
     ENV_DB_PORT,
     ENV_DB_TYPE,
     ENV_DB_USER,
+    ENV_ELASTICSEARCH_PORT,
     ENV_ENABLE_AUTH,
+    ENV_ENABLE_ELASTICSEARCH,
     ENV_IMAGE_LIBRARY,
+    ENV_KIBANA_PORT,
     ENV_NODE_ENV,
     ENV_REDIS_HOST,
     ENV_REDIS_PORT,
@@ -296,5 +299,26 @@ export class AppConfigService {
 
     storageBucket(): string {
         return this.configService.get<string>(ENV_STORAGE_BUCKET);
+    }
+
+    /**
+     * Whether elasticsearch is enabled
+     */
+    isElasticsearchEnabled(): boolean {
+        return this.configService.get<string>(ENV_ENABLE_ELASTICSEARCH) === '1';
+    }
+
+    /**
+     * The Elasticsearch port to connect to on the Elasticsearch host
+     */
+    elasticsearchPort(): number {
+        return parseInt(this.configService.get<string>(ENV_ELASTICSEARCH_PORT));
+    }
+
+    /**
+     * The Kibana port to connect to on the Kibana host
+     */
+    kibanaPort(): number {
+        return parseInt(this.configService.get<string>(ENV_KIBANA_PORT));
     }
 }

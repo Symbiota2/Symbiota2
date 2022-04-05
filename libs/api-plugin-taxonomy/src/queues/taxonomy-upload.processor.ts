@@ -106,10 +106,14 @@ export class TaxonomyUploadProcessor {
 
         // Now let's process all the ranks
         if (error) {
+            this.logger.error(" Queue processing failed ")
             await job.moveToFailed(error)
         } else {
+            this.logger.log(" keys length " + keys.length)
             for (let key of keys) {
+                this.logger.log("TEST doing " + key)
                 error = await this.processRankFile(key, job, upload)
+                this.logger.log("TEST rank file processed " + error)
             }
             if (error) {
                 this.logger.error(" Error detected in processing rank file")
@@ -118,6 +122,7 @@ export class TaxonomyUploadProcessor {
         }
 
         if (error) {
+            this.logger.error(" Error detected in processing rank file")
             await job.moveToFailed(error)
         }
         else {
@@ -128,6 +133,7 @@ export class TaxonomyUploadProcessor {
                 upload.uniqueIDField = "done"
                 await this.uploads.save(upload)
             } catch (e) {
+                this.logger.error(" Error detected in processing rank file")
                 await job.moveToFailed(e);
             }
         }
@@ -169,14 +175,25 @@ export class TaxonomyUploadProcessor {
 
 
     private async processRankFile(key, job, upload) {
-        for await (const batch of objectIterator<DeepPartial<Taxon>>(this.taxonFilesPath + key)) {
-            try {
-                await this.onJSONBatch(job, upload, batch);
-            } catch (e) {
-                this.logger.error(`Error processing rank file: ${JSON.stringify(e)}`)
-                return e
+        this.logger.log(" TEST doing processRankFile " + this.taxonFilesPath + key)
+        try {
+            for await (const batch of objectIterator<DeepPartial<Taxon>>(this.taxonFilesPath + key)) {
+                try {
+                    this.logger.log("TEST doing a batch")
+                    await this.onJSONBatch(job, upload, batch);
+                    this.logger.log("TEST done with batch")
+                } catch (e) {
+                    this.logger.error("erros is ")
+                    this.logger.error(`Error processing rank file: ${JSON.stringify(e)}`)
+                    return e
+                }
             }
+            this.logger.log(" TEST batches done " + this.taxonFilesPath + key)
+        } catch (e) {
+            this.logger.error(`Error reading batch file : ${JSON.stringify(e)}`)
+            return e
         }
+
         return null
     }
 
@@ -187,14 +204,14 @@ export class TaxonomyUploadProcessor {
 
     @OnQueueFailed()
     async queueFailedHandler(job: Job, err: Error) {
-        this.logger.error(JSON.stringify(err));
+        this.logger.error("Queue failed " + JSON.stringify(err));
+        await this.notifications.save({ uid: job.data.uid, message: `Upload failed: ${JSON.stringify(err)}` });
         try {
             return this.onCSVComplete(job.data.uid, job.data.authorityID);
         } catch (e) {
             this.logger.error(`Error updating statistics: ${JSON.stringify(e)}`);
         }
-        await this.notifications.save({ uid: job.data.uid, message: `Upload failed: ${JSON.stringify(err)}` });
-    }
+     }
 
     /**
      * Write each row to a new file based on the rank id
@@ -251,7 +268,7 @@ export class TaxonomyUploadProcessor {
                     fileMap.set(file,writeStream)
                 }
                 const writeStream = fileMap.get(file)
-                writeStream.write(JSON.stringify(row))
+                writeStream.write(JSON.stringify(row) + "\n")
             } catch (e) {
                 this.logger.error('Error writing to file' + e)
                 throw new Error('Error writing to file')
@@ -594,7 +611,7 @@ export class TaxonomyUploadProcessor {
                                 if (skippedStatusesDueToParentMismatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
                                     skippedStatusesDueToParentMismatch.push(row)
                                 }
-                                this.logger.warn(`Parent taxon name does not have a matching taxon! Skipping...`)
+                                this.logger.warn(`Parent taxon name ${csvValue} does not have a matching taxon! Skipping...`)
                             } else {
                                 if (skippedStatusesDueToAcceptedMismatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
                                     skippedStatusesDueToAcceptedMismatch.push(row)
