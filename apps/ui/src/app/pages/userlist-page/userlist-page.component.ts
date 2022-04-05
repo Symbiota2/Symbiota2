@@ -1,35 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { User, UserService } from '@symbiota2/ui-common';
+import { UserOutputDto } from '@symbiota2/api-auth';
 
 @Component({
   selector: 'symbiota2-userlist-page',
   templateUrl: './userlist-page.component.html',
   styleUrls: ['./userlist-page.component.scss'],
 })
-export class UserlistPageComponent {
-  todo = [
-    'Get to work',
-    'Pick up groceries',
-    'Go home',
-    'Fall asleep'
-  ];
 
-  done = [
-    'Get up',
-    'Brush teeth',
-    'Take a shower',
-    'Check e-mail',
-    'Walk dog'
-  ];
+export class UserlistPageComponent implements OnInit {
+  currentUser$ = this.userService.currentUser;
+  user: User;
+  isSuperAdmin: Boolean;
+  userList: UserOutputDto[];
 
-  drop(event: CdkDragDrop<string[]>): void {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    } else {
-      transferArrayItem(event.previousContainer.data,
-          event.container.data,
-          event.previousIndex,
-          event.currentIndex);
-    }
+  constructor(
+    private readonly userService: UserService,
+  ) { }
+  ngOnInit(): void {
+    //Get user list and load data only they are a superadmin
+    //Check if superAdmin
+    this.currentUser$.subscribe(user => {
+      this.user = user;
+      if (this.user && user.isSuperAdmin()) {
+        const userList$ = this.userService.getUsers();
+        userList$.subscribe(userList => {
+          this.userList = userList;
+          console.log(userList);
+        })
+      }
+    });
+
   }
 }

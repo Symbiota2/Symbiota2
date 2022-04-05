@@ -43,6 +43,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { SitemapUnorderedListComponent } from './components/sitemap-unordered-list/sitemap-unordered-list.component';
 import { UserlistPageComponent } from './pages/userlist-page/userlist-page.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { UserlistComponent } from './components/userlist/userlist.component';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -75,6 +76,7 @@ const PLUGINS = [
         NavbarMenuComponent,
         SitemapUnorderedListComponent,
         UserlistPageComponent,
+        UserlistComponent,
     ],
     imports: [
         MatToolbarModule,
