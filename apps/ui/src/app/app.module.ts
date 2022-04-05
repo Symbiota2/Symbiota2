@@ -41,6 +41,8 @@ import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { SitemapUnorderedListComponent } from './components/sitemap-unordered-list/sitemap-unordered-list.component';
+import { UserlistPageComponent } from './pages/userlist-page/userlist-page.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -72,6 +74,7 @@ const PLUGINS = [
         NotificationDialog,
         NavbarMenuComponent,
         SitemapUnorderedListComponent,
+        UserlistPageComponent,
     ],
     imports: [
         MatToolbarModule,
@@ -93,6 +96,7 @@ const PLUGINS = [
         ReactiveFormsModule,
         UserModule,
         ...PLUGINS,
+        DragDropModule,
     ],
     bootstrap: [AppComponent]
 })
