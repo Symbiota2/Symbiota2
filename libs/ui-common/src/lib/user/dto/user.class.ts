@@ -79,7 +79,7 @@ export class User {
         return this.isSuperAdmin() || isGlobalAdmin || isAdmin;
     }
 
-    isSuperAdmin(): boolean {
+    public isSuperAdmin(): boolean {
         return this.hasRole(ApiUserRoleName.SUPER_ADMIN);
     }
 
@@ -122,7 +122,7 @@ export class User {
         }
 
         // TODO: Implement more roles
-        switch(role) {
+        switch (role) {
             case ApiUserRoleName.CHECKLIST_ADMIN:
                 return User.checkHasRole(this.checklistRoles, role, roleTarget);
             case ApiUserRoleName.COLLECTION_ADMIN:
