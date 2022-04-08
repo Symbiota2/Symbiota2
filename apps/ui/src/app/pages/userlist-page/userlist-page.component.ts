@@ -12,7 +12,7 @@ import { UserOutputDto } from '@symbiota2/api-auth';
 export class UserlistPageComponent implements OnInit {
   currentUser$ = this.userService.currentUser;
   user: User;
-  isSuperAdmin: Boolean;
+  isSuperAdmin = false;
   userList: UserOutputDto[];
 
   constructor(
@@ -23,12 +23,14 @@ export class UserlistPageComponent implements OnInit {
     //Check if superAdmin
     this.currentUser$.subscribe(user => {
       this.user = user;
-      if (this.user && user.isSuperAdmin()) {
+      this.isSuperAdmin = user.isSuperAdmin();
+      if (this.user && this.isSuperAdmin) {
         const userList$ = this.userService.getUsers();
         userList$.subscribe(userList => {
           this.userList = userList;
         })
       }
+
     });
 
   }

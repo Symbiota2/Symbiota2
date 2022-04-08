@@ -1,3 +1,6 @@
-<div>
+<div *ngIf="!isSuperAdmin" class='my2' fxLayout='row' fxLayoutGap='1rem'>
+  {{"taxonomy.utils.lacks.edit.permission" | translate}}
+</div>
+<div *ngIf="isSuperAdmin" id="listPageDiv">
   <symbiota2-userlist [userList]=userList></symbiota2-userlist>
 </div>
