@@ -7,7 +7,7 @@ import {
 } from '@symbiota2/ui-common';
 import { Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
-import { InstitutionInputDto } from '../../dto/Institution.input.dto';
+import { InstitutionInputDto } from '../dto/Institution.input.dto';
 
 interface FindAllParams {
     id?: number | number[];

@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder } from '@angular/forms';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
-import { CollectionService } from '../../services/collection/collection.service';
+import { CollectionService } from '../../services/collection.service';
 import { AlertService } from '@symbiota2/ui-common';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Institution } from '@symbiota2/api-database';
-import { InstitutionService } from '../../services/institution/institution.service';
+import { InstitutionService } from '../../services/institution.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ROUTE_COLLECTION_PROFILE } from '../../routes';

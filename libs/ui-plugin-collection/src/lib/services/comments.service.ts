@@ -4,7 +4,7 @@ import {
     AlertService,
     UserService,
 } from '@symbiota2/ui-common';
-import { Comment } from '../../dto/Comment.output.dto';
+import { Comment } from '../dto/Comment.output.dto';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { cpuUsage } from 'node:process';

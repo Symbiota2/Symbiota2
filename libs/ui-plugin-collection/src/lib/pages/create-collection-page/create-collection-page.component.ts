@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { ROUTE_COLLECTION_LIST, ROUTE_COLLECTION_PROFILE } from '../../routes';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
-import { CollectionService } from '../../services/collection/collection.service';
+import { CollectionService } from '../../services/collection.service';
 import { CollectionNewCollectionComponent } from '../../components/create-collection-form/create-collection-form.component';
 import { ThrowStmt } from '@angular/compiler';
 

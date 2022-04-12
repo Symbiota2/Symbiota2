@@ -5,8 +5,8 @@ import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { Collection } from '../../dto/Collection.output.dto';
 import { DwcArchive } from '../../dto/Dwc.dto';
-import { CollectionService } from '../../services/collection/collection.service';
-import { DwcService } from '../../services/dwc/dwc.service';
+import { CollectionService } from '../../services/collection.service';
+import { DwcService } from '../../services/dwc.service';
 
 @Component({
     selector: 'symbiota2-dwc-publishing',

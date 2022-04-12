@@ -8,13 +8,13 @@ import {
 } from '@symbiota2/ui-common';
 import { Observable, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { InstitutionService } from '../../services/institution/institution.service';
+import { InstitutionService } from '../../services/institution.service';
 import { CollectionAsyncValidators } from '../../validators/CollectionValidators';
 import { Institution } from '@symbiota2/api-database';
 import { ApiCollectionCategoryOutput } from '@symbiota2/data-access';
 import { InstitutionNewDialogComponent } from '../institution-new-dialog/institution-new-dialog.component';
 import { CollectionInputDto } from '../../dto/Collection.input.dto';
-import { CollectionService } from '../../services/collection/collection.service';
+import { CollectionService } from '../../services/collection.service';
 import { Collection } from '../../dto/Collection.output.dto';
 
 @Component({
@@ -51,6 +51,8 @@ export class CollectionEditorComponent implements OnInit {
             homePage: ['', Validators.required],
             contact: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
+            // contact2: [''],
+            // email2: ['', Validators.email],
             latitude: [
                 '0',
                 [Validators.required, Validators.min(-90), Validators.max(90)],
