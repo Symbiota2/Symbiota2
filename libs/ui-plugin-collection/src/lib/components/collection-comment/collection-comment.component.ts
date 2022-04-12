@@ -1,6 +1,6 @@
 import { Input } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
-import { CommentService } from '../../services/collection-comments/collection-comments.service';
+import { CommentService } from '../../services/comments.service';
 import { Comment } from '../../dto/Comment.output.dto';
 
 @Component({

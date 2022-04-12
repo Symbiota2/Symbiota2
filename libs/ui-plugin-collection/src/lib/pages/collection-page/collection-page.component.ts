@@ -17,11 +17,11 @@ import {
     Subscription,
     throwError,
 } from 'rxjs';
-import { CollectionService } from '../../services/collection/collection.service';
+import { CollectionService } from '../../services/collection.service';
 import {
     CollectionProfileLink,
     CollectionProfileService,
-} from '../../services/collection-profile/collection-profile.service';
+} from '../../services/collection-profile.service';
 import { AlertService, UserService } from '@symbiota2/ui-common';
 import {
     ROUTE_COLLECTION_LIST,

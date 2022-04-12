@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { CollectionProfileService } from '../collection-profile.service';
+import { CollectionProfileService } from './collection-profile.service';
 
 describe('CollectionProfileLinkService', () => {
   let service: CollectionProfileService;

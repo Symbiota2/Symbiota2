@@ -7,7 +7,7 @@ import { CollectionEditorComponent } from '../../components/collection-editor/co
 import { CollectionPermissionsComponent } from '../../components/collection-permissions/collection-permissions.component';
 import { DwcPublishingComponent } from '../../components/dwc-publishing/dwc-publishing.component';
 import { Collection } from '../../dto/Collection.output.dto';
-import { CollectionService } from '../../services/collection/collection.service';
+import { CollectionService } from '../../services/collection.service';
 
 @Component({
     selector: 'symbiota2-collection-tools-page',
