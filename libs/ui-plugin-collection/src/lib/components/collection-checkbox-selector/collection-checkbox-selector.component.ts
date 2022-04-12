@@ -5,7 +5,7 @@ import {
     Injectable,
     Output, OnChanges, SimpleChanges, OnInit, ChangeDetectorRef
 } from '@angular/core';
-import { CollectionService } from '../../services/collection.service';
+import { CollectionService } from '../../services/collection/collection.service';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { SelectionModel } from '@angular/cdk/collections';

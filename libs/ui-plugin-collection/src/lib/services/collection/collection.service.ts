@@ -9,7 +9,7 @@ import {
 import {
     CollectionCategory,
     CollectionIDBody,
-} from '../dto/Category.output.dto';
+} from '../../dto/Category.output.dto';
 import {
     AlertService,
     ApiClientService,
@@ -27,9 +27,9 @@ import {
     take,
     tap,
 } from 'rxjs/operators';
-import { Collection, CollectionListItem } from '../dto/Collection.output.dto';
+import { Collection, CollectionListItem } from '../../dto/Collection.output.dto';
 import { Injectable } from '@angular/core';
-import { CollectionInputDto } from '../dto/Collection.input.dto';
+import { CollectionInputDto } from '../../dto/Collection.input.dto';
 import {
     ApiCollectionCategoryOutput,
     ApiCollectionListItem,
@@ -39,7 +39,7 @@ import {
 import {
     CollectionRoleInput,
     CollectionRoleOutput,
-} from '../dto/CollectionRole.dto';
+} from '../../dto/CollectionRole.dto';
 
 interface FindAllParams {
     id?: number | number[];

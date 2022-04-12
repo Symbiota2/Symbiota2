@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Collection } from '../../dto/Collection.output.dto';
-import { CollectionService } from '../../services/collection.service';
+import { CollectionService } from '../../services/collection/collection.service';
 import { ApiUserRoleName } from '@symbiota2/data-access';
 import { UserOutputDto } from '@symbiota2/api-auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';

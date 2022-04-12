@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { DEFAULT_BREAKPOINTS } from '@angular/flex-layout';
 import { ROUTE_COLLECTION_PROFILE } from '../../routes';
-import { CollectionService } from '../../services/collection.service';
+import { CollectionService } from '../../services/collection/collection.service';
 
 @Component({
     selector: 'symbiota2-collection-logo',

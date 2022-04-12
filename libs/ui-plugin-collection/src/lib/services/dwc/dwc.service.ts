@@ -7,8 +7,8 @@ import {
 } from '@symbiota2/ui-common';
 import { combineLatest, Observable, of } from 'rxjs';
 import { catchError, map, switchMap, take } from 'rxjs/operators';
-import { DwcArchive } from '../dto/Dwc.dto';
-import { CollectionService } from './collection.service';
+import { DwcArchive } from '../../dto/Dwc.dto';
+import { CollectionService } from '../collection/collection.service';
 
 
 @Injectable()

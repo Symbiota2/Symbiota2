@@ -2,13 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { Collection } from '../../dto/Collection.output.dto';
-import { CollectionService } from '../../services/collection.service';
+import { CollectionService } from '../../services/collection/collection.service';
 import { AlertService } from '@symbiota2/ui-common';
 import { PageEvent } from '@angular/material/paginator';
 import { UserService } from '@symbiota2/ui-common';
 import { filter } from 'rxjs/operators';
 import { Comment } from '../../dto/Comment.output.dto';
-import { CommentService } from '../../services/comments.service';
+import { CommentService } from '../../services/collection-comments/collection-comments.service';
 import { Observable, Subscription } from 'rxjs';
 import { once } from 'node:events';
 

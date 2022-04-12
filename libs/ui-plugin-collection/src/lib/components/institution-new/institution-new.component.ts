@@ -1,7 +1,7 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { InstitutionInputDto } from '../../dto/Institution.input.dto';
-import { InstitutionService } from '../../services/institution.service';
+import { InstitutionService } from '../../services/institution/institution.service';
 import { Institution } from '@symbiota2/api-database';
 import { InstitutionAsyncValidators } from '../../validators/InstitutionValidators';
 

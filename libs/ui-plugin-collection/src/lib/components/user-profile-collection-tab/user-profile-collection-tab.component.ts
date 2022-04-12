@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CollectionService } from '../../services/collection.service';
+import { CollectionService } from '../../services/collection/collection.service';
 import { UserService } from '@symbiota2/ui-common';
 import { filter } from 'rxjs/operators';
 
