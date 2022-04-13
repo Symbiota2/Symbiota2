@@ -494,6 +494,11 @@ export class TaxonController {
         );
     }
 
+    /**
+     * NOTE Currently this route is unprotected & synchronous.
+     * It needs to be restricted to superadmins and asynchronous, utilizing a queue, as with
+     * occurrences in libs/api-plugin-occurrence/src/occurrence/occurrence.controller.ts
+     */
     @Post('dwc')
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor('file'))
