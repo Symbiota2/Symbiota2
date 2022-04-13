@@ -58,7 +58,16 @@ export class DwCArchiveParser {
             ];
         }, []);
 
-        // Use csv-parser to read each row of each data csv and yield it as an iterator
+        /// NOTE Use csv-parser to read each row of each data csv and yield it as an iterator,
+        // Returned rows are an object with the following format:
+        // {
+        //   "dwc_uri": "value",
+        //   "dwc_uri": "value",
+        //   ...
+        // }
+        // Where dwc_uri is the identifier (uri) of a term defined in the dwc 
+        // text spec (https://dwc.tdwg.org/terms/), and value is the value of that term for the
+        // current row
         for (const file of coreFiles) {
             const stream = createReadStream(file).pipe(
                 csv({
