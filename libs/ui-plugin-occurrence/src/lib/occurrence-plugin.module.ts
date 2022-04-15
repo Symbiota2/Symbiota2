@@ -39,7 +39,7 @@ import {
     ROUTE_CREATE_OCCURRENCE,
     ROUTE_SEARCH_OCCURRENCES,
     ROUTE_SEARCH_RESULTS,
-    ROUTE_SPATIAL_MODULE,
+    ROUTE_SPATIAL_MODULE, ROUTE_SPATIAL_MODULE_DASHBOARD,
     ROUTE_UPLOAD,
     ROUTE_UPLOAD_FIELD_MAP
 } from './routes';
@@ -56,6 +56,7 @@ import { OccurrenceUploadFieldMapPage } from './pages/occurrence-upload/field-ma
 import { OccurrenceUploadService } from './services/occurrence-upload.service';
 import { FieldMapSelectComponent } from './pages/occurrence-upload/field-map/field-map-select-component/field-map-select.component';
 import { ConfirmDialogComponent } from './pages/occurrence-upload/field-map/confirm-dialog-component/confirm-dialog.component';
+import { SpatialModuleDashboardPage } from './pages/spatial-module-dashboard/spatial-module-dashboard-page';
 
 @NgModule({
     imports: [
@@ -106,6 +107,7 @@ import { ConfirmDialogComponent } from './pages/occurrence-upload/field-map/conf
         OccurrenceEditorComponent,
         OccurrenceFieldComponent,
         SpatialModulePage,
+        SpatialModuleDashboardPage,
         OccurrenceUploadFieldMapPage,
         FieldMapSelectComponent,
         ConfirmDialogComponent,
@@ -160,6 +162,10 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
                 component: SpatialModulePage
             },
             {
+                path: ROUTE_SPATIAL_MODULE_DASHBOARD,
+                component: SpatialModuleDashboardPage
+            },
+            {
                 path: ROUTE_SEARCH_OCCURRENCES,
                 component: OccurrenceSearchCollectionsPage
             },
@@ -187,6 +193,10 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
             {
                 url: `/${ROUTE_SPATIAL_MODULE}`,
                 name: "plugins.occurrence.spatialModule.navbar"
+            },
+            {
+                url: `/${ROUTE_SPATIAL_MODULE_DASHBOARD}`,
+                name: "plugins.occurrence.spatialModuleDashboard.navbar"
             }
         ];
     }
