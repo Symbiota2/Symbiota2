@@ -1,11 +1,12 @@
 
 /**
- * Usage: Input one or more folder names (max of 4) or 'all' out of the following supported translation folders
+ * Usage: Input one or more folder names (max of 5) or 'all' out of the following supported translation folders
  * Options:
  * ui-plugin-collection
  * ui-plugin-image
  * ui-plugin-occurrence
  * ui-plugin-taxonomy
+ * ui (which is the base ui app files)
  * all
  */
 
@@ -37,6 +38,7 @@ async function runTranslations() {
     'ui-plugin-image': path.resolve(__dirname, "..", 'libs', 'ui-plugin-image', 'src', 'i18n', '*.json'),
     'ui-plugin-occurrence': path.resolve(__dirname, "..", 'libs', 'ui-plugin-occurrence', 'src', 'i18n', '*.json'),
     'ui-plugin-taxonomy': path.resolve(__dirname, "..", 'libs', 'ui-plugin-taxonomy', 'src', 'i18n', '*.json'),
+    'ui': path.resolve(__dirname, "..", 'apps', 'ui', 'src', 'app', 'i18n', '*.json'),
   }
 
   let selectedDirs = []
@@ -49,7 +51,7 @@ async function runTranslations() {
     for (let i = 2; i < process.argv.length; i++) {
       let currDir = langPathsObj[process.argv[i]]
       if (currDir == undefined) {
-        throw new Error("Please input a valid plugin directory name. Valid names: ui-plugin-collection, ui-plugin-image, ui-plugin-occurrence, ui-plugin-taxonomy, all.");
+        throw new Error("Please input a valid plugin directory name. Valid names: ui-plugin-collection, ui-plugin-image, ui-plugin-occurrence, ui-plugin-taxonomy, ui, all.");
       }
       selectedDirs.push(currDir);
     }
@@ -111,7 +113,7 @@ async function runTranslations() {
  */
 async function translateJson(enContents, languages, jsonFileIndex, targetLangPrefixes) {
   // Creates a client
-  const symbiotaKey = fs.readFileSync("cloudKey.txt").toString('utf-8');
+  const symbiotaKey = fs.readFileSync("gCloudTranslateKey.txt").toString('utf-8');
   //Make sure you have the key file needed to use the API stored locally! Find it on GCloud.
   //This allows us to use a generic API key instead of an application service account for authentication.
   const translate = new Translate({ key: symbiotaKey });

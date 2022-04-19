@@ -327,6 +327,12 @@ export class OccurrenceService {
         return upload;
     }
 
+    /**
+     * @param id The idea of the upload to update 
+     * @param uniqueIDField The field that uniquely represents a row in an upload csv
+     * @param fieldMap A mapping of csv fields to database fields
+     * @returns The modified upload
+     */
     async patchUploadFieldMap(id: number, uniqueIDField: string, fieldMap: OccurrenceUploadFieldMap): Promise<OccurrenceUpload> {
         const upload = await this.uploadRepo.findOne(id);
         if (!upload) {
@@ -340,10 +346,16 @@ export class OccurrenceService {
         return upload;
     }
 
+    /**
+     * Find a given OccurrenceUpload by id
+     */
     async findUploadByID(id: number): Promise<OccurrenceUpload> {
         return this.uploadRepo.findOne(id);
     }
 
+    /**
+     * Delete a given occurrenceUpload by id
+     */
     async deleteUploadByID(id: number): Promise<boolean> {
         const upload = await this.uploadRepo.delete({ id });
         return upload.affected > 0;
@@ -376,6 +388,14 @@ export class OccurrenceService {
         return { uniqueValues: [...uniqueFieldValues], nulls };
     }
 
+    /**
+     * Count the number of distict values of field among all occurrences with collectionID.
+     * isIn specifies a filter for the values.
+     * 
+     * Example:
+     * countOccurrences(1, 'scientificaName', ['cat', 'dog'])
+     * Counts the number of occurrences in collectionID 1 that have 'cat' or 'dog' as a scientificName
+     */
     async countOccurrences(collectionID: number, field: string, isIn: any[]): Promise<number> {
         if (isIn.length === 0) {
             return 0;
@@ -391,6 +411,10 @@ export class OccurrenceService {
         return result.cnt;
     }
 
+    /**
+     * Add the Upload with uploadID to the queue for processing, 
+     * specifying the user & collection that the Upload belongs to
+     */
     async startUpload(uid: number, collectionID: number, uploadID: number): Promise<void> {
         await this.uploadQueue.add({ uid, collectionID, uploadID });
     }

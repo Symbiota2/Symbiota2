@@ -115,7 +115,7 @@ services:
       - "${SYMBIOTA2_LOGSTASH_PORT:-5600}:5600"
     command: --config.reload.automatic
     environment:
-      - "LS_JAVA_OPTS=${SYMBIOTA2_LOGSTASH_ENV_JAVA_OPTIONS:--Xmx256m -Xms256m}"
+      - "LS_JAVA_OPTS=${SYMBIOTA2_LOGSTASH_ENV_JAVA_OPTIONS:--Xmx1g -Xms1g}"
 
 volumes:
   s2-db: { name: s2-db }

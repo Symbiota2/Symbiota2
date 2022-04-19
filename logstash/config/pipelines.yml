@@ -1,2 +1,5 @@
-- pipeline.id: main_pipeline
-  path.config: "/usr/share/logstash/pipeline/jdbc.conf"
+- pipeline.id: spatial_module_pipeline
+  path.config: "/usr/share/logstash/pipeline/spatialModule.conf"
+
+- pipeline.id: image_search_pipeline
+  path.config: "/usr/share/logstash/pipeline/imageSearch.conf"
