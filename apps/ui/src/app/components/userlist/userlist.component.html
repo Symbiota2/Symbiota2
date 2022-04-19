@@ -1,9 +1,21 @@
 <div id="userListDiv">
-    <ul>
+    <mat-accordion multi="True">
+        <mat-expansion-panel *ngFor="let user of userList" (opened)="panelOpenState = true"
+            (closed)="panelOpenState = false">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{user.firstName}} {{user.lastName}}
+                </mat-panel-title>
+                <mat-panel-description>
+                    Currently I am {{panelOpenState ? 'open' : 'closed'}}
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p>I'm visible because I am open</p>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <!--  <ul>
         <ng-container *ngFor="let user of userList">
-            <mat-card id="usercard">
-                {{user.firstName}} {{user.lastName}}
-            </mat-card>
+            
         </ng-container>
-    </ul>
+    </ul>-->
 </div>

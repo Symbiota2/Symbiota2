@@ -44,6 +44,7 @@ import { SitemapUnorderedListComponent } from './components/sitemap-unordered-li
 import { UserlistPageComponent } from './pages/userlist-page/userlist-page.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { UserlistComponent } from './components/userlist/userlist.component';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -99,6 +100,7 @@ const PLUGINS = [
         UserModule,
         ...PLUGINS,
         DragDropModule,
+        MatExpansionModule,
     ],
     bootstrap: [AppComponent]
 })

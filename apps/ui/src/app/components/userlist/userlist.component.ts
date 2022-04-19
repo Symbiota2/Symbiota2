@@ -8,6 +8,7 @@ import { UserOutputDto } from '@symbiota2/api-auth';
 })
 export class UserlistComponent implements OnInit {
   @Input() userList: UserOutputDto[];
+  panelOpenState = false;
 
   constructor() { }
 
