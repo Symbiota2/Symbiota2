@@ -10,7 +10,40 @@
                     Currently I am {{panelOpenState ? 'open' : 'closed'}}
                 </mat-panel-description>
             </mat-expansion-panel-header>
-            <p>I'm visible because I am open</p>
+            <mat-grid-list cols="2" rowHeight="100px" columnWidth="100px">
+                <mat-grid-tile>
+                    <div>
+                        <ul>
+                            <li><strong>Title: </strong>{{user.title ? user.title : 'Not specified'}}</li>
+                        </ul>
+                        <ul>
+                            <li><strong>Institution: </strong>{{user.institution ? user.institution : 'Not specified'}}
+                            </li>
+                        </ul>
+                        <ul>
+                            <li><strong>City: </strong>{{user.city ? user.city : 'Not specified'}}</li>
+                        </ul>
+                        <ul>
+                            <li><strong>State: </strong>{{user.state ? user.state : 'Not specified'}}</li>
+                        </ul>
+                    </div>
+                </mat-grid-tile>
+                <mat-grid-tile>
+                    <div>
+                        <ul>
+                            <li><strong>Country: </strong>{{user.country ? user.country : 'Not specified'}}</li>
+                            <li><strong>Email: </strong>{{user.email ? user.email : 'Not specified'}}</li>
+                            <li><strong>URL: </strong>{{user.url ? user.url : 'Not specified'}}</li>
+                            <li><strong>Username: </strong>{{user.username ? user.username : 'Not specified'}} (Last
+                                login: {{user.lastLogin ? user.lastLogin : "Unknown"}})</li>
+
+                        </ul>
+                    </div>
+                </mat-grid-tile>
+                <mat-grid-tile id="SitePerms">3</mat-grid-tile>
+                <mat-grid-tile id="OccurrencePerms">4</mat-grid-tile>
+
+            </mat-grid-list>
         </mat-expansion-panel>
     </mat-accordion>
     <!--  <ul>

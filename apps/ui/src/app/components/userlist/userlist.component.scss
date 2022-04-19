@@ -1,3 +1,31 @@
-#usercard {
+ul {
+    list-style: none;
+    margin: 0;
+}
+
+mat-expansion-panel {
     margin-bottom: 5px;
+}
+
+mat-grid-list {
+    background: yellowgreen;
+    border: 1px solid grey;
+    border-radius: 10px;
+}
+
+mat-grid-tile {
+    background-color: rgba(146, 139, 30, 0.61);
+    border-radius: 10px;
+}
+
+mat-grid-tile div {
+    width: 100%;
+    text-align: start;
+    vertical-align: top;
+    padding: 0px;
+}
+
+#userListDiv {
+    margin-left: 10%;
+    margin-right: 10%;
 }

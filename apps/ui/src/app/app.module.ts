@@ -40,6 +40,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { SitemapUnorderedListComponent } from './components/sitemap-unordered-list/sitemap-unordered-list.component';
 import { UserlistPageComponent } from './pages/userlist-page/userlist-page.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -101,6 +102,7 @@ const PLUGINS = [
         ...PLUGINS,
         DragDropModule,
         MatExpansionModule,
+        MatGridListModule,
     ],
     bootstrap: [AppComponent]
 })
