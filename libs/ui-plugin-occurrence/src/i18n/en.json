@@ -57,5 +57,6 @@
     "plugins.occurrence.search.taxonCriteria.higherTaxon": "Higher taxonomy",
     "plugins.occurrence.search.taxonCriteria.commonName": "Common name",
     "plugins.occurrence.spatialModule.navbar": "Spatial Module",
+    "plugins.occurrence.spatialModuleDashboard.navbar": "Spatial Module Dashboard",
     "plugins.occurrence.search.navbar": "Occurrence Search"
 }

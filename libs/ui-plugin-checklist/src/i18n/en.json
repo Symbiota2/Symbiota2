@@ -1,0 +1,9 @@
+{
+    "plugins.checklist.name": "Checklist",
+    "core.layout.header.topnav.checklist.create.link": "Create checklist",
+    "core.layout.header.topnav.checklist.regional.link": "Regional checklists",
+    "core.layout.header.topnav.checklist.teaching.link": "Teaching checklists",
+    "checklist.create.create.new.checklist": "Create a new checklist",
+    "checklist.viewer.view.checklist.list": "All checklists",
+    "checklist.create.lacks.create.permission": "Not logged in or insufficient privileges to create a checklist"
+}
