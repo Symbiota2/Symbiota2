@@ -102,10 +102,7 @@ const PLUGINS = [
         ...PLUGINS,
         DragDropModule,
         MatExpansionModule,
-<<<<<<< HEAD
         MatGridListModule,
-=======
->>>>>>> e655fbf528920d6184d25e16b48962675e1bc5cd
     ],
     bootstrap: [AppComponent]
 })
