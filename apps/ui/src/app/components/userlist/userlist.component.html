@@ -7,28 +7,22 @@
                     {{user.firstName}} {{user.lastName}}
                 </mat-panel-title>
                 <mat-panel-description>
-                    Currently I am {{panelOpenState ? 'open' : 'closed'}}
+                    {{user.username}}
                 </mat-panel-description>
             </mat-expansion-panel-header>
-            <mat-grid-list cols="2" rowHeight="100px" columnWidth="100px">
-                <mat-grid-tile>
+            <mat-grid-list cols="2" rowHeight="100px" columnWidth=" 100px">
+                <mat-grid-tile class="profile-row" id="profile-tile1">
                     <div>
                         <ul>
                             <li><strong>Title: </strong>{{user.title ? user.title : 'Not specified'}}</li>
-                        </ul>
-                        <ul>
                             <li><strong>Institution: </strong>{{user.institution ? user.institution : 'Not specified'}}
                             </li>
-                        </ul>
-                        <ul>
                             <li><strong>City: </strong>{{user.city ? user.city : 'Not specified'}}</li>
-                        </ul>
-                        <ul>
                             <li><strong>State: </strong>{{user.state ? user.state : 'Not specified'}}</li>
                         </ul>
                     </div>
                 </mat-grid-tile>
-                <mat-grid-tile>
+                <mat-grid-tile class="profile-row" id="profile-tile2">
                     <div>
                         <ul>
                             <li><strong>Country: </strong>{{user.country ? user.country : 'Not specified'}}</li>
@@ -40,8 +34,47 @@
                         </ul>
                     </div>
                 </mat-grid-tile>
-                <mat-grid-tile id="SitePerms">3</mat-grid-tile>
-                <mat-grid-tile id="OccurrencePerms">4</mat-grid-tile>
+                <mat-grid-tile class="perms-row" id="SitePerms" [rowspan]=1.5>
+                    <div>
+                        <ul>
+                            <li>
+                                <h3>Sitewide Permissions</h3>
+                            </li>
+                            <li>
+                                <mat-checkbox class="site-perm">Super Administrator</mat-checkbox>
+                            </li>
+                            <li>
+                                <mat-checkbox class="site-perm">Taxonomy Editor</mat-checkbox>
+                            </li>
+                            <li>
+                                <mat-checkbox class="site-perm">Taxonomy Profile Editor</mat-checkbox>
+                            </li>
+                            <li>
+                                <mat-checkbox class="site-perm">Identification Key Administrator</mat-checkbox>
+                            </li>
+                            <li>
+                                <mat-checkbox class="site-perm">Identification Key Editor</mat-checkbox>
+                            </li>
+                        </ul>
+                    </div>
+                </mat-grid-tile>
+                <mat-grid-tile class="perms-row" id="OccurrencePerms" [rowspan]=1.5>
+                    <div>
+                        <ul>
+                            <li>
+                                <h3>Occurrence Management Permissions</h3>
+                            </li>
+                            <li>
+                                <mat-checkbox class="site-perm">Rare Species Administrator (can add/remove species)
+                                </mat-checkbox>
+                            </li>
+                            <li>
+                                <mat-checkbox class="site-perm">Can read Rare Species data for all collections
+                                </mat-checkbox>
+                            </li>
+                        </ul>
+                    </div>
+                </mat-grid-tile>
 
             </mat-grid-list>
         </mat-expansion-panel>
