@@ -7,7 +7,7 @@
     "core.layout.header.topnav.search_dropdown": "بحث",
     "core.layout.header.topnav.tools_dropdown": "أدوات",
     "core.layout.header.topnav.resources_dropdown": "موارد",
-    "core.layout.header.topnav.superadmin_dropdown": "SuperAdmin",
+    "core.layout.header.topnav.superadmin_dropdown": "مشرف فائق",
     "core.layout.header.topnav.statistics_link": "إحصائيات",
     "core.layout.header.topnav.home_link": "الصفحة الرئيسية",
     "core.layout.header.topnav.images_link": "الصور",
@@ -32,6 +32,7 @@
     "core.layout.header.topnav.resource_link_four": "علم المواطن (NfN)",
     "core.layout.header.topnav.resource_link_five": "سير عمل الرقمنة",
     "core.layout.header.topnav.resource_link_six": "مسح",
+    "core.layout.header.topnav.userlist_link_one": "قائمة المستخدم",
     "core.layout.header.topnav.welcome_line": "مرحبًا {{firstName}}!",
     "core.layout.home.para_one": "Symbiota هو نظام إدارة محتوى مفتوح المصدر لرعاية بيانات التنوع البيولوجي القائمة على العينات والمراقبة. يعمل Symbiota جنبًا إلى جنب مع قاعدة بيانات SQL أساسية مثبتة على خادم ويب. تستخدم Symbiota حاليًا من قبل مئات مجموعات التاريخ الطبيعي في أمريكا الشمالية ، والتي يتم تنظيمها عادةً في 30 بوابة موضوعية. قامت هذه البوابات بشكل مشترك بتعبئة 20 مليون سجل حدوث قسيمة على مدى السنوات العشر الماضية. تشمل بوابات سيمبيوتا النباتات الوعائية ، الأشنات ، الطحالب ، الطحالب ، الفطريات ، اللافقاريات ، وبدرجة أقل الفقاريات. يمكن ربط السجلات الممنوحة بالصور والأنسجة وبيانات تسلسل الحمض النووي وغيرها من المعلومات التصنيفية.",
     "core.layout.home.para_two": "يتمثل الهدف الأساسي لـ Symbiota في تقديم منصة لتوثيق أحداث التنوع البيولوجي بناءً على العينات والملاحظات ، من خلال توفير أدوات معيارية لمشاركة بيانات التنوع البيولوجي وتصورها وتوليفها للبحث الذي يحركه الأسئلة (على سبيل المثال عبر قوائم المراجعة والمفاتيح التفاعلية). إن إنشاء برمجيات قوية ومتعددة الوظائف للتنوع البيولوجي وتدفقات عمل معالجة البيانات ، فضلاً عن تنظيم علاقات البيانات للإدارة المرنة والنشر عبر الإنترنت ، هي كل أهداف قادرة على التغلب على موارد تكنولوجيا المعلومات لمجموعة فردية. تتمثل الفرضية المركزية لـ Symbiota في أنه من خلال شراكة تعاونية بين أخصائيي معلومات التنوع البيولوجي ومجتمعات أبحاث المجموعات ، يمكن بناء بوابات للتنوع البيولوجي ذات جودة أعلى وأكثر فائدة للجمهور ، بدلاً من النموذج القديم لقواعد البيانات المستقلة التي غالبًا ما تكون مخصصة للغاية في مؤسسة فردية. يشجع إطار تطوير البرمجيات مفتوح المصدر من Symbiota على ابتكار الكود المدفوع بالاستخدام وإنشاء الأدوات. كل هذا يسمح لعلماء التجميع بتركيز جهودهم على معالجة مجموعات البيانات عالية الجودة.",
@@ -52,5 +53,6 @@
     "core.layout.sitemap.install_plugins_link_text": "تثبيت الإضافات",
     "core.layout.sitemap.manage_plugins_link_text": "إدارة الإضافات",
     "core.layout.sitemap.portal_management_header": "إدارة البوابة",
-    "core.layout.sitemap.user_management_link_text": "إدارةالمستخدم"
+    "core.layout.sitemap.user_management_link_text": "إدارةالمستخدم",
+    "core.layout.superadmin.user_list_denied": "لم تسجل الدخول أو امتيازات غير كافية لاستخدام وظائف superadmin."
 }

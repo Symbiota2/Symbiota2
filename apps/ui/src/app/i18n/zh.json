@@ -32,6 +32,7 @@
     "core.layout.header.topnav.resource_link_four": "公民科学（NfN）",
     "core.layout.header.topnav.resource_link_five": "数字化工作流程",
     "core.layout.header.topnav.resource_link_six": "扫描",
+    "core.layout.header.topnav.userlist_link_one": "用户列表",
     "core.layout.header.topnav.welcome_line": "欢迎{{firstName}}！",
     "core.layout.home.para_one": "Symbiota 是一个开源内容管理系统，用于管理基于标本和观察的生物多样性数据。 Symbiota 与安装在 Web 服务器上的底层 SQL 数据库一起工作。 Symbiota 目前被北美数百个自然历史收藏所使用，这些收藏通常被组织成 30 个主题门户。在过去的 10 年里，这些门户网站共同调动了 2000 万条凭证发生记录。共生门包括维管植物、地衣、苔藓植物、藻类、真菌、无脊椎动物和较小程度的脊椎动物。凭证记录可以链接到图像、组织、DNA 序列数据和其他分类信息。",
     "core.layout.home.para_two": "Symbiota 的一个核心目标是提供一个平台，通过提供模块化工具来共享、可视化和综合生物多样性数据以进行问题驱动的研究（例如通过清单和交互式密钥），以记录基于标本和观察的生物多样性事件。创建强大的多功能生物多样性软件和数据处理工作流程，以及为灵活管理和在线发布而策划数据关系，这些目标都能够压倒单个集合的 IT 资源。 Symbiota 的一个核心前提是，通过生物多样性信息学家和收集研究社区的合作伙伴关系，可以建立更高质量和更公开有用的生物多样性门户，而不是在单个机构中经常高度定制的独立数据库的旧模式。 Symbiota 的开源软件开发框架促进了使用驱动的代码创新和工具创建。所有这些都使收集科学家能够集中精力管理高质量的数据集。",
@@ -52,5 +53,6 @@
     "core.layout.sitemap.install_plugins_link_text": "安装插件",
     "core.layout.sitemap.manage_plugins_link_text": "管理插件",
     "core.layout.sitemap.portal_management_header": "门户管理",
-    "core.layout.sitemap.user_management_link_text": "用户管理"
+    "core.layout.sitemap.user_management_link_text": "用户管理",
+    "core.layout.superadmin.user_list_denied": "未登录或权限不足，无法使用超级管理员功能。"
 }
