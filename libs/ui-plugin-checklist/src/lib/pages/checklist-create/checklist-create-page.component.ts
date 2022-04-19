@@ -90,7 +90,6 @@ export class ChecklistCreatePageComponent {
 
     // Input order
     inputOrder = false;
-    
     // Name of parent taxon
     // nameControl;
     // nameOptions: TaxonIDAuthorNameItem[] = [];
@@ -101,12 +100,15 @@ export class ChecklistCreatePageComponent {
     // hasAuthors = true;
 
     constructor(private readonly translate: TranslateService, fb: FormBuilder) {
-
         this.toppings = fb.group({
-            pepperoni: false,
-            extracheese: false,
-            mushroom: false,
+            commonNames: false,
+            images: false,
+            notesAndVouchers: false,
+            taxonAuthors: false,
+            taxaAlghabetically: false,
+            identificationKey: true,
           });
+
     }
     
     // constructor(

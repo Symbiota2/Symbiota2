@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import {
   Checklist,
   ChecklistChild,
@@ -15,6 +15,9 @@ import {
 import { In, Like, Repository, Raw } from 'typeorm';
 import { BaseService, csvIterator } from '@symbiota2/api-common';
 import { ProjectFindAllParams } from './dto/project-find-param';
+import { ProjectLinkDto } from './dto/project-link-dto';
+import { ProjectArn } from 'aws-sdk/clients/iot1clickprojects';
+import { ProjectDto } from './dto/project-dto';
 
 @Injectable()
 export class ChecklistService extends BaseService<Project> {
@@ -24,6 +27,10 @@ export class ChecklistService extends BaseService<Project> {
   constructor(
     @Inject(Project.PROVIDER_ID)
     private readonly projectRepo: Repository<Project>,
+    @Inject(Checklist.PROVIDER_ID) 
+    private readonly checklistRepo: Repository<Checklist>,
+    @Inject(ChecklistProjectLink.PROVIDER_ID) 
+    private readonly projectLinkRepo: Repository<ChecklistProjectLink>
   ) {
       super(projectRepo)
   }
@@ -32,26 +39,44 @@ export class ChecklistService extends BaseService<Project> {
     return [ChecklistService.S3_PREFIX, objectName].join('/');
   }
 
-    async findAll(params?: ProjectFindAllParams): Promise<Project[]> {
-    const { limit, offset, ...qParams } = params
+    async findAllProjects(params?: ProjectFindAllParams): Promise<Project[]> {
+        const { limit, offset, ...qParams } = params
 
-    const qb = this.projectRepo.createQueryBuilder('p')
+        const qb = this.projectRepo.createQueryBuilder('p')
 
-    return qb.getMany()
+        return qb.getMany()
+    }
+  
+    async findProjectIdAndchecklistIDsByProjectId(pid: number): Promise<ChecklistProjectLink[]> {
+        const qb = this.projectLinkRepo.createQueryBuilder('link')
+            .where('link.projectID = :pid', { pid: pid })
+        return qb.getMany()
     }
 
-     /**
-     * Find a project using a project ID.
-     * @param id - the taxon id
-     * @returns Observable of response from api casted as `project`
-     * will be the found project
-     * @returns `of(null)` if api errors or not found
-     * @see Project
-     */
-    async findByPid(id: number): Promise<Project> {
-        return this.projectRepo.findOne({ where: {id: id} })
+    async findAllChecklistsByProject(ids: number[]): Promise<Checklist[]> {
+        if (ids.length > 0) {
+            const qb = this.checklistRepo.createQueryBuilder('checklist')
+            .where("checklist.id IN (:...clid)", { clid: ids })
+            return qb.getMany()
+        }
+        return []
+    }
+
+    async findProjectById(id: number): Promise<Project> {
+        if (!id) {
+            return null;
+        }
+        return this.projectRepo.findOne({where: {id: id}})
+    }
+
+    async findChecklistById(id: number): Promise<Checklist> {
+        if (!id) {
+            return null;
+        }
+        return this.checklistRepo.findOne({where: {id: id}})
     }
 }
+
 
 // import { Inject, Injectable, Logger } from '@nestjs/common';
 // import {

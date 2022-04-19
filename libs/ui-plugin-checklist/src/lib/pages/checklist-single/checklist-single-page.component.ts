@@ -1,6 +1,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 import { Component } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
+import { ChecklistList } from "../../dto/checklist-list";
 import { ChecklistProject } from '../../dto/checklist-projects';
 import { ChecklistService } from "../../services/checklist/checklist.service";
 
@@ -11,15 +12,28 @@ import { ChecklistService } from "../../services/checklist/checklist.service";
 })
 export class ChecklistSinglePageComponent {
     checklistProject: ChecklistProject;
+    checklistList: ChecklistList[];
+    checklistProjectLinks = []
     constructor(private checklistService: ChecklistService, private route: ActivatedRoute) {
-        //this.onClick();
-        this.onClick(this.route.params['_value'].projectId)
+        this.loadProject(parseInt(this.route.params['_value'].projectId))
+        this.loadChecklists(parseInt(this.route.params['_value'].projectId));
+        console.log('id---', typeof parseInt(this.route.params['_value'].projectId))
     }
 
-    onClick(pid) {
+    async loadProject(pid: number) {
         this.checklistService.findByID(pid)
         .subscribe(project => {
             this.checklistProject = project;
+            console.log('checklist: ', project)
         })
+    }
+
+    async loadChecklists(pid: number) {
+        console.log('test checklist')
+        this.checklistService.findAllChecklists(pid)
+        .subscribe(checklists => {
+            this.checklistList = checklists
+            console.log('checklist list: ', this.checklistList)
+        });
     }
 }

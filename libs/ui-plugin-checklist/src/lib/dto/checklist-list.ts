@@ -37,17 +37,20 @@ import { Exclude, Expose, plainToClass } from 'class-transformer';
 
 
 @Exclude()
-export class ChecklistProject {
+export class ChecklistList {
     @Expose() id: number
     @Expose() name: string
-    @Expose() managers: string
-    @Expose() fullDescription: string
-    @Expose() clids: number[]
+    @Expose() title: string
+    @Expose() locality: string
+    @Expose() publication: string
+    @Expose() abstract: string
+    @Expose() authors: string
+    @Expose() type: string
 
-    static fromJSON(projectJSON: Record<string, unknown>): ChecklistProject {
+    static fromJSON(checklistListJson: Record<string, unknown>): ChecklistList {
         return plainToClass(
-            ChecklistProject,
-            projectJSON,
+            ChecklistList,
+            checklistListJson,
             { excludeExtraneousValues: true, enableImplicitConversion: true }
         );
     }

@@ -1,12 +1,17 @@
 import { Controller, Get, HttpStatus, NotFoundException, Query, Param } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
-import { ProjectDto } from "./dto/checklistDto";
+import { Checklist, ChecklistProjectLink } from "@symbiota2/api-database";
+import { ProjectDescription } from "aws-sdk/clients/codebuild";
+import { stringify } from "querystring";
+import { ChecklistDto } from "./dto/checklist-dto";
+import { ProjectDto } from "./dto/project-dto";
 import { ProjectFindAllParams } from "./dto/project-find-param";
+import { ProjectLinkDto } from "./dto/project-link-dto";
 import { ChecklistService } from "./project.service";
 
 @Controller('projects')
 export class ChecklistController {
-    checklists = [];
+    checklistsIds: number[] = [];
     constructor(private projectService: ChecklistService) {}
     
     //The default controller fetches all of the records
@@ -16,7 +21,7 @@ export class ChecklistController {
         summary: "Retrieve a list of projects.  The list can be narrowed by project IDs"
     })
     async findAll(@Query() findAllParams: ProjectFindAllParams): Promise<ProjectDto[]> {
-        const projects = await this.projectService.findAll(findAllParams)
+        const projects = await this.projectService.findAllProjects(findAllParams)
         if (!projects) {
             return []
         }
@@ -28,18 +33,64 @@ export class ChecklistController {
     }
 
     @Get(':pid')
-    @ApiResponse({ status: HttpStatus.OK, type: ProjectDto })
+    @ApiResponse({ status: HttpStatus.OK, type: ProjectLinkDto })
     @ApiOperation({
-        summary: "find a checklist project by id"
+        summary: "find a project checklists by pid"
     })
-    async findByPid(@Param('pid') id: number): Promise<ProjectDto> {
-        const project = await this.projectService.findByPid(id)
-        if (!project) {
+    async findChecklistsByProjectId(@Param('pid') pid: number): Promise<ProjectDto> {
+        
+        const pidAndCLID = await this.projectService.findProjectIdAndchecklistIDsByProjectId(pid)
+        if (!pidAndCLID) {
             throw new NotFoundException()
         }
-        const dto = new ProjectDto(project)
-        return dto;
+
+        const project = await this.projectService.findProjectById(pid)
+        const projectChecklistIDs: number[] = [];
+
+        pidAndCLID.map(async (c) => {
+            projectChecklistIDs.push(c.checklistID);
+        });
+
+        const projectWithChecklistIDs = new ProjectDto(project)
+        projectWithChecklistIDs.clids = projectChecklistIDs;
+
+        return projectWithChecklistIDs;
     }
+    
+    @Get(':pid/checklists')
+    @ApiResponse({ status: HttpStatus.OK, type: ChecklistDto })
+    @ApiOperation({
+        summary: "find checklists by ids"
+    })
+    async findChecklistsByProject(@Param('pid') id: number): Promise<ChecklistDto[]> {
+        const project = await this.projectService.findProjectIdAndchecklistIDsByProjectId(id)
+        
+        const checklists = await this.projectService.findAllChecklistsByProject(project.map(checklist => checklist.checklistID));
+
+        if (!checklists) return []
+
+        const checklistDto = checklists.map(async (c) => {
+            const checklist = new ChecklistDto(c)
+            return checklist;
+        });
+        return Promise.all(checklistDto)
+   }
+
+   @Get(':pid/checklists/:clid')
+    @ApiResponse({ status: HttpStatus.OK, type: ChecklistDto })
+    @ApiOperation({
+        summary: "find single checklists by id"
+    })
+    async findChecklistById(@Param('pid') pid: number, @Param('clid') clid: number): Promise<ChecklistDto> {
+        const project = await this.projectService.findProjectIdAndchecklistIDsByProjectId(pid)
+        if (project.map(proj => proj.checklistID).includes(clid)) {
+        const checklists = await this.projectService.findChecklistById(clid);
+        if (!checklists) return null
+        const dto = new ChecklistDto(checklists)
+        return dto
+        }
+        return null
+   }
 }
 
 // import {

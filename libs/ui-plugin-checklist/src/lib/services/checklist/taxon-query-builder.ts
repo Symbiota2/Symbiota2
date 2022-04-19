@@ -27,6 +27,10 @@ export class TaxonQueryBuilder {
         return new FindAllProjectsBuilder(this.baseUrl);
     }
 
+    findAllChecklists(): FindAllChecklistsBuilder {
+        return new FindAllChecklistsBuilder(this.baseUrl);
+    }
+
     findAll(): FindAllBuilder {
         return new FindAllBuilder(this.baseUrl)
     }
@@ -246,6 +250,33 @@ class FindAllProjectsBuilder extends TaxonQueryBuilder {
     }
 
     build(): string {
+        return super.build();
+    }
+}
+
+class FindAllChecklistsBuilder extends TaxonQueryBuilder {
+    projectId: number;
+    _name: string;
+    _title: string;
+    _locality: string;
+    _abstract: string;
+    _limit: string;
+
+    id(id: number): FindAllChecklistsBuilder {
+        this.projectId = id;
+        return this;
+    }
+
+    // constructor(apiBaseUrl: string) {
+    //     super(apiBaseUrl);
+    //     this.baseUrl = apiBaseUrl;
+    //     this.url.pathname = `${this.url.pathname}/${this.projectId}/checklists`;
+    //     console.log('path name: ', this.url.pathname)
+    //     console.log('url::: ', this.url)
+    // }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/${this.projectId}/checklists`;
         return super.build();
     }
 }

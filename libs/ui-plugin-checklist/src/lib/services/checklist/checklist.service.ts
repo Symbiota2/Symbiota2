@@ -1,13 +1,10 @@
 import { Observable, of } from 'rxjs'
-import { AlertService, ApiClientService, AppConfigService, UserService } from '@symbiota2/ui-common';
+import { AlertService, ApiClientService, AppConfigService, UserService } from '@symbiota2/ui-common'
 import { catchError, map, switchMap } from 'rxjs/operators'
 import { Injectable } from '@angular/core'
-import { Taxon  } from '../../dto/taxon'
-import { TaxonListItem  } from '../../dto/taxon-list-item'
-import { TaxonInputDto  } from '../../dto/taxonInputDto'
-import { TaxonIDAuthorNameItem  } from '../../dto/taxon-id-author-name-item'
 import { TaxonQueryBuilder } from './taxon-query-builder'
-import { ChecklistProject } from '../../dto/checklist-projects';
+import { ChecklistProject } from '../../dto/checklist-projects'
+import { ChecklistList } from '../../dto/checklist-list'
 
 interface FindAllParams {
     taxonIDs: number[]
@@ -59,6 +56,26 @@ export class ChecklistService {
         const url = qb.build();
         const query = this.apiClient.queryBuilder(url).get().build();
         return this.apiClient.send<any, ChecklistProject[]>(query)
+    }
+
+    findAllChecklists(pid: number): Observable<ChecklistList[]> {
+        const qb = this.createQueryBuilder()
+            .findAllChecklists()
+            .id(pid)
+        const url = qb.build()
+        console.log('urllll:', url)
+        const query = this.apiClient.queryBuilder(url).get().build();
+        console.log('query::::', query)
+        return this.apiClient.send<any, ChecklistList[]>(query)
+
+        // const url = this.createQueryBuilder()
+        //     .findOne()
+        //     .id(id)
+        //     .build()
+
+        // const query = this.apiClient.queryBuilder(url).get().build()
+        // return this.apiClient.send<any, Record<string, unknown>>(query)
+        //     .pipe(map((o) => ChecklistProject.fromJSON(o)))
     }
 
     // findAllScientificNamesWithImages(partialName, limit, authorityID?): Observable<TaxonIDAndNameItem[]> {

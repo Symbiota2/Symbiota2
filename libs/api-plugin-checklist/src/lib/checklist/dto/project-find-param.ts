@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { IsOptional, IsArray, IsInt, Max, Min } from 'class-validator'
 import { Type } from 'class-transformer'
 import { BaseFindAllParams } from '@symbiota2/api-common'
+import { ChecklistProjectLink } from '@symbiota2/api-database';
 
 // export class ProjectFindCommonParams extends BaseFindAllParams {
 //     static readonly DEFAULT_LIMIT = 20

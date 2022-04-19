@@ -13,6 +13,7 @@ import {
   CHECKLIST_ADMIN_ROUTE,
   CHECKLIST_CREATE_ROUTE,
   CHECKLIST_TEACHING_ROUTE,
+  CHECKLIST_PROJECT_ID_CHECKLIST_LIST_ROUTE,
  } from './routes';
 import { Route, RouterModule } from '@angular/router';
 import { ChecklistCreatePageComponent } from './pages/checklist-create/checklist-create-page.component';
@@ -20,12 +21,15 @@ import { ChecklistRegionalPageComponent } from './pages/checklist-regional/check
 import { ChecklistTeachingPageComponent } from './pages/checklist-teaching/checklist-teaching-page.component';
 import { ChecklistService } from './services/checklist/checklist.service';
 import { ReactiveFormsModule } from '@angular/forms';
-import {MatCardModule} from '@angular/material/card';
+import { MatCardModule} from '@angular/material/card';
 import { ChecklistSinglePageComponent } from './pages/checklist-single/checklist-single-page.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatListModule } from '@angular/material/list';
 
 @NgModule({
   imports: [
@@ -38,17 +42,22 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatInputModule,
     MatSelectModule,
     MatCheckboxModule,
+    MatButtonModule,
+    MatDividerModule,
+    MatListModule,
   ],
   providers: [ChecklistService],
   declarations: [
     ChecklistCreatePageComponent,
     ChecklistTeachingPageComponent,
     ChecklistRegionalPageComponent,
+    ChecklistSinglePageComponent,
   ],
   entryComponents: [
     ChecklistCreatePageComponent,
     ChecklistTeachingPageComponent,
     ChecklistRegionalPageComponent,
+    ChecklistSinglePageComponent,
   ],
 })
 export class ChecklistPlugin extends SymbiotaUiPlugin {
@@ -61,7 +70,7 @@ export class ChecklistPlugin extends SymbiotaUiPlugin {
   static routes(): Route[] {
     return [
       {
-        path: CHECKLIST_REGIONAL_ROUTE,
+        path: CHECKLIST_PROJECT_LIST_ROUTE,
         component: ChecklistRegionalPageComponent,
       },
       {
@@ -75,14 +84,18 @@ export class ChecklistPlugin extends SymbiotaUiPlugin {
       {
         path: CHECKLIST_PROJECT_ID_ROUTE,
         component: ChecklistSinglePageComponent
-      }
+      },
+      {
+        path: CHECKLIST_PROJECT_ID_CHECKLIST_LIST_ROUTE,
+        component: ChecklistSinglePageComponent
+     }
     ];
   }
 
   static navBarLinks(): NavBarLink[] {
       return [
           {
-            url: `/${CHECKLIST_REGIONAL_ROUTE}`,
+            url: `/${CHECKLIST_PROJECT_LIST_ROUTE}`,
             name: 'core.layout.header.topnav.checklist.regional.link',
           },
           {

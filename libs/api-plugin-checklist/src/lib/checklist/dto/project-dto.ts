@@ -1,6 +1,8 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import { Project } from '@symbiota2/api-database';
+import { Checklist, ChecklistProjectLink, Project } from '@symbiota2/api-database';
 import { ApiProperty } from '@nestjs/swagger';
+import { ChecklistCreateDto } from './checklist-create.dto';
+import { ChecklistDto } from './checklist-dto';
 // import { TaxonomicStatusDto } from '../../taxonomicStatus/dto/TaxonomicStatusDto';
 
 @Exclude()
@@ -24,4 +26,12 @@ export class ProjectDto {
     @ApiProperty()
     @Expose()
     fullDescription: string;
+
+    @ApiProperty()
+    @Expose()
+    checklist: Promise<ChecklistDto[]>
+
+    @ApiProperty()
+    @Expose()
+    clids: number[]
 }

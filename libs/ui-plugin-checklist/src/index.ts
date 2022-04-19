@@ -1,8 +1,8 @@
 export * from './lib/checklist-plugin.module';
-export * from './lib/dto/checklist-list-item';
+export * from './lib/dto/checklist-list';
 export * from './lib/dto/checklist-projects';
 export * from './lib/pages/checklist-create/checklist-create-page.component';
 export * from './lib/pages/checklist-regional/checklist-regional-page.component';
 export * from './lib/pages/checklist-teaching/checklist-teaching-page.component';
-export * from './lib/services/checklist/checklist.service';
+// export * from './lib/services/checklist/checklist.service';
 export * from './lib/routes';

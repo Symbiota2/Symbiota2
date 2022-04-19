@@ -1,5 +1,15 @@
 <div id="main">
-    <p>{{ checklistProject.name }}</p>
-    <p>{{ checklistProject.managers }}</p>
-    <p>{{ checklistProject.fullDescription }}</p>
+  <mat-card class="example-card">
+    <mat-card-title-group>
+      <mat-card-title>{{checklistProject?.name}}</mat-card-title>
+      <mat-card-subtitle><span style="font-weight:bold">Project managers:</span> {{checklistProject?.managers}}</mat-card-subtitle>
+    </mat-card-title-group>
+    <mat-card-content>
+      {{checklistProject?.fullDescription}}
+    </mat-card-content>
+
+    <br>
+    <h3 *ngFor="let checklist of checklistList"><a class="checklist-link" routerLink="">{{checklist.name}}</a></h3>
+    <h3 *ngIf="checklistList.length === 0">No checklists available</h3>
+  </mat-card>
 </div>
