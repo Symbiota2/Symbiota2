@@ -7,7 +7,7 @@
     "core.layout.header.topnav.search_dropdown": "Suche",
     "core.layout.header.topnav.tools_dropdown": "Werkzeuge",
     "core.layout.header.topnav.resources_dropdown": "Ressourcen",
-    "core.layout.header.topnav.superadmin_dropdown": "Höchster Vorgesetzter",
+    "core.layout.header.topnav.superadmin_dropdown": "höchster Vorgesetzter",
     "core.layout.header.topnav.statistics_link": "Statistiken",
     "core.layout.header.topnav.home_link": "Zuhause",
     "core.layout.header.topnav.images_link": "Bilder",
@@ -32,6 +32,7 @@
     "core.layout.header.topnav.resource_link_four": "Citizen Science (NfN)",
     "core.layout.header.topnav.resource_link_five": "Digitalisierungs-Workflows",
     "core.layout.header.topnav.resource_link_six": "SCAN",
+    "core.layout.header.topnav.userlist_link_one": "Benutzerliste",
     "core.layout.header.topnav.welcome_line": "Willkommen {{firstName}}!",
     "core.layout.home.para_one": "Symbiota ist ein Open-Source-Content-Management-System zum Kuratieren von proben- und beobachtungsbasierten Biodiversitätsdaten. Symbiota arbeitet in Verbindung mit einer zugrunde liegenden SQL-Datenbank, die auf einem Webserver installiert ist. Symbiota wird derzeit von Hunderten von naturkundlichen Sammlungen in Nordamerika genutzt, die wiederum typischerweise in 30 thematischen Portalen organisiert sind. Gemeinsam haben diese Portale in den letzten 10 Jahren 20 Millionen Belegvorkommensaufzeichnungen mobilisiert. Symbiota-Portale umfassen Gefäßpflanzen, Flechten, Moose, Algen, Pilze, Wirbellose und in geringerem Maße Wirbeltiere. Belegte Aufzeichnungen können mit Bildern, Geweben, DNA-Sequenzdaten und anderen taxonomischen Informationen verknüpft werden.",
     "core.layout.home.para_two": "Ein Kernziel von Symbiota ist es, eine Plattform für die Dokumentation von Biodiversitätsvorkommen auf der Grundlage von Proben und Beobachtungen anzubieten, indem modulare Werkzeuge bereitgestellt werden, um Biodiversitätsdaten für die fragenorientierte Forschung (z. B. über Checklisten und interaktive Schlüssel) auszutauschen, zu visualisieren und zu synthetisieren. Die Schaffung robuster, multifunktionaler Biodiversitätssoftware und Datenverarbeitungsworkflows sowie die Kuratierung von Datenbeziehungen für eine flexible Verwaltung und Online-Veröffentlichung sind Ziele, die die IT-Ressourcen einer einzelnen Sammlung überfordern können. Eine zentrale Prämisse von Symbiota ist, dass durch eine kooperative Partnerschaft von Biodiversitätsinformatikern und Sammlungsforschungsgemeinschaften qualitativ hochwertigere und öffentlich nützlichere Biodiversitätsportale aufgebaut werden können, anstatt das alte Modell von oft hochgradig angepassten eigenständigen Datenbanken an einer einzelnen Institution. Das Open-Source-Softwareentwicklungs-Framework von Symbiota fördert nutzungsorientierte Code-Innovation und Tool-Erstellung. All dies ermöglicht es den Sammlungswissenschaftlern, ihre Bemühungen auf die Pflege hochwertiger Datensätze zu konzentrieren.",
@@ -52,5 +53,6 @@
     "core.layout.sitemap.install_plugins_link_text": "Plugins installieren",
     "core.layout.sitemap.manage_plugins_link_text": "Plugins verwalten",
     "core.layout.sitemap.portal_management_header": "Portalverwaltung",
-    "core.layout.sitemap.user_management_link_text": "Benutzerverwaltung"
+    "core.layout.sitemap.user_management_link_text": "Benutzerverwaltung",
+    "core.layout.superadmin.user_list_denied": "Nicht eingeloggt oder unzureichende Rechte, um Superadmin-Funktionen zu verwenden."
 }
