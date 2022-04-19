@@ -60,3 +60,16 @@ h3 {
     margin-left: 10%;
     margin-right: 10%;
 }
+
+#submit-div {
+    display: flex;
+    align-items: flex-end;
+    text-align: right;
+
+}
+
+button {
+    text-align: right;
+    margin-left: auto;
+    margin-right: 0;
+}
