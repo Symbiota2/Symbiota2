@@ -32,6 +32,7 @@
     "core.layout.header.topnav.resource_link_four": "Ciência Cidadã (NfN)",
     "core.layout.header.topnav.resource_link_five": "Fluxos de trabalho de digitalização",
     "core.layout.header.topnav.resource_link_six": "VARREDURA",
+    "core.layout.header.topnav.userlist_link_one": "Lista de usuários",
     "core.layout.header.topnav.welcome_line": "Bem-vindo {{firstName}}!",
     "core.layout.home.para_one": "Symbiota é um sistema de gerenciamento de conteúdo de código aberto para a curadoria de dados de biodiversidade baseados em espécimes e observações. O Symbiota funciona em conjunto com um banco de dados SQL subjacente instalado em um servidor web. O Symbiota é atualmente utilizado por centenas de coleções de história natural na América do Norte, que por sua vez são normalmente organizadas em 30 portais temáticos. Juntos, esses portais mobilizaram 20 milhões de registros de ocorrências de vouchers nos últimos 10 anos. Os portais Symbiota abrangem plantas vasculares, líquens, briófitas, algas, fungos, invertebrados e, em menor grau, vertebrados. Os registros com comprovante podem ser vinculados a imagens, tecidos, dados de sequência de DNA e outras informações taxonômicas.",
     "core.layout.home.para_two": "Um objetivo central do Symbiota é oferecer uma plataforma para documentar ocorrências de biodiversidade com base em espécimes e observações, fornecendo ferramentas modulares para compartilhar, visualizar e sintetizar dados de biodiversidade para pesquisas orientadas por perguntas (por exemplo, por meio de listas de verificação e chaves interativas). A criação de software de biodiversidade robusto e multifuncional e fluxos de trabalho de processamento de dados, bem como a curadoria de relacionamentos de dados para gerenciamento flexível e publicação on-line, são objetivos capazes de sobrecarregar os recursos de TI de uma coleção individual. Uma premissa central do Symbiota é que, por meio de uma parceria colaborativa de informantes de biodiversidade e comunidades de pesquisa de coleções, portais de biodiversidade de maior qualidade e utilidade pública podem ser construídos, em vez do antigo modelo de bancos de dados autônomos altamente personalizados em uma instituição individual. A estrutura de desenvolvimento de software de código aberto da Symbiota promove a inovação de código orientada ao uso e a criação de ferramentas. Tudo isso permite que os cientistas de coleções concentrem seus esforços na curadoria de conjuntos de dados de alta qualidade.",
@@ -52,5 +53,6 @@
     "core.layout.sitemap.install_plugins_link_text": "Instalar plug-ins",
     "core.layout.sitemap.manage_plugins_link_text": "Gerenciar plug-ins",
     "core.layout.sitemap.portal_management_header": "Gerenciamento do Portal",
-    "core.layout.sitemap.user_management_link_text": "Gerenciamento de usuários"
+    "core.layout.sitemap.user_management_link_text": "Gerenciamento de usuários",
+    "core.layout.superadmin.user_list_denied": "Não conectado ou privilégios insuficientes para usar as funções de superadministrador."
 }

@@ -53,5 +53,6 @@
 	"core.layout.sitemap.install_plugins_link_text": "Install Plugins",
 	"core.layout.sitemap.manage_plugins_link_text": "Manage Plugins",
 	"core.layout.sitemap.portal_management_header": "Portal Management",
-	"core.layout.sitemap.user_management_link_text": "User Management"
+	"core.layout.sitemap.user_management_link_text": "User Management",
+	"core.layout.superadmin.user_list_denied": "Not logged in or insufficient privileges to use superadmin functions."
 }
