@@ -5,14 +5,14 @@ _by Curtis Dyreson_
 Symbiota2 users often want to *search* data, for example to search for occurrence records in a particular region of the world.  Users also want to obtain aggregate, statistical data about their site such as a graph of the number of occurrence records added to a collection over time.  To meet both needs, Symbiota2 utilizes the *Elasticsearch stack*.
 
 The stack consists of three parts, as described below.
- 1. Elasticsearch - Elasticsearch is a search engine.  A search engine indexes a data collection and supports various kinds of searches on the data.
- 2. Kibana - Kibana is a user-interface builder and display system.  Users can build visualizations and search interfaces using Kibana.
- 3. Logstash - Logstash is software for feeding data to Elasticsearch.  In Symbiota2 we use Logstash to extract data from the Symbiota2 database and pipe it into Elasticsearch.
+1. Elasticsearch - Elasticsearch is a search engine.  A search engine indexes a data collection and supports various kinds of searches on the data.
+2. Kibana - Kibana is a user-interface builder and display system.  Users can build visualizations and search interfaces using Kibana.
+3. Logstash - Logstash is software for feeding data to Elasticsearch.  In Symbiota2 we use Logstash to extract data from the Symbiota2 database and pipe it into Elasticsearch.
 
 In common parlance the stack is often referred to as the *ELK stack* or just *ELK*.
 
- ## Using ELK in Symbiota2
- We added ELK to Docker for (relatively) easy installation and maintenance in Symbiota2.  If you would like to use a different ELK stack, for instance, if your site already runs ELK, then you can modify these instructions to utilize your setup.
+## Using ELK in Symbiota2
+We added ELK to Docker for (relatively) easy installation and maintenance in Symbiota2.  If you would like to use a different ELK stack, for instance, if your site already runs ELK, then you can modify these instructions to utilize your setup.
 
 ### Configure the Environment Variables
 The following Environment Variables are utilized in the ELK  stack, Docker compose, and Symbiota2 setup, so configure them as needed.  If you don't know a particular setting, don't worry, just use the default setting (but be sure to change the passwords!).  You configure the variables by editing the .env file.
@@ -49,7 +49,7 @@ After you run the Docker compose, ELK plus Symbiota2 should be running.  You can
 
 (If you changed the Elasticsearch port in your .env you'll have to use the port you changed it to).  Navigating to the URL will prompt for a login and password.  The login is "elastic" and the password is whatever you set it to in your .env.
 
-You can also check out Kibana by navigating to 
+You can also check out Kibana by navigating to
 
     http://localhost:5601
 
@@ -79,19 +79,21 @@ You will be prompted to enter a password and use the password that you set for t
 ### Getting the Built-in Kibana Dashboard Working
 There are three Kibana dashboards that Symbiota2 has integrated into the front end.
 
- 1. The spatial-module dashboard - Search for and display occurrences on a map.
- 2. The collection-statistics dashboard - Show statistics on a per collection basis.
- 3. The image-search dashboard - An example dashboard to demonstrate filtering and visualizations.
+1. The spatial-module dashboard - Search for and display occurrences on a map.
+2. The collection-statistics dashboard - Show statistics on a per collection basis.
+3. The image-search dashboard - An example dashboard to demonstrate filtering and visualizations.
 
 To integrate the dashboards with Symbiota2, do the following.
 
- 1. Start the ELK stack.
- 2. Start Kibana at http://localhost:5601 where 5601 is the Kibana port (you may have changed this in your `.env` file). Login to Kibana when prompted using the `elastic` user credentials. 
- 3. From the Kibana home page, navigate to the `Stack Management` menu.
- 4. From the `Stack Management` menu select `Saved Objects`.
- 5. Choose to `Browse` to upload `Saved Objects`.  Within the Symbiota2 project navigate to `kibana/dashboards.njson` and upload that file.
- 6. Return to the Kibana home page and navigate to `Dashboards`.  You should see three dashboards: `spatial-module`, `collection-statistics`, and `simple-image-search`.  Try each dashboard to ensure that the dashboards are working.  Skip the next step if the dashboards are working.
- 7. If a dashboard is not working it will be because the indexes have not yet been created.  These indexes are created by reading the data from the database.  Logstash runs to create and populate the indexes.  There are more instructions for Logstash below.
- 8. This step is necessary for now, until ELK supports links to dashboard names rather than internal identifiers.  We have to set up a link in the Symbiota2 user interface to the corresponding dashboard. In the dashboard menu, for each dashboard in turn do the following. <ol><li>Goto the `Share` tab.</li><li>Choose to `share a link` to the dashboard.</li><li>Copy the link to the `.env` file and the appropriate environment variable.  For instance the `$SYMBIOTA2_SPATIAL_MODULE_DASHBOARD` variable should be set to the copied text of the link (and enclosed within quotation marks).</li></ol>.
- 9. Start or restart Symbiota2 and the dashboards will now work in the user interface.
+1. Start the ELK stack.
+2. Start Kibana at http://localhost:5601 where 5601 is the Kibana port (you may have changed this in your `.env` file). Login to Kibana when prompted using the `elastic` user credentials.
+3. From the Kibana home page, navigate to the `Stack Management` menu.
+4. From the `Stack Management` menu select `Saved Objects`.
+5. Choose `Import`.
+6. Choose `Select a File to Import`.  Within the Symbiota2 project navigate to `elasticsearch/config/kibana.ndjson` and upload that file.
+7. It should report that several objects were created.  Click on the `Done` button.
+8. Return to the Kibana home page and navigate to `Dashboards`.  You should see three dashboards: `spatial-module`, `collection-statistics`, and `simple-image-search`.  Try each dashboard to ensure that the dashboards are working.  Skip the next step if the dashboards are working.
+9. If a dashboard is not working it will be because the indexes have not yet been created.  These indexes are created by reading the data from the database.  Logstash runs to create and populate the indexes.
+10. If the dashboards are working, then you are done!  If for some reason, the dashboard is not visible in Symbiota2, it may be necessary to recreate the dashboard in Symbiota (this should be an unsual case).  This step is necessary for now, until ELK supports links to dashboard names rather than internal identifiers.  We have to set up a link in the Symbiota2 user interface to the corresponding dashboard. In the dashboard menu, for each dashboard in turn do the following. <ol><li>Goto the `Share` tab.</li><li>Choose to `Embed Code` for the dashboard.</li><li>Choose `Saved Object`.<li>Choose to `Copy the IFrame code`. Copy the iframe code to the `.env` file and the appropriate environment variable.  For instance the `$SYMBIOTA2_SPATIAL_MODULE_DASHBOARD` variable should be set to the copied text of the link (and enclosed within single quotation marks).</li><li>Start or restart Symbiota2 and the dashboards will now work in the user interface.</li></ol>.
+
 > Written with [StackEdit](https://stackedit.io/).
