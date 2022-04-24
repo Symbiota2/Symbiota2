@@ -109,11 +109,11 @@ export class TaxonomyUploadProcessor {
             this.logger.error(" Queue processing failed ")
             await job.moveToFailed(error)
         } else {
-            this.logger.log(" keys length " + keys.length)
+            // this.logger.log(" keys length " + keys.length)
             for (let key of keys) {
-                this.logger.log("TEST doing " + key)
+                // this.logger.log("TEST doing " + key)
                 error = await this.processRankFile(key, job, upload)
-                this.logger.log("TEST rank file processed " + error)
+                // this.logger.log("TEST rank file processed " + error)
             }
             if (error) {
                 this.logger.error(" Error detected in processing rank file")
@@ -175,20 +175,20 @@ export class TaxonomyUploadProcessor {
 
 
     private async processRankFile(key, job, upload) {
-        this.logger.log(" TEST doing processRankFile " + this.taxonFilesPath + key)
+        // this.logger.log(" TEST doing processRankFile " + this.taxonFilesPath + key)
         try {
             for await (const batch of objectIterator<DeepPartial<Taxon>>(this.taxonFilesPath + key)) {
                 try {
-                    this.logger.log("TEST doing a batch")
+                    // this.logger.log("TEST doing a batch")
                     await this.onJSONBatch(job, upload, batch);
-                    this.logger.log("TEST done with batch")
+                    // this.logger.log("TEST done with batch")
                 } catch (e) {
-                    this.logger.error("erros is ")
+                    // this.logger.error("erros is ")
                     this.logger.error(`Error processing rank file: ${JSON.stringify(e)}`)
                     return e
                 }
             }
-            this.logger.log(" TEST batches done " + this.taxonFilesPath + key)
+            // this.logger.log(" TEST batches done " + this.taxonFilesPath + key)
         } catch (e) {
             this.logger.error(`Error reading batch file : ${JSON.stringify(e)}`)
             return e
