@@ -137,7 +137,7 @@ services:
       test:
         [
             "CMD-SHELL",
-            "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+            "curl -s --cacert config/certs/ca/ca.crt https://localhost:${SYMBIOTA2_ELASTICSEARCH_PORT:-9200} | grep -q 'missing authentication credentials'",
         ]
       interval: 10s
       timeout: 10s
@@ -181,7 +181,7 @@ services:
       test:
         [
             "CMD-SHELL",
-            "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+            "curl -s --cacert config/certs/ca/ca.crt https://localhost:${SYMBIOTA2_ELASTICSEARCH_PORT:-9200} | grep -q 'missing authentication credentials'",
         ]
       interval: 10s
       timeout: 10s
@@ -225,7 +225,7 @@ services:
       test:
         [
             "CMD-SHELL",
-            "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+            "curl -s --cacert config/certs/ca/ca.crt https://localhost:${SYMBIOTA2_ELASTICSEARCH_PORT:-9200} | grep -q 'missing authentication credentials'",
         ]
       interval: 10s
       timeout: 10s
@@ -247,7 +247,7 @@ services:
       - ${SYMBIOTA2_KIBANA_PORT:-5601}:5601
     environment:
       - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=http://es01:9200
+      - ELASTICSEARCH_HOSTS=http://es01:${SYMBIOTA2_ELASTICSEARCH_PORT:-9200}
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${SYMBIOTA2_KIBANA_PASSWORD:-hellothere}
       - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
@@ -256,7 +256,7 @@ services:
       test:
         [
             "CMD-SHELL",
-            "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+            "curl -s -I http://localhost:${SYMBIOTA2_KIBANA_PORT:-5601} | grep -q 'HTTP/1.1 302 Found'",
         ]
       interval: 10s
       timeout: 10s

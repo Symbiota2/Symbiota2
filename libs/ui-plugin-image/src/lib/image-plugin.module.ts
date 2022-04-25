@@ -2,9 +2,9 @@ import { NgModule } from "@angular/core";
 import { TranslateModule } from "@ngx-translate/core";
 
 import {
-  ApiClientModule,
-  NavBarLink, SymbiotaComponentModule,
-  SymbiotaUiPlugin
+    ApiClientModule, AppConfigService,
+    NavBarLink, SymbiotaComponentModule,
+    SymbiotaUiPlugin
 } from '@symbiota2/ui-common';
 
 import { Route, RouterModule } from "@angular/router";
@@ -35,6 +35,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
 import {
     ImageDisplayPage,
+    ImageSearchDashboardPage,
     ImageLibraryPageComponent,
     ImageDetailsPageComponent,
     ImageSearchPageComponent,
@@ -53,7 +54,7 @@ import {
     IMAGE_DETAILS_ROUTE,
     IMAGE_DISPLAY_ROUTE, IMAGE_FOLDER_UPLOAD_COMPLETE_ROUTE,
     IMAGE_FOLDER_UPLOAD_ROUTE,
-    IMAGE_LIBRARY_ROUTE,
+    IMAGE_LIBRARY_ROUTE, IMAGE_SEARCH_DASHBOARD_ROUTE,
     IMAGE_SEARCH_ROUTE
 } from './routes';
 
@@ -92,6 +93,7 @@ import {
     ],
     declarations: [
         ImageSearchPageComponent,
+        ImageSearchDashboardPage,
         ImageLibraryPageComponent,
         ImageDetailsPageComponent,
         ImageDetailsEditorDialogComponent,
@@ -109,6 +111,7 @@ import {
     ],
     entryComponents: [
         ImageSearchPageComponent,
+        ImageSearchDashboardPage,
         ImageLibraryPageComponent,
         ImageDisplayPage,
         ImageDetailsPageComponent,
@@ -124,11 +127,12 @@ export class ImagePlugin extends SymbiotaUiPlugin {
     private static MY_IMAGE_LIBRARY_ROUTE = IMAGE_LIBRARY_ROUTE
     private static MY_IMAGE_DETAILS_ROUTE = IMAGE_DETAILS_ROUTE
     private static MY_IMAGE_SEARCH_ROUTE = IMAGE_SEARCH_ROUTE
+    private static MY_IMAGE_SEARCH_DASHBOARD_ROUTE = IMAGE_SEARCH_DASHBOARD_ROUTE
     private static MY_IMAGE_DISPLAY_ROUTE = IMAGE_DISPLAY_ROUTE
     private static MY_IMAGE_FOLDER_UPLOAD_ROUTE = IMAGE_FOLDER_UPLOAD_ROUTE
     private static MY_IMAGE_FOLDER_UPLOAD_COMPLETE_ROUTE = IMAGE_FOLDER_UPLOAD_COMPLETE_ROUTE
 
-    constructor() {
+    constructor(private readonly appConfig: AppConfigService) {
         super();
     }
 
@@ -145,6 +149,10 @@ export class ImagePlugin extends SymbiotaUiPlugin {
             {
                 path: ImagePlugin.MY_IMAGE_SEARCH_ROUTE,
                 component: ImageSearchPageComponent
+            },
+            {
+                path: ImagePlugin.MY_IMAGE_SEARCH_DASHBOARD_ROUTE,
+                component: ImageSearchDashboardPage
             },
             {
                 path: ImagePlugin.MY_IMAGE_FOLDER_UPLOAD_ROUTE,
@@ -175,6 +183,10 @@ export class ImagePlugin extends SymbiotaUiPlugin {
                 url: `/${ImagePlugin.MY_IMAGE_FOLDER_UPLOAD_ROUTE}`,
                 name: "core.layout.header.topnav.image_folder_upload_link"
             },
+            {
+                url: `/${ImagePlugin.MY_IMAGE_SEARCH_DASHBOARD_ROUTE}`,
+                name: "core.layout.header.topnav.image_search_dashboard_link"
+            }
         ]
         }
 

@@ -44,7 +44,7 @@ import {
     ROUTE_COLLECTION_NEW,
     ROUTE_COLLECTION_COMMENTS,
     ROUTE_COLLECTION_TOOLS,
-    ROUTE_COLLECTION_DWCARCHIVES,
+    ROUTE_COLLECTION_DWCARCHIVES, ROUTE_COLLECTION_STATISTICS_DASHBOARD
 } from './routes';
 import { CollectionFieldComponent } from './components/collection-field/collection-field.component';
 import { CollectionListPage } from './pages/collection-list-page/collection-list-page.component';
@@ -67,6 +67,9 @@ import { DwcService } from './services/dwc.service';
 import { CollectionDwcPage } from './pages/collection-dwc-page/collection-dwc-page.component';
 import { DwcTableComponent } from './components/dwc-table/dwc-table.component';
 import { DwcDownloadLinkComponent } from './components/dwc-download-link/dwc-download-link.component';
+import {
+    CollectionStatisticsDashboardPage
+} from './pages/collection-statistics-dashboard/collection-statistics-dashboard-page';
 
 
 @NgModule({
@@ -75,6 +78,7 @@ import { DwcDownloadLinkComponent } from './components/dwc-download-link/dwc-dow
         CollectionFieldComponent,
         UserProfileCollectionTab,
         CollectionPage,
+        CollectionStatisticsDashboardPage,
         CollectionLogoComponent,
         CollectionListPage,
         CollectionCardComponent,
@@ -152,21 +156,25 @@ export class CollectionPlugin extends SymbiotaUiPlugin {
                 path: ROUTE_COLLECTION_DWCARCHIVES,
                 component: CollectionDwcPage,
             },
+            {
+                path: ROUTE_COLLECTION_STATISTICS_DASHBOARD,
+                component: CollectionStatisticsDashboardPage,
+            },
         ];
     }
 
     static navBarLinks(): NavBarLink[] {
         return [
-            { name: 'Browse Collections', url: ROUTE_COLLECTION_LIST },
-            { name: 'Darwin Core Archives', url: ROUTE_COLLECTION_DWCARCHIVES },
+            { name: 'core.layout.header.topnav.collection.browse_collections_link', url: ROUTE_COLLECTION_LIST },
+            { name: 'core.layout.header.topnav.collection.dca_link', url: ROUTE_COLLECTION_DWCARCHIVES },
+            { name: "core.layout.header.topnav.collection.statistics.dashboard_link", url: ROUTE_COLLECTION_STATISTICS_DASHBOARD}
         ];
     }
 
     static userProfileTabs(): UserProfileTab[] {
-        // TODO: i18n
         return [
             {
-                name: 'Collections',
+                name: 'core.layout.header.topnav.search_collections_link',
                 component: UserProfileCollectionTab,
             },
         ];
