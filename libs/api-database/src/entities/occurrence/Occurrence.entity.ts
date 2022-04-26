@@ -505,6 +505,13 @@ export class Occurrence extends EntityProvider {
     georeferenceProtocol: string;
 
     @Column('varchar', {
+        name: 'degreeOfEstablishment',
+        nullable: true,
+        length: 255,
+    })
+    degreeOfEstablishment: string;
+
+    @Column('varchar', {
         name: 'georeferenceSources',
         nullable: true,
         length: 255,

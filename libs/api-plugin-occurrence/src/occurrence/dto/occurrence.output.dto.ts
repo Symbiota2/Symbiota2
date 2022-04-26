@@ -222,4 +222,8 @@ export class OccurrenceOutputDto extends OccurrenceListItem {
     @ApiProperty()
     @Expose()
     recordEnteredBy: string;
+
+    @ApiProperty()
+    @Expose()
+    degreeOfEstablishment: string;
 }
