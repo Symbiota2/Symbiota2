@@ -51,16 +51,22 @@ export class OccurrenceUploadProcessor {
         private readonly collectionStatsUpdateQueue: Queue<CollectionStatsUpdateJob>) { }
 
     // TODO: Wrap in a transaction? Right now each chunk goes straight to the database until a failure occurs
+    /**
+     * Retrieve an upload job from the database & convert it into occurrences in the database
+     */
     @Process()
     async upload(job: Job<OccurrenceUploadJob>): Promise<void> {
+        // Count the number of processed occurrences
         this.processed = 0;
 
+        // Find the Upload specified in the OccurrenceUploadJob
         const upload = await this.uploads.findOne(job.data.uploadID);
         if (!upload) {
             return;
         }
         this.logger.log(`Upload of '${upload.filePath}' started...`);
 
+        // Parse the csv in batches
         let error: Error = null;
         for await (const batch of csvIterator<DeepPartial<Occurrence>>(upload.filePath)) {
             try {
@@ -99,20 +105,35 @@ export class OccurrenceUploadProcessor {
         await this.notifications.save({ uid: job.data.uid, message: `Upload failed: ${JSON.stringify(err)}` });
     }
 
+    /**
+     * Process a batch of occurrences from a csv
+     */
     private async onCSVBatch(job: Job<OccurrenceUploadJob>, upload: OccurrenceUpload, batch: DeepPartial<Occurrence>[]) {
+        // All updates that will be made to Occurrence entities
         const allOccurrenceUpdates = [];
 
+        // For each csv row
         for (const occurrenceRow of batch) {
             const occurrenceData = {};
 
+            // Find the csv field and cooresponding csv field defined by the user in the Upload's
+            // fieldMap. See patchUploadFieldMap() in libs/api-plugin-occurrence/src/occurrence/occurrence.service.ts
             for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
+                // If the csvField wasn't mapped to a dbField, skip it
                 if (!dbField) {
                     continue;
                 }
+                // Grab the value of the csvField from the csv
                 const csvValue = occurrenceRow[csvField];
+
+                // If the value's truthy, store it in the Occurrence entity. If not, store
+                // null in the Occurrence entity
                 occurrenceData[dbField] = csvValue === '' ? null : csvValue;
             }
 
+            // Field the database field that cooresponds to the user-defined csv field
+            // that uniquely identifies each row in the csv. This could be something like 'id' or 
+            // 'catalogNumber'.
             const dbIDField = upload.fieldMap[upload.uniqueIDField];
             const currenceOccurrenceUniqueValue = occurrenceData[dbIDField];
 
@@ -124,6 +145,8 @@ export class OccurrenceUploadProcessor {
             // Hard code based on job's collection ID
             occurrenceData['collectionID'] = job.data.collectionID;
 
+            // Find any existing occurrence in the database with an id that matches the value for
+            // uniqueIDField. It'll be updated instead of a new one being created.
             const dbOccurrence = await this.occurrences.findOne({
                 [dbIDField]: currenceOccurrenceUniqueValue
             });
@@ -132,11 +155,17 @@ export class OccurrenceUploadProcessor {
             // dbOccurrence has it; If it's not, we'll generate a new one
             delete occurrenceData['id'];
 
-            // This is also generated; see occurrence entity
+            // NOTE This should also be generated, but currently we don't have the functionality to:
+            // a) Create a new Taxon based on the occurrence csv fields and link it to the TaxaEnumTree
+            // b) Find an existing Taxon based on the occurrence csv fields and link it to the created/updated
+            // occurrence
+            // So right now any occurrence csv uploads WILL NOT be properly linked to Taxonomy, and not
+            // properly searchable as a result
             delete occurrenceData['taxonID'];
 
             // Update
             if (dbOccurrence) {
+                // If we found a matching occurrence, use the csv data to update its fields
                 for (const [k, v] of Object.entries(occurrenceData)) {
                     if (k in dbOccurrence) {
                         dbOccurrence[k] = v;
@@ -151,6 +180,7 @@ export class OccurrenceUploadProcessor {
             }
         }
 
+        // Save all of the edits for this batch
         await this.occurrences.save(allOccurrenceUpdates);
         this.processed += allOccurrenceUpdates.length;
 

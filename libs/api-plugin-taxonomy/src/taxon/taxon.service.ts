@@ -626,21 +626,36 @@ export class TaxonService extends BaseService<Taxon>{
             TaxonService.skippedStatusesDueToTaxonMismatchPath
             ]
 
-        await result.map((key) => {
+        const myList = []
+        for (const key in result) {
+            await myList.push(this.getStringData(TaxonService.s3Key(key)))
+        }
+        /*
+        await result.forEach((key) => {
+            myList.push(this.getStringData(TaxonService.s3Key(key)))
+        })
+
+        result.map((key) => {
             this.getStringData(TaxonService.s3Key(key))
         })
-        return result
+
+         */
+        return myList
     }
 
     private async getStringData(key): Promise<string> {
+        // console.log(" get string data " + key)
         // See if there exists such an object
         const exists = await this.storageService.hasObject(key)
         if (!exists) {
             return ""
         }
 
+        // console.log(" here ")
+
         // Fetch the object if it exists
         const buffer = await this.storageService.getData(key)
+        // console.log(" buffer is " + buffer.toString())
         return buffer.toString()
     }
 
@@ -698,7 +713,7 @@ export class TaxonService extends BaseService<Taxon>{
         let nullRankNames = 0
         let totalRecords = 0
 
-        console.log("sciname field is " + sciNameField)
+        // console.log("sciname field is " + sciNameField)
         try {
             for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
                 for (const row of batch) {
@@ -906,19 +921,31 @@ export class TaxonService extends BaseService<Taxon>{
         return taxon ? taxon.id : -1;
     }
 
+    /**
+     * Process a dwc archive & upload its taxa to the database
+     * @param filename The path to the dwc archive
+     */
     async fromDwcA(filename: string): Promise<void> {
+        // Holds the current taxa being processed
         let taxonBuffer = [];
+
+        // Get the dwc fields for the following database fields. See the
+        // DwcField decorators on libs/api-database/src/entities/taxonomy/Taxon.entity.ts
         const kingdomNameDwcUri = getDwcField(Taxon, 'kingdom');
         const sciNameDwcUri = getDwcField(Taxon, 'scientificName');
         const rankNameDwcUri = getDwcField(Taxon, 'rankName');
         const authorDwcUri = getDwcField(Taxon, 'author');
 
+        // Loop through each line in the csv
         for await (const csvTaxon of DwCArchiveParser.read(filename, Taxon.DWC_TYPE)) {
+
+            // If the buffer is full, flush all of the taxa inside it to the database
             if (taxonBuffer.length > TaxonService.UPLOAD_CHUNK_SIZE) {
                 await this.taxonRepo.save(taxonBuffer);
                 taxonBuffer = [];
             }
 
+            // Pull the following fields out of the csv
             let author = csvTaxon[authorDwcUri];
             const kingdomName = csvTaxon[kingdomNameDwcUri];
             const rankName = csvTaxon[rankNameDwcUri];
@@ -934,6 +961,7 @@ export class TaxonService extends BaseService<Taxon>{
                 sciName = sciName.replace(authorRegexp, '');
             }
 
+            // A taxon needs the following three fields in order to be stored in the db
             if (!kingdomName) {
                 TaxonService.LOGGER.warn(`Taxon does not have a kingdom! Skipping...`);
                 continue;
@@ -947,11 +975,12 @@ export class TaxonService extends BaseService<Taxon>{
                 continue;
             }
 
+            // Create an empty taxon & populate it with what we've found alredy
             const taxon = this.taxonRepo.create();
             taxon.scientificName = sciName;
             taxon.author = author;
 
-            // Avoid duplicate uploads
+            // If the taxon id exists in the db, overwrite the taxon
             const taxonID = await this.findTaxonID(kingdomName, rankName, sciName);
             if (taxonID !== -1) {
                 taxon.id = taxonID;
@@ -965,6 +994,8 @@ export class TaxonService extends BaseService<Taxon>{
                 authorDwcUri
             ];
 
+            // Get all of the columns in the db that we haven't discovered a value for
+            // already
             let extraTaxonFields = this.taxonRepo.manager.connection
                 .getMetadata(Taxon)
                 .columns
@@ -974,6 +1005,8 @@ export class TaxonService extends BaseService<Taxon>{
             const csvFields = Object.keys(csvTaxon);
 
             for (const field of extraTaxonFields) {
+                // Loop through all of the fields annotated with the DwcField decorator,
+                // finding any matching columns in the csv
                 const dwcFieldUri = getDwcField(Taxon, field);
                 if (dwcFieldUri && csvFields.includes(dwcFieldUri)) {
                     taxon[field] = csvTaxon[dwcFieldUri];
@@ -989,12 +1022,18 @@ export class TaxonService extends BaseService<Taxon>{
                 return props;
             }, { ...taxon.dynamicProperties });
 
+            // Add the taxon to the buffer
             taxonBuffer.push(taxon);
         }
 
+        // Flush any remaining buffered taxa to the database
         await this.taxonRepo.save(taxonBuffer);
     }
 
+    /**
+     * @param taxonID The taxonID to find ancestors for
+     * @returns The taxonIDs of all ancestors of the given taxonID
+     */
     async findAncestorTaxonIDs(taxonID: number): Promise<number[]> {
         const treeEntries = await this.treeRepo.find({
             select: ['parentTaxonID'],
@@ -1003,8 +1042,15 @@ export class TaxonService extends BaseService<Taxon>{
         return treeEntries.map((te) => te.parentTaxonID);
     }
 
+    /**
+     * @param taxon The taxon to link to ancestor taxa
+     * @param directParentTaxon The most direct parent of the given taxon. For the taxon
+     * Arthropoda with rank phylum, this would be the kingdom Animalia. For the species Agapostemon angelicus,
+     * this would be the genus Agapostemon. etc.
+     */
     async linkTaxonToAncestors(taxon: Taxon, directParentTaxon: Taxon): Promise<void> {
         // TODO: Get rid of taxonomic authorities?
+        // Create a tree entry for the taxon & its direct parent and save it to the database
         const directParentTreeEntry = this.treeRepo.create({
             taxonAuthorityID: 1,
             taxonID: taxon.id,
@@ -1012,10 +1058,13 @@ export class TaxonService extends BaseService<Taxon>{
         });
         await this.treeRepo.save(directParentTreeEntry);
 
+        // Find all of the ancestors of the direct parent. Its ancestors are also taxon's ancestors
         const ancestorSaves = [];
         const ancestorIDs = await this.findAncestorTaxonIDs(
             directParentTreeEntry.parentTaxonID
         );
+
+        // Link each ancestor of the direct parent to taxon & save to the database
         for (const ancestorID of ancestorIDs) {
             const ancestorEntry = this.treeRepo.create({
                 taxonAuthorityID: 1,

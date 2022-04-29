@@ -19,7 +19,7 @@ import { NotificationDialog } from './notification-dialog/notification-dialog.co
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { customLinksEnd, customLinksStart } from './custom-navbarlinks';
+import { customLinksEnd, customLinksStart, superAdminLinks } from './custom-navbarlinks';
 
 @Component({
     selector: 'symbiota2-navbar',
@@ -47,6 +47,8 @@ export class NavbarComponent implements OnInit {
 
     searchMenu: NavBarLink;
     toolMenu: NavBarLink;
+    user: User;
+    isSuperAdmin: Boolean;
 
     constructor(
         private readonly userService: UserService,
@@ -56,25 +58,63 @@ export class NavbarComponent implements OnInit {
         private readonly plugins: PluginService,
         private readonly router: Router,
         private readonly breakpointObserver: BreakpointObserver
-    ) {}
+    ) { }
 
     ngOnInit(): void {
-        // create new categories
-        this.pluginLinks$ = this.pluginLinks$.pipe(
-            map((navMap: Map<string, NavBarLink[]>) => {
-                //add custom navbar elements
-                return new Map<string, NavBarLink[]>([
-                    ...customLinksStart.entries(),
-                    ...navMap.entries(),
-                    ...customLinksEnd.entries(),
-                ]);
-            })
-        );
-
-        // get plugin categories
-        this.linkCategories().subscribe((categories) => {
-            // get category links
+        //Check if superAdmin
+        this.currentUser$.subscribe(user => {
+            this.user = user;
+            if (this.user && user.isSuperAdmin()) {
+                // create new categories
+                this.pluginLinks$ = this.pluginLinks$.pipe(
+                    map((navMap: Map<string, NavBarLink[]>) => {
+                        //add custom navbar elements
+                        return new Map<string, NavBarLink[]>([
+                            ...customLinksStart.entries(),
+                            ...navMap.entries(),
+                            ...customLinksEnd.entries(),
+                            ...superAdminLinks.entries(),
+                        ]);
+                    })
+                );
+            }
+            else {
+                // create new categories
+                this.pluginLinks$ = this.pluginLinks$.pipe(
+                    map((navMap: Map<string, NavBarLink[]>) => {
+                        //add custom navbar elements
+                        return new Map<string, NavBarLink[]>([
+                            ...customLinksStart.entries(),
+                            ...navMap.entries(),
+                            ...customLinksEnd.entries(),
+                        ]);
+                    })
+                );
+            }
+            // get plugin categories
+            this.linkCategories().subscribe((categories) => {
+                // get category links
+            });
         });
+
+        /* // create new categories
+         this.pluginLinks$ = this.pluginLinks$.pipe(
+             map((navMap: Map<string, NavBarLink[]>) => {
+                 //add custom navbar elements
+                 return new Map<string, NavBarLink[]>([
+                     ...customLinksStart.entries(),
+                     ...navMap.entries(),
+                     ...customLinksEnd.entries(),
+                 ]);
+             })
+         );
+ 
+         // get plugin categories
+         this.linkCategories().subscribe((categories) => {
+             // get category links
+         });*/
+
+
 
         // add plugin links to new categories links in a easy to customize way
     }

@@ -45,5 +45,6 @@ Thumbs.db
 /oldCode/**
 /oldCode/image-old-not-used-search/
 apps/ui/src/assets/images/layout/tpt_logo_old.png
-.gitignore
 cloudKey.txt
+gCloudTranslateKey.txt
+.env

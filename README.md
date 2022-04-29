@@ -163,7 +163,7 @@ Run `npm run i18n:clean` to delete all merged translation files.
 
 Symbiota2 has support for refreshing all translations using the Google Translate API provided by Google Cloud.
 
-1. Acquire the API key to use the Google Cloud instance and place it into a file named "cloudKey.txt" in the bin directory of symbiota.
+1. Acquire the API key from S2 Google Drive folder to use the Google Cloud instance and place it into a file named "gCloudTranslateKey.txt" in the bin directory of symbiota2 project structure.
 
 2. Run `node perform-translations.js <plugin directory names>` where plugin directory names is a list of one or more of the following options:
 
@@ -171,6 +171,7 @@ Symbiota2 has support for refreshing all translations using the Google Translate
     - ui-plugin-image
     - ui-plugin-occurrence
     - ui-plugin-taxonomy
+    - ui 
     - all
 
 Example command to translate the ui-plugin-collection and ui-plugin-image i18n files:

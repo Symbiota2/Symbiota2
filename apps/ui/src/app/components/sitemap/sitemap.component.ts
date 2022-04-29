@@ -12,7 +12,6 @@ import { customLinksEnd, customLinksStart, superAdminLinks } from '../navbar/cus
 })
 export class Sitemap implements OnInit {
     categories$: Observable<string[]>;
-    displayAdminLinks = superAdminLinks.entries();
     constructor(private readonly plugins: PluginService, private readonly userService: UserService) { }
     pluginLinks$ = this.plugins.navBarLinks$;
 
@@ -41,12 +40,6 @@ export class Sitemap implements OnInit {
 
     getCategoryLinks(category: string): Observable<NavBarLink[]> {
         return this.pluginLinks$.pipe(map((pls) => pls.get(category)));
-    }
-
-    isSuperAdmin(): Observable<Boolean> {
-        return this.userService.currentUser.pipe(
-            map((user) => user.isSuperAdmin())
-        );
     }
 
 

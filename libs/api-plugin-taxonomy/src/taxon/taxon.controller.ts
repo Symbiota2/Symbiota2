@@ -386,13 +386,13 @@ export class TaxonController {
     @ApiOperation({ summary: 'Retrieve the potential problems in the upload. You must choose by kind of problem by setting the "kind" field. Potential choices are 1 (problem rows), 2 (problem accepted names), 3 (problem parent names), and 4 (problem ranks).' })
     async getresults(@Param('kind') kind: number) : Promise<string[]> {
         if (kind == 1) {
-            return this.taxa.getProblemUploadRows()
+            return await this.taxa.getProblemUploadRows()
         } else if (kind == 2) {
-            return this.taxa.getProblemAcceptedNames()
+            return await this.taxa.getProblemAcceptedNames()
         } else if (kind == 3) {
-            return this.taxa.getProblemParentNames()
+            return await this.taxa.getProblemParentNames()
         } else if (kind == 4) {
-            return this.taxa.getProblemRanks()
+            return await this.taxa.getProblemRanks()
         } else {
             throw new BadRequestException(" The kind is out of the range 1 to 4 it is " + kind)
         }
@@ -458,7 +458,7 @@ export class TaxonController {
             if (body.fieldMap[key] == "RankName") {
                 rankField = key
             }
-            console.log(body.fieldMap[key]);
+            // console.log(body.fieldMap[key]);
         });
 
         const problemsFound = await this.taxa.taxonCheck(
@@ -494,6 +494,11 @@ export class TaxonController {
         );
     }
 
+    /**
+     * NOTE Currently this route is unprotected & synchronous.
+     * It needs to be restricted to superadmins and asynchronous, utilizing a queue, as with
+     * occurrences in libs/api-plugin-occurrence/src/occurrence/occurrence.controller.ts
+     */
     @Post('dwc')
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor('file'))

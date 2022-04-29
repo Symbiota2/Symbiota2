@@ -1,0 +1,130 @@
+<div id="main">
+    <div>
+      <h1>{{ "checklist.create.form.checklist.title" | translate }}</h1>
+    </div>
+  
+    <!-- <div *ngIf="!userCanEdit" class="my2" fxLayout="row" fxLayoutGap="1rem">
+      {{"checklist.create.lacks.create.permission" | translate}}
+    </div> -->
+    <!-- <div *ngIf="userCanEdit" class="my2" fxLayout="row" fxLayoutGap="1rem"> -->
+      <div class="my2" fxLayout="row" fxLayoutGap="1rem">
+      <div mat-dialog-content>
+        <form class="example-form">
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>{{ "checklist.create.form.checklist.name" | translate }}</mat-label>
+            <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
+                   [placeholder]="'checklist.create.form.checklist.name' | translate ">
+          </mat-form-field>
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>{{ "checklist.create.form.checklist.authors" | translate }}</mat-label>
+            <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
+                   [placeholder]="'checklist.create.form.checklist.authors' | translate ">
+          </mat-form-field>
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>{{ "checklist.create.form.checklist.locality" | translate }}</mat-label>
+            <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
+                   [placeholder]="'checklist.create.form.checklist.locality' | translate ">
+          </mat-form-field>
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>{{ "checklist.create.form.checklist.citation" | translate }}</mat-label>
+            <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
+                   [placeholder]="'checklist.create.form.checklist.citation' | translate ">
+          </mat-form-field>
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>{{ "checklist.create.form.checklist.abstract" | translate }}</mat-label>
+            <textarea type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
+                   [placeholder]="'checklist.create.form.checklist.abstract' | translate "></textarea>
+          </mat-form-field>
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>{{ "checklist.create.form.checklist.notes" | translate }}</mat-label>
+            <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
+                   [placeholder]="'checklist.create.form.checklist.notes' | translate ">
+          </mat-form-field>
+          <mat-form-field style="width:auto" class="example-full-width" appearance="fill">
+            <mat-label>{{ "checklist.create.form.checklist.reference" | translate }}</mat-label>
+            <mat-select>
+              <mat-option [value]="">
+                {{'some text'}}
+              </mat-option>
+              <mat-option [value]="">
+                {{'some text'}}
+              </mat-option>
+              <mat-option [value]="">
+                {{'some text'}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field> <br>
+          <mat-form-field style="width:12%;margin-right: 2%">
+            <mat-label>{{ "checklist.create.form.checklist.lat" | translate }}</mat-label>
+            <input matInput>
+          </mat-form-field>
+          <mat-form-field style="width:12%;margin-right: 0.5%">
+            <mat-label>{{ "checklist.create.form.checklist.lon" | translate }}</mat-label>
+            <input matInput>
+          </mat-form-field>
+          <img mat-card-sm-image style="height: 1rem;width:auto;cursor:pointer;margin-top:2rem;box-shadow:0 0 2px 4px 0.0.0.0.3;margin-right:2%" 
+                 src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Globe.svg" >
+          <mat-form-field style="width:20%;">
+            <mat-label>{{ "checklist.create.form.checklist.point" | translate }}</mat-label>
+            <input matInput>
+          </mat-form-field>
+
+          <mat-card class="example-card" style="width: 40%;float:right;margin-top:-2rem">
+            <mat-card-title-group>
+              <mat-card-title>{{ "checklist.create.form.checklist.polygon.title" | translate }}</mat-card-title>
+              <!-- <mat-card-subtitle>Small</mat-card-subtitle> -->
+              <img mat-card-sm-image style="height: 1.4rem;width:auto;cursor:pointer;box-shadow:0 0 2px 4px 0.0.0.0.3" src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Globe.svg" >
+            </mat-card-title-group>
+            <mat-card-content>
+              {{ "checklist.create.form.checklist.polygon.description" | translate }}
+            </mat-card-content>
+          </mat-card><br><br>
+
+          <section class="example-section" [formGroup]="toppings">
+            <h4>{{ "checklist.create.form.checklist.display.settings" | translate }}</h4>
+            <mat-checkbox formControlName="commonNames">Display Common Names</mat-checkbox><br>
+            <mat-checkbox formControlName="images">Display as Images</mat-checkbox><br>
+            <mat-checkbox formControlName="notesAndVouchers">Show Notes & Vouchers</mat-checkbox><br>
+            <mat-checkbox formControlName="taxonAuthors">Dislay Taxon Authors</mat-checkbox><br>
+            <mat-checkbox formControlName="taxaAlghabetically">Display Taxa Alphabetically</mat-checkbox><br>
+            <mat-checkbox formControlName="identificationKey">Activate Identification Key</mat-checkbox><br>
+          </section><br>
+
+          <mat-form-field style="width: auto;" class="example-full-width" appearance="fill">
+            <mat-label>{{ "checklist.create.form.checklist.access" | translate }}</mat-label>
+            <mat-select style="height: 1rem">
+              <mat-option [value]="" selected>
+                {{'Private'}}
+              </mat-option>
+              <mat-option [value]="">
+                {{'Public'}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field> <br>
+          <button mat-raised-button color="primary">{{ "checklist.create.form.checklist.submit" | translate }}</button>
+          <hr style="margin: 2rem 0; border-top: 1px solid rgb(235, 235, 235)">
+
+          <mat-card class="example-card">
+            <mat-card-title-group>
+              <mat-card-title>{{ "checklist.create.form.checklist.checklists.assigned" | translate }}</mat-card-title>
+            </mat-card-title-group>
+            <mat-card-content>
+              <mat-list role="list">
+                <mat-list-item role="listitem">Pakistan, Balochistan, Quetta District</mat-list-item>
+              </mat-list>
+            </mat-card-content>
+          </mat-card><br>
+
+          <mat-card class="example-card">
+            <mat-card-title-group>
+              <mat-card-title>{{ "checklist.create.form.checklist.inventory.project.administration" | translate }}</mat-card-title>
+            </mat-card-title-group>
+            <mat-card-content>
+              <mat-list role="list">
+                <mat-list-item role="listitem">There are no Projects for which you have administrative permissions</mat-list-item>
+              </mat-list>
+            </mat-card-content>
+          </mat-card>
+        </form>
+    </div>
+  </div>

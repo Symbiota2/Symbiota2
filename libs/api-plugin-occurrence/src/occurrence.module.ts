@@ -1,3 +1,4 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import { Module } from '@nestjs/common';
 import { OccurrenceService } from './occurrence/occurrence.service';
 import { OccurrenceController } from './occurrence/occurrence.controller';

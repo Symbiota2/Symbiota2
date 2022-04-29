@@ -1,0 +1,306 @@
+services:
+  mariadb:
+    image: "mariadb:10.5"
+    container_name: s2-mariadb
+    environment:
+      TZ: "America/Phoenix"
+      MYSQL_ROOT_PASSWORD: ${SYMBIOTA2_DATABASE_PASSWORD:-password}
+    # To allow for big BLOB values; default is 64M
+    command: ["--max_allowed_packet=256M"]
+    volumes:
+      - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
+      - "${SYMBIOTA2_DATABASE_VOLUME:-s2-db:/var/lib/mysql}"
+    ports: ["${SYMBIOTA2_DATABASE_PORT:-3306}:3306"]
+
+  redis:
+    image: "redis:6"
+    container_name: s2-redis
+    command: "redis-server --appendonly yes"
+    volumes: ["redis:/data"]
+    ports: ["${SYMBIOTA2_REDIS_PORT:-6379}:6379"]
+
+  s3:
+    image: "quay.io/minio/minio:RELEASE.2021-09-24T00-24-24Z"
+    container_name: s2-storage
+    environment:
+      MINIO_ROOT_USER: ${SYMBIOTA2_MINIO_ROOT_USER:-symbiota2}
+      MINIO_ROOT_PASSWORD: ${SYMBIOTA2_MINIO_ROOT_PASSWORD:-password}
+    command: "server /data --console-address ':9001'"
+    volumes: ["s3:/data"]
+    ports:
+      - "${SYMBIOTA2_S3_HOST:-127.0.0.1}:${SYMBIOTA2_S3_PORT1:-9000}:9000"
+      - "${SYMBIOTA2_S3_HOST:-127.0.0.1}:${SYMBIOTA2_S3_PORT2:-9001}:9001"
+
+  setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${SYMBIOTA2_ELASTICSEARCH_VERSION:-8.1.2}
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+    user: "0"
+    command: >
+      bash -c '
+        echo "vm.max_map_count = 262144" >> /etc/sysctl.d/99-sysctl.conf;
+        if [ x${SYMBIOTA2_ELASTIC_PASSWORD:-hello} == x ]; then
+          echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
+          exit 1;
+        elif [ x${SYMBIOTA2_KIBANA_PASSWORD:-hellothere} == x ]; then
+          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
+          exit 1;
+        fi;
+        if [ ! -f certs/ca.zip ]; then
+          echo "Creating CA";
+          bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
+          unzip config/certs/ca.zip -d config/certs;
+        fi;
+        if [ ! -f certs/certs.zip ]; then
+          echo "Creating certs";
+          echo -ne \
+          "instances:\n"\
+          "  - name: es01\n"\
+          "    dns:\n"\
+          "      - es01\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: es02\n"\
+          "    dns:\n"\
+          "      - es02\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: es03\n"\
+          "    dns:\n"\
+          "      - es03\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          > config/certs/instances.yml;
+          bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
+          unzip config/certs/certs.zip -d config/certs;
+        fi;
+        echo "Setting file permissions"
+        chown -R root:root config/certs;
+        find . -type d -exec chmod 750 \{\} \;;
+        find . -type f -exec chmod 640 \{\} \;;
+        chmod -R a+rx config/certs;
+        echo "Waiting for Elasticsearch availability";
+        until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
+        echo "Setting kibana_system password";
+        until curl -s -X POST --cacert config/certs/ca/ca.crt -u elastic:${SYMBIOTA2_ELASTIC_PASSWORD:-hello} -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${SYMBIOTA2_KIBANA_PASSWORD:-hellothere}\"}" | grep -q "^{}"; do sleep 10; done;
+        echo "All done!";
+      '
+    healthcheck:
+      test: [ "CMD-SHELL", "[ -f config/certs/es01/es01.crt ]" ]
+      interval: 1s
+      timeout: 5s
+      retries: 120
+
+  es01:
+    depends_on:
+      setup:
+        condition: service_healthy
+
+    image: docker.elastic.co/elasticsearch/elasticsearch:${SYMBIOTA2_ELASTICSEARCH_VERSION:-8.1.2}
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+      - esdata01:/usr/share/elasticsearch/data
+      #- type: bind
+      #  source: ${SYMBIOTA2_ELASTICSEARCH_DATA_FOLDER:-./elasticsearch/data/esdata01}
+      #  target: /usr/share/elasticsearch/data
+    ports:
+      - ${SYMBIOTA2_ELASTICSEARCH_PORT:-9200}:9200
+    environment:
+      - node.name=es01
+      - logger.level=error
+      - cluster.name=${SYMBIOTA2_CLUSTER_NAME:-elasticsearch}
+      - cluster.initial_master_nodes=es01,es02,es03
+      - discovery.seed_hosts=es02,es03
+      - ELASTIC_PASSWORD=${SYMBIOTA2_ELASTIC_PASSWORD:-hello}
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.http.ssl.key=certs/es01/es01.key
+      - xpack.security.http.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.http.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es01/es01.key
+      - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.license.self_generated.type=${SYMBIOTA2_LICENSE:-basic}
+    mem_limit: ${MEM_LIMIT:-1073741824}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test:
+        [
+            "CMD-SHELL",
+            "curl -s --cacert config/certs/ca/ca.crt https://localhost:${SYMBIOTA2_ELASTICSEARCH_PORT:-9200} | grep -q 'missing authentication credentials'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+  es02:
+    depends_on:
+      - es01
+    image: docker.elastic.co/elasticsearch/elasticsearch:${SYMBIOTA2_ELASTICSEARCH_VERSION:-8.1.2}
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+      - esdata02:/usr/share/elasticsearch/data
+      #- type: bind
+      #  source: ${SYMBIOTA2_ELASTICSEARCH_DATA_FOLDER:-./elasticsearch/data/esdata02}
+      #  target: /usr/share/elasticsearch/data
+    environment:
+      - node.name=es02
+      - logger.level=error
+      - cluster.name=${SYMBIOTA2_CLUSTER_NAME:-elasticsearch}
+      - cluster.initial_master_nodes=es01,es02,es03
+      - discovery.seed_hosts=es01,es03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.http.ssl.key=certs/es02/es02.key
+      - xpack.security.http.ssl.certificate=certs/es02/es02.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.http.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es02/es02.key
+      - xpack.security.transport.ssl.certificate=certs/es02/es02.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.license.self_generated.type=${LICENSE:-basic}
+    mem_limit: ${SYMBIOTA2_ELASTICSEARCH_MEM_LIMIT:-1073741824}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test:
+        [
+            "CMD-SHELL",
+            "curl -s --cacert config/certs/ca/ca.crt https://localhost:${SYMBIOTA2_ELASTICSEARCH_PORT:-9200} | grep -q 'missing authentication credentials'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+  es03:
+    depends_on:
+      - es02
+    image: docker.elastic.co/elasticsearch/elasticsearch:${SYMBIOTA2_ELASTICSEARCH_VERSION:-8.1.2}
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+      - esdata03:/usr/share/elasticsearch/data
+      #- type: bind
+      #  source: ${SYMBIOTA2_ELASTICSEARCH_DATA_FOLDER:-./elasticsearch/data/esdata03}
+      #  target: /usr/share/elasticsearch/data
+    environment:
+      - node.name=es03
+      - logger.level=error
+      - cluster.name=${SYMBIOTA2_CLUSTER_NAME:-elasticsearch}
+      - cluster.initial_master_nodes=es01,es02,es03
+      - discovery.seed_hosts=es01,es02
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.http.ssl.key=certs/es03/es03.key
+      - xpack.security.http.ssl.certificate=certs/es03/es03.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.http.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es03/es03.key
+      - xpack.security.transport.ssl.certificate=certs/es03/es03.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.license.self_generated.type=${SYMBIOTA2_ELASTICSEARCH_LICENSE:-basic}
+    mem_limit: ${SYMBIOTA2_ELASTICSEARCH_MEM_LIMIT:-1073741824}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test:
+        [
+            "CMD-SHELL",
+            "curl -s --cacert config/certs/ca/ca.crt https://localhost:${SYMBIOTA2_ELASTICSEARCH_PORT:-9200} | grep -q 'missing authentication credentials'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+  kibana:
+    depends_on:
+      es01:
+        condition: service_healthy
+      es02:
+        condition: service_healthy
+      es03:
+        condition: service_healthy
+    image: docker.elastic.co/kibana/kibana:${SYMBIOTA2_ELASTICSEARCH_VERSION:-8.1.2}
+    volumes:
+      - certs:/usr/share/kibana/config/certs
+      - kibanadata:/usr/share/kibana/data
+    ports:
+      - ${SYMBIOTA2_KIBANA_PORT:-5601}:5601
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=http://es01:${SYMBIOTA2_ELASTICSEARCH_PORT:-9200}
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${SYMBIOTA2_KIBANA_PASSWORD:-hellothere}
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+    mem_limit: ${SYMBIOTA2_ELASTICSEARCH_MEM_LIMIT:-1073741824}
+    healthcheck:
+      test:
+        [
+            "CMD-SHELL",
+            "curl -s -I http://localhost:${SYMBIOTA2_KIBANA_PORT:-5601} | grep -q 'HTTP/1.1 302 Found'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+  logstash:
+    depends_on: [elasticsearch]
+    image: docker.elastic.co/logstash/logstash:${SYMBIOTA2_LOGSTASH_VERSION:-8.1.2}
+    container_name: s2-logstash
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+      - type: bind
+        source: ${SYMBIOTA2_LOGSTASH_CONFIG_FOLDER:-./logstash/config}/pipelines.yml
+        target: /usr/share/logstash/config/pipelines.yml
+        read_only: true
+      - type: bind
+        source: ${SYMBIOTA2_LOGSTASH_FOLDER:-./logstash}/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+      - type: bind
+        source: ${SYMBIOTA2_LOGSTASH_FOLDER:-./logstash}/data
+        target: /var/lib/logstash/data
+    ports:
+      - "${SYMBIOTA2_LOGSTASH_PORT:-5600}:5600"
+    command: --config.reload.automatic
+    environment:
+      - "LS_JAVA_OPTS=${SYMBIOTA2_LOGSTASH_ENV_JAVA_OPTIONS:--Xmx1g -Xms1g}"
+      - xpack.management.enable=true
+    links:
+      - "es01:elasticsearch"
+
+volumes:
+  s2-db: { name: s2-db }
+  redis: { name: s2-redis }
+  s3: { name: s2-storage }
+  certs:
+    driver: local
+  esdata01:
+    driver: local
+  esdata02:
+    driver: local
+  esdata03:
+    driver: local
+  kibanadata:
+    driver: local
+
+

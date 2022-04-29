@@ -7,6 +7,7 @@
 	"core.layout.header.topnav.search_dropdown": "Search",
 	"core.layout.header.topnav.tools_dropdown": "Tools",
 	"core.layout.header.topnav.resources_dropdown": "Resources",
+	"core.layout.header.topnav.superadmin_dropdown": "Super Admin",
 	"core.layout.header.topnav.statistics_link": "Statistics",
 	"core.layout.header.topnav.home_link": "Home",
 	"core.layout.header.topnav.images_link": "Images",
@@ -31,6 +32,7 @@
 	"core.layout.header.topnav.resource_link_four": "Citizen Science (NfN)",
 	"core.layout.header.topnav.resource_link_five": "Digitization Workflows",
 	"core.layout.header.topnav.resource_link_six": "SCAN",
+	"core.layout.header.topnav.userlist_link_one": "User List",
 	"core.layout.header.topnav.welcome_line": "Welcome {{firstName}}!",
 	"core.layout.home.para_one": "Parasitic arthropods inflict an enormous burden on human society, in terms of both human health and agricultural impact. The negative effect of parasitic arthropods appears to be increasing as climates and ecosystems change. From the historical impact of flea transmitted bubonic plague, to mosquito borne diseases such as malaria and dengue, to tick transmitted Lyme disease, arthropod vectors have delivered disease to hundreds of millions of people. Arthropod-borne pathogens can also have a significant impact on our livestock, which poses a serious threat to agriculture and food security globally. Entomology collections around the world host valuable information about the diversity and distribution of these arthropod vectors through space and time, yet these data have not been synthesized or made visible to scientists across the many relevant disciplines.",
 	"core.layout.home.para_two": "This portal brings together terrestrial arthropod parasite records from many different museum collections and makes them available to everyone.",
@@ -51,5 +53,6 @@
 	"core.layout.sitemap.install_plugins_link_text": "Install Plugins",
 	"core.layout.sitemap.manage_plugins_link_text": "Manage Plugins",
 	"core.layout.sitemap.portal_management_header": "Portal Management",
-	"core.layout.sitemap.user_management_link_text": "User Management"
+	"core.layout.sitemap.user_management_link_text": "User Management",
+	"core.layout.superadmin.user_list_denied": "Not logged in or insufficient privileges to use superadmin functions."
 }

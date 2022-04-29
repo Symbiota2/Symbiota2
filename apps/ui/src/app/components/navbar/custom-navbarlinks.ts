@@ -1,4 +1,4 @@
-import { NavBarLink } from "@symbiota2/ui-common";
+import { NavBarLink, ROUTE_USER_LIST } from "@symbiota2/ui-common";
 import { ROUTE_COLLECTION_LIST } from "@symbiota2/ui-plugin-collection";
 import { IMAGE_SEARCH_ROUTE } from "libs/ui-plugin-image/src/lib/routes";
 import { ROUTE_SEARCH_OCCURRENCES, ROUTE_SPATIAL_MODULE } from "libs/ui-plugin-occurrence/src/lib/routes";
@@ -82,14 +82,10 @@ export const customLinksEnd: Map<string, NavBarLink[]> = new Map<string, NavBarL
 ]);
 
 export const superAdminLinks: Map<string, NavBarLink[]> = new Map<string, NavBarLink[]>([
-    ['core.layout.header.topnav.SuperAdmin_dropdown', [
+    ['core.layout.header.topnav.superadmin_dropdown', [
         <NavBarLink>{
-            name: 'Secret admin link.',
-            url: 'https://scan-bugs.org/portal/',
-        },
-        <NavBarLink>{
-            name: 'Test Admin Link.',
-            url: 'https://symbiota.org/help-resources/',
-        },
+            name: 'core.layout.header.topnav.userlist_link_one',
+            url: ROUTE_USER_LIST,
+        }
     ]]
 ]);
