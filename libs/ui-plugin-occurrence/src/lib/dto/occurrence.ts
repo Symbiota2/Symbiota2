@@ -65,7 +65,8 @@ type MiscInfoProps = (
     'samplingProtocol' |
     'sex' |
     'substrate' |
-    'verbatimAttributes'
+    'verbatimAttributes' |
+    'degreeOfEstablishment'
 );
 interface MiscInfo extends Pick<Occurrence, MiscInfoProps> { }
 
@@ -136,6 +137,7 @@ export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurre
     @Expose() verbatimDepth: string;
     @Expose() verbatimElevation: string;
     @Expose() verbatimEventDate: string;
+    @Expose() degreeOfEstablishment: string;
 
     static fromJSON(occurrenceJSON: Record<string, unknown>): Occurrence {
         return plainToClass(
@@ -206,7 +208,8 @@ export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurre
             samplingProtocol: this.samplingProtocol,
             sex: this.sex,
             substrate: this.substrate,
-            verbatimAttributes: this.verbatimAttributes
+            verbatimAttributes: this.verbatimAttributes,
+            degreeOfEstablishment: this.degreeOfEstablishment
         };
     }
 

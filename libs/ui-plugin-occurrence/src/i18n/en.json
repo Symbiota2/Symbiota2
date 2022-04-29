@@ -51,6 +51,7 @@
     "plugins.occurrence.fields.verbatimDepth": "Verbatim depth",
     "plugins.occurrence.fields.verbatimElevation": "Verbatim elevation",
     "plugins.occurrence.fields.verbatimEventDate": "Verbatim event date",
+    "plugins.occurrence.fields.degreeOfEstablishment": "Degree of establishment",
     "plugins.occurrence.search.taxonCriteria.familyOrSciName": "Family or scientific name",
     "plugins.occurrence.search.taxonCriteria.family": "Family only",
     "plugins.occurrence.search.taxonCriteria.sciName": "Scientific name only",
