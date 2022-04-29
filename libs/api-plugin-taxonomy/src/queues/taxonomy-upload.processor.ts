@@ -490,6 +490,7 @@ export class TaxonomyUploadProcessor {
                         if (skippedTaxonsDueToMultipleMatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
                             skippedTaxonsDueToMultipleMatch.push(row)
                         }
+                        this.logger.warn("Skipping row due to multiple mismatch")
                         skip = true
                     }
                 }
