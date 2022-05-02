@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { getManager, Not, Repository } from 'typeorm';
+import { getManager, InsertResult, Not, Repository } from 'typeorm';
 import { TaxonomicEnumTreeFindAllParams } from './dto/taxonomicEnumTree-find-all.input.dto';
 import { BaseService } from '@symbiota2/api-common';
 import { TaxaEnumTreeEntry, Taxon, TaxonomicStatus, TaxonomicUnit } from '@symbiota2/api-database';
@@ -199,6 +199,29 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
     }
 
     /**
+     * Insert a taxonomic enum tree record using a Full TaxaEnumTreeEntry record
+     * @param data The data for the record to create
+     * @return number The created data or null (not found)
+     */
+    async saveCheck(data: TaxaEnumTreeEntry): Promise<InsertResult> {
+        // Let's check if it is already in the taxaenumtree
+        /*
+        const myRecord =
+            await this.enumTreeRepository.find({
+                where: {
+                    taxonID: data.taxonID,
+                    taxonAuthorityID: data.taxonAuthorityID,
+                    parentTaxonID:  data.parentTaxonID
+                }})
+
+        if (myRecord) return data; // exists in table
+
+         */
+        //if (data.taxonID = data.parentTaxonID) return  // return if same, why same?
+        return await this.enumTreeRepository.upsert(data,[])
+    }
+
+    /**
      * Delete all the enum tree records using a taxon id
      * @param taxonID The id of the taxon
      * @return TaxaEnumTreeEntry A fake enum tree entry if good else null (not found or api error)
@@ -219,7 +242,74 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
         return null
     }
 
+    /**
+     * Modify the taxa enum tree by extending a taxon with a child.
+     * Delete from the tree the records for the taxon
+     * Insert into the tree the records for where the taxon moved to
+     * @param taxonID - the id of the taxon to move
+     * @param taxonAuthorityID - the id of the taxa authority
+     * @param parentTaxonID - the id of the taxon to move this taxon to
+     * @return TaxaEnumTreeEntry the moved taxons or null (not found)
+     * @see TaxaEnumTreeEntry
+     */
+    async extendTaxonTree(taxonID, taxonAuthorityID, parentTaxonID): Promise<TaxaEnumTreeEntry> {
 
+        // Let's check if it is already in the taxaenumtree
+        const myRecord =
+            await this.enumTreeRepository.find({
+                where: {
+                    taxonID: taxonID,
+                    taxonAuthorityID: taxonAuthorityID,
+                    parentTaxonID:  parentTaxonID
+                }})
+
+        if (myRecord) return; // exists in table
+
+        // First find all of the new parent's taxaEnum tree entries
+        const newAncestors =
+            await this.enumTreeRepository.find({
+                where: {
+                    taxonAuthorityID: taxonAuthorityID,
+                    taxonID: parentTaxonID
+                }})
+
+        // console.log(" zzzz newAncestors " + newAncestors.length)
+        // Sanity check, don't delete if parent info not found!
+        if (!newAncestors) return null
+
+        // Delete this taxonID's taxaEnum tree entries
+        await this.enumTreeRepository.delete({
+            taxonAuthorityID: taxonAuthorityID,
+            taxonID: taxonID
+        })
+
+        // console.log(" zzzz did delete " + newAncestors.length)
+        // Update the enum tree pointing the taxonID to the new parent's ancestors
+        const buffer : Partial<TaxaEnumTreeEntry>[] = []
+        await newAncestors.forEach((entry) => {
+            const data = new TaxaEnumTreeEntry()
+            data.parentTaxonID = entry.parentTaxonID
+            data.taxonID = taxonID
+            data.taxonAuthorityID = entry.taxonAuthorityID
+            data.initialTimestamp = new Date()
+            buffer.push(data)
+            this.saveCheck(data)
+        })
+
+        // console.log(" zzzz did saves " + newAncestors.length)
+        // Add the entry for taxon with the new parent
+        const data = new TaxaEnumTreeEntry()
+        data.parentTaxonID = parentTaxonID
+        data.taxonID = taxonID
+        data.taxonAuthorityID = taxonAuthorityID
+        data.initialTimestamp = new Date()
+
+        // Save the updates
+        buffer.unshift(data)
+        await this.saveCheck(data)
+        // await this.enumTreeRepository.save(buffer)
+        return data
+    }
 
     /**
      * Modify the taxa enum tree by moving a taxon within the tree.
@@ -237,8 +327,20 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
         /*
         // [TODO wrap in a transaction? ]
         await getManager().transaction("SERIALIZABLE", entityManager => {
-
         })
+         */
+
+        /*
+        // Let's check if it is already in the taxaenumtree
+        const myRecord =
+            await this.enumTreeRepository.find({
+                where: {
+                    taxonID: taxonID,
+                    taxonAuthorityID: taxonAuthorityID,
+                    parentTaxonID:  parentTaxonID
+                }})
+
+        if (myRecord) return; // exists in table
          */
 
         // First find all of the new parent's taxaEnum tree entries
@@ -270,6 +372,7 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
                 }
             })
 
+
         // Delete the taxonID's taxaEnum tree entries
         await this.enumTreeRepository.delete({
             taxonAuthorityID: taxonAuthorityID,
@@ -278,14 +381,16 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
 
         // Update the enum tree pointing the taxonID to the new parent's ancestors
         const buffer : Partial<TaxaEnumTreeEntry>[] = []
-        entries.forEach((entry) => {
+        await entries.forEach((entry) => {
             const data = new TaxaEnumTreeEntry()
             data.parentTaxonID = entry.parentTaxonID
             data.taxonID = taxonID
             data.taxonAuthorityID = entry.taxonAuthorityID
             data.initialTimestamp = new Date()
             buffer.push(data)
+            this.saveCheck(data)
         })
+
 
         // For all of the descendants, delete their relevant taxaEnum tree entries
         // and add the new ones
@@ -299,8 +404,11 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
             })
         })
 
+
         // Need to do two loops to let the deletes finish before the inserts
         await descendants.forEach((descendant) => {
+            this.doSave(entries, descendant, buffer)
+            /*
             entries.forEach((entry) => {
                 const data = new TaxaEnumTreeEntry()
                 data.parentTaxonID = entry.parentTaxonID
@@ -308,8 +416,9 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
                 data.taxonAuthorityID = entry.taxonAuthorityID
                 data.initialTimestamp = new Date()
                 buffer.push(data)
-                //this.save(data)
+                // this.save(data)
             })
+             */
             // Add the entry for descendant with the new parent
             const data = new TaxaEnumTreeEntry()
             data.parentTaxonID = parentTaxonID
@@ -317,7 +426,7 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
             data.taxonAuthorityID = taxonAuthorityID
             data.initialTimestamp = new Date()
             buffer.push(data)
-            //this.save(data)
+            this.saveCheck(data)
         })
 
         // Add the entry for taxon with the new parent
@@ -329,8 +438,24 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
 
         // Save the updates
         buffer.unshift(data)
-        await this.enumTreeRepository.save(buffer)
-        return data
+        await this.saveCheck(data)
+        //for (const row in buffer) {
+        //    await this.enumTreeRepository.save([row])
+        //}
+        // await this.enumTreeRepository.save(buffer)
+        //return data
+    }
+
+    private async doSave(entries, descendant, buffer) {
+        await entries.forEach((entry) => {
+            const data = new TaxaEnumTreeEntry()
+            data.parentTaxonID = entry.parentTaxonID
+            data.taxonID = descendant.taxonID
+            data.taxonAuthorityID = entry.taxonAuthorityID
+            data.initialTimestamp = new Date()
+            buffer.push(data)
+            this.saveCheck(data)
+        })
     }
 
     /**
@@ -340,7 +465,7 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
      */
     private async processRank(rankID, kingdomName, taxonAuthorityID) {
         // Fetch the statuses at this rank
-        console.log(" rank is " + rankID)
+        // console.log(" rank is " + rankID)
         const statuses = (kingdomName) ?
             await this.statusRepository.find({
                 where: {
@@ -359,7 +484,7 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
                 relations: ["taxon"]
             })
 
-        console.log("adding statuses " + statuses.length)
+        // ("adding statuses " + statuses.length)
         // Add to the enum tree
         for (let status of statuses) {
             // Add the entry for taxon with the new parent
