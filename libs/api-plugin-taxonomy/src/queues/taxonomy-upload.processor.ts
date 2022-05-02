@@ -211,7 +211,7 @@ export class TaxonomyUploadProcessor {
         } catch (e) {
             this.logger.error(`Error updating statistics: ${JSON.stringify(e)}`);
         }
-     }
+    }
 
     /**
      * Write each row to a new file based on the rank id
@@ -502,15 +502,18 @@ export class TaxonomyUploadProcessor {
             if (skip) {
                 // Should already be pushed into a skipped list
             } else {
+                let newRecordFlag = false
                 // Do we need to insert?
                 if (!dbTaxon) {
                     // Need to insert, create a new one
                     dbTaxon = this.taxonRepo.create(taxonData)
+                    newRecordFlag = true
                 }
                 // Update with taxonData information
                 let changed = false
                 for (const [k, v] of Object.entries(taxonData)) {
                     if (k in dbTaxon) {
+                        // this.logger.log(" k and stuff " + v + " other " + dbTaxon[k])
                         if (dbTaxon[k] != v) {
                             dbTaxon[k] = v
                             changed = true
@@ -521,18 +524,17 @@ export class TaxonomyUploadProcessor {
                 taxonUpdates.push(dbTaxon)
                 taxonRowToBatchRow.set(taxonRowNumber++, batchRowNumber)
                 // Only add to the change queue if actually changed
-                if (changed) {
+                if (changed || newRecordFlag) {
                     changedTaxons.push(dbTaxon)
                 }
             }
 
         }
 
-        // this.logger.log("zzzz saving to taxonRepo ")
-
         // Save all of the taxons
         //await this.taxonRepo.save(taxonUpdates)
-        await this.taxonRepo.upsert(changedStatuses, [])
+        // this.logger.log("zzz saving to taxonRepo " + changedTaxons.length)
+        await this.taxonRepo.upsert(changedTaxons, [])
         this.processed += taxonUpdates.length
 
         // this.logger.log("zzzz done saving to taxonRepo ")
@@ -730,9 +732,11 @@ export class TaxonomyUploadProcessor {
             if (skip) {
                 // Skipped, it is already in one of the skipped queues
             } else {
+                let newRecordFlag = false
                 if (!dbStatus) {
                     // Create
                     dbStatus = this.statusRepo.create(statusData)
+                    newRecordFlag = true
                 } else {
                     // Since the save later will die on already present status, need to delete this one if found
                    /* Curt took out since now using upsert
@@ -760,7 +764,7 @@ export class TaxonomyUploadProcessor {
                     }
                 }
 
-                if (changed) {
+                if (changed || newRecordFlag) {
                     changedStatuses.push(dbStatus)
                 }
                 statusUpdates.push(dbStatus)
