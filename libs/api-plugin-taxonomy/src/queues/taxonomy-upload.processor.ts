@@ -288,12 +288,14 @@ export class TaxonomyUploadProcessor {
 
         // list of all the updates to do to taxon records
         const taxonUpdates : Taxon[] = []
+        const changedTaxons : Taxon[] = []
         const skippedTaxonsDueToMultipleMatch = job.data.skippedTaxonsDueToMultipleMatch
         const skippedTaxonsDueToMismatchRank = job.data.skippedTaxonsDueToMismatchRank
         const skippedTaxonsDueToMissingName = job.data.skippedTaxonsDueToMissingName
 
         // list of all the updates to do to status records
         const statusUpdates : TaxonomicStatus[] = []
+        const changedStatuses : TaxonomicStatus[] = []
         const skippedStatusesDueToMultipleMatch = job.data.skippedStatusesDueToMultipleMatch
         const skippedStatusesDueToAcceptedMismatch = job.data.skippedStatusesDueToAcceptedMismatch
         const skippedStatusesDueToParentMismatch = job.data.skippedStatusesDueToParentMismatch
@@ -355,8 +357,8 @@ export class TaxonomyUploadProcessor {
 
         // Must have a kingdomName field
         if (!kingdomInRowName) {
-            this.logger.warn(`Mapping is missing a field for kingdom name! Exiting...`)
-            return // [TODO should throw error]
+            this.logger.error(`Mapping is missing a field for kingdom name! Exiting...`)
+            return
         }
 
         // Process the taxon info first
@@ -506,14 +508,22 @@ export class TaxonomyUploadProcessor {
                     dbTaxon = this.taxonRepo.create(taxonData)
                 }
                 // Update with taxonData information
+                let changed = false
                 for (const [k, v] of Object.entries(taxonData)) {
                     if (k in dbTaxon) {
-                        dbTaxon[k] = v;
+                        if (dbTaxon[k] != v) {
+                            dbTaxon[k] = v
+                            changed = true
+                        }
                     }
                 }
-                // this.logger.log("zzzz pushing update of dbtaxon")
+
                 taxonUpdates.push(dbTaxon)
                 taxonRowToBatchRow.set(taxonRowNumber++, batchRowNumber)
+                // Only add to the change queue if actually changed
+                if (changed) {
+                    changedTaxons.push(dbTaxon)
+                }
             }
 
         }
@@ -521,7 +531,8 @@ export class TaxonomyUploadProcessor {
         // this.logger.log("zzzz saving to taxonRepo ")
 
         // Save all of the taxons
-        await this.taxonRepo.save(taxonUpdates)
+        //await this.taxonRepo.save(taxonUpdates)
+        await this.taxonRepo.upsert(changedStatuses, [])
         this.processed += taxonUpdates.length
 
         // this.logger.log("zzzz done saving to taxonRepo ")
@@ -590,7 +601,6 @@ export class TaxonomyUploadProcessor {
 
                 let csvValue = row[csvField]
 
-
                 if (fieldToTable.get(dbField) == "artificial") {
                     // "AcceptedTaxonName", "ParentTaxonName",
                     if (dbField == "ParentTaxonName" || dbField == "AcceptedTaxonName") {
@@ -608,6 +618,7 @@ export class TaxonomyUploadProcessor {
                         let taxons = await this.taxonRepo.find({
                             where: whereClause
                         })
+
                         if (taxons.length == 0) {
                             // Not found, try again without the kingdom name
                             // this.logger.log("zzzz didn't find " + csvValue)
@@ -637,19 +648,40 @@ export class TaxonomyUploadProcessor {
                             csvValue = taxons[0].id
                         } else {
                             // Found more than one match
-                            skip = true
-                            if (dbField == "ParentTaxonName") {
-                                if (skippedStatusesDueToParentMismatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
-                                    skippedStatusesDueToParentMismatch.push(row)
-                                }
-                                this.logger.warn(`Parent taxon name has more than one matching taxon! Skipping...`)
-                            } else {
-                                if (skippedStatusesDueToAcceptedMismatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
-                                    skippedStatusesDueToAcceptedMismatch.push(row)
-                                }
-                                this.logger.warn(`Accepted taxon has more than one matching taxon! Skipping...`)
+                            // try again with limited to accepted names only
+
+                            const qb = this.taxonRepo.createQueryBuilder('o')
+                                .innerJoin('o.taxonStatuses', 'c')
+                                .where('c.taxonAuthorityID = :authorityID', { authorityID: job.data.authorityID })
+                                .andWhere('o.scientificName = :sciname', {sciname: csvValue})
+                                .andWhere('c.taxonID = c.taxonIDAccepted')
+
+                            // Does it have a kingdom name?  Use it if it does
+                            if (taxonData["kingdomName"]) {
+                                qb.andWhere('o.kingdomName = :kingdom', {kindgom: taxonData["kingdomName"]})
                             }
-                            continue
+
+                            taxons = await qb.getMany()
+
+                            if (taxons.length == 1) {
+                                // found exactly one, good!
+                                csvValue = taxons[0].id
+                            } else {
+                                // Still have problems skip
+                                skip = true
+                                if (dbField == "ParentTaxonName") {
+                                    if (skippedStatusesDueToParentMismatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                                        skippedStatusesDueToParentMismatch.push(row)
+                                    }
+                                    this.logger.warn(`Parent taxon name has more than one matching taxon! Skipping...`)
+                                } else {
+                                    if (skippedStatusesDueToAcceptedMismatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                                        skippedStatusesDueToAcceptedMismatch.push(row)
+                                    }
+                                    this.logger.warn(`Accepted taxon has more than one matching taxon! Skipping...`)
+                                }
+                                continue
+                            }
                         }
                     }
                     if (dbField == "ParentTaxonName") {
@@ -703,10 +735,13 @@ export class TaxonomyUploadProcessor {
                     dbStatus = this.statusRepo.create(statusData)
                 } else {
                     // Since the save later will die on already present status, need to delete this one if found
+                   /* Curt took out since now using upsert
                     this.statusRepo.delete({
                         taxonID: taxon.id,
                         taxonAuthorityID: job.data.authorityID
                     })
+
+                    */
                 }
 
                 // Set the taxon id explicitly
@@ -715,12 +750,19 @@ export class TaxonomyUploadProcessor {
                 // Set the taxonomic authority explicitly
                 dbStatus.taxonAuthorityID = job.data.authorityID
 
+                let changed = false
                 for (const [k, v] of Object.entries(statusData)) {
                     if (k in dbStatus) {
-                        dbStatus[k] = v
+                        if (dbStatus[k] != v) {
+                            dbStatus[k] = v
+                            changed = true
+                        }
                     }
                 }
 
+                if (changed) {
+                    changedStatuses.push(dbStatus)
+                }
                 statusUpdates.push(dbStatus)
                 // Figure out the rank for this status update
                 if (!statusRankMap.has(taxon.rankID)) {
@@ -733,7 +775,7 @@ export class TaxonomyUploadProcessor {
         }
 
         // Save all of the statuses
-        await this.statusRepo.save(statusUpdates)
+        await this.statusRepo.upsert(changedStatuses, [])
         //await this.statusRepo.upsert(statusUpdates, ["taxonID", "taxonIDAccepted", "taxonAuthorityID"])
         this.processed += statusUpdates.length
 

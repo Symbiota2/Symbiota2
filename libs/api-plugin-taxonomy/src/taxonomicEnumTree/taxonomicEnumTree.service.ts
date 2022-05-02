@@ -254,6 +254,17 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
      */
     async extendTaxonTree(taxonID, taxonAuthorityID, parentTaxonID): Promise<TaxaEnumTreeEntry> {
 
+        // Let's check if it is already in the taxaenumtree
+        const myRecord =
+            await this.enumTreeRepository.find({
+                where: {
+                    taxonID: taxonID,
+                    taxonAuthorityID: taxonAuthorityID,
+                    parentTaxonID:  parentTaxonID
+                }})
+
+        if (myRecord) return; // exists in table
+
         // First find all of the new parent's taxaEnum tree entries
         const newAncestors =
             await this.enumTreeRepository.find({
