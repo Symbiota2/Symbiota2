@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { User, UserService, UserRole } from '@symbiota2/ui-common';
 import { RoleOutputDto, UserOutputDto } from '@symbiota2/api-auth';
-import { FormBuilder, FormGroup } from '@angular/forms';
 import { UserPanel } from './userpanel-data';
 
 
@@ -19,12 +18,10 @@ export class UserlistPageComponent implements OnInit {
   userList: UserOutputDto[];
   userPerms: RoleOutputDto[][];
   userPanelList: UserPanel[];
-  sitePermsForm: FormGroup;
-  occurencePermsForm: FormGroup;
+
 
   constructor(
     private readonly userService: UserService,
-    fb: FormBuilder,
   ) { }
   ngOnInit(): void {
     this.userPerms = [];
