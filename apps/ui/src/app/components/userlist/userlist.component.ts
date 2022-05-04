@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { UserOutputDto } from '@symbiota2/api-auth';
+import { UserPanel } from '../../pages/userlist-page/userpanel-data';
 
 @Component({
   selector: 'symbiota2-userlist',
@@ -8,7 +9,8 @@ import { UserOutputDto } from '@symbiota2/api-auth';
 })
 export class UserlistComponent implements OnInit {
   @Input() userList: UserOutputDto[];
-  panelOpenState = false;
+  @Input() userPanelList: UserPanel[];
+  panelOpenState = true;
 
   constructor() { }
 

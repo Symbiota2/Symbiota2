@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { User, UserService, UserRole } from '@symbiota2/ui-common';
 import { RoleOutputDto, UserOutputDto } from '@symbiota2/api-auth';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { UserPanel } from './userpanel-data';
 
 
 @Component({
@@ -16,12 +18,17 @@ export class UserlistPageComponent implements OnInit {
   isSuperAdmin = false;
   userList: UserOutputDto[];
   userPerms: RoleOutputDto[][];
+  userPanelList: UserPanel[];
+  sitePermsForm: FormGroup;
+  occurencePermsForm: FormGroup;
 
   constructor(
     private readonly userService: UserService,
+    fb: FormBuilder,
   ) { }
   ngOnInit(): void {
     this.userPerms = [];
+    this.userPanelList = [];
     //Get user list and load data only they are a superadmin
     //Check if superAdmin
     this.currentUser$.subscribe(user => {
@@ -35,6 +42,8 @@ export class UserlistPageComponent implements OnInit {
             const currUserPerms$ = this.userService.getUserRolesById(user.uid);
             currUserPerms$.subscribe(currUserRoles => {
               this.userPerms.push(currUserRoles);
+              let currPanel = new UserPanel(user, currUserRoles);
+              this.userPanelList.push(currPanel);
             })
           });
         })
@@ -42,6 +51,9 @@ export class UserlistPageComponent implements OnInit {
 
     });
     console.log("USER PERMS", this.userPerms);
+    console.log("USER PANELS", this.userPanelList);
 
   }
+
+
 }

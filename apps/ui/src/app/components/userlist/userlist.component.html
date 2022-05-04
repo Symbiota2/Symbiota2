@@ -1,35 +1,42 @@
 <div id="userListDiv">
     <mat-accordion multi="True">
-        <mat-expansion-panel *ngFor="let user of userList" (opened)="panelOpenState = true"
+        <mat-expansion-panel *ngFor="let userPanel of userPanelList" (opened)="panelOpenState = true"
             (closed)="panelOpenState = false">
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    {{user.firstName}} {{user.lastName}}
+                    {{userPanel.user.firstName}} {{userPanel.user.lastName}}
                 </mat-panel-title>
                 <mat-panel-description>
-                    {{user.username}}
+                    {{userPanel.user.username}}
                 </mat-panel-description>
             </mat-expansion-panel-header>
             <mat-grid-list cols="2" rowHeight="100px" columnWidth=" 100px">
                 <mat-grid-tile class="profile-row" id="profile-tile1">
                     <div>
                         <ul>
-                            <li><strong>Title: </strong>{{user.title ? user.title : 'Not specified'}}</li>
-                            <li><strong>Institution: </strong>{{user.institution ? user.institution : 'Not specified'}}
+                            <li><strong>Title: </strong>{{userPanel.user.title ? userPanel.user.title : 'Not
+                                specified'}}</li>
+                            <li><strong>Institution: </strong>{{userPanel.user.institution ? userPanel.user.institution
+                                : 'Not specified'}}
                             </li>
-                            <li><strong>City: </strong>{{user.city ? user.city : 'Not specified'}}</li>
-                            <li><strong>State: </strong>{{user.state ? user.state : 'Not specified'}}</li>
+                            <li><strong>City: </strong>{{userPanel.user.city ? userPanel.user.city : 'Not specified'}}
+                            </li>
+                            <li><strong>State: </strong>{{userPanel.user.state ? userPanel.user.state : 'Not
+                                specified'}}</li>
                         </ul>
                     </div>
                 </mat-grid-tile>
                 <mat-grid-tile class="profile-row" id="profile-tile2">
                     <div>
                         <ul>
-                            <li><strong>Country: </strong>{{user.country ? user.country : 'Not specified'}}</li>
-                            <li><strong>Email: </strong>{{user.email ? user.email : 'Not specified'}}</li>
-                            <li><strong>URL: </strong>{{user.url ? user.url : 'Not specified'}}</li>
-                            <li><strong>Username: </strong>{{user.username ? user.username : 'Not specified'}} (Last
-                                login: {{user.lastLogin ? user.lastLogin : "Unknown"}})</li>
+                            <li><strong>Country: </strong>{{userPanel.user.country ? userPanel.user.country : 'Not
+                                specified'}}</li>
+                            <li><strong>Email: </strong>{{userPanel.user.email ? userPanel.user.email : 'Not
+                                specified'}}</li>
+                            <li><strong>URL: </strong>{{userPanel.user.url ? userPanel.user.url : 'Not specified'}}</li>
+                            <li><strong>Username: </strong>{{userPanel.user.username ? userPanel.user.username : 'Not
+                                specified'}} (Last
+                                login: {{userPanel.user.lastLogin ? userPanel.user.lastLogin : "Unknown"}})</li>
 
                         </ul>
                     </div>
