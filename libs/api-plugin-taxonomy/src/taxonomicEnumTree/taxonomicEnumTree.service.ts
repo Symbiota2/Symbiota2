@@ -89,7 +89,6 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
     async findDescendants(taxonid: number, params?: TaxonomicEnumTreeFindAllParams): Promise<TaxaEnumTreeEntry[]> {
         const { ...qParams } = params
         // Fetch the descendants
-        console.log(" finding " + taxonid + " " + params.taxonAuthorityID)
         return (qParams.taxonAuthorityID) ?
             await this.enumTreeRepository.find({
                 relations: ["taxon"],

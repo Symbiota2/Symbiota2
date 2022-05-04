@@ -5,7 +5,7 @@ import { v4 as uuid4 } from 'uuid';
 import { zipFiles } from '@symbiota2/api-common';
 import { Logger } from '@nestjs/common';
 import { PassThrough } from 'stream';
-import { getKGProperty, isKGID, KGRecordType } from '../decorators';
+import { getKGProperty, isKGID, KGNode } from '../decorators';
 import { IKGAMeta, IKGAMetaFileLocationType } from '../interfaces';
 
 export class KnowledgeGraphBuilder {
@@ -96,7 +96,7 @@ c
     }
 
     async addRecord(record: any): Promise<void> {
-        const recordType = KGRecordType(record.constructor);
+        const recordType = KGNode([], record.constructor)["url"];
         let recordID;
 
         if (!recordType) {

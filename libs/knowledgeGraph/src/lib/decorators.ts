@@ -2,7 +2,7 @@ import "reflect-metadata";
 const KG_META_PREFIX = 'kg';
 const KG_FIELD_PREFIX = `${KG_META_PREFIX}:field`;
 const KG_FIELD_LIST_PREFIX = `${KG_META_PREFIX}:fieldList`;
-const KGRecordTypeKey = Symbol(`${KG_META_PREFIX}:type`);
+const KGNodeKey = Symbol(`${KG_META_PREFIX}:type`);
 const KGRecordIDKey = Symbol(`${KG_META_PREFIX}:recordID`);
 
 /**
@@ -10,18 +10,18 @@ const KGRecordIDKey = Symbol(`${KG_META_PREFIX}:recordID`);
  * represents
  * @param url The URI identifier
  */
-export function KGType(url: string) {
-    return Reflect.metadata(KGRecordTypeKey, url)
+export function KGNode(graphs: string[], url: string) {
+    return Reflect.metadata(KGNodeKey, {graphs: graphs, url: url})
 }
 
 /**
  * Property decorator that describes which KG property the property corresponds to
  * @param url The KG URI identifier
  */
-export function KGProperty(url: string) {
+export function KGProperty(graphs: string[], url: string) {
     return function(instance, propertyName) {
         const metaKey = `${KG_FIELD_PREFIX}:${propertyName}`
-        return Reflect.defineMetadata(metaKey, url, instance.constructor)
+        return Reflect.defineMetadata(metaKey, {graphs: graphs, url: url}, instance.constructor)
     }
 }
 
@@ -30,10 +30,10 @@ export function KGProperty(url: string) {
  * of things
  * @param url The KG URI identifier
  */
-export function KGPropertyList(url: string) {
+export function KGEdge(graphs: string[], url: string) {
     return function(instance, propertyName) {
         const metaKey = `${KG_FIELD_LIST_PREFIX}:${propertyName}`;
-        return Reflect.defineMetadata(metaKey, url, instance.constructor);
+        return Reflect.defineMetadata(metaKey, {graphs: graphs, url: url}, instance.constructor);
     }
 }
 
@@ -51,10 +51,10 @@ export function KGID() {
 }
 
 /**
- * Retrieves the URI for the given class set by the KGRecord decorator
+ * Retrieves the JSON for the given class set by the KGNode decorator
  */
-export function KGRecordType(cls: any) {
-    return Reflect.getMetadata(KGRecordTypeKey, cls);
+export function getKGNode(cls: any) {
+    return Reflect.getMetadata(KGNodeKey, cls);
 }
 
 /**
@@ -70,7 +70,7 @@ export function getKGProperty(cls: any, propertyName: string) {
  * Retrieves the URI for the given propertyName on the given class,
  * set by the KGPropertyList decorator
  */
-export function getKGPropertyList(cls: any, propertyName: string) {
+export function getKGEdge(cls: any, propertyName: string) {
     const metaKey = `${KG_FIELD_LIST_PREFIX}:${propertyName}`;
     return Reflect.getMetadata(metaKey, cls);
 }
