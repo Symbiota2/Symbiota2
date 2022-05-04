@@ -282,6 +282,10 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
     static navBarLinks(): NavBarLink[] {
         return [
             {
+                url: `/${TAXA_VIEWER_ROUTE}`,
+                name: "core.layout.header.topnav.taxonomy.viewer.link"
+            },
+            {
                 url: `/${TAXA_PROFILER_ROUTE}`,
                 name: 'core.layout.header.topnav.taxonomy.profiler.link',
             },
@@ -307,10 +311,6 @@ export class TaxonomyPlugin extends SymbiotaUiPlugin {
                 url: `${TAXA_ROUTE}`,
                 name:
                     'core.layout.header.topnav.taxonomy.scientific.alternative.taxonomies',
-            },
-            {
-                url: `/${TAXA_VIEWER_ROUTE}`,
-                name: "core.layout.header.topnav.taxonomy.viewer.link"
             },
             {
                 url: `/${TAXA_EDITOR_ROUTE}`,
