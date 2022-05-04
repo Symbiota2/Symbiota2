@@ -21,8 +21,8 @@ import { CurrentUserGuard } from '../../../auth/guards/current-user.guard';
 import { SuperAdminGuard } from '../../../auth/guards/super-admin/super-admin.guard';
 
 @ApiTags('Users')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
+//@UseGuards(JwtAuthGuard)
+//@ApiBearerAuth()
 @Controller('users/:id/roles')
 export class UserRoleController {
     constructor(
@@ -34,7 +34,7 @@ export class UserRoleController {
         summary: "Return a list of roles for a user",
         description: "Only available to the user or a user with the 'SuperAdmin' role"
     })
-    @UseGuards(CurrentUserGuard)
+    //@UseGuards(CurrentUserGuard)
     @ApiResponse({ status: HttpStatus.OK, type: RoleOutputDto, isArray: true })
     async findAll(@Param('id') uid: number): Promise<RoleOutputDto[]> {
         const roles = await this.roleRepo.find({ uid });

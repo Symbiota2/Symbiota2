@@ -28,7 +28,7 @@ import { AlertService, LoadingService } from '../alert';
 import { HttpErrorResponse } from '@angular/common/http';
 import jwtDecode from 'jwt-decode';
 import { ApiCreateUserData, ApiUser } from '@symbiota2/data-access';
-import { UserOutputDto } from '@symbiota2/api-auth';
+import { RoleOutputDto, UserOutputDto } from '@symbiota2/api-auth';
 
 type AuthData = { username?: string; password?: string };
 interface NotificationResults {
@@ -154,7 +154,7 @@ export class UserService {
         private readonly alert: AlertService,
         private readonly api: ApiClientService,
         private readonly loading: LoadingService
-    ) {}
+    ) { }
 
     /**
      * Creates a new user
@@ -487,6 +487,29 @@ export class UserService {
                 return this.api.send(req).pipe(
                     map((user: UserOutputDto) => {
                         return user;
+                    })
+                );
+            })
+        );
+    }
+
+    getUserRolesById(uid: number): Observable<RoleOutputDto[]> {
+        return this.currentUser.pipe(
+            map((currentUser) => {
+                return currentUser.token;
+            }),
+            switchMap((token) => {
+                const url = `${this.usersUrl}/${uid}/roles`;
+                console.log(url);
+                const req = this.api
+                    .queryBuilder(url)
+                    .get()
+                    .addJwtAuth(token)
+                    .build();
+
+                return this.api.send(req).pipe(
+                    map((roles: RoleOutputDto[]) => {
+                        return roles;
                     })
                 );
             })

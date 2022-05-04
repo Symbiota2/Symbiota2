@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { User, UserService } from '@symbiota2/ui-common';
-import { UserOutputDto } from '@symbiota2/api-auth';
+import { User, UserService, UserRole } from '@symbiota2/ui-common';
+import { RoleOutputDto, UserOutputDto } from '@symbiota2/api-auth';
+
 
 @Component({
   selector: 'symbiota2-userlist-page',
@@ -14,11 +15,13 @@ export class UserlistPageComponent implements OnInit {
   user: User;
   isSuperAdmin = false;
   userList: UserOutputDto[];
+  userPerms: RoleOutputDto[][];
 
   constructor(
     private readonly userService: UserService,
   ) { }
   ngOnInit(): void {
+    this.userPerms = [];
     //Get user list and load data only they are a superadmin
     //Check if superAdmin
     this.currentUser$.subscribe(user => {
@@ -28,10 +31,17 @@ export class UserlistPageComponent implements OnInit {
         const userList$ = this.userService.getUsers();
         userList$.subscribe(userList => {
           this.userList = userList;
+          userList.forEach(user => {
+            const currUserPerms$ = this.userService.getUserRolesById(user.uid);
+            currUserPerms$.subscribe(currUserRoles => {
+              this.userPerms.push(currUserRoles);
+            })
+          });
         })
       }
 
     });
+    console.log("USER PERMS", this.userPerms);
 
   }
 }
