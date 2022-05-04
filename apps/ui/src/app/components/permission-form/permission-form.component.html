@@ -1,0 +1,65 @@
+<!-- <form id="permsForm" [formGroup]="permsForm"> -->
+<mat-grid-list cols="2" rowHeight="100px" columnWidth="100px">
+    <mat-grid-tile class="perms-row" id="SitePerms" [rowspan]=1.5>
+
+        <div>
+            <ul>
+                <li>
+                    <h3>Sitewide Permissions</h3>
+                </li>
+                <li>
+                    <mat-checkbox class="site-perm" [checked]="userPanel.hasPermission(SUPER_ADMIN)" name="SuperAdmin">
+                        Super
+                        Administrator</mat-checkbox>
+                </li>
+                <li>
+                    <mat-checkbox class="site-perm" [checked]="userPanel.hasPermission(TAXON_EDITOR)">
+                        Taxonomy Editor</mat-checkbox>
+                </li>
+                <li>
+                    <mat-checkbox class="site-perm" [checked]="userPanel.hasPermission(TAXON_PROFILE_EDITOR)">
+                        Taxonomy
+                        Profile
+                        Editor
+                    </mat-checkbox>
+                </li>
+                <li>
+                    <mat-checkbox class="site-perm" [checked]="userPanel.hasPermission(ROLE_KEY_ADMIN)">
+                        Identification Key Administrator</mat-checkbox>
+                </li>
+                <li>
+                    <mat-checkbox class="site-perm" [checked]="userPanel.hasPermission(ROLE_KEY_EDITOR)">
+                        Identification Key Editor</mat-checkbox>
+                </li>
+            </ul>
+        </div>
+    </mat-grid-tile>
+    <mat-grid-tile class="perms-row" id="OccurrencePerms" [rowspan]=1.5>
+        <div>
+            <ul>
+                <li>
+                    <h3>Occurrence Management Permissions</h3>
+                </li>
+                <li>
+                    <mat-checkbox class="site-perm" [checked]="userPanel.hasPermission(RARE_SPECIES_ADMIN)">
+                        Rare Species Administrator (can add/remove species)
+                    </mat-checkbox>
+                </li>
+                <li>
+                    <mat-checkbox class="site-perm" [checked]="userPanel.hasPermission(RARE_SPECIES_READER)">Can
+                        read
+                        Rare Species
+                        data
+                        for all collections
+                    </mat-checkbox>
+                </li>
+            </ul>
+        </div>
+    </mat-grid-tile>
+    <mat-grid-tile class="perms-row" id="OccurrencePerms" [rowspan]=.5>
+        <div id="submit-div">
+            <button mat-raised-button color="primary">Update Permissions</button>
+        </div>
+    </mat-grid-tile>
+</mat-grid-list>
+<!-- </form> -->

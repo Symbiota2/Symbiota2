@@ -45,6 +45,7 @@ h3 {
 
 .perms-row {
     height: fit-content;
+    //background-color: blueviolet;
 }
 
 .profile-row {
@@ -72,4 +73,9 @@ button {
     text-align: right;
     margin-left: auto;
     margin-right: 0;
+}
+
+.permission_form {
+    width: 100%;
+    height: 100%;
 }

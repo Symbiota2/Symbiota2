@@ -1,6 +1,6 @@
 <div id="userListDiv">
     <mat-accordion multi="True">
-        <mat-expansion-panel *ngFor="let userPanel of userPanelList" (opened)="panelOpenState = true"
+        <mat-expansion-panel *ngFor="let userPanel of userPanelList; let i=index" (opened)="panelOpenState = true"
             (closed)="panelOpenState = false">
             <mat-expansion-panel-header>
                 <mat-panel-title>
@@ -41,64 +41,10 @@
                         </ul>
                     </div>
                 </mat-grid-tile>
-                <mat-grid-tile class="perms-row" id="SitePerms" [rowspan]=1.5>
-                    <div>
-                        <ul>
-                            <li>
-                                <h3>Sitewide Permissions</h3>
-                            </li>
-                            <li>
-                                <mat-checkbox class="site-perm" [checked]="userPanel.hasPermission(SUPER_ADMIN)"
-                                    name="SuperAdmin">
-                                    Super
-                                    Administrator</mat-checkbox>
-                            </li>
-                            <li>
-                                <mat-checkbox class="site-perm" [checked]="userPanel.hasPermission(TAXON_EDITOR)">
-                                    Taxonomy Editor</mat-checkbox>
-                            </li>
-                            <li>
-                                <mat-checkbox class="site-perm"
-                                    [checked]="userPanel.hasPermission(TAXON_PROFILE_EDITOR)">Taxonomy Profile Editor
-                                </mat-checkbox>
-                            </li>
-                            <li>
-                                <mat-checkbox class="site-perm" [checked]="userPanel.hasPermission(ROLE_KEY_ADMIN)">
-                                    Identification Key Administrator</mat-checkbox>
-                            </li>
-                            <li>
-                                <mat-checkbox class="site-perm" [checked]="userPanel.hasPermission(ROLE_KEY_EDITOR)">
-                                    Identification Key Editor</mat-checkbox>
-                            </li>
-                        </ul>
-                    </div>
+                <mat-grid-tile class="perms-row" id="SitePerms" [rowspan]=3 [colspan]=2>
+                    <symbiota2-permission-form class="permission_form" [userPanel]="userPanel">
+                    </symbiota2-permission-form>
                 </mat-grid-tile>
-                <mat-grid-tile class="perms-row" id="OccurrencePerms" [rowspan]=1.5>
-                    <div>
-                        <ul>
-                            <li>
-                                <h3>Occurrence Management Permissions</h3>
-                            </li>
-                            <li>
-                                <mat-checkbox class="site-perm" [checked]="userPanel.hasPermission(RARE_SPECIES_ADMIN)">
-                                    Rare Species Administrator (can add/remove species)
-                                </mat-checkbox>
-                            </li>
-                            <li>
-                                <mat-checkbox class="site-perm"
-                                    [checked]="userPanel.hasPermission(RARE_SPECIES_READER)">Can read Rare Species data
-                                    for all collections
-                                </mat-checkbox>
-                            </li>
-                        </ul>
-                    </div>
-                </mat-grid-tile>
-                <mat-grid-tile class="perms-row" id="OccurrencePerms" [rowspan]=.5>
-                    <div id="submit-div">
-                        <button mat-raised-button color="primary">Update Permissions</button>
-                    </div>
-                </mat-grid-tile>
-
             </mat-grid-list>
         </mat-expansion-panel>
     </mat-accordion>

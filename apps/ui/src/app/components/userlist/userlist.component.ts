@@ -16,25 +16,10 @@ export class UserlistComponent implements OnInit {
   @Input() userPanelList: UserPanel[];
   panelOpenState = true;
 
-  //Role names ripped from the ApiUserRoleName enum to use here on the ui.
-  CHECKLIST_ADMIN = "ClAdmin";
-  COLLECTION_ADMIN = "CollAdmin";
-  COLLECTION_EDITOR = "CollEditor";
-  ROLE_COLLECTION_TAXON_EDITOR = "CollTaxon";
-  ROLE_KEY_ADMIN = "KeyAdmin";
-  ROLE_KEY_EDITOR = "KeyEditor";
-  PROJECT_ADMIN = "ProjAdmin";
-  RARE_SPECIES_ADMIN = "RareSppAdmin";
-  ROLE_RARE_SPP_EDITOR = "RareSppReader";
-  RARE_SPECIES_READER = "RareSppReadAll";
-  SUPER_ADMIN = "SuperAdmin";
-  TAXON_EDITOR = "Taxonomy";
-  TAXON_PROFILE_EDITOR = "TaxonProfile";
-
-  permsForm: FormGroup;
 
 
-  constructor(fb: FormBuilder,) { }
+
+  constructor() { }
 
   ngOnInit(): void {
   }

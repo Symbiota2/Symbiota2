@@ -46,6 +46,7 @@ import { UserlistPageComponent } from './pages/userlist-page/userlist-page.compo
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { UserlistComponent } from './components/userlist/userlist.component';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { PermissionFormComponent } from './components/permission-form/permission-form.component';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -79,6 +80,7 @@ const PLUGINS = [
         SitemapUnorderedListComponent,
         UserlistPageComponent,
         UserlistComponent,
+        PermissionFormComponent,
     ],
     imports: [
         MatToolbarModule,
