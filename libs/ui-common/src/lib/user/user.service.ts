@@ -516,6 +516,44 @@ export class UserService {
         );
     }
 
+
+    deleteRole(uid: number, roleID: number) {
+        this.currentUser
+            .pipe(
+                take(1),
+                map((user) => {
+                    if (!user) {
+                        throw new Error('Please log in');
+                    }
+                    return user;
+                }),
+                switchMap((user) => {
+                    const url = `${this.usersUrl}/${uid}/roles/${roleID}`;
+                    const query = this.api
+                        .queryBuilder(url)
+                        .delete()
+                        .addJwtAuth(user.token)
+                        .build();
+
+                    return this.api
+                        .send(query, { skipLoading: true })
+                        .pipe(map(() => null));
+                }),
+                catchError((e) => {
+                    return of(e);
+                })
+            )
+            .subscribe((err) => {
+                if (err !== null) {
+                    this.alert.showError(
+                        `Error deleting role: ${err.message}`
+                    );
+                } else {
+                    this.notificationDeleted.emit();
+                }
+            });
+    }
+
     private get loginUrl() {
         return `${this.api.apiRoot()}/auth/login`;
     }

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { RoleOutputDto } from '@symbiota2/api-auth';
-import { UserRole } from '@symbiota2/ui-common';
+import { UserRole, UserService } from '@symbiota2/ui-common';
 import { UserPanel } from '../../pages/userlist-page/userpanel-data';
 
 @Component({
@@ -29,7 +29,8 @@ export class PermissionFormComponent implements OnInit {
   permsForm: FormGroup;
 
 
-  constructor(private fb: FormBuilder,) { }
+  constructor(private fb: FormBuilder,
+    private readonly userService: UserService,) { }
 
   ngOnInit(): void {
     this.permsForm = this.fb.group({
@@ -50,8 +51,9 @@ export class PermissionFormComponent implements OnInit {
     let oldPermissions: RoleOutputDto[] = this.userPanel.permissions;
     var formData = this.permsForm.getRawValue();
     var selectedPermissions = [];
+    var permissionNamesToRemove = [];
     var permissionsToRemove = [];
-    //console.log(this.permsForm.getRawValue());
+
     for (var permissionName in formData) {
       if (formData[permissionName]) {
         selectedPermissions.push(permissionName);
@@ -60,10 +62,21 @@ export class PermissionFormComponent implements OnInit {
 
     for (var index in oldPermissions) {
       if (!selectedPermissions.includes(oldPermissions[index].name)) {
-        permissionsToRemove.push(oldPermissions[index].name);
+        permissionNamesToRemove.push(oldPermissions[index].name);
+        permissionsToRemove.push(oldPermissions[index]);
       }
     }
+
     alert("Selected permissions for user: " + this.userPanel.user.username + ": " + selectedPermissions + "\n"
-      + "Removing permissions: " + permissionsToRemove);
+      + "Removing permissions: " + permissionNamesToRemove);
+    console.log(permissionsToRemove);
+
+    //Add permissions
+
+    //Remove permissions
+    for (var index in permissionsToRemove) {
+      this.userService.deleteRole(this.userPanel.user.uid, permissionsToRemove[index].id);
+    }
+
   }
 }
