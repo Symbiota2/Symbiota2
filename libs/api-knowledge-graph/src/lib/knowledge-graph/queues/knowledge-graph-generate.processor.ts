@@ -39,7 +39,7 @@ export class KnowledgeGraphGenerateProcessor {
     async onKGGenerated(job: Job<KnowledgeGraphGenerateJob>) {
         const message = `Knowledge graph generation complete `;
         this.logger.debug(message);
-        // await this.notifications.add(job.data.userID, message);
+        await this.notifications.add(job.data.userID, message);
     }
 
     @OnQueueFailed()
@@ -48,9 +48,9 @@ export class KnowledgeGraphGenerateProcessor {
         this.logger.error(message);
         this.logger.error(JSON.stringify(err));
 
-        //await this.notifications.add(
-        //    job.data.userID,
-        //    `${message}: ${JSON.stringify(err)}`
-        //);
+        await this.notifications.add(
+            job.data.userID,
+            `${message}: ${JSON.stringify(err)}`
+        );
     }
 }
