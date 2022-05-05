@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { RoleOutputDto } from '@symbiota2/api-auth';
+import { UserRole } from '@symbiota2/ui-common';
 import { UserPanel } from '../../pages/userlist-page/userpanel-data';
 
 @Component({
@@ -26,9 +28,42 @@ export class PermissionFormComponent implements OnInit {
 
   permsForm: FormGroup;
 
-  constructor(fb: FormBuilder,) { }
+
+  constructor(private fb: FormBuilder,) { }
 
   ngOnInit(): void {
+    this.permsForm = this.fb.group({
+      SuperAdmin: this.userPanel.hasPermission(this.SUPER_ADMIN),
+      Taxonomy: this.userPanel.hasPermission(this.TAXON_EDITOR),
+      TaxonProfile: this.userPanel.hasPermission(this.TAXON_PROFILE_EDITOR),
+      KeyAdmin: this.userPanel.hasPermission(this.ROLE_KEY_ADMIN),
+      KeyEditor: this.userPanel.hasPermission(this.ROLE_KEY_EDITOR),
+      RareSppAdmin: this.userPanel.hasPermission(this.RARE_SPECIES_ADMIN),
+      RareSppReader: this.userPanel.hasPermission(this.RARE_SPECIES_READER),
+    });
+    this.permsForm.markAsPristine();
   }
 
+
+
+  onSubmit(): void {
+    let oldPermissions: RoleOutputDto[] = this.userPanel.permissions;
+    var formData = this.permsForm.getRawValue();
+    var selectedPermissions = [];
+    var permissionsToRemove = [];
+    //console.log(this.permsForm.getRawValue());
+    for (var permissionName in formData) {
+      if (formData[permissionName]) {
+        selectedPermissions.push(permissionName);
+      }
+    }
+
+    for (var index in oldPermissions) {
+      if (!selectedPermissions.includes(oldPermissions[index].name)) {
+        permissionsToRemove.push(oldPermissions[index].name);
+      }
+    }
+    alert("Selected permissions for user: " + this.userPanel.user.username + ": " + selectedPermissions + "\n"
+      + "Removing permissions: " + permissionsToRemove);
+  }
 }

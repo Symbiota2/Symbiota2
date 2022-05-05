@@ -14,7 +14,7 @@ export class UserPanel {
     hasPermission(targetPermission: String): boolean {
         var hasPermission = false;
         this.permissions.forEach(role => {
-            console.log("Checking targetPermission: ", targetPermission, " against permission: ", role.name);
+            //console.log("Checking targetPermission: ", targetPermission, " against permission: ", role.name);
             if (role.name === targetPermission) {
                 hasPermission = true;
             }
