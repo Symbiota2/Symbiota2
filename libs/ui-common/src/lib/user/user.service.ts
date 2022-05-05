@@ -8,6 +8,7 @@ import {
     timer,
 } from 'rxjs';
 import { User, UserProfileData } from './dto/user.class';
+import { UserRoleInputDto } from './dto/role-input-dto.class'
 import { ApiClientService } from '../api-client';
 import { plainToClass } from 'class-transformer';
 import {
@@ -29,6 +30,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import jwtDecode from 'jwt-decode';
 import { ApiCreateUserData, ApiUser } from '@symbiota2/data-access';
 import { RoleOutputDto, UserOutputDto } from '@symbiota2/api-auth';
+import { UserRole } from './dto/user-role.class';
 
 type AuthData = { username?: string; password?: string };
 interface NotificationResults {
@@ -47,6 +49,7 @@ export class UserService {
     private readonly _currentUser = new BehaviorSubject<User>(null);
     private refreshSubscription: Subscription = null;
     private notificationDeleted = new EventEmitter<void>();
+    private roleDeleted = new EventEmitter<void>();
 
     /**
      * The currently logged in user
@@ -516,6 +519,26 @@ export class UserService {
         );
     }
 
+    createUserRole(
+        uid: number,
+        roleData: UserRoleInputDto
+    ): Observable<> {
+        const url = `${this.usersUrl}/${uid}/roles`
+        const createReq = this.api
+            .queryBuilder(url)
+            .post()
+            .body(roleData)
+            .build();
+
+        return this.api.send(createReq).pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.error && err.error.message) {
+                    return of(`Account creation failed: ${err.error.message}`);
+                }
+                return of('Account creation failed');
+            })
+        );
+    }
 
     deleteRole(uid: number, roleID: number) {
         this.currentUser
@@ -549,7 +572,7 @@ export class UserService {
                         `Error deleting role: ${err.message}`
                     );
                 } else {
-                    this.notificationDeleted.emit();
+                    this.roleDeleted.emit();
                 }
             });
     }

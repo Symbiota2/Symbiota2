@@ -1,7 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { RoleOutputDto } from '@symbiota2/api-auth';
-import { UserRole, UserService } from '@symbiota2/ui-common';
+import { ApiUserRoleName } from '@symbiota2/data-access';
+import { UserService } from '@symbiota2/ui-common';
+import { UserRoleInputDto } from 'libs/ui-common/src/lib/user/dto/role-input-dto.class';
 import { UserPanel } from '../../pages/userlist-page/userpanel-data';
 
 @Component({
@@ -11,7 +13,10 @@ import { UserPanel } from '../../pages/userlist-page/userpanel-data';
 })
 export class PermissionFormComponent implements OnInit {
   @Input() userPanel: UserPanel;
-  //Role names ripped from the ApiUserRoleName enum to use here on the ui.
+
+  //stuff = this.CHECKLIST_ADMIN;
+
+  //Role names ripped from the this enum to use here on the ui.
   CHECKLIST_ADMIN = "ClAdmin";
   COLLECTION_ADMIN = "CollAdmin";
   COLLECTION_EDITOR = "CollEditor";
@@ -26,6 +31,16 @@ export class PermissionFormComponent implements OnInit {
   TAXON_EDITOR = "Taxonomy";
   TAXON_PROFILE_EDITOR = "TaxonProfile";
 
+  apiRoleNames = {
+    "SuperAdmin": ApiUserRoleName.SUPER_ADMIN,
+    "Taxonomy": ApiUserRoleName.TAXON_EDITOR,
+    "TaxonProfile": ApiUserRoleName.TAXON_PROFILE_EDITOR,
+    "KeyAdmin": ApiUserRoleName.ROLE_KEY_ADMIN,
+    "KeyEditor": ApiUserRoleName.ROLE_KEY_EDITOR,
+    "RareSppAdmin": ApiUserRoleName.RARE_SPECIES_ADMIN,
+    "RareSppReader": ApiUserRoleName.RARE_SPECIES_READER
+  }
+
   permsForm: FormGroup;
 
 
@@ -34,13 +49,13 @@ export class PermissionFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.permsForm = this.fb.group({
-      SuperAdmin: this.userPanel.hasPermission(this.SUPER_ADMIN),
-      Taxonomy: this.userPanel.hasPermission(this.TAXON_EDITOR),
-      TaxonProfile: this.userPanel.hasPermission(this.TAXON_PROFILE_EDITOR),
-      KeyAdmin: this.userPanel.hasPermission(this.ROLE_KEY_ADMIN),
-      KeyEditor: this.userPanel.hasPermission(this.ROLE_KEY_EDITOR),
-      RareSppAdmin: this.userPanel.hasPermission(this.RARE_SPECIES_ADMIN),
-      RareSppReader: this.userPanel.hasPermission(this.RARE_SPECIES_READER),
+      SuperAdmin: this.userPanel.hasPermission(ApiUserRoleName.SUPER_ADMIN),
+      Taxonomy: this.userPanel.hasPermission(ApiUserRoleName.TAXON_EDITOR),
+      TaxonProfile: this.userPanel.hasPermission(ApiUserRoleName.TAXON_PROFILE_EDITOR),
+      KeyAdmin: this.userPanel.hasPermission(ApiUserRoleName.ROLE_KEY_ADMIN),
+      KeyEditor: this.userPanel.hasPermission(ApiUserRoleName.ROLE_KEY_EDITOR),
+      RareSppAdmin: this.userPanel.hasPermission(ApiUserRoleName.RARE_SPECIES_ADMIN),
+      RareSppReader: this.userPanel.hasPermission(ApiUserRoleName.RARE_SPECIES_READER),
     });
     this.permsForm.markAsPristine();
   }
@@ -50,28 +65,46 @@ export class PermissionFormComponent implements OnInit {
   onSubmit(): void {
     let oldPermissions: RoleOutputDto[] = this.userPanel.permissions;
     var formData = this.permsForm.getRawValue();
-    var selectedPermissions = [];
+    var selectedPermissionNames = [];
     var permissionNamesToRemove = [];
     var permissionsToRemove = [];
+    var permissionNamesToAdd = [];
 
+
+    //Get the permissions marked as true.
     for (var permissionName in formData) {
       if (formData[permissionName]) {
-        selectedPermissions.push(permissionName);
+        selectedPermissionNames.push(permissionName);
       }
     }
 
+    //Initialize as all selected need to be added
+    permissionNamesToAdd = Object.assign([], selectedPermissionNames);
+    //Get permissions that need to be added
     for (var index in oldPermissions) {
-      if (!selectedPermissions.includes(oldPermissions[index].name)) {
+      if (permissionNamesToAdd.includes(oldPermissions[index].name)) {
+        permissionNamesToAdd = permissionNamesToAdd.filter(item => item !== oldPermissions[index].name);
+      }
+
+    }
+
+    //Get permissions to remove
+    for (var index in oldPermissions) {
+      if (!selectedPermissionNames.includes(oldPermissions[index].name)) {
         permissionNamesToRemove.push(oldPermissions[index].name);
         permissionsToRemove.push(oldPermissions[index]);
       }
     }
 
-    alert("Selected permissions for user: " + this.userPanel.user.username + ": " + selectedPermissions + "\n"
-      + "Removing permissions: " + permissionNamesToRemove);
+    alert("Selected permissions for user: " + this.userPanel.user.username + ": " + selectedPermissionNames + "\n"
+      + "Adding permissions: " + permissionNamesToAdd + "\nRemoving permissions: " + permissionNamesToRemove);
     console.log(permissionsToRemove);
 
     //Add permissions
+    for (var permissionName in permissionNamesToAdd) {
+      //Make role input dto to send to user_service
+      const newRole = new UserRoleInputDto(this.apiRoleNames[permissionName]);
+    }
 
     //Remove permissions
     for (var index in permissionsToRemove) {
