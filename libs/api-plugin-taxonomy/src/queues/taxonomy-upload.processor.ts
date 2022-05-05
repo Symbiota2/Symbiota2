@@ -660,7 +660,7 @@ export class TaxonomyUploadProcessor {
 
                             // Does it have a kingdom name?  Use it if it does
                             if (taxonData["kingdomName"]) {
-                                qb.andWhere('o.kingdomName = :kingdom', {kindgom: taxonData["kingdomName"]})
+                                qb.andWhere('o.kingdomName = :kingdom', {kingdom: taxonData["kingdomName"]})
                             }
 
                             taxons = await qb.getMany()
