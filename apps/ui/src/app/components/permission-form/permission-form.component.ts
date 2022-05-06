@@ -101,9 +101,15 @@ export class PermissionFormComponent implements OnInit {
     console.log(permissionsToRemove);
 
     //Add permissions
-    for (var permissionName in permissionNamesToAdd) {
+    console.log(permissionNamesToAdd);
+    for (let permissionName in permissionNamesToAdd) {
+      var currName = this.apiRoleNames[permissionNamesToAdd[permissionName]];
+      console.log("permissionName: ", permissionName, "Value: ", currName);
       //Make role input dto to send to user_service
-      const newRole = new UserRoleInputDto(this.apiRoleNames[permissionName]);
+      const newRole = new UserRoleInputDto(currName);
+      newRole.name = currName;
+      console.log("newRole: ", newRole);
+      this.userService.createUserRole(this.userPanel.user.uid, newRole);
     }
 
     //Remove permissions

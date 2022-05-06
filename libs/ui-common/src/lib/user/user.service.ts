@@ -522,22 +522,44 @@ export class UserService {
     createUserRole(
         uid: number,
         roleData: UserRoleInputDto
-    ): Observable<> {
+    ) {
         const url = `${this.usersUrl}/${uid}/roles`
-        const createReq = this.api
-            .queryBuilder(url)
-            .post()
-            .body(roleData)
-            .build();
 
-        return this.api.send(createReq).pipe(
-            catchError((err: HttpErrorResponse) => {
-                if (err.error && err.error.message) {
-                    return of(`Account creation failed: ${err.error.message}`);
+        this.currentUser
+            .pipe(
+                take(1),
+                map((user) => {
+                    if (!user) {
+                        throw new Error('Please log in');
+                    }
+                    return user;
+                }),
+                switchMap((user) => {
+                    const url = `${this.usersUrl}/${uid}/roles/`;
+                    const query = this.api
+                        .queryBuilder(url)
+                        .post()
+                        .body(roleData)
+                        .addJwtAuth(user.token)
+                        .build();
+
+                    return this.api
+                        .send(query, { skipLoading: true })
+                        .pipe(map(() => null));
+                }),
+                catchError((e) => {
+                    return of(e);
+                })
+            )
+            .subscribe((err) => {
+                if (err !== null) {
+                    this.alert.showError(
+                        `Error adding role: ${err.message}`
+                    );
+                } else {
+                    this.roleDeleted.emit();
                 }
-                return of('Account creation failed');
-            })
-        );
+            });
     }
 
     deleteRole(uid: number, roleID: number) {

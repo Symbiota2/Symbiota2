@@ -1,4 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
 import {
     IsEnum, IsInt,
     IsNotEmpty,
@@ -16,11 +15,9 @@ export class UserRoleInputDto implements ApiCreateUserRoleData {
         this.name = name;
     }
 
-    @ApiProperty()
     @IsNotEmpty()
     name: ApiUserRoleName;
 
-    @ApiProperty({ required: false })
     @Type(() => Number)
     @IsInt()
     @IsOptional()
