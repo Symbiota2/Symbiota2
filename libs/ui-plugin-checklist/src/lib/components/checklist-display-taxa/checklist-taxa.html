@@ -1,0 +1,41 @@
+<div class="container">
+    <div class="row">
+        <mat-card class="checklist-taxa-card">
+            <mat-card-title-group class="checklist-detail">
+              <mat-card-title>Checklist title</mat-card-title>
+              <mat-card-subtitle>Authors:</mat-card-subtitle>
+              <mat-card-subtitle>Citation:</mat-card-subtitle>
+              <mat-card-subtitle><a href="">Show more</a></mat-card-subtitle>
+            </mat-card-title-group>
+            <!-- <mat-card-content>
+              <mat-card-title>Taxon will be listed here</mat-card-title>
+            </mat-card-content> -->
+            <div class="access-links" *ngIf="upload_taxon_link_access">
+                <!-- <a class="edit-species-list"(click)="showUploadTaxon()" >spp</a> -->
+                <button *ngIf="userCanEdit" style="float: right" mat-icon-button>
+                    <!-- <button style="float: right" mat-icon-button -->
+                        
+                        matTooltip="Edit Species List"
+                        matTooltipClass="example-tooltip-red"
+                        aria-label="Edit Species List"
+                        matTooltipHideDelay="100"
+                        class="example-button"
+    
+                    >
+                    <mat-icon color="primary" (click)="openDialog('uploadTaxon')"
+                      >edit</mat-icon
+                    >
+                    <span>spp</span>
+                  </button>
+            </div>
+        </mat-card>
+        <div class="checklist-list-container">
+            <div class="checklist-list">
+                <checklist-list-taxa></checklist-list-taxa>
+            </div>
+            <div class="checklist-upload-taxon-container" *ngIf="upload_taxon_access">
+                <checklist-upload-taxon></checklist-upload-taxon>
+            </div>
+        </div>
+    </div>
+</div>

@@ -32,6 +32,15 @@ services:
       - "${SYMBIOTA2_S3_HOST:-127.0.0.1}:${SYMBIOTA2_S3_PORT1:-9000}:9000"
       - "${SYMBIOTA2_S3_HOST:-127.0.0.1}:${SYMBIOTA2_S3_PORT2:-9001}:9001"
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - 8080:80
+    environment:
+      - PMA_HOST: mariadb
+      - PMA_PASSWORD: ${SYMBIOTA2_DATABASE_PASSWORD:-password}
+    restart: unless-stopped
+
 volumes:
   s2-db: { name: s2-db }
   redis: { name: s2-redis }

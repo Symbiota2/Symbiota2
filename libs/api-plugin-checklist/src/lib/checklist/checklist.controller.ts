@@ -1,96 +1,257 @@
-import { Controller, Get, HttpStatus, NotFoundException, Query, Param } from "@nestjs/common";
-import { ApiOperation, ApiResponse } from "@nestjs/swagger";
-import { Checklist, ChecklistProjectLink } from "@symbiota2/api-database";
+import { Controller, Get, HttpStatus, NotFoundException, Query, Param, Post, UseGuards, HttpCode, Req, Body, ParseArrayPipe, ForbiddenException, Delete, Patch } from "@nestjs/common";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { AuthenticatedRequest, CurrentUserGuard, JwtAuthGuard, TokenService } from "@symbiota2/api-auth";
+// import {
+//     AuthenticatedRequest,
+//     JwtAuthGuard,
+//     SuperAdminGuard,
+//     TokenService
+// } from '@symbiota2/api-auth';
+import { Checklist, ChecklistProjectLink, ChecklistTaxonLink, Taxon } from "@symbiota2/api-database";
 import { ProjectDescription } from "aws-sdk/clients/codebuild";
 import { stringify } from "querystring";
 import { ChecklistDto } from "./dto/checklist-dto";
+import { ChecklistInputDto } from "./dto/checklist-input.dto";
+import { ChecklistTaxonDto } from "./dto/checklist-taxon.dto";
+import { ChecklistTaxonLinkDto } from "./dto/checklist-taxon-link.dto";
 import { ProjectDto } from "./dto/project-dto";
 import { ProjectFindAllParams } from "./dto/project-find-param";
 import { ProjectLinkDto } from "./dto/project-link-dto";
 import { ChecklistService } from "./project.service";
 
-@Controller('projects')
+@Controller()
 export class ChecklistController {
     checklistsIds: number[] = [];
     constructor(private projectService: ChecklistService) {}
     
     //The default controller fetches all of the records
-    @Get()
+    @Get('projects')
     @ApiResponse({ status: HttpStatus.OK, type: ProjectDto, isArray: true })
     @ApiOperation({
         summary: "Retrieve a list of projects.  The list can be narrowed by project IDs"
     })
-    async findAll(@Query() findAllParams: ProjectFindAllParams): Promise<ProjectDto[]> {
+    async findAllProject(@Query() findAllParams: ProjectFindAllParams): Promise<ProjectDto[]> {
         const projects = await this.projectService.findAllProjects(findAllParams)
         if (!projects) {
             return []
         }
-        const projectsDto = projects.map(async (c) => {
-            const project = new ProjectDto(c)
+        const projectsDto = projects.map(async (p) => {
+            const project = new ProjectDto(p)
             return project
         });
         return Promise.all(projectsDto)
     }
 
-    @Get(':pid')
+    @Get('checklists')
+    @ApiResponse({ status: HttpStatus.OK, type: ChecklistDto, isArray: true})
+    @ApiOperation({ summary: "Retrieve all checklists." })
+    async findAllChecklists(): Promise<ChecklistDto[] | []> {
+
+        const checklists = await this.projectService.findAllChecklists();
+
+        if (!checklists) return [];
+
+        const checklistsDto = checklists.map(async (c) => {
+            const checklist = new ChecklistDto(c)
+            return checklist
+        })
+        return Promise.all(checklistsDto)
+    }
+
+    @Get('projects/:pid')
+    @ApiResponse({ status: HttpStatus.OK, type: ProjectLinkDto })
+    @ApiOperation({
+        summary: "find a project by id"
+    })
+    async findProjectById(@Param('pid') pid: number): Promise<ProjectDto> {
+        
+        const project = await this.projectService.findProjectById(pid)
+        if (!project) {
+            throw new NotFoundException('Project not found!')
+        }
+
+        const projectDto = new ProjectDto(project);
+
+        return projectDto;
+    }
+
+    @Get('projects/:pid/checklists')
     @ApiResponse({ status: HttpStatus.OK, type: ProjectLinkDto })
     @ApiOperation({
         summary: "find a project checklists by pid"
     })
-    async findChecklistsByProjectId(@Param('pid') pid: number): Promise<ProjectDto> {
+    async findChecklistsByProjectId(@Param('pid') pid: number): Promise<ChecklistDto[]> {
         
-        const pidAndCLID = await this.projectService.findProjectIdAndchecklistIDsByProjectId(pid)
-        if (!pidAndCLID) {
+        const checklistProjectLink = await this.projectService.findProjectchecklists(pid)
+        if (!checklistProjectLink) {
             throw new NotFoundException()
         }
 
-        const project = await this.projectService.findProjectById(pid)
-        const projectChecklistIDs: number[] = [];
+        const checklistProjectLinkDto = checklistProjectLink.map(async (c) => {
+            const checklistDto = new ChecklistDto(await c.checklist);
+            return checklistDto;
+        })
 
-        pidAndCLID.map(async (c) => {
-            projectChecklistIDs.push(c.checklistID);
-        });
-
-        const projectWithChecklistIDs = new ProjectDto(project)
-        projectWithChecklistIDs.clids = projectChecklistIDs;
-
-        return projectWithChecklistIDs;
+        return Promise.all(checklistProjectLinkDto)
     }
     
-    @Get(':pid/checklists')
-    @ApiResponse({ status: HttpStatus.OK, type: ChecklistDto })
-    @ApiOperation({
-        summary: "find checklists by ids"
-    })
-    async findChecklistsByProject(@Param('pid') id: number): Promise<ChecklistDto[]> {
-        const project = await this.projectService.findProjectIdAndchecklistIDsByProjectId(id)
+//     @Get(':pid/checklists')
+//     @ApiResponse({ status: HttpStatus.OK, type: ChecklistDto })
+//     @ApiOperation({
+//         summary: "find checklists by ids"
+//     })
+//     async findChecklistsByProject(@Param('pid') id: number): Promise<ChecklistDto[]> {
+//         const project = await this.projectService.findProjectchecklists(id)
         
-        const checklists = await this.projectService.findAllChecklistsByProject(project.map(checklist => checklist.checklistID));
+//         const checklists = await this.projectService.findAllChecklistsByProject(project.map(checklist => checklist.checklistID));
 
-        if (!checklists) return []
+//         if (!checklists) return []
 
-        const checklistDto = checklists.map(async (c) => {
-            const checklist = new ChecklistDto(c)
-            return checklist;
-        });
-        return Promise.all(checklistDto)
-   }
+//         const checklistDto = checklists.map(async (c) => {
+//             const checklist = new ChecklistDto(c)
+//             return checklist;
+//         });
+//         return Promise.all(checklistDto)
+//    }
 
-   @Get(':pid/checklists/:clid')
+   @Get('projects/:pid/checklists/:clid')
     @ApiResponse({ status: HttpStatus.OK, type: ChecklistDto })
     @ApiOperation({
-        summary: "find single checklists by id"
+        summary: "find single checklist by id"
     })
-    async findChecklistById(@Param('pid') pid: number, @Param('clid') clid: number): Promise<ChecklistDto> {
-        const project = await this.projectService.findProjectIdAndchecklistIDsByProjectId(pid)
-        if (project.map(proj => proj.checklistID).includes(clid)) {
-        const checklists = await this.projectService.findChecklistById(clid);
-        if (!checklists) return null
-        const dto = new ChecklistDto(checklists)
-        return dto
-        }
-        return null
+    async findChecklistById(@Param('pid') pid: number, @Param('clid') clid: number): Promise<[ChecklistDto, ChecklistTaxonDto[]]> {
+        const projectChecklists = await this.projectService.findProjectchecklists(pid)
+        
+        
+        const projectChecklistLink = projectChecklists.find(c => c.checklistID === clid)
+        if (!projectChecklistLink) throw new NotFoundException('Checklist not found!')
+        const checklistDto = new ChecklistDto(await projectChecklistLink.checklist)
+        //{
+        //     const check = new ChecklistDto(await c.checklist);
+        //     if (check.id == 160) {
+        //         return check;
+        //     }
+        //     return null;
+        // })
+        
+        // const checklistDto = new ProjectLinkDto(checklist)
+        //checklistalldto = new ChecklistDto(checklistDto.checklist)
+
+        const checklistTaxa = await this.projectService.findTaxaByChecklist(clid);
+        console.log(checklistDto)
+        // if (project.map(proj => proj.checklistID).includes(clid)) {
+        // const checklists = await this.projectService.findChecklistById(clid);
+        // if (!checklists) throw null
+        // if (!checklistTaxa) return null
+        //const checklistdto = new ChecklistDto(checklist)
+        // const checklistTaxa = await this.projectService.findTaxaByChecklist(clid);
+        
+        const checklistTaxonLinkDto = checklistTaxa.map(async (c) => {
+            const checklistTaxonLink = new ChecklistTaxonLinkDto(c)
+            return checklistTaxonLink;
+        })
+        const checklistTaxaDto = checklistTaxa.map(async (c) => {
+            const checklistTaxon = new ChecklistTaxonDto(await c.taxon);
+
+            return checklistTaxon;
+        });
+       // return [checklistdto, await Promise.all(checklistTaxaDto)]
+
+        // console.log('taxon:::: ', await this.projectService.findTaxaByChecklist(clid))
+        // return dto
+        //}
+        return [checklistDto, await Promise.all(checklistTaxaDto)];
    }
+
+//    private canEdit(request) {
+//         // SuperAdmins and TaxonProfileEditors have editing privileges
+//         const isSuperAdmin = TokenService.isSuperAdmin(request.user)
+//         const isEditor = TokenService.canE(request.user)
+//         return isSuperAdmin || isEditor
+//     }
+
+    @Post('checklists')
+    @ApiOperation({
+        summary: "Create a new checklist"
+    })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.CREATED)
+    @ApiResponse({ status: HttpStatus.CREATED, type: ChecklistDto })
+    //@SerializeOptions({ groups: ['single'] })
+    @ApiBody({ type: ChecklistInputDto, isArray: false })
+    /**
+     @see - @link ChecklistInputDto
+     **/
+    async createChecklist(
+        @Req() request: AuthenticatedRequest,
+        @Body() data: Partial<Checklist>
+    ): Promise<ChecklistDto> {
+        // if (!this.canEdit(request)) {
+        //     throw new ForbiddenException()
+        // }
+
+        const checklist = await this.projectService.createChecklist(data)
+        const dto = new ChecklistDto(checklist)
+        return dto
+    }
+
+    @Patch('checklists/:id')
+    @ApiOperation({
+        summary: "Update a checklist"
+    })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({ status: HttpStatus.OK, type: ChecklistDto })
+    @ApiBody({ type: ChecklistInputDto, isArray: false })
+    /**
+     @see - @link ChecklistInputDto
+     **/
+    async updateChecklist(
+        @Req() request: AuthenticatedRequest,
+        @Param('id') id: number,
+        @Body() data: Partial<Checklist>
+    ): Promise<ChecklistDto> {
+
+        const checklist = await this.projectService.updateChecklist(id, data)
+        const dto = new ChecklistDto(checklist)
+        return dto
+    }
+
+    @Delete('checklists/:id')
+    @ApiOperation({
+        summary: "Delete a checklist"
+    })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    async deleteChecklist(
+        @Req() request: AuthenticatedRequest,
+        @Param('id') id: number
+    ): Promise<void> {
+        this.projectService.deleteChecklist(id)
+    }
+
+    @Post('projects/:pid/checklists/:clid/taxon')
+    @ApiOperation({
+        summary: "Add a taxon to checklist"
+    })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    async uploadChecklistTaxon(
+        @Req() request: AuthenticatedRequest,
+        @Param('clid') id: string,
+        @Body() data: Partial<ChecklistTaxonLinkDto>
+    ): Promise<ChecklistTaxonLinkDto> {
+        
+        const checklistTaxonLink = await this.projectService.uploadChecklistTaxon(parseInt(id), data );
+        
+        const checklistTaxonLinkDto = new ChecklistTaxonLinkDto(checklistTaxonLink);
+        return checklistTaxonLinkDto;
+    }
+
 }
 
 // import {
@@ -580,3 +741,4 @@ export class ChecklistController {
 //         await this.taxa.fromDwcA(file.path);
 //     }
 // }
+

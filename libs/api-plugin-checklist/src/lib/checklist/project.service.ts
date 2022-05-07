@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import {
   Checklist,
   ChecklistChild,
@@ -10,6 +10,7 @@ import {
   DynamicChecklist,
   DynamicChecklistTaxonLink,
   Project,
+  Taxon,
 } from '@symbiota2/api-database';
 
 import { In, Like, Repository, Raw } from 'typeorm';
@@ -18,6 +19,9 @@ import { ProjectFindAllParams } from './dto/project-find-param';
 import { ProjectLinkDto } from './dto/project-link-dto';
 import { ProjectArn } from 'aws-sdk/clients/iot1clickprojects';
 import { ProjectDto } from './dto/project-dto';
+import { ChecklistDto } from './dto/checklist-dto';
+import e from 'express';
+import { ChecklistTaxonLinkDto } from './dto/checklist-taxon-link.dto';
 
 @Injectable()
 export class ChecklistService extends BaseService<Project> {
@@ -30,7 +34,11 @@ export class ChecklistService extends BaseService<Project> {
     @Inject(Checklist.PROVIDER_ID) 
     private readonly checklistRepo: Repository<Checklist>,
     @Inject(ChecklistProjectLink.PROVIDER_ID) 
-    private readonly projectLinkRepo: Repository<ChecklistProjectLink>
+    private readonly projectLinkRepo: Repository<ChecklistProjectLink>,
+    @Inject(Taxon.PROVIDER_ID)
+    private readonly taxonRepo: Repository<Taxon>,
+    @Inject(ChecklistTaxonLink.PROVIDER_ID)
+    private readonly checklistTaxonLinkRepo: Repository<ChecklistTaxonLink>
   ) {
       super(projectRepo)
   }
@@ -46,21 +54,26 @@ export class ChecklistService extends BaseService<Project> {
 
         return qb.getMany()
     }
+
+    async findAllChecklists(): Promise<Checklist[]> {
+        return this.checklistRepo.find();
+    }
   
-    async findProjectIdAndchecklistIDsByProjectId(pid: number): Promise<ChecklistProjectLink[]> {
+    async findProjectchecklists(pid: number): Promise<ChecklistProjectLink[]> {
         const qb = this.projectLinkRepo.createQueryBuilder('link')
-            .where('link.projectID = :pid', { pid: pid })
+            .leftJoinAndSelect('link.checklist', 'checklist')
+            .where('link.projectID = :projectID', { projectID: pid })
         return qb.getMany()
     }
 
-    async findAllChecklistsByProject(ids: number[]): Promise<Checklist[]> {
-        if (ids.length > 0) {
-            const qb = this.checklistRepo.createQueryBuilder('checklist')
-            .where("checklist.id IN (:...clid)", { clid: ids })
-            return qb.getMany()
-        }
-        return []
-    }
+    // async findAllChecklistsByProject(ids: number[]): Promise<Checklist[]> {
+    //     if (ids.length > 0) {
+    //         const qb = this.checklistRepo.createQueryBuilder('checklist')
+    //         .where("checklist.id IN (:...clid)", { clid: ids })
+    //         return qb.getMany()
+    //     }
+    //     return []
+    // }
 
     async findProjectById(id: number): Promise<Project> {
         if (!id) {
@@ -73,11 +86,85 @@ export class ChecklistService extends BaseService<Project> {
         if (!id) {
             return null;
         }
+        //return this.checklistRepo.findOne({where: {id: id}})
+        //const qb = this.checklistRepo.createQueryBuilder('c')
+        // .leftJoinAndSelect('c.taxaLinks', 'taxa')
+        // .where('c.id = :id', {id: id})
         return this.checklistRepo.findOne({where: {id: id}})
+        //return qb;
+    }
+
+    async findTaxaByChecklist(cid: number): Promise<ChecklistTaxonLink[]> {
+        if (!cid) {
+            return null;
+        }
+        return this.checklistTaxonLinkRepo.find({where: {checklistID : cid}, relations: ['taxon']})
+        
+    }
+
+    /**
+     * Create a checklist record using a Partial Checklist record
+     * @param data The data for the record to create
+     * @return number The created data or null (not found)
+     */
+    async createChecklist(data: Partial<Checklist>): Promise<Checklist> {
+        const checklist = this.checklistRepo.create(data);
+        return this.checklistRepo.save(checklist)
+    }
+
+    /**
+     * update a checklist record using a Partial Checklist record
+     * @param id The id for the record to update
+     * @return The created data or null (id not found)
+     */
+     async updateChecklist(id: number, data: Partial<Checklist>): Promise<Checklist> {
+        const updateResult = await this.checklistRepo.update({ id }, data);
+        if (updateResult.affected > 0) {
+            return this.findChecklistById(id)
+        }
+        return null
+    }
+
+    /**
+     * delete a checklist record using a id record
+     * @param id The id for the record to delete
+     * @return null (id not found)
+     */
+    async deleteChecklist(id: number): Promise<void> {
+        this.checklistRepo.delete({id: id})
+    }
+
+    async uploadChecklistTaxon(clid: number, data: Partial<ChecklistTaxonLinkDto>): Promise<ChecklistTaxonLink> {
+        const checklist = await this.checklistRepo.findOne({id: clid})
+        if (!checklist) throw new NotFoundException('Invalid checklist')
+
+        const taxon = await this.taxonRepo.findOne({scientificName: data.scientificName})
+        
+        if (!taxon) throw new NotFoundException('Name not found. It needs to be added to the database. Contact the portal manager [embed email link]')
+        
+        try {
+            return await this.checklistTaxonLinkRepo.save({
+                taxonID: taxon.id,
+                checklistID: clid,
+                familyOverride: data.familyOverride,
+                habitat: data.habitat,
+                abundance: data.abundance,
+                notes: data.notes,
+                internalNotes: data.internalNotes,
+                source: data.source
+            })
+        } catch(error) {
+            if (error.code === 'ER_DUP_ENTRY') {
+                throw new ConflictException('Name already in the list.');
+            } else {
+                throw new InternalServerErrorException('Something went wrong! Please try again later.')
+            }
+        }
+
     }
 }
 
-
+// return this.checklistRepo.findOne({where: {id: id}, relations: ['taxaLinks']})
 // import { Inject, Injectable, Logger } from '@nestjs/common';
 // import {
 //     TaxaEnumTreeEntry,

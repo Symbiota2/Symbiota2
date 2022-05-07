@@ -1,0 +1,45 @@
+.container {
+    width: 100%;
+    padding: 1rem 0;
+    min-height: 100vh;
+}
+
+.row {
+    width: 96vw;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.checklist-list-container {
+    display: relative;
+}
+
+.checklist-list {
+    width: 70%;
+    max-width: 100%;
+    margin-top: 1rem;
+    float: left;
+}
+
+.checklist-detail {
+    width: 70%;
+    max-width:100%;
+}
+
+.checklist-upload-taxon-container {
+    width: 25vw;
+    max-width: 100%;
+    height:auto;
+    position: relative;
+    top: 1rem;
+    right: 1rem;
+    float: right;
+}
+
+.access-links {
+    position:absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 25%;
+    max-width: 100%;
+}

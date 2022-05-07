@@ -1,0 +1,18 @@
+.checklist-upload-form {
+    margin-bottom: 1rem;
+}
+
+input {
+    height: 80%;
+    width: 100%;
+}
+
+.successMessage {
+    padding: 0 0 1rem 0;
+    color: green;
+}
+
+.errorMessage {
+    padding: 0 0 1rem 0;
+    color: rgb(255, 32, 32);
+}
