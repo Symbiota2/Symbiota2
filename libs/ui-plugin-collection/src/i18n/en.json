@@ -82,6 +82,8 @@
   "collection.create_collection.administrator.email.error.required": "email required",
   "collection.create_collection.administrator.email.error.invalid": "Please enter valid email address",
   "collection.create_collection.submit.label": "Create Collection",
-  "core.layout.header.topnav.search_collections_link": "Collections"
-
+  "core.layout.header.topnav.search_collections_link": "Collections",
+    "core.layout.header.topnav.collection.browse_collections_link": "Browse Collections",
+    "core.layout.header.topnav.collection.dca_link": "Darwin Core Archives",
+    "core.layout.header.topnav.collection.statistics.dashboard_link": "Collection Statistics Dashboard"
 }

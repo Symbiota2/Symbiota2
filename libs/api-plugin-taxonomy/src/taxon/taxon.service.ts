@@ -626,21 +626,36 @@ export class TaxonService extends BaseService<Taxon>{
             TaxonService.skippedStatusesDueToTaxonMismatchPath
             ]
 
-        await result.map((key) => {
+        const myList = []
+        for (const key in result) {
+            await myList.push(this.getStringData(TaxonService.s3Key(key)))
+        }
+        /*
+        await result.forEach((key) => {
+            myList.push(this.getStringData(TaxonService.s3Key(key)))
+        })
+
+        result.map((key) => {
             this.getStringData(TaxonService.s3Key(key))
         })
-        return result
+
+         */
+        return myList
     }
 
     private async getStringData(key): Promise<string> {
+        // console.log(" get string data " + key)
         // See if there exists such an object
         const exists = await this.storageService.hasObject(key)
         if (!exists) {
             return ""
         }
 
+        // console.log(" here ")
+
         // Fetch the object if it exists
         const buffer = await this.storageService.getData(key)
+        // console.log(" buffer is " + buffer.toString())
         return buffer.toString()
     }
 
@@ -698,7 +713,7 @@ export class TaxonService extends BaseService<Taxon>{
         let nullRankNames = 0
         let totalRecords = 0
 
-        console.log("sciname field is " + sciNameField)
+        // console.log("sciname field is " + sciNameField)
         try {
             for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
                 for (const row of batch) {
@@ -1016,7 +1031,7 @@ export class TaxonService extends BaseService<Taxon>{
     }
 
     /**
-     * @param taxonID The taxonID to find ancestors for 
+     * @param taxonID The taxonID to find ancestors for
      * @returns The taxonIDs of all ancestors of the given taxonID
      */
     async findAncestorTaxonIDs(taxonID: number): Promise<number[]> {

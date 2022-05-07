@@ -9,7 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 
 @Component({
-    selector: 'taxonomy-upload-problem-accepted-names',
+    selector: 'taxonomy-upload-problem-parent-names',
     templateUrl: './taxonomy-upload-problem-parent-names-page.html',
     styleUrls: ['./taxonomy-upload-problem-parent-names-page.scss'],
 })
@@ -28,7 +28,7 @@ export class TaxonomyUploadProblemParentNamesPage implements OnInit {
     Called when Angular starts
      */
     ngOnInit() {
-        this.taxaService.getProblemAcceptedNames().subscribe((names) => {
+        this.taxaService.getProblemParentNames().subscribe((names) => {
             this.names = names
         })
 
