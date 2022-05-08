@@ -1,0 +1,46 @@
+<div class="container" id="top">
+    <div class="row">
+        <mat-card class="checklist-batch-upload-card">
+            <h1>{{ checklist?.name }}</h1>
+            <p>Authors: 
+                <span>{{ checklist?.authors }}</span>
+            </p>
+            <hr style="border-top: 1px solid #f1f1f1">
+
+            <div style="margin-top:1rem">
+                <h3>Checklist batch upload</h3>
+
+                <label for="checklist-file">Checklist File: </label>
+                <input type="file" id="checklist-file">
+            </div>
+            <div style="margin-top:1rem">
+                <label  style="outline:none">Taxonomic Resolution:</label>
+                <select id="taxonomic-resolution">
+                    <option value="">Lease taxonomy as is</option>
+                    <option value="">Central thecaurus</option>
+                </select>
+            </div>
+            <div class="csv-intro">
+                <ul>Must be a CSV text file with the first row containing the
+                     following columns. Note that Excel spreadsheets can be saved as a CSV file.
+                    <li>sciname (required)</li>
+                    <li>family (optional)</li>
+                    <li>habitat (optional)</li>
+                    <li>abundance (optional)</li>
+                    <li>notes (optional)</li>
+                    <li>internalnotes (optional) - displayed only to editors</li>
+                    <li>source (optional)</li>
+                </ul>
+            </div>
+
+            <div>
+                <button mat-stroked-button color="primary">
+                    Upload file
+                </button>
+            </div>
+        </mat-card>
+
+        
+        
+    </div>
+</div>
