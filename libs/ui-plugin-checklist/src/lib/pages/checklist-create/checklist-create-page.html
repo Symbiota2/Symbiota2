@@ -1,6 +1,6 @@
 <div id="main">
     <div>
-      <h1>{{ "checklist.create.create.new.checklist" | translate }}</h1>
+      <h1>{{ "checklist.create.form.checklist.title" | translate }}</h1>
     </div>
   
     <!-- <div *ngIf="!userCanEdit" class="my2" fxLayout="row" fxLayoutGap="1rem">
@@ -11,37 +11,37 @@
       <div mat-dialog-content>
         <form class="example-form">
           <mat-form-field class="example-full-width" appearance="fill">
-            <mat-label>Checklist name</mat-label>
+            <mat-label>{{ "checklist.create.form.checklist.name" | translate }}</mat-label>
             <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
-                   placeholder="Checklist name">
+                   [placeholder]="'checklist.create.form.checklist.name' | translate ">
           </mat-form-field>
           <mat-form-field class="example-full-width" appearance="fill">
-            <mat-label>Authors</mat-label>
+            <mat-label>{{ "checklist.create.form.checklist.authors" | translate }}</mat-label>
             <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
-                   placeholder="Checklist name">
+                   [placeholder]="'checklist.create.form.checklist.authors' | translate ">
           </mat-form-field>
           <mat-form-field class="example-full-width" appearance="fill">
-            <mat-label>Locality</mat-label>
+            <mat-label>{{ "checklist.create.form.checklist.locality" | translate }}</mat-label>
             <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
-                   placeholder="Checklist name">
+                   [placeholder]="'checklist.create.form.checklist.locality' | translate ">
           </mat-form-field>
           <mat-form-field class="example-full-width" appearance="fill">
-            <mat-label>Citation</mat-label>
+            <mat-label>{{ "checklist.create.form.checklist.citation" | translate }}</mat-label>
             <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
-                   placeholder="Checklist name">
+                   [placeholder]="'checklist.create.form.checklist.citation' | translate ">
           </mat-form-field>
           <mat-form-field class="example-full-width" appearance="fill">
-            <mat-label>Abstract</mat-label>
+            <mat-label>{{ "checklist.create.form.checklist.abstract" | translate }}</mat-label>
             <textarea type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
-                   placeholder="Checklist name"></textarea>
+                   [placeholder]="'checklist.create.form.checklist.abstract' | translate "></textarea>
           </mat-form-field>
           <mat-form-field class="example-full-width" appearance="fill">
-            <mat-label>Notes</mat-label>
+            <mat-label>{{ "checklist.create.form.checklist.notes" | translate }}</mat-label>
             <input type="text" matInput [formControl]="checklistName" [errorStateMatcher]="matcher"
-                   placeholder="Checklist name">
+                   [placeholder]="'checklist.create.form.checklist.notes' | translate ">
           </mat-form-field>
           <mat-form-field style="width:auto" class="example-full-width" appearance="fill">
-            <mat-label>More Inclusive Reference Checklist</mat-label>
+            <mat-label>{{ "checklist.create.form.checklist.reference" | translate }}</mat-label>
             <mat-select>
               <mat-option [value]="">
                 {{'some text'}}
@@ -55,33 +55,33 @@
             </mat-select>
           </mat-form-field> <br>
           <mat-form-field style="width:12%;margin-right: 2%">
-            <mat-label>Latitude</mat-label>
+            <mat-label>{{ "checklist.create.form.checklist.lat" | translate }}</mat-label>
             <input matInput>
           </mat-form-field>
           <mat-form-field style="width:12%;margin-right: 0.5%">
-            <mat-label>Longitude</mat-label>
+            <mat-label>{{ "checklist.create.form.checklist.lon" | translate }}</mat-label>
             <input matInput>
           </mat-form-field>
           <img mat-card-sm-image style="height: 1rem;width:auto;cursor:pointer;margin-top:2rem;box-shadow:0 0 2px 4px 0.0.0.0.3;margin-right:2%" 
                  src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Globe.svg" >
           <mat-form-field style="width:20%;">
-            <mat-label>Pont radius (meter)</mat-label>
+            <mat-label>{{ "checklist.create.form.checklist.point" | translate }}</mat-label>
             <input matInput>
           </mat-form-field>
 
           <mat-card class="example-card" style="width: 40%;float:right;margin-top:-2rem">
             <mat-card-title-group>
-              <mat-card-title>Polygon footprint</mat-card-title>
+              <mat-card-title>{{ "checklist.create.form.checklist.polygon.title" | translate }}</mat-card-title>
               <!-- <mat-card-subtitle>Small</mat-card-subtitle> -->
               <img mat-card-sm-image style="height: 1.4rem;width:auto;cursor:pointer;box-shadow:0 0 2px 4px 0.0.0.0.3" src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Globe.svg" >
             </mat-card-title-group>
             <mat-card-content>
-              {{'Polygon footprint not defined Click globe to create polygon'}}
+              {{ "checklist.create.form.checklist.polygon.description" | translate }}
             </mat-card-content>
           </mat-card><br><br>
 
           <section class="example-section" [formGroup]="toppings">
-            <h4>Default Display Settings</h4>
+            <h4>{{ "checklist.create.form.checklist.display.settings" | translate }}</h4>
             <mat-checkbox formControlName="commonNames">Display Common Names</mat-checkbox><br>
             <mat-checkbox formControlName="images">Display as Images</mat-checkbox><br>
             <mat-checkbox formControlName="notesAndVouchers">Show Notes & Vouchers</mat-checkbox><br>
@@ -91,7 +91,7 @@
           </section><br>
 
           <mat-form-field style="width: auto;" class="example-full-width" appearance="fill">
-            <mat-label>Access</mat-label>
+            <mat-label>{{ "checklist.create.form.checklist.access" | translate }}</mat-label>
             <mat-select style="height: 1rem">
               <mat-option [value]="" selected>
                 {{'Private'}}
@@ -101,12 +101,12 @@
               </mat-option>
             </mat-select>
           </mat-form-field> <br>
-          <button mat-raised-button color="primary">Submit</button>
+          <button mat-raised-button color="primary">{{ "checklist.create.form.checklist.submit" | translate }}</button>
           <hr style="margin: 2rem 0; border-top: 1px solid rgb(235, 235, 235)">
 
           <mat-card class="example-card">
             <mat-card-title-group>
-              <mat-card-title>Checklists assigned to your account</mat-card-title>
+              <mat-card-title>{{ "checklist.create.form.checklist.checklists.assigned" | translate }}</mat-card-title>
             </mat-card-title-group>
             <mat-card-content>
               <mat-list role="list">
@@ -117,7 +117,7 @@
 
           <mat-card class="example-card">
             <mat-card-title-group>
-              <mat-card-title>Inventory project administration</mat-card-title>
+              <mat-card-title>{{ "checklist.create.form.checklist.inventory.project.administration" | translate }}</mat-card-title>
             </mat-card-title-group>
             <mat-card-content>
               <mat-list role="list">

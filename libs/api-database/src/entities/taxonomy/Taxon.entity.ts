@@ -61,12 +61,11 @@ import {
     dwcRecordType,
 } from '@symbiota2/dwc';
 import { TaxonomicUnit } from './TaxonomicUnit.entity';
-import { KGProperty, KGPropertyList, KGType } from '@symbiota2/knowledgeGraph';
+import { KGProperty, KGEdge, KGNode } from '@symbiota2/knowledgeGraph';
 
 @DwCRecord(DWC_TERM_TAXON)
-@KGType('http://purl.org/biodiversity/taxon/Taxon')
+@KGNode(["all", "taxonomy"], 'http://purl.org/biodiversity/taxon/Taxon')
 @Index('sciname_unique', ['scientificName', 'rankID', 'author'], { unique: true })
-@KGType('taxon:Taxon')
 @Index('sciname_unique', ['scientificName', 'rankID', 'author'], {
     unique: true,
 })
@@ -85,7 +84,7 @@ export class Taxon extends EntityProvider {
     @PrimaryGeneratedColumn({ type: 'int', name: 'TID', unsigned: true })
     id: number;
 
-    @KGProperty("https://dbpedia.org/ontology/kingdom")
+    @KGProperty(["all", "taxonomy"], "https://dbpedia.org/ontology/kingdom")
     @Column('varchar', { name: 'kingdomName', nullable: true, length: 45 })
     kingdomName: string;
 
@@ -93,7 +92,7 @@ export class Taxon extends EntityProvider {
     rankID: number | null;
 
     @DwCField(DWC_FIELD_TAXON_SCIENTIFIC_NAME)
-    @KGProperty('https://dbpedia.org/ontology/scientificName')
+    @KGProperty(["all", "taxonomy"], 'https://dbpedia.org/ontology/scientificName')
     @Column('varchar', { name: 'SciName', length: 250 })
     scientificName: string;
 
@@ -199,7 +198,7 @@ export class Taxon extends EntityProvider {
     )
     referenceTaxonLinks: Promise<ReferenceTaxonLink[]>;
 
-    @KGPropertyList('https://schema.org/image')
+    @KGEdge(["all", "taxonomy"], 'https://schema.org/image')
     @OneToMany(() => Image, (images) => images.taxon)
     images: Promise<Image[]>;
 

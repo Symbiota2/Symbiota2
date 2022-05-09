@@ -45,3 +45,4 @@ Thumbs.db
 /oldCode/**
 /oldCode/image-old-not-used-search/
 gCloudTranslateKey.txt
+.env
