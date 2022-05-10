@@ -2,8 +2,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { RoleOutputDto } from '@symbiota2/api-auth';
 import { ApiUserRoleName } from '@symbiota2/data-access';
-import { UserService } from '@symbiota2/ui-common';
+import { AlertService, UserService } from '@symbiota2/ui-common';
 import { UserRoleInputDto } from 'libs/ui-common/src/lib/user/dto/role-input-dto.class';
+import { catchError } from 'rxjs/operators';
 import { UserPanel } from '../../pages/userlist-page/userpanel-data';
 
 @Component({
@@ -45,7 +46,9 @@ export class PermissionFormComponent implements OnInit {
 
 
   constructor(private fb: FormBuilder,
-    private readonly userService: UserService,) { }
+    private readonly userService: UserService,
+    private readonly alert: AlertService,) { }
+
 
   ngOnInit(): void {
     this.permsForm = this.fb.group({
@@ -96,26 +99,35 @@ export class PermissionFormComponent implements OnInit {
       }
     }
 
-    alert("Selected permissions for user: " + this.userPanel.user.username + ": " + selectedPermissionNames + "\n"
-      + "Adding permissions: " + permissionNamesToAdd + "\nRemoving permissions: " + permissionNamesToRemove);
-    console.log(permissionsToRemove);
+    this.alert.showMessage("Selected permissions for user: " + this.userPanel.user.username + ": " + selectedPermissionNames + "\n"
+      + "\nAdding permissions: " + permissionNamesToAdd + "\nRemoving permissions: " + permissionNamesToRemove);
 
     //Add permissions
-    console.log(permissionNamesToAdd);
     for (let permissionName in permissionNamesToAdd) {
       var currName = this.apiRoleNames[permissionNamesToAdd[permissionName]];
-      console.log("permissionName: ", permissionName, "Value: ", currName);
       //Make role input dto to send to user_service
       const newRole = new UserRoleInputDto(currName);
       newRole.name = currName;
-      console.log("newRole: ", newRole);
-      this.userService.createUserRole(this.userPanel.user.uid, newRole);
+      this.userService.createUserRole(this.userPanel.user.uid, newRole).subscribe(() => {
+        this.userService.getUserRolesById(this.userPanel.user.uid).subscribe((userroles) => {
+          console.log(userroles);
+          this.userPanel.permissions = userroles;
+        });
+      }
+      );
     }
 
     //Remove permissions
     for (var index in permissionsToRemove) {
-      this.userService.deleteRole(this.userPanel.user.uid, permissionsToRemove[index].id);
+      this.userService.deleteRole(this.userPanel.user.uid, permissionsToRemove[index].id).subscribe(() => {
+        this.userService.getUserRolesById(this.userPanel.user.uid).subscribe((userroles) => {
+          this.userPanel.permissions = userroles;
+        });
+      }
+      );
     }
 
   }
+
+
 }

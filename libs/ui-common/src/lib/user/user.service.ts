@@ -522,10 +522,10 @@ export class UserService {
     createUserRole(
         uid: number,
         roleData: UserRoleInputDto
-    ) {
+    ): Observable<any> {
         const url = `${this.usersUrl}/${uid}/roles`
 
-        this.currentUser
+        return this.currentUser
             .pipe(
                 take(1),
                 map((user) => {
@@ -548,22 +548,16 @@ export class UserService {
                         .pipe(map(() => null));
                 }),
                 catchError((e) => {
+                    this.alert.showError(
+                        `Error adding role: ${e.message}`
+                    );
                     return of(e);
                 })
             )
-            .subscribe((err) => {
-                if (err !== null) {
-                    this.alert.showError(
-                        `Error adding role: ${err.message}`
-                    );
-                } else {
-                    this.roleDeleted.emit();
-                }
-            });
     }
 
-    deleteRole(uid: number, roleID: number) {
-        this.currentUser
+    deleteRole(uid: number, roleID: number): Observable<any> {
+        return this.currentUser
             .pipe(
                 take(1),
                 map((user) => {
@@ -585,18 +579,12 @@ export class UserService {
                         .pipe(map(() => null));
                 }),
                 catchError((e) => {
+                    this.alert.showError(
+                        `Error deleting role: ${e.message}`
+                    );
                     return of(e);
                 })
-            )
-            .subscribe((err) => {
-                if (err !== null) {
-                    this.alert.showError(
-                        `Error deleting role: ${err.message}`
-                    );
-                } else {
-                    this.roleDeleted.emit();
-                }
-            });
+            );
     }
 
     private get loginUrl() {

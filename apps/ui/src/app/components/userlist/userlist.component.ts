@@ -16,9 +16,6 @@ export class UserlistComponent implements OnInit {
   @Input() userPanelList: UserPanel[];
   panelOpenState = true;
 
-
-
-
   constructor() { }
 
   ngOnInit(): void {

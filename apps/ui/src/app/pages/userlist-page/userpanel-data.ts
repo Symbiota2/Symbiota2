@@ -21,4 +21,9 @@ export class UserPanel {
         })
         return hasPermission;
     }
+
+
+    setPermission(targetPermission: String) {
+
+    }
 }
