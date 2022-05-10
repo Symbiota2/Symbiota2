@@ -134,6 +134,8 @@ export class OccurrenceController {
             throw new BadRequestException('File not specified');
         }
 
+        console.log("File mimetype: " + file.mimetype);
+
         if (file.mimetype.startsWith('text/csv')) {
             const headers = await getCSVFields(file.path);
             const headerMap = {};
@@ -145,7 +147,7 @@ export class OccurrenceController {
                 headerMap
             );
         }
-        else if (file.mimetype.startsWith('application/zip')) {
+        else if (file.mimetype.startsWith('application/zip') || file.mimetype.startsWith('application/x-zip-compressed')) {
             // TODO: DwCA uploads
             // Accepts file
             // Find npm package to unzip to directory
@@ -162,7 +164,7 @@ export class OccurrenceController {
         }
         else {
             await fsPromises.unlink(file.path);
-            throw new BadRequestException('Unsupported file type: CSV and DwCA zip files are supported');
+            throw new BadRequestException('Unsupported file type: CSV and DwCA zip files are supported. Uploaded type: ' + file.mimetype);
         }
 
         return upload;
