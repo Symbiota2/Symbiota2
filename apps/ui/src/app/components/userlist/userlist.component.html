@@ -1,16 +1,51 @@
 <div id="userListDiv">
     <mat-accordion multi="True">
-        <mat-expansion-panel *ngFor="let user of userList" (opened)="panelOpenState = true"
+        <mat-expansion-panel *ngFor="let userPanel of userPanelList; let i=index" (opened)="panelOpenState = true"
             (closed)="panelOpenState = false">
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    {{user.firstName}} {{user.lastName}}
+                    {{userPanel.user.firstName}} {{userPanel.user.lastName}}
                 </mat-panel-title>
                 <mat-panel-description>
-                    Currently I am {{panelOpenState ? 'open' : 'closed'}}
+                    {{userPanel.user.username}}
                 </mat-panel-description>
             </mat-expansion-panel-header>
-            <p>I'm visible because I am open</p>
+            <mat-grid-list cols="2" rowHeight="100px" columnWidth=" 100px">
+                <mat-grid-tile class="profile-row" id="profile-tile1">
+                    <div>
+                        <ul>
+                            <li><strong>Title: </strong>{{userPanel.user.title ? userPanel.user.title : 'Not
+                                specified'}}</li>
+                            <li><strong>Institution: </strong>{{userPanel.user.institution ? userPanel.user.institution
+                                : 'Not specified'}}
+                            </li>
+                            <li><strong>City: </strong>{{userPanel.user.city ? userPanel.user.city : 'Not specified'}}
+                            </li>
+                            <li><strong>State: </strong>{{userPanel.user.state ? userPanel.user.state : 'Not
+                                specified'}}</li>
+                        </ul>
+                    </div>
+                </mat-grid-tile>
+                <mat-grid-tile class="profile-row" id="profile-tile2">
+                    <div>
+                        <ul>
+                            <li><strong>Country: </strong>{{userPanel.user.country ? userPanel.user.country : 'Not
+                                specified'}}</li>
+                            <li><strong>Email: </strong>{{userPanel.user.email ? userPanel.user.email : 'Not
+                                specified'}}</li>
+                            <li><strong>URL: </strong>{{userPanel.user.url ? userPanel.user.url : 'Not specified'}}</li>
+                            <li><strong>Username: </strong>{{userPanel.user.username ? userPanel.user.username : 'Not
+                                specified'}} (Last
+                                login: {{userPanel.user.lastLogin ? userPanel.user.lastLogin : "Unknown"}})</li>
+
+                        </ul>
+                    </div>
+                </mat-grid-tile>
+                <mat-grid-tile class="perms-row" id="SitePerms" [rowspan]=3 [colspan]=2>
+                    <symbiota2-permission-form class="permission_form" [userPanel]="userPanel">
+                    </symbiota2-permission-form>
+                </mat-grid-tile>
+            </mat-grid-list>
         </mat-expansion-panel>
     </mat-accordion>
     <!--  <ul>
