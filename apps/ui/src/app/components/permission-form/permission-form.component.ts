@@ -110,7 +110,6 @@ export class PermissionFormComponent implements OnInit {
       newRole.name = currName;
       this.userService.createUserRole(this.userPanel.user.uid, newRole).subscribe(() => {
         this.userService.getUserRolesById(this.userPanel.user.uid).subscribe((userroles) => {
-          console.log(userroles);
           this.userPanel.permissions = userroles;
         });
       }
