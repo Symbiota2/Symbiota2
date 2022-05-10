@@ -71,6 +71,10 @@ export class TaxonQueryBuilder {
         return new UploadBuilder(this.baseUrl);
     }
 
+    uploadChecklistTaxon(): UploadChecklistTaxonBuilder {
+        return new UploadChecklistTaxonBuilder(this.baseUrl)
+    }
+
     uploadFile(): UploadFileBuilder {
         return new UploadFileBuilder(this.baseUrl);
     }
@@ -254,6 +258,23 @@ class FindAllProjectsBuilder extends TaxonQueryBuilder {
     }
 }
 
+class UploadChecklistTaxonBuilder extends TaxonQueryBuilder {
+    projectId: number;
+    checklistId: number;
+
+    id(pid: number, clid: number)  {
+        this.projectId = pid;
+        this.checklistId = clid;
+
+        return this;
+    }
+
+    build(): string {
+        this.url.pathname = `${this.url.pathname}/${this.projectId}/checklists/${this.checklistId}/taxon`;
+        return super.build();
+    }
+}
+
 class FindAllChecklistsBuilder extends TaxonQueryBuilder {
     projectId: number;
     _name: string;
@@ -266,14 +287,6 @@ class FindAllChecklistsBuilder extends TaxonQueryBuilder {
         this.projectId = id;
         return this;
     }
-
-    // constructor(apiBaseUrl: string) {
-    //     super(apiBaseUrl);
-    //     this.baseUrl = apiBaseUrl;
-    //     this.url.pathname = `${this.url.pathname}/${this.projectId}/checklists`;
-    //     console.log('path name: ', this.url.pathname)
-    //     console.log('url::: ', this.url)
-    // }
 
     build(): string {
         this.url.pathname = `${this.url.pathname}/${this.projectId}/checklists`;

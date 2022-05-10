@@ -14,6 +14,7 @@ import {
   CHECKLIST_CREATE_ROUTE,
   CHECKLIST_TEACHING_ROUTE,
   CHECKLIST_PROJECT_ID_CHECKLIST_LIST_ROUTE,
+  CHECKLIST_TAXA_DISPLAY,
  } from './routes';
 import { Route, RouterModule } from '@angular/router';
 import { ChecklistCreatePageComponent } from './pages/checklist-create/checklist-create-page.component';
@@ -30,6 +31,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
+import { ChecklistDisplayTaxaComponent } from './components/checklist-display-taxa/checklist-taxa.component';
+import { ChecklistListTaxaComponent } from './components/checklist-taxon-list/checklist-taxon-list.component';
+import { ChecklistUploadTaxonComponent } from './components/checklist-upload-taxon/checklist-upload-taxon.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   imports: [
@@ -45,6 +51,8 @@ import { MatListModule } from '@angular/material/list';
     MatButtonModule,
     MatDividerModule,
     MatListModule,
+    MatIconModule,
+    MatTooltipModule,
   ],
   providers: [ChecklistService],
   declarations: [
@@ -52,12 +60,18 @@ import { MatListModule } from '@angular/material/list';
     ChecklistTeachingPageComponent,
     ChecklistRegionalPageComponent,
     ChecklistSinglePageComponent,
+    ChecklistDisplayTaxaComponent,
+    ChecklistListTaxaComponent,
+    ChecklistUploadTaxonComponent,
   ],
   entryComponents: [
     ChecklistCreatePageComponent,
     ChecklistTeachingPageComponent,
     ChecklistRegionalPageComponent,
     ChecklistSinglePageComponent,
+    ChecklistDisplayTaxaComponent,
+    ChecklistListTaxaComponent,
+    ChecklistUploadTaxonComponent,
   ],
 })
 export class ChecklistPlugin extends SymbiotaUiPlugin {
@@ -86,8 +100,8 @@ export class ChecklistPlugin extends SymbiotaUiPlugin {
         component: ChecklistSinglePageComponent
       },
       {
-        path: CHECKLIST_PROJECT_ID_CHECKLIST_LIST_ROUTE,
-        component: ChecklistSinglePageComponent
+        path: CHECKLIST_TAXA_DISPLAY,
+        component: ChecklistDisplayTaxaComponent
      }
     ];
   }
