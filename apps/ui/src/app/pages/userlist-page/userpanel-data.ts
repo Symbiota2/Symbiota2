@@ -21,4 +21,5 @@ export class UserPanel {
         })
         return hasPermission;
     }
+
 }

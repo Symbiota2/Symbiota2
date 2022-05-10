@@ -46,6 +46,8 @@ import { AppConfigService } from '@symbiota2/api-config';
 import { IsNull, Not } from 'typeorm';
 import { StorageService } from '@symbiota2/api-storage';
 import { DwCService } from '@symbiota2/api-dwc';
+import extract from 'extract-zip';
+
 
 type File = Express.Multer.File;
 const fsPromises = fs.promises;
@@ -145,6 +147,16 @@ export class OccurrenceController {
         }
         else if (file.mimetype.startsWith('application/zip')) {
             // TODO: DwCA uploads
+            // Accepts file
+            // Find npm package to unzip to directory
+            // Writes file to uploads directory /home/dovahcraft/symbiota2/data/uploads/occurrences
+            // fsPromises zip package?
+            /*  try {
+                  await extract(source, { dir: target })
+                  console.log('Extraction complete')
+              } catch (err) {
+                  // handle any errors
+              }*/
             await fsPromises.unlink(file.path);
             throw new BadRequestException('DwCA uploads are not yet implemented');
         }
