@@ -5,6 +5,8 @@ import { Injectable } from '@angular/core'
 import { TaxonQueryBuilder } from './taxon-query-builder'
 import { ChecklistProject } from '../../dto/checklist-projects'
 import { ChecklistList } from '../../dto/checklist-list'
+import { HttpClient } from '@angular/common/http'
+import { ChecklistTaxonLinkDto } from '../../dto/checklist-taxon-link'
 
 interface FindAllParams {
     taxonIDs: number[]
@@ -19,6 +21,7 @@ export class ChecklistService {
         private readonly alerts: AlertService,
         private readonly user: UserService,
         private readonly apiClient: ApiClientService,
+        private readonly httpService: HttpClient,
         private readonly appConfig: AppConfigService) { }
 
     private createQueryBuilder(): TaxonQueryBuilder {
@@ -126,7 +129,7 @@ export class ChecklistService {
     //         .build();
 
     //     const query = this.apiClient.queryBuilder(url).get().build();
-    //     return this.apiClient.send<any, Record<string, unknown>[]>(query)
+    //     return this.apiClient.send<any                          , Record<string, unknown>[]>(query)
     //         .pipe(
     //             map((taxons) => taxons.map((o) => {
     //                 return TaxonListItem.fromJSON(o)
@@ -157,6 +160,28 @@ export class ChecklistService {
         return this.apiClient.send<any, Record<string, unknown>>(query)
             .pipe(map((o) => ChecklistProject.fromJSON(o)))
 
+    }
+
+
+
+    uploadTaxonToChecklist(pid: number, clid: number, checklistTaxon: Partial<ChecklistTaxonLinkDto>): Observable<ChecklistTaxonLinkDto> {
+
+        const url = this.createQueryBuilder().uploadChecklistTaxon()
+            .id(pid, clid)
+            .build()
+         return this.jwtToken.pipe(
+             switchMap((token) => {
+                 const query = this.apiClient.queryBuilder(url)
+                    .addJwtAuth(token)
+                    .post()
+                    .body(checklistTaxon)
+                    .build()
+        //console.log('query: ', query)
+        //const query = this.apiClient.queryBuilder(url).get().build()
+        return this.apiClient.send<any, Record<string, unknown>>(query)
+            .pipe(map((o) => ChecklistTaxonLinkDto.fromJSON(o)))
+             })
+        )
     }
 
     // getProblemUploadRows(): Observable<string[]> {

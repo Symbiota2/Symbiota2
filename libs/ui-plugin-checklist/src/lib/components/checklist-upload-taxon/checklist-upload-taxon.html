@@ -1,0 +1,57 @@
+<mat-card class="checklist-upload-taxon">
+    <mat-card-title-group>
+        <mat-card-title>Upload taxon</mat-card-title>
+        <!-- <mat-card-subtitle>Small</mat-card-subtitle> -->
+    </mat-card-title-group>
+    <mat-card-content class="checklist-upload-form-holder">
+        <form [formGroup]="checklistTaxonForm" class="checklist-upload-form">
+            <mat-form-field appearance="fill"
+                [style.width.%]="100"
+                >
+              <input matInput placeholder="Taxon:" formControlName="scientificName" required>
+            </mat-form-field>
+          
+              <mat-form-field appearance="fill"
+                  [style.width.%]="100"
+                  >
+                <input matInput placeholder="Family Override:" formControlName="familyOverride">
+              </mat-form-field>
+          
+              <mat-form-field appearance="fill"
+              [style.width.%]="100">
+                <input matInput placeholder="Habitat:" formControlName="habitat">
+              </mat-form-field>
+          
+              <mat-form-field appearance="fill" [style.width.%]="100">
+                <input matInput placeholder="Abundance:" formControlName="abundance">
+              </mat-form-field>
+          
+              <mat-form-field appearance="fill" [style.width.%]="100">
+                <input matInput placeholder="Notes:" formControlName="notes">
+              </mat-form-field>
+
+              <mat-form-field appearance="fill" [style.width.%]="100">
+                <input matInput placeholder="Internal notes:" formControlName="internalNotes">
+              </mat-form-field>
+          
+              <mat-form-field appearance="fill" [style.width.%]="100">
+                <input matInput placeholder="Source:" formControlName="source">
+              </mat-form-field>
+
+              <div>
+                  <button mat-stroked-button 
+                  (click)="onAddTaxon(projectID, checklistID, checklistTaxonForm.value)" 
+                  [disabled]="checklistTaxonForm.invalid">Add species to list</button>
+              </div>
+          </form>
+          <div class="successMessage" *ngIf="hasSuccess">
+            {{ successMessage }}
+          </div>
+          <div *ngIf="hasError" class="errorMessage">
+            {{ errorMessage }}
+          </div>
+          <div>
+              <a>Batch upload</a>
+          </div>
+    </mat-card-content>
+  </mat-card>
