@@ -10,31 +10,13 @@ import { UserPanel } from '../../pages/userlist-page/userpanel-data';
 })
 
 export class UserlistComponent implements OnInit {
-
-
   @Input() userList: UserOutputDto[];
   @Input() userPanelList: UserPanel[];
   panelOpenState = true;
-
-
-
 
   constructor() { }
 
   ngOnInit(): void {
   }
-
-  /*hasPermission(userPanel: UserPanel, targetPermission: String): boolean {
-    userPanel.permissions.forEach(role => {
-      console.log("Checking targetPermission: ", typeof targetPermission, " against permission: ", typeof role.name);
-      if (role.name === targetPermission) {
-        console.log("Returning true");
-        return true;
-      }
-
-    })
-    return false;
-  } */
-
 }
 
