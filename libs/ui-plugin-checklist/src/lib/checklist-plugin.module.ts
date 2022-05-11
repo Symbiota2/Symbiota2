@@ -15,6 +15,7 @@ import {
   CHECKLIST_TEACHING_ROUTE,
   CHECKLIST_PROJECT_ID_CHECKLIST_LIST_ROUTE,
   CHECKLIST_TAXA_DISPLAY,
+  CHECKLIST_TOOLS_CHECKLIST_UPLOAD_BATCH,
  } from './routes';
 import { Route, RouterModule } from '@angular/router';
 import { ChecklistCreatePageComponent } from './pages/checklist-create/checklist-create-page.component';
@@ -36,6 +37,7 @@ import { ChecklistListTaxaComponent } from './components/checklist-taxon-list/ch
 import { ChecklistUploadTaxonComponent } from './components/checklist-upload-taxon/checklist-upload-taxon.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ChecklistBatchUploadTaxaComponent } from './components/checklist-batch-upload-taxa/checklist-batch-upload-taxa.component';
 
 @NgModule({
   imports: [
@@ -63,6 +65,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     ChecklistDisplayTaxaComponent,
     ChecklistListTaxaComponent,
     ChecklistUploadTaxonComponent,
+    ChecklistBatchUploadTaxaComponent,
   ],
   entryComponents: [
     ChecklistCreatePageComponent,
@@ -72,6 +75,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     ChecklistDisplayTaxaComponent,
     ChecklistListTaxaComponent,
     ChecklistUploadTaxonComponent,
+    ChecklistBatchUploadTaxaComponent,
   ],
 })
 export class ChecklistPlugin extends SymbiotaUiPlugin {
@@ -102,7 +106,11 @@ export class ChecklistPlugin extends SymbiotaUiPlugin {
       {
         path: CHECKLIST_TAXA_DISPLAY,
         component: ChecklistDisplayTaxaComponent
-     }
+      },
+      {
+        path: CHECKLIST_TOOLS_CHECKLIST_UPLOAD_BATCH,
+        component: ChecklistBatchUploadTaxaComponent
+      }
     ];
   }
 

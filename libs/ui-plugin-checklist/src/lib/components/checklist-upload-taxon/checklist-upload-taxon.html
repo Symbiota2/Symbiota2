@@ -1,6 +1,6 @@
 <mat-card class="checklist-upload-taxon">
     <mat-card-title-group>
-        <mat-card-title>Upload taxon</mat-card-title>
+        <mat-card-title class="checklist-upload-taxon-title">Add new species to checklist</mat-card-title>
         <!-- <mat-card-subtitle>Small</mat-card-subtitle> -->
     </mat-card-title-group>
     <mat-card-content class="checklist-upload-form-holder">
@@ -51,7 +51,7 @@
             {{ errorMessage }}
           </div>
           <div>
-              <a>Batch upload</a>
+              <a routerLink="./tools/batchupload" autoscroll="true">Batch upload spreadsheet</a>
           </div>
     </mat-card-content>
   </mat-card>

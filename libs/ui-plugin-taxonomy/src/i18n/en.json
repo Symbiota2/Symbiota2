@@ -6,10 +6,10 @@
     "core.layout.header.topnav.taxonomy.scientific.common.names": "Common names",
     "core.layout.header.topnav.taxonomy.scientific.alternative.taxonomies": "Alternative taxonomies",
     "core.layout.header.topnav.taxonomy.viewer.link": "Taxonomy Explorer",
-    "core.layout.header.topnav.taxonomy.editor.link": "Edit Taxon",
+    "core.layout.header.topnav.taxonomy.editor.link": "Edit name",
     "core.layout.header.topnav.taxonomy.profiler.link": "Profile Taxon",
     "core.layout.header.topnav.taxonomy.uploader.link": "Upload",
-    "core.layout.header.topnav.taxon.create.link": "Create Taxon",
+    "core.layout.header.topnav.taxon.create.link": "Create name",
     "core.layout.header.topnav.taxonomy.utils.link": "Utilities",
     "taxa.taxa_available_permission.admin": "Admin",
     "taxa.taxa_available_permission.taxa_permissions": "taxa Permissions",
@@ -72,7 +72,7 @@
     "taxonomy.upload.problem.parent.names.title": "List of parent names that could not be found",
     "taxonomy.upload.problem.ranks.title": "List of ranks that could not be found",
 
-    "taxonomy.utils.entry.title": "Taxonomic Utilties",
+    "taxonomy.utils.entry.title": "Taxonomic Utilities",
     "taxonomy.utils.lacks.edit.permission": "Not logged in or insufficient privileges to use taxonomic utilities.",
     "taxonomy.utils.rebuild.tree.button": "Rebuild Tree",
     "taxonomy.utils.rebuild.tree.message": "Rebuild the taxonomic hierarchy.  The hierarchy is used to speed up lookup of a taxon's place in a taxonomic hierarchy.  Depending on the size of the taxonomy the hierarchy may take awhile to rebuild.  The process is idempotent so if it fails to run to completion, you may re-run the build.",
@@ -102,7 +102,7 @@
     "taxon.profile.no.description": "Description not yet available.",
 
     "taxon.editor.title": "Taxon Editor",
-    "taxon.editor.link.label": "Edit Taxon",
+    "taxon.editor.link.label": "Edit name",
     "taxon.editor.description": "Description",
 
     "taxon.editor.descriptionBlock": "Description Block",
