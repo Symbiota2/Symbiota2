@@ -1,4 +1,3 @@
-
 services:
   mariadb:
     image: "mariadb:10.5"
@@ -7,7 +6,7 @@ services:
       TZ: "America/Phoenix"
       MYSQL_ROOT_PASSWORD: ${SYMBIOTA2_DATABASE_PASSWORD:-password}
     # To allow for big BLOB values; default is 64M
-    command: ["--max_allowed_packet=256M"]
+    command: ["--max_allowed_packet=256M","--wait_timeout=120","--innodb_buffer_pool_size=1073741824"]
     volumes:
       - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
       - "${SYMBIOTA2_DATABASE_VOLUME:-s2-db:/var/lib/mysql}"
@@ -33,17 +32,17 @@ services:
       - "${SYMBIOTA2_S3_HOST:-127.0.0.1}:${SYMBIOTA2_S3_PORT2:-9001}:9001"
 
   phpmyadmin:
-    image: phpmyadmin:latest
+    container_name: s2-phpmyadmin
+    image: "phpmyadmin:latest"
     ports:
-      - 8080:80
+      - "${SYMBIOTA2_PHPMYADMIN_PORT:-8081}:80"
     environment:
-      - PMA_HOST: mariadb
-      - PMA_PASSWORD: ${SYMBIOTA2_DATABASE_PASSWORD:-password}
-    restart: unless-stopped
+      PMA_HOST: "mariadb"
+      PMA_PASSWORD: "${SYMBIOTA2_DATABASE_PASSWORD:-password}"
+    restart: "unless-stopped"
 
 volumes:
   s2-db: { name: s2-db }
   redis: { name: s2-redis }
   s3: { name: s2-storage }
-
 

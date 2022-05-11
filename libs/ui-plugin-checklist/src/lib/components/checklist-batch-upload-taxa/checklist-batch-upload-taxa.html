@@ -1,6 +1,7 @@
 <div class="container" id="top">
     <div class="row">
         <mat-card class="checklist-batch-upload-card">
+            <form [formGroup]="batchUploadTaxonForm" #ngForm="ngForm">
             <h1>{{ checklist?.name }}</h1>
             <p>Authors: 
                 <span>{{ checklist?.authors }}</span>
@@ -11,13 +12,13 @@
                 <h3>Checklist batch upload</h3>
 
                 <label for="checklist-file">Checklist File: </label>
-                <input type="file" id="checklist-file">
+                <input type="file" id="checklist-file" formControlName="file" (change)="onSelect($event)">
             </div>
             <div style="margin-top:1rem">
                 <label  style="outline:none">Taxonomic Resolution:</label>
-                <select id="taxonomic-resolution">
-                    <option value="">Lease taxonomy as is</option>
-                    <option value="">Central thecaurus</option>
+                <select id="taxonomic-resolution" formControlName="taxonomicResolution">
+                    <option value="leave_taxonomy_as_is" [defaultSelected]="true">Leave taxonomy as is</option>
+                    <option value="central_thecaurus">Central thecaurus</option>
                 </select>
             </div>
             <div class="csv-intro">
@@ -34,13 +35,36 @@
             </div>
 
             <div>
-                <button mat-stroked-button color="primary">
+                <button mat-stroked-button color="primary" 
+                  [disabled]="batchUploadTaxonForm.invalid" 
+                  (click)="onUpload()"
+                >
                     Upload file
                 </button>
             </div>
-        </mat-card>
+            </form>
 
-        
-        
+            <div *ngIf="ngForm.submitted" class="checklist-upload-report-box">
+                <h3>Upload report</h3>
+                <div>
+                    <p style="color: green"># successfull upload: {{ taxonCount[0].count }}</p>
+                    <p>Details: </p>
+                    <p *ngFor="let t of taxonCount[0].success; let i = index">
+                        <strong>name:</strong> &nbsp; <span style="color:green"><em>{{ taxonCount[0].success[i] | json }}</em></span>
+                    </p>
+                </div>
+                
+                <hr style="border-top: 1px solid #f1f1f1;margin: .6rem 0">
+
+                <p style="color:red"># unsuccessfull upload:  {{ taxonCount[1].count }}</p>
+                
+                    <p>Details: </p>
+                    <p *ngFor="let t of taxonCount[1].fail; let i = index">
+                        <strong> name: &nbsp; </strong> <span style="color:red"><em>{{ t | json }}</em> &nbsp;</span>
+                        <strong>reason:</strong> &nbsp; <span style="color:red">{{ taxonCount[1].errors[i] | json }}</span>
+                    </p>
+                
+            </div>
+        </mat-card>
     </div>
 </div>
