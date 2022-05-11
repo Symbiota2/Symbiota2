@@ -150,10 +150,10 @@ export class ChecklistService {
 
     // }
 
-    findByID(id: number): Observable<ChecklistProject> {
+    findProjectByID(pid: number): Observable<ChecklistProject> {
         const url = this.createQueryBuilder()
             .findOne()
-            .id(id)
+            .id(pid)
             .build()
 
         const query = this.apiClient.queryBuilder(url).get().build()
