@@ -152,15 +152,19 @@ export class OccurrenceController {
             // Accepts file
             // Find npm package to unzip to directory
             // Writes file to uploads directory /home/dovahcraft/symbiota2/data/uploads/occurrences
+            let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
+
             // fsPromises zip package?
-            /*  try {
-                  await extract(source, { dir: target })
-                  console.log('Extraction complete')
-              } catch (err) {
-                  // handle any errors
-              }*/
+            try {
+                await extract(file.path, { dir: extractDir })
+                console.log('Extraction complete at path: ' + extractDir);
+            } catch (err) {
+                // handle any errors
+                console.log("Couldn't extract file!" + err);
+                throw new BadRequestException('DwCA upload not extracted!');
+            }
             await fsPromises.unlink(file.path);
-            throw new BadRequestException('DwCA uploads are not yet implemented');
+            throw new BadRequestException('DwCA uploads extracted');
         }
         else {
             await fsPromises.unlink(file.path);
