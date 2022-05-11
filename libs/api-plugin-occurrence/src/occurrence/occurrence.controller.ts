@@ -158,9 +158,7 @@ export class OccurrenceController {
             try {
                 await extract(file.path, { dir: extractDir })
                 let occurrenceCsvPath: string = path.resolve(extractDir, "occurrences.csv");
-                console.log("Occurrence.csv path: " + occurrenceCsvPath);
                 const headers = await getCSVFields(occurrenceCsvPath);
-                console.log("Headers: " + headers);
                 const headerMap = {};
                 headers.forEach((h) => headerMap[h] = '');
 
@@ -171,8 +169,7 @@ export class OccurrenceController {
                 );
             } catch (err) {
                 // handle any errors
-                console.log("Couldn't extract file!" + err);
-                throw new BadRequestException('DwCA upload not extracted!');
+                throw new BadRequestException('DwCA upload not extracted! ' + err);
             }
 
         }
