@@ -157,14 +157,24 @@ export class OccurrenceController {
             // fsPromises zip package?
             try {
                 await extract(file.path, { dir: extractDir })
-                console.log('Extraction complete at path: ' + extractDir);
+                let occurrenceCsvPath: string = path.resolve(extractDir, "occurrences.csv");
+                console.log("Occurrence.csv path: " + occurrenceCsvPath);
+                const headers = await getCSVFields(occurrenceCsvPath);
+                console.log("Headers: " + headers);
+                const headerMap = {};
+                headers.forEach((h) => headerMap[h] = '');
+
+                upload = await this.occurrenceService.createUpload(
+                    path.resolve(file.path),
+                    file.mimetype,
+                    headerMap
+                );
             } catch (err) {
                 // handle any errors
                 console.log("Couldn't extract file!" + err);
                 throw new BadRequestException('DwCA upload not extracted!');
             }
-            await fsPromises.unlink(file.path);
-            throw new BadRequestException('DwCA uploads extracted');
+
         }
         else {
             await fsPromises.unlink(file.path);
