@@ -21,7 +21,7 @@ export class ChecklistSinglePageComponent {
     }
 
     async loadProject(pid: number) {
-        this.checklistService.findByID(pid)
+        this.checklistService.findProjectByID(pid)
         .subscribe(project => {
             this.checklistProject = project;
             // console.log('checklist: ', project)

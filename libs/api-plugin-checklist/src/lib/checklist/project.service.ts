@@ -22,6 +22,7 @@ import { ProjectDto } from './dto/project-dto';
 import { ChecklistDto } from './dto/checklist-dto';
 import e from 'express';
 import { ChecklistTaxonLinkDto } from './dto/checklist-taxon-link.dto';
+import { isObject } from 'node:util';
 
 @Injectable()
 export class ChecklistService extends BaseService<Project> {
@@ -138,30 +139,67 @@ export class ChecklistService extends BaseService<Project> {
         const checklist = await this.checklistRepo.findOne({id: clid})
         if (!checklist) throw new NotFoundException('Invalid checklist')
 
-        const taxon = await this.taxonRepo.findOne({scientificName: data.scientificName})
-        
-        if (!taxon) throw new NotFoundException('Name not found. It needs to be added to the database. Contact the portal manager [embed email link]')
-        
-        try {
-            return await this.checklistTaxonLinkRepo.save({
-                taxonID: taxon.id,
-                checklistID: clid,
-                familyOverride: data.familyOverride,
-                habitat: data.habitat,
-                abundance: data.abundance,
-                notes: data.notes,
-                internalNotes: data.internalNotes,
-                source: data.source
-            })
-        } catch(error) {
-            if (error.code === 'ER_DUP_ENTRY') {
-                throw new ConflictException('Name already in the list.');
-            } else {
-                throw new InternalServerErrorException('Something went wrong! Please try again later.')
-            }
-        }
+        // if (typeof data === 'object' &&
+        // !Array.isArray(data) &&
+        // data !== null) {
+            const taxon = await this.taxonRepo.findOne({scientificName: data.scientificName})
+            
+            if (!taxon) throw new NotFoundException('Name not found. It needs to be added to the database. Contact the portal manager [embed email link]')
+            
+                
+                try {
+                     return await this.checklistTaxonLinkRepo.save({
+                        taxonID: taxon.id,
+                        checklistID: clid,
+                        familyOverride: data.familyOverride,
+                        habitat: data.habitat,
+                        abundance: data.abundance,
+                        notes: data.notes,
+                        internalNotes: data.internalNotes,
+                        source: data.source
+                    })
+                } catch(error) {
+                    if (error.code === 'ER_DUP_ENTRY') {
+                        throw new ConflictException('Name already in the list.');
+                    } else {
+                        throw new InternalServerErrorException('Something went wrong! Please try again later.')
+                    }
+                }
 
-    }
+
+        // } else {
+
+
+
+            // const taxa = []
+            // for (const [i, row] of data.entries()) {
+            //     const taxon = await this.taxonRepo.findOne({scientificName: row[i].scientificName})
+                
+            //     if (!taxon) throw new NotFoundException('Name not found. It needs to be added to the database. Contact the portal manager [embed email link]')
+                
+                    
+            //         try {
+            //             taxa.push(await this.checklistTaxonLinkRepo.save({
+            //                 taxonID: taxon.id,
+            //                 checklistID: clid,
+            //                 familyOverride: row[i].familyOverride,
+            //                 habitat: row[i].habitat,
+            //                 abundance: row[i].abundance,
+            //                 notes: row[i].notes,
+            //                 internalNotes: row[i].internalNotes,
+            //                 source: row[i].source
+            //             }))
+            //         } catch(error) {
+            //             if (error.code === 'ER_DUP_ENTRY') {
+            //                 throw new ConflictException('Name already in the list.');
+            //             } else {
+            //                 throw new InternalServerErrorException('Something went wrong! Please try again later.')
+            //             }
+            //         }
+            //     }
+            // return taxa;
+        }
+    
 }
 
 // return this.checklistRepo.findOne({where: {id: id}, relations: ['taxaLinks']})
