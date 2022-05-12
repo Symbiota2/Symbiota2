@@ -1,0 +1,57 @@
+.container {
+    width: 100%;
+    padding: 1rem 0;
+    min-height: 100vh;
+}
+
+.row {
+    width: 96vw;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.checklist-list-container {
+    display: relative;
+}
+
+.checklist-list {
+    width: 70%;
+    max-width: 100%;
+    margin-top: 1rem;
+    float: left;
+}
+
+.checklist-detail {
+    width: 70%;
+    max-width:100%;
+}
+
+.checklist-upload-taxon-container {
+    width: 25vw;
+    max-width: 100%;
+    height:auto;
+    position: relative;
+    top: 1rem;
+    right: 1rem;
+    float: right;
+}
+
+.showmore {
+    color: green;
+    cursor:pointer;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.access-links {
+    position:absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 25%;
+    max-width: 100%;
+}

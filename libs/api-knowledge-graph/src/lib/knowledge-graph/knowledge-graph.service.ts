@@ -13,6 +13,7 @@ import { createReadStream } from 'fs';
 import { Collection, Occurrence } from '@symbiota2/api-database';
 import ReadableStream = NodeJS.ReadableStream;
 import { getKGNode, getKGProperty, getKGEdge, KnowledgeGraphBuilder } from '@symbiota2/knowledgeGraph';
+import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 
 interface CreateGraphOpts {
     publish?: boolean;
@@ -103,10 +104,20 @@ export class KnowledgeGraphService {
             // console.log("Meta " + entityMeta.name + " " + recordType)
             if (recordType) {
                 console.log("Meta " + entityMeta.name)
+                const columns : ColumnMetadata[] = entityMeta.columns
+                for (let i = 0; i < columns.length; i++) {
+                    console.log( " column "+ columns[i].propertyName)
+                }
                 for (const key in recordType) {
                     console.log("KG Node " + key + " " + recordType[key])
                 }
                 const propertyMap = entityMeta.propertiesMap
+                const ids = entityMeta.primaryColumns
+                console.log( " ids is " + ids)
+                for (let key in ids) {
+                    console.log(" key " + propertyMap)
+                }
+
                 for (let key in propertyMap) {
                     const propertyType = getKGProperty(entityMeta.target, key)
                     if (propertyType) {

@@ -8,6 +8,7 @@ import {
     timer,
 } from 'rxjs';
 import { User, UserProfileData } from './dto/user.class';
+import { UserRoleInputDto } from './dto/role-input-dto.class'
 import { ApiClientService } from '../api-client';
 import { plainToClass } from 'class-transformer';
 import {
@@ -28,7 +29,8 @@ import { AlertService, LoadingService } from '../alert';
 import { HttpErrorResponse } from '@angular/common/http';
 import jwtDecode from 'jwt-decode';
 import { ApiCreateUserData, ApiUser } from '@symbiota2/data-access';
-import { UserOutputDto } from '@symbiota2/api-auth';
+import { RoleOutputDto, UserOutputDto } from '@symbiota2/api-auth';
+import { UserRole } from './dto/user-role.class';
 
 type AuthData = { username?: string; password?: string };
 interface NotificationResults {
@@ -47,6 +49,7 @@ export class UserService {
     private readonly _currentUser = new BehaviorSubject<User>(null);
     private refreshSubscription: Subscription = null;
     private notificationDeleted = new EventEmitter<void>();
+    private roleDeleted = new EventEmitter<void>();
 
     /**
      * The currently logged in user
@@ -154,7 +157,7 @@ export class UserService {
         private readonly alert: AlertService,
         private readonly api: ApiClientService,
         private readonly loading: LoadingService
-    ) {}
+    ) { }
 
     /**
      * Creates a new user
@@ -491,6 +494,97 @@ export class UserService {
                 );
             })
         );
+    }
+
+    getUserRolesById(uid: number): Observable<RoleOutputDto[]> {
+        return this.currentUser.pipe(
+            map((currentUser) => {
+                return currentUser.token;
+            }),
+            switchMap((token) => {
+                const url = `${this.usersUrl}/${uid}/roles`;
+                console.log(url);
+                const req = this.api
+                    .queryBuilder(url)
+                    .get()
+                    .addJwtAuth(token)
+                    .build();
+
+                return this.api.send(req).pipe(
+                    map((roles: RoleOutputDto[]) => {
+                        return roles;
+                    })
+                );
+            })
+        );
+    }
+
+    createUserRole(
+        uid: number,
+        roleData: UserRoleInputDto
+    ): Observable<any> {
+        const url = `${this.usersUrl}/${uid}/roles`
+
+        return this.currentUser
+            .pipe(
+                take(1),
+                map((user) => {
+                    if (!user) {
+                        throw new Error('Please log in');
+                    }
+                    return user;
+                }),
+                switchMap((user) => {
+                    const url = `${this.usersUrl}/${uid}/roles/`;
+                    const query = this.api
+                        .queryBuilder(url)
+                        .post()
+                        .body(roleData)
+                        .addJwtAuth(user.token)
+                        .build();
+
+                    return this.api
+                        .send(query, { skipLoading: true })
+                        .pipe(map(() => null));
+                }),
+                catchError((e) => {
+                    this.alert.showError(
+                        `Error adding role: ${e.message}`
+                    );
+                    return of(e);
+                })
+            )
+    }
+
+    deleteRole(uid: number, roleID: number): Observable<any> {
+        return this.currentUser
+            .pipe(
+                take(1),
+                map((user) => {
+                    if (!user) {
+                        throw new Error('Please log in');
+                    }
+                    return user;
+                }),
+                switchMap((user) => {
+                    const url = `${this.usersUrl}/${uid}/roles/${roleID}`;
+                    const query = this.api
+                        .queryBuilder(url)
+                        .delete()
+                        .addJwtAuth(user.token)
+                        .build();
+
+                    return this.api
+                        .send(query, { skipLoading: true })
+                        .pipe(map(() => null));
+                }),
+                catchError((e) => {
+                    this.alert.showError(
+                        `Error deleting role: ${e.message}`
+                    );
+                    return of(e);
+                })
+            );
     }
 
     private get loginUrl() {

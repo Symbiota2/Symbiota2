@@ -1,15 +1,9 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import { Checklist, ChecklistProjectLink, ChecklistTaxonLink, Project } from '@symbiota2/api-database';
 import { ApiProperty } from '@nestjs/swagger';
-import { ChecklistCreateDto } from './checklist-create.dto';
-import { ChecklistTaxonLinkDto } from './checklist-taxon-link.dto';
-// import { TaxonomicStatusDto } from '../../taxonomicStatus/dto/TaxonomicStatusDto';
+
 
 @Exclude()
-export class ChecklistDto {
-    constructor(checklist: Checklist) {
-        Object.assign(this, checklist);
-    }
+export class ChecklistInputDto {
 
     @ApiProperty()
     @Expose()
@@ -85,7 +79,7 @@ export class ChecklistDto {
 
     @ApiProperty()
     @Expose()
-    access: string
+    accecss: string
 
     @ApiProperty()
     @Expose()
@@ -118,9 +112,4 @@ export class ChecklistDto {
     @ApiProperty()
     @Expose()
     initialTimeStamp: Date;
-
-    @ApiProperty()
-    @Expose()
-    taxaLinks: ChecklistTaxonLinkDto;
-
 }
