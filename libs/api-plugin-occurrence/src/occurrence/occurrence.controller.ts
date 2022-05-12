@@ -134,6 +134,8 @@ export class OccurrenceController {
             throw new BadRequestException('File not specified');
         }
 
+        console.log("File mimetype: " + file.mimetype);
+
         if (file.mimetype.startsWith('text/csv')) {
             const headers = await getCSVFields(file.path);
             const headerMap = {};
@@ -145,24 +147,35 @@ export class OccurrenceController {
                 headerMap
             );
         }
-        else if (file.mimetype.startsWith('application/zip')) {
+        else if (file.mimetype.startsWith('application/zip') || file.mimetype.startsWith('application/x-zip-compressed')) {
             // TODO: DwCA uploads
             // Accepts file
             // Find npm package to unzip to directory
             // Writes file to uploads directory /home/dovahcraft/symbiota2/data/uploads/occurrences
+            let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
+
             // fsPromises zip package?
-            /*  try {
-                  await extract(source, { dir: target })
-                  console.log('Extraction complete')
-              } catch (err) {
-                  // handle any errors
-              }*/
-            await fsPromises.unlink(file.path);
-            throw new BadRequestException('DwCA uploads are not yet implemented');
+            try {
+                await extract(file.path, { dir: extractDir })
+                let occurrenceCsvPath: string = path.resolve(extractDir, "occurrences.csv");
+                const headers = await getCSVFields(occurrenceCsvPath);
+                const headerMap = {};
+                headers.forEach((h) => headerMap[h] = '');
+
+                upload = await this.occurrenceService.createUpload(
+                    path.resolve(file.path),
+                    file.mimetype,
+                    headerMap
+                );
+            } catch (err) {
+                // handle any errors
+                throw new BadRequestException('DwCA upload not extracted! ' + err);
+            }
+
         }
         else {
             await fsPromises.unlink(file.path);
-            throw new BadRequestException('Unsupported file type: CSV and DwCA zip files are supported');
+            throw new BadRequestException('Unsupported file type: CSV and DwCA zip files are supported. Uploaded type: ' + file.mimetype);
         }
 
         return upload;
