@@ -148,13 +148,17 @@ export class OccurrenceController {
             );
         }
         else if (file.mimetype.startsWith('application/zip') || file.mimetype.startsWith('application/x-zip-compressed')) {
-            // TODO: DwCA uploads
             // Accepts file
             // Find npm package to unzip to directory
             // Writes file to uploads directory /home/dovahcraft/symbiota2/data/uploads/occurrences
-            let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
+            //Generate timestamped dir
+            //Move items with a new unique id/timestamp to top level
+            //Delete dir and uneeded items.
+            const currDate = new Date();
+            const timestamp = currDate.getTime();
+            console.log("Timestamp: " + timestamp);
+            let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", currDate.toString().replace(" ", ""));
 
-            // fsPromises zip package?
             try {
                 await extract(file.path, { dir: extractDir })
                 let occurrenceCsvPath: string = path.resolve(extractDir, "occurrences.csv");
@@ -167,6 +171,7 @@ export class OccurrenceController {
                     file.mimetype,
                     headerMap
                 );
+
             } catch (err) {
                 // handle any errors
                 throw new BadRequestException('DwCA upload not extracted! ' + err);
