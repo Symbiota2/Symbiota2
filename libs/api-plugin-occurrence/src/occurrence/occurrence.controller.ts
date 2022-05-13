@@ -148,17 +148,13 @@ export class OccurrenceController {
             );
         }
         else if (file.mimetype.startsWith('application/zip') || file.mimetype.startsWith('application/x-zip-compressed')) {
-            // Accepts file
-            // Find npm package to unzip to directory
-            // Writes file to uploads directory /home/dovahcraft/symbiota2/data/uploads/occurrences
-            //Generate timestamped dir
-            //Move items with a new unique id/timestamp to top level
-            //Delete dir and uneeded items.
             const currDate = new Date();
             const timestamp = currDate.getTime();
+            const re = /\s/gi;
+            const fileTimeStamp = currDate.toString().replace(re, "")
             console.log("Timestamp: " + timestamp);
-            let re = /\s/gi;
-            let uniqueDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", currDate.toString().replace(re, ""));
+
+            let uniqueDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", fileTimeStamp);
             let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
 
             try {
@@ -167,9 +163,101 @@ export class OccurrenceController {
                 console.log("Files in directory: " + uniqueDir);
                 for (var currFile of files) {
                     console.log(currFile);
+                    //Rebuild string with timestamp added to it.
+                    const fileNameParts = currFile.split('.');
+                    //Splits fileName before file extension, adding the timestamp between them. 
+                    let fullFileName: string = fileNameParts[0] + "-" + fileTimeStamp + "." + fileNameParts[1];
+
+                    fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName), function (err) {
+                        if (err) throw err;
+                    });
                 }
 
-                let occurrenceCsvPath: string = path.resolve(uniqueDir, "occurrences.csv");
+                //Remove the now empty unique directory
+                fs.rmSync(uniqueDir, { recursive: true, force: true });
+
+                //Get the timestamped occurrences file.
+                let occurrencesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
+                let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
+                const headers = await getCSVFields(occurrenceCsvPath);
+                const headerMap = {};
+                headers.forEach((h) => headerMap[h] = '');
+
+                upload = await this.occurrenceService.createUpload(
+                    path.resolve(file.path),
+                    file.mimetype,
+                    headerMap
+                );
+
+            } catch (err) {
+                // handle any errors
+                throw new BadRequestException('DwCA upload not extracted! ' + err);
+            }
+
+        }
+        else {
+            await fsPromises.unlink(file.path);
+            throw new BadRequestException('Unsupported file type: CSV and DwCA zip files are supported. Uploaded type: ' + file.mimetype);
+        }
+
+        return upload;
+    }
+
+
+    @Post('upload')
+    @HttpCode(HttpStatus.CREATED)
+    @UseInterceptors(FileInterceptor('file'))
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({
+        summary: "Upload a CSV or DwCA file containing occurrences"
+    })
+    @ApiFileInput('file')
+    async uploadOccurrenceDwCA(@UploadedFile() file: File): Promise<OccurrenceUpload> {
+        let upload: OccurrenceUpload;
+
+        if (!file) {
+            throw new BadRequestException('File not specified');
+        }
+
+        console.log("File mimetype: " + file.mimetype);
+
+        if (file.mimetype.startsWith('application/zip') || file.mimetype.startsWith('application/x-zip-compressed')) {
+            // Accepts file
+            // Writes file to uploads directory /home/dovahcraft/symbiota2/data/uploads/occurrences
+            // Generates timestamped dir
+            // Moves items with a new unique id/timestamp to top level
+            // Deletes uniqueDir and uneeded items.
+            const currDate = new Date();
+            const timestamp = currDate.getTime();
+            const re = /\s/gi;
+            const fileTimeStamp = currDate.toString().replace(re, "")
+            console.log("Timestamp: " + timestamp);
+
+            let uniqueDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", fileTimeStamp);
+            let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
+
+            try {
+                await extract(file.path, { dir: uniqueDir })
+                const files = await fs.promises.readdir(uniqueDir);
+                console.log("Files in directory: " + uniqueDir);
+                for (var currFile of files) {
+                    console.log(currFile);
+                    //Rebuild string with timestamp added to it.
+                    const fileNameParts = currFile.split('.');
+                    //Splits fileName before file extension, adding the timestamp between them. 
+                    let fullFileName: string = fileNameParts[0] + "-" + fileTimeStamp + "." + fileNameParts[1];
+
+                    fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName), function (err) {
+                        if (err) throw err;
+                    });
+                }
+
+                //Remove the now empty unique directory
+                fs.rmSync(uniqueDir, { recursive: true, force: true });
+
+                //Get the timestamped occurrences file.
+                let occurrencesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
+                let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
                 const headers = await getCSVFields(occurrenceCsvPath);
                 const headerMap = {};
                 headers.forEach((h) => headerMap[h] = '');
