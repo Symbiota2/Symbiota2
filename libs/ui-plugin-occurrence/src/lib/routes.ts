@@ -6,3 +6,4 @@ export const ROUTE_CREATE_OCCURRENCE = "occurrences";
 export const ROUTE_OCCURRENCE_PROFILE = "occurrences/:occurrenceID";
 export const ROUTE_SPATIAL_MODULE = "occurrences/spatial";
 export const ROUTE_SPATIAL_MODULE_DASHBOARD = "occurrences/spatialmoduledashboard";
+export const ROUTE_DWC_OCCURRENCE_UPLOAD = "occurrences/dwcoccurrenceupload"
