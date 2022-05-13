@@ -12,7 +12,8 @@ import { join as pathJoin } from 'path';
 import { createReadStream } from 'fs';
 import { Collection, Occurrence } from '@symbiota2/api-database';
 import ReadableStream = NodeJS.ReadableStream;
-import { getKGProperty, getKGPropertyList, KGRecordType, KnowledgeGraphBuilder } from '@symbiota2/knowledgeGraph';
+import { getKGNode, getKGProperty, getKGEdge, KnowledgeGraphBuilder } from '@symbiota2/knowledgeGraph';
+import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 
 interface CreateGraphOpts {
     publish?: boolean;
@@ -99,27 +100,42 @@ export class KnowledgeGraphService {
         const db = getConnection();
         console.log("got connection")
         db.entityMetadatas.forEach((entityMeta) => {
-            const recordType = KGRecordType(entityMeta.target);
+            const recordType = getKGNode(entityMeta.target);
             // console.log("Meta " + entityMeta.name + " " + recordType)
             if (recordType) {
                 console.log("Meta " + entityMeta.name)
+                const columns : ColumnMetadata[] = entityMeta.columns
+                for (let i = 0; i < columns.length; i++) {
+                    console.log( " column "+ columns[i].propertyName)
+                }
+                for (const key in recordType) {
+                    console.log("KG Node " + key + " " + recordType[key])
+                }
                 const propertyMap = entityMeta.propertiesMap
+                const ids = entityMeta.primaryColumns
+                console.log( " ids is " + ids)
+                for (let key in ids) {
+                    console.log(" key " + propertyMap)
+                }
+
                 for (let key in propertyMap) {
                     const propertyType = getKGProperty(entityMeta.target, key)
                     if (propertyType) {
-                        console.log("KG Property " + key + " " + propertyType)
+                        console.log(" Property " + key)
+                        for (const key in propertyType) {
+                            console.log("KG Property " + key + " " + propertyType[key])
+                        }
                     }
                 }
                 for (let key in propertyMap) {
-                    const propertyType = getKGPropertyList(entityMeta.target, key)
+                    const propertyType = getKGEdge(entityMeta.target, key)
                     if (propertyType) {
-                        console.log("KG Property List " + key + " " + propertyType)
+                        console.log(" Edge " + key)
+                        for (const key in propertyType) {
+                            console.log("KG Edge " + key + " " + propertyType[key])
+                        }
                     }
                 }
-                //console.log(propertyMap.keys().length)
-                //propertyMap.forEach((value, key) => {
-                //    console.log(key)
-                //});
             }
         })
 

@@ -34,7 +34,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     templateUrl: './checklist-create-page.html',
     styleUrls: ['./checklist-create-page.component.scss'],
 })
-export class ChecklistCreatePageComponent {
+export class ChecklistCreatePageComponent implements OnInit {
 
     checklistName = new FormControl();
     toppings: FormGroup;
@@ -99,7 +99,8 @@ export class ChecklistCreatePageComponent {
     // acceptedNameOptions: TaxonIDAuthorNameItem[] = [];
     // hasAuthors = true;
 
-    constructor(private readonly translate: TranslateService, fb: FormBuilder) {
+    constructor(private readonly translate: TranslateService, fb: FormBuilder,
+                private readonly userService: UserService) {
         this.toppings = fb.group({
             commonNames: false,
             images: false,
@@ -109,6 +110,15 @@ export class ChecklistCreatePageComponent {
             identificationKey: true,
           });
 
+    }
+
+    ngOnInit() {
+        this.userService.currentUser
+            .pipe(filter((user) => user !== null))
+            .subscribe((user) => {
+                this.userID = user.uid;
+                this.userCanEdit = user.canEditChecklist(user.uid);
+            });
     }
     
     // constructor(

@@ -1,0 +1,41 @@
+.container {
+    width: 100%;
+    padding: 1rem 0;
+    min-height: 100vh;
+}
+
+.row {
+    width: 96vw;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.checklist-batch-upload-card {
+    min-height: 100vh;
+}
+
+.taxonomic-resolution {
+    outline:none;
+    outline: 0;
+}
+
+.csv-intro {
+    margin-top: 1rem;
+    margin-left: 0;
+}
+
+.csv-intro > ul {
+    margin-left: 0;
+    margin-bottom: 1rem;
+}
+
+.csv-intro > ul > li {
+    margin-left: 2rem;
+}
+
+.checklist-upload-report-box {
+    margin-top: 2rem;
+    box-shadow: 0px 0px 1px 1px rgba(0,0,0, .2);
+    border-radius: 4px;
+    padding: 1rem;
+}

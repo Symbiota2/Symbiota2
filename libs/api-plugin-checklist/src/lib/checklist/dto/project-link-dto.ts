@@ -21,4 +21,7 @@ export class ProjectLinkDto {
     @Expose()
     checklistID: number;
 
+    @ApiProperty()
+    @Expose()
+    checklist: ChecklistDto[];
 }

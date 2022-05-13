@@ -452,7 +452,6 @@ export class TaxonomyUploadProcessor {
                     where: { scientificName: taxonData["scientificName"] }
                 })
 
-                // this.logger.log("zzzz found " + testTaxons.length)
                 // See how many things we got back
                 if (testTaxons.length == 0) {
                     // A new scientific name, we'll insert
@@ -487,7 +486,7 @@ export class TaxonomyUploadProcessor {
                         // A new scientific name, we'll insert
                     } else if (moreTestTaxons.length == 1) {
                         // An existing unique name, we'll update
-                        dbTaxon = testTaxons[0]
+                        dbTaxon = moreTestTaxons[0]
                     } else {
                         // Still ambiguous
                         if (skippedTaxonsDueToMultipleMatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
@@ -503,24 +502,24 @@ export class TaxonomyUploadProcessor {
                 // Should already be pushed into a skipped list
             } else {
                 let newRecordFlag = false
+                let changed = false
                 // Do we need to insert?
                 if (!dbTaxon) {
                     // Need to insert, create a new one
                     dbTaxon = this.taxonRepo.create(taxonData)
                     newRecordFlag = true
-                }
-                // Update with taxonData information
-                let changed = false
-                for (const [k, v] of Object.entries(taxonData)) {
-                    if (k in dbTaxon) {
-                        // this.logger.log(" k and stuff " + v + " other " + dbTaxon[k])
-                        if (dbTaxon[k] != v) {
-                            dbTaxon[k] = v
-                            changed = true
+                } else {
+                    for (const [k, v] of Object.entries(taxonData)) {
+                        if (k in dbTaxon) {
+                            // this.logger.log(" k and stuff " + v + " other " + dbTaxon[k])
+                            if (dbTaxon[k] != v) {
+                                dbTaxon[k] = v
+                                changed = true
+                            }
                         }
                     }
                 }
-
+                // Update with taxonData information
                 taxonUpdates.push(dbTaxon)
                 taxonRowToBatchRow.set(taxonRowNumber++, batchRowNumber)
                 // Only add to the change queue if actually changed
@@ -533,11 +532,8 @@ export class TaxonomyUploadProcessor {
 
         // Save all of the taxons
         //await this.taxonRepo.save(taxonUpdates)
-        // this.logger.log("zzz saving to taxonRepo " + changedTaxons.length)
         await this.taxonRepo.upsert(changedTaxons, [])
         this.processed += taxonUpdates.length
-
-        // this.logger.log("zzzz done saving to taxonRepo ")
 
         // Now do the taxonomic status, iterating through the taxonUpdates
         const statusRankMap = new Map()
@@ -588,7 +584,6 @@ export class TaxonomyUploadProcessor {
 
             // Have a taxon match, let's get it
             const taxon = taxons[0]
-            // this.logger.log("zzzz have a match ")
 
             // Go through the fields in the row
             for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
@@ -607,6 +602,8 @@ export class TaxonomyUploadProcessor {
                     // "AcceptedTaxonName", "ParentTaxonName",
                     if (dbField == "ParentTaxonName" || dbField == "AcceptedTaxonName") {
 
+                        // Find the parent or accepted taxon
+
                         // Map taxon name to taxon ID
                         const whereClause = { scientificName: csvValue }
 
@@ -615,21 +612,16 @@ export class TaxonomyUploadProcessor {
                             whereClause["kingdomName"] = taxonData["kingdomName"]
                         }
 
-                        // this.logger.log("zzzz looking for " + csvValue)
-
                         let taxons = await this.taxonRepo.find({
                             where: whereClause
                         })
 
                         if (taxons.length == 0) {
                             // Not found, try again without the kingdom name
-                            // this.logger.log("zzzz didn't find " + csvValue)
-
                             taxons = await this.taxonRepo.find({
                                 where: { scientificName: csvValue /*, kingdomName: IsNull()*/ }
                             })
                         }
-                        // this.logger.log("zzzz found this many " + taxons.length)
                         if (taxons.length == 0) {
                             // nothing found skip
                             skip = true
@@ -651,7 +643,6 @@ export class TaxonomyUploadProcessor {
                         } else {
                             // Found more than one match
                             // try again with limited to accepted names only
-
                             const qb = this.taxonRepo.createQueryBuilder('o')
                                 .innerJoin('o.taxonStatuses', 'c')
                                 .where('c.taxonAuthorityID = :authorityID', { authorityID: job.data.authorityID })
@@ -660,7 +651,7 @@ export class TaxonomyUploadProcessor {
 
                             // Does it have a kingdom name?  Use it if it does
                             if (taxonData["kingdomName"]) {
-                                qb.andWhere('o.kingdomName = :kingdom', {kindgom: taxonData["kingdomName"]})
+                                qb.andWhere('o.kingdomName = :kingdom', {kingdom: taxonData["kingdomName"]})
                             }
 
                             taxons = await qb.getMany()

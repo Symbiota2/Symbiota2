@@ -9,7 +9,7 @@
     </mat-card-content>
 
     <br>
-    <h3 *ngFor="let checklist of checklistList"><a class="checklist-link" routerLink="">{{checklist.name}}</a></h3>
-    <h3 *ngIf="checklistList.length === 0">No checklists available</h3>
+    <h3 *ngFor="let checklist of checklistList"><a class="checklist-link" [routerLink]="'./checklists/'+checklist.id">{{checklist.name}}</a></h3>
+    <h3 *ngIf="checklistList?.length === 0">No checklists available</h3>
   </mat-card>
 </div>
