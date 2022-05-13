@@ -14,6 +14,14 @@
     min-height: 100vh;
 }
 
+// .checklist-taxon-form {
+//     display: none;
+// }
+
+// .checklist-batch-upload-card:not(.checklist-upload-report-box) .checklist-taxon-form {
+//     display: block;
+// }
+
 .taxonomic-resolution {
     outline:none;
     outline: 0;
@@ -34,8 +42,30 @@
 }
 
 .checklist-upload-report-box {
-    margin-top: 2rem;
-    box-shadow: 0px 0px 1px 1px rgba(0,0,0, .2);
+    position: absolute;
+    top: 6rem;
+    left: 0;
+    right: 0;
+    min-height: 80vh;
+    box-shadow: 0px 2px 3px 3px rgba(0,0,0, .3);
     border-radius: 4px;
-    padding: 1rem;
+    padding: 2rem;
+    padding-top: 3rem;
+    padding-bottom: 7rem;
+    background-color: #f1f1f1;
 }
+
+// .overlay {
+//     z-index: 50;
+//     position: fixed;
+//     top: 0;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     background-color: pink;
+// }
+
+// .checklist-taxon-form:not(.checklist-batch-upload-card) .overlay {
+//     display: none !important;
+// }
+
