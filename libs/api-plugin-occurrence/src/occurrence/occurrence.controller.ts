@@ -157,11 +157,19 @@ export class OccurrenceController {
             const currDate = new Date();
             const timestamp = currDate.getTime();
             console.log("Timestamp: " + timestamp);
-            let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", currDate.toString().replace(" ", ""));
+            let re = /\s/gi;
+            let uniqueDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", currDate.toString().replace(re, ""));
+            let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
 
             try {
-                await extract(file.path, { dir: extractDir })
-                let occurrenceCsvPath: string = path.resolve(extractDir, "occurrences.csv");
+                await extract(file.path, { dir: uniqueDir })
+                const files = await fs.promises.readdir(uniqueDir);
+                console.log("Files in directory: " + uniqueDir);
+                for (var currFile of files) {
+                    console.log(currFile);
+                }
+
+                let occurrenceCsvPath: string = path.resolve(uniqueDir, "occurrences.csv");
                 const headers = await getCSVFields(occurrenceCsvPath);
                 const headerMap = {};
                 headers.forEach((h) => headerMap[h] = '');
