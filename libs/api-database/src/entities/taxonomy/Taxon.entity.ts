@@ -66,9 +66,6 @@ import { KGProperty, KGEdge, KGNode } from '@symbiota2/knowledgeGraph';
 @DwCRecord(DWC_TERM_TAXON)
 @KGNode(["all", "taxonomy"], 'http://purl.org/biodiversity/taxon/Taxon')
 @Index('sciname_unique', ['scientificName', 'rankID', 'author'], { unique: true })
-@Index('sciname_unique', ['scientificName', 'rankID', 'author'], {
-    unique: true,
-})
 @Index('rankid_index', ['rankID'])
 @Index('idx_taxacreated', ['initialTimestamp'])
 @Index(['lastModifiedUID'])

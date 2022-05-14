@@ -267,7 +267,6 @@ export class OccurrenceController {
                     file.mimetype,
                     headerMap
                 );
-
             } catch (err) {
                 // handle any errors
                 throw new BadRequestException('DwCA upload not extracted! ' + err);
