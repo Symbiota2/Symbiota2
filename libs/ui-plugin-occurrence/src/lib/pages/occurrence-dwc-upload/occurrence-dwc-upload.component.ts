@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormControl } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { AlertService } from '@symbiota2/ui-common';
 import { map, switchMap, take, tap } from 'rxjs/operators';
 import { ROUTE_UPLOAD_FIELD_MAP } from '../../routes';
@@ -18,6 +18,8 @@ import { combineLatest, merge } from 'rxjs';
 })
 export class OccurrenceDwcUploadPage implements OnInit {
   private static readonly Q_PARAM_PAGE = 'page';
+
+  uploadOption: "upload" | "link" = "upload"
 
   collectionID = this.collections.currentCollection.pipe(
     tap((collection) => {
@@ -42,7 +44,13 @@ export class OccurrenceDwcUploadPage implements OnInit {
     private readonly alerts: AlertService,
     private readonly router: Router,
     private readonly currentRoute: ActivatedRoute,
-    private readonly upload: OccurrenceUploadService) { }
+    private readonly upload: OccurrenceUploadService,
+    private fb: FormBuilder) { }
+
+  uploadDwcForm = this.fb.group({
+    uploadOption: ['upload']
+  })
+
 
   ngOnInit(): void {
     const qParams = this.currentRoute.snapshot.queryParamMap;

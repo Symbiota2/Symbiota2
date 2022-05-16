@@ -1,16 +1,72 @@
-<!-- TODO: i18n -->
-<div id="main">
-    <div id="header" fxLayoutAlign="start center" fxLayoutGap="1rem">
-        <ng-container *ngIf="collections.currentCollection | async as collection">
-            <symbiota2-collection-logo [src]="collection.icon" [collectionID]="collection.id">
-            </symbiota2-collection-logo>
-        </ng-container>
-        <h1>Occurrence Upload</h1>
+<form id="form" [formGroup]="uploadDwcForm">
+    <div id="main">
+        <div id="header" fxLayoutAlign="start center" fxLayoutGap="1rem">
+            <ng-container *ngIf="collections.currentCollection | async as collection">
+                <symbiota2-collection-logo [src]="collection.icon" [collectionID]="collection.id">
+                </symbiota2-collection-logo>
+            </ng-container>
+            <h1>Occurrence Upload</h1>
+        </div>
+        <mat-card id="institution" class="mat-elevation-z0 s2-field">
+            <mat-card-title>
+                {{ 'Select Option for Adding Darwin Core Archive' | translate }}
+            </mat-card-title>
+            <mat-card class="mat-elevation-z0 s2-field outline">
+                <mat-radio-group formControlName="instOption" fxLayout="column">
+                    <mat-radio-button value="create"></mat-radio-button>
+                    <mat-card id="create-inst" class="mat-elevation-z0 s2-field no-padding">
+                        <mat-card-title>
+                            {{
+                            'Provide a link to a Darwin Core Archive'
+                            | translate
+                            }}
+                        </mat-card-title>
+                        <mat-card-subtitle>
+                            {{
+                            'collection.create_collection.institution.create.hint'
+                            | translate
+                            }}
+                        </mat-card-subtitle>
+                        <div id="two-field-row" fxLayout="row" fxLayoutGap=".5rem">
+                            <mat-form-field appearance="outline">
+                                <input matInput placeholder="{{
+                                        'DwCA link'
+                                            | translate
+                                    }}" formControlName="institutionName" />
+
+                            </mat-form-field>
+                        </div>
+                    </mat-card>
+                    <mat-radio-button value="select"> </mat-radio-button>
+                    <mat-card id="select-inst" class="mat-elevation-z0 s2-field no-padding">
+                        <mat-card-title>
+                            {{
+                            'Upload Darwin Core Archive'
+                            | translate
+                            }}
+                        </mat-card-title>
+                        <mat-card-subtitle>
+                            {{
+                            'Upload a DwCA archive from your computer (.zip)'
+                            | translate
+                            }}
+                        </mat-card-subtitle>
+                        <mat-form-field appearance="outline" class="full-width">
+
+                            <div class="my2" fxLayout="row" fxLayoutGap="1rem">
+                                <symbiota2-file-upload-field [formControl]="fileInput"></symbiota2-file-upload-field>
+                                <button mat-flat-button color="primary" (click)="onUpload()"
+                                    [disabled]="!fileInput.value">
+                                    Upload
+                                </button>
+                            </div>
+
+                        </mat-form-field>
+                    </mat-card>
+                </mat-radio-group>
+            </mat-card>
+        </mat-card>
+
+
     </div>
-    <div class="my2" fxLayout="row" fxLayoutGap="1rem">
-        <symbiota2-file-upload-field [formControl]="fileInput"></symbiota2-file-upload-field>
-        <button mat-flat-button color="primary" (click)="onUpload()" [disabled]="!fileInput.value">
-            Upload
-        </button>
-    </div>
-</div>
+</form>

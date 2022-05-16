@@ -35,6 +35,7 @@ import { OccurrenceCreateComponent } from './pages/occurrence-create/occurrence-
 import { OccurrenceEditorComponent } from './components/occurrence-editor/occurrence-editor.component';
 import { OccurrenceFieldComponent } from './components/occurrence-editor/occurrence-field/occurrence-field.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatRadioModule } from '@angular/material/radio';
 import {
     ROUTE_CREATE_OCCURRENCE,
     ROUTE_DWC_OCCURRENCE_UPLOAD,
@@ -86,6 +87,7 @@ import { OccurrenceDwcUploadPage } from './pages/occurrence-dwc-upload/occurrenc
         MatNativeDateModule,
         MatOptionModule,
         MatPaginatorModule,
+        MatRadioModule,
         MatSelectModule,
         MatTableModule,
         ReactiveFormsModule,
