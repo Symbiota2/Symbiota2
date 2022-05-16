@@ -51,7 +51,8 @@ export class OccurrenceDwcUploadPage implements OnInit {
     private fb: FormBuilder) { }
 
   uploadDwcForm = this.fb.group({
-    uploadOption: ['link']
+    uploadOption: ['link'],
+    // dwcaLink: ['']
   })
 
 
@@ -107,9 +108,11 @@ export class OccurrenceDwcUploadPage implements OnInit {
   onToggleUploadOption(option: 'link' | 'upload') {
     if (option == 'link') {
       this.uploadEnabled = false;
+      //this.uploadDwcForm.get("dwcaLink").disable();
     }
     else {
       this.uploadEnabled = true;
+      //this.uploadDwcForm.get("dwcaLink").enable();
     }
   }
 
