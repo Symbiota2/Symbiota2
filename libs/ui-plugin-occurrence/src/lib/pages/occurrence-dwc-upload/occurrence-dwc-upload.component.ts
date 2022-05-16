@@ -19,7 +19,9 @@ import { combineLatest, merge } from 'rxjs';
 export class OccurrenceDwcUploadPage implements OnInit {
   private static readonly Q_PARAM_PAGE = 'page';
 
-  uploadOption: "upload" | "link" = "upload"
+  uploadOption: "upload" | "link" = "link"
+
+  uploadEnabled = false;
 
   collectionID = this.collections.currentCollection.pipe(
     tap((collection) => {
@@ -32,6 +34,7 @@ export class OccurrenceDwcUploadPage implements OnInit {
   );
 
   fileInput = new FormControl(null);
+  dwcaLink = new FormControl(null);
   currentPage = this.currentRoute.queryParamMap.pipe(
     map((params) => {
       const hasPage = params.has(OccurrenceDwcUploadPage.Q_PARAM_PAGE);
@@ -48,7 +51,7 @@ export class OccurrenceDwcUploadPage implements OnInit {
     private fb: FormBuilder) { }
 
   uploadDwcForm = this.fb.group({
-    uploadOption: ['upload']
+    uploadOption: ['link']
   })
 
 
@@ -62,8 +65,21 @@ export class OccurrenceDwcUploadPage implements OnInit {
     }
 
     this.collections.setCollectionID(collID);
+
+    // listen to instOption to toggle inst select/create disabled status
+    this.uploadDwcForm
+      .get('uploadOption')
+      .valueChanges.subscribe((option) => this.onToggleUploadOption(option));
+    // setting default toggle to select institution
+    this.onToggleUploadOption('link');
   }
 
+  //Getting dwca from link
+  onLinking() {
+
+  }
+
+  //Uploading dwca
   onUpload() {
     combineLatest([
       this.collectionID,
@@ -86,6 +102,15 @@ export class OccurrenceDwcUploadPage implements OnInit {
         this.alerts.showError('Upload failed');
       }
     });
+  }
+
+  onToggleUploadOption(option: 'link' | 'upload') {
+    if (option == 'link') {
+      this.uploadEnabled = false;
+    }
+    else {
+      this.uploadEnabled = true;
+    }
   }
 
 }
