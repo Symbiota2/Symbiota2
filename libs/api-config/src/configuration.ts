@@ -50,7 +50,7 @@ export const DEFAULT_DB_USER = 'root';
 export const DEFAULT_DB_PASSWORD = 'password';
 export const DEFAULT_DB_HOST = '127.0.0.1';
 export const DEFAULT_DB_PORT = '3306';
-export const DEFAULT_DB_NAME = 'symbiota';
+export const DEFAULT_DB_NAME = 's2clean';
 export const DEFAULT_DB_PATH = ':memory:';
 
 export const DEFAULT_ENABLE_ELASTICSEARCH = '0';
