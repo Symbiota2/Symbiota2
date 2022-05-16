@@ -6,7 +6,7 @@ services:
       TZ: "America/Phoenix"
       MYSQL_ROOT_PASSWORD: ${SYMBIOTA2_DATABASE_PASSWORD:-password}
     # To allow for big BLOB values; default is 64M
-    command: ["--max_allowed_packet=256M","--wait_timeout=120","--innodb_buffer_pool_size=1073741824", tail -F anything]
+    command: ["--max_allowed_packet=256M","--wait_timeout=120","--innodb_buffer_pool_size=1073741824"]
     volumes:
       - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
       - "${SYMBIOTA2_DATABASE_VOLUME:-s2-db:/var/lib/mysql}"
@@ -15,7 +15,7 @@ services:
   redis:
     image: "redis:6"
     container_name: s2-redis
-    command: ["redis-server --appendonly yes", tail -F anything]
+    command: "redis-server --appendonly yes"
     volumes: ["redis:/data"]
     ports: ["${SYMBIOTA2_REDIS_PORT:-6379}:6379"]
 
@@ -25,7 +25,7 @@ services:
     environment:
       MINIO_ROOT_USER: ${SYMBIOTA2_MINIO_ROOT_USER:-symbiota2}
       MINIO_ROOT_PASSWORD: ${SYMBIOTA2_MINIO_ROOT_PASSWORD:-password}
-    command: ["server /data --console-address ':9001'", tail -F anything]
+    command: "server /data --console-address ':9001'"
     volumes: ["s3:/data"]
     ports:
       - "${SYMBIOTA2_S3_HOST:-127.0.0.1}:${SYMBIOTA2_S3_PORT1:-9000}:9000"
