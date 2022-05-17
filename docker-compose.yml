@@ -11,6 +11,7 @@ services:
       - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
       - "${SYMBIOTA2_DATABASE_VOLUME:-s2-db:/var/lib/mysql}"
     ports: ["${SYMBIOTA2_DATABASE_PORT:-3306}:3306"]
+    tty: true
 
   redis:
     image: "redis:6"
@@ -18,6 +19,7 @@ services:
     command: "redis-server --appendonly yes"
     volumes: ["redis:/data"]
     ports: ["${SYMBIOTA2_REDIS_PORT:-6379}:6379"]
+    tty: true
 
   s3:
     image: "quay.io/minio/minio:RELEASE.2021-09-24T00-24-24Z"
@@ -30,6 +32,7 @@ services:
     ports:
       - "${SYMBIOTA2_S3_HOST:-127.0.0.1}:${SYMBIOTA2_S3_PORT1:-9000}:9000"
       - "${SYMBIOTA2_S3_HOST:-127.0.0.1}:${SYMBIOTA2_S3_PORT2:-9001}:9001"
+    tty: true
 
   phpmyadmin:
     container_name: s2-phpmyadmin
@@ -40,6 +43,7 @@ services:
       PMA_HOST: "mariadb"
       PMA_PASSWORD: "${SYMBIOTA2_DATABASE_PASSWORD:-password}"
     restart: "unless-stopped"
+    tty: true
 
 volumes:
   s2-db: { name: s2-db }

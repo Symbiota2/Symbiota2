@@ -64,7 +64,10 @@ import { TaxonomicUnit } from './TaxonomicUnit.entity';
 import { KGProperty, KGEdge, KGNode } from '@symbiota2/knowledgeGraph';
 
 @DwCRecord(DWC_TERM_TAXON)
-@KGNode(["all", "taxonomy"], 'http://purl.org/biodiversity/taxon/Taxon')
+@KGNode([
+    { graph: "all", url: 'http://purl.org/biodiversity/taxon/Taxon' },
+    { graph: "taxonomy", url: 'http://purl.org/biodiversity/taxon/Taxon' }
+])
 @Index('sciname_unique', ['scientificName', 'rankID', 'author'], { unique: true })
 @Index('rankid_index', ['rankID'])
 @Index('idx_taxacreated', ['initialTimestamp'])
@@ -81,7 +84,10 @@ export class Taxon extends EntityProvider {
     @PrimaryGeneratedColumn({ type: 'int', name: 'TID', unsigned: true })
     id: number;
 
-    @KGProperty(["all", "taxonomy"], "https://dbpedia.org/ontology/kingdom")
+    @KGProperty([
+        { graph: "all", url: 'https://dbpedia.org/ontology/kingdom' },
+        { graph: "taxonomy", url: 'https://dbpedia.org/ontology/kingdom' }
+    ])
     @Column('varchar', { name: 'kingdomName', nullable: true, length: 45 })
     kingdomName: string;
 
@@ -89,7 +95,10 @@ export class Taxon extends EntityProvider {
     rankID: number | null;
 
     @DwCField(DWC_FIELD_TAXON_SCIENTIFIC_NAME)
-    @KGProperty(["all", "taxonomy"], 'https://dbpedia.org/ontology/scientificName')
+    @KGProperty([
+        { graph: "all", url: 'https://dbpedia.org/ontology/scientificName' },
+        { graph: "taxonomy", url: 'https://dbpedia.org/ontology/scientificName' }
+    ])
     @Column('varchar', { name: 'SciName', length: 250 })
     scientificName: string;
 
@@ -195,7 +204,10 @@ export class Taxon extends EntityProvider {
     )
     referenceTaxonLinks: Promise<ReferenceTaxonLink[]>;
 
-    @KGEdge(["all", "taxonomy"], 'https://schema.org/image')
+    @KGEdge([
+        { graph: "all", url: 'https://schema.org/image' },
+        { graph: "taxonomy", url: 'https://schema.org/image' }
+    ])
     @OneToMany(() => Image, (images) => images.taxon)
     images: Promise<Image[]>;
 
@@ -343,6 +355,27 @@ export class Taxon extends EntityProvider {
             },
         });
         console.log(JSON.stringify(oldAncestorLink));
+    }
+
+    async setAncestors(
+        taxaEnumRepo: Repository<TaxaEnumTreeEntry>,
+        taxonomicAuthorityID: number,
+        parent: Taxon
+    ) {
+        const ancestors = await taxaEnumRepo.find({
+            where: {
+                taxonID: parent.id
+            },
+        })
+
+        for (const ancestor of ancestors) {
+            const newRecord : TaxaEnumTreeEntry = await taxaEnumRepo.create()
+            newRecord.taxonID = this.id
+            newRecord.parentTaxonID = ancestor.taxonID
+            newRecord.taxonAuthorityID = taxonomicAuthorityID
+            newRecord.initialTimestamp = new Date()
+            await taxaEnumRepo.save(newRecord)
+        }
     }
 
     private async ancestorSciName(ancestorRankName: string): Promise<string> {
