@@ -62,7 +62,7 @@ export class CollectionPage implements OnInit {
         private readonly alerts: AlertService,
         private readonly currentRoute: ActivatedRoute,
         private readonly profileService: CollectionProfileService
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         this.collection$ = this.getCollection();
@@ -71,12 +71,12 @@ export class CollectionPage implements OnInit {
             this.collection$.subscribe((collection) => {
                 this.geoReferencedPercent =
                     collection.collectionStats != null &&
-                    collection.collectionStats.recordCount > 0
+                        collection.collectionStats.recordCount > 0
                         ? Math.round(
-                              (collection.collectionStats.georeferencedCount /
-                                  collection.collectionStats.recordCount) *
-                                  100
-                          )
+                            (collection.collectionStats.georeferencedCount /
+                                collection.collectionStats.recordCount) *
+                            100
+                        )
                         : 0;
 
                 //TODO: replace this comment link

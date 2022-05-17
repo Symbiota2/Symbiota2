@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OccurrenceUploadComponent } from './upload.component';
+import { OccurrenceUploadPage } from './occurrence-upload-page.component';
 
-describe('UploadComponent', () => {
-  let component: OccurrenceUploadComponent;
-  let fixture: ComponentFixture<OccurrenceUploadComponent>;
+describe('OccurrenceUploadPage', () => {
+  let component: OccurrenceUploadPage;
+  let fixture: ComponentFixture<OccurrenceUploadPage>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OccurrenceUploadComponent ]
+      declarations: [OccurrenceUploadPage]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OccurrenceUploadComponent);
+    fixture = TestBed.createComponent(OccurrenceUploadPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
