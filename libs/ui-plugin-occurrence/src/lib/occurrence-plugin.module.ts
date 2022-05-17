@@ -38,7 +38,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import {
     ROUTE_CREATE_OCCURRENCE,
-    ROUTE_DWC_OCCURRENCE_UPLOAD,
     ROUTE_SEARCH_OCCURRENCES,
     ROUTE_SEARCH_RESULTS,
     ROUTE_SPATIAL_MODULE, ROUTE_SPATIAL_MODULE_DASHBOARD,
@@ -59,7 +58,6 @@ import { OccurrenceUploadService } from './services/occurrence-upload.service';
 import { FieldMapSelectComponent } from './pages/occurrence-upload/field-map/field-map-select-component/field-map-select.component';
 import { ConfirmDialogComponent } from './pages/occurrence-upload/field-map/confirm-dialog-component/confirm-dialog.component';
 import { SpatialModuleDashboardPage } from './pages/spatial-module-dashboard/spatial-module-dashboard-page';
-import { OccurrenceDwcUploadPage } from './pages/occurrence-dwc-upload/occurrence-dwc-upload.component';
 
 @NgModule({
     imports: [
@@ -115,7 +113,6 @@ import { OccurrenceDwcUploadPage } from './pages/occurrence-dwc-upload/occurrenc
         OccurrenceUploadFieldMapPage,
         FieldMapSelectComponent,
         ConfirmDialogComponent,
-        OccurrenceDwcUploadPage,
     ],
     entryComponents: [
         OccurrenceSearchCollectionsPage,
@@ -155,15 +152,6 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
             };
         });
 
-        collectionProfile.putLink((collectionID) => {
-            return {
-                text: "Upload darwin core archive",
-                routerLink: `/${ROUTE_DWC_OCCURRENCE_UPLOAD}`,
-                requiresLogin: true,
-                queryParams: { 'collectionID': collectionID }
-            };
-        });
-
     }
 
     static routes(): Route[] {
@@ -195,10 +183,6 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
             {
                 path: ROUTE_UPLOAD_FIELD_MAP,
                 component: OccurrenceUploadFieldMapPage
-            },
-            {
-                path: ROUTE_DWC_OCCURRENCE_UPLOAD,
-                component: OccurrenceDwcUploadPage
             },
         ];
 
