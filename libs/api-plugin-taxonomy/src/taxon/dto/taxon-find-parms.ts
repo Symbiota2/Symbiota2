@@ -53,6 +53,40 @@ export class TaxonFindNamesParams extends TaxonFindCommonParams {
     rankID: string
 }
 
+export class TaxonFindByMatchingParams extends TaxonFindCommonParams {
+
+    @ApiProperty({ name: 'taxonAuthorityID', type: Number, required: false })
+    @Type(() => Number)
+    @IsInt({ each: true })
+    @IsOptional()
+    taxonAuthorityID: number
+
+    @ApiProperty({ name: 'scientificName', type: String, required: false })
+    @Type(() => String)
+    @IsOptional()
+    scientificName: string
+
+    @ApiProperty({ name: 'kingdom', type: String, required: false })
+    @Type(() => String)
+    @IsOptional()
+    kingdom: string
+
+    @ApiProperty({ name: 'family', type: String, required: false })
+    @Type(() => String)
+    @IsOptional()
+    family: string
+
+    @ApiProperty({ name: 'genus', type: String, required: false })
+    @Type(() => String)
+    @IsOptional()
+    genus: string
+
+    @ApiProperty({ name: 'author', type: String, required: false })
+    @Type(() => String)
+    @IsOptional()
+    author: string
+}
+
 export class TaxonFindAllParams extends TaxonFindCommonParams {
 
     @ApiProperty({ name: 'id[]', type: [Number], required: false })

@@ -8,20 +8,18 @@ import {
     TaxonomyUploadFieldMap,
     TaxonVernacular
 } from '@symbiota2/api-database';
-import { In, Like, Repository, Raw, getCustomRepository } from 'typeorm';
+import { Repository, Raw } from 'typeorm';
 import { BaseService, csvIterator } from '@symbiota2/api-common';
-import { DwCArchiveParser, dwcCoreID, getDwcField, isDwCID } from '@symbiota2/dwc';
-import { TaxonFindAllParams, TaxonFindNamesParams } from './dto/taxon-find-parms';
+import { DwCArchiveParser, getDwcField } from '@symbiota2/dwc';
+import { TaxonFindAllParams, TaxonFindByMatchingParams, TaxonFindNamesParams } from './dto/taxon-find-parms';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP } from '../queues/taxonomy-upload-cleanup.queue';
 import { TaxonomyUploadCleanupJob } from '../queues/taxonomy-upload-cleanup.processor';
 import { QUEUE_ID_TAXONOMY_UPLOAD } from '../queues/taxonomy-upload.queue';
 import { TaxonomyUploadJob } from '../queues/taxonomy-upload.processor';
-//import fs, { createReadStream } from 'fs';
 import { StorageService } from '@symbiota2/api-storage';
 import path from 'path';
-//import { ElasticsearchRepository } from './elasticsearch.repository';
 
 @Injectable()
 export class TaxonService extends BaseService<Taxon>{
@@ -473,6 +471,8 @@ export class TaxonService extends BaseService<Taxon>{
             return await this.taxonRepo.find({ where: { scientificName: sciname } })
         }
     }
+
+
 
     /**
      * Find a taxon and its synonyms using a taxon ID.

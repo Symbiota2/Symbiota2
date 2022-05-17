@@ -36,21 +36,21 @@ export class KnowledgeGraphController {
         private readonly kgService: KnowledgeGraphService) { }
 
     @Get('')
-    @ApiOperation({ summary: 'Retrieve the list of publicly-available Knowledge Graphs for this portal' })
+    @ApiOperation({ summary: 'Retrieve the list of Knowledge Graphs for this portal' })
     async getPublishedGraphs(): Promise<KnowledgeGraph[]> {
         const graphs = await this.kgService.listGraphs();
 
         return graphs.map((a) => {
-            const { objectKey, ...graph } = a;
+            const { name, ...graph } = a;
             return new KnowledgeGraph({
-                graph: basename(objectKey),
+                graph: name,
                 ...graph,
             });
         });
     }
 
-    @Get(':graphID')
-    @ApiOperation({ summary: 'Retrieve the publicly-available knowledge graph for a given graphID' })
+    @Get(':graphName')
+    @ApiOperation({ summary: 'Retrieve the knowledge graph for a given name' })
     @ApiResponse({
         status: HttpStatus.OK,
         content: {
@@ -62,8 +62,8 @@ export class KnowledgeGraphController {
             }
         }
     })
-    async getGraphByID(@Param() params: KnowledgeGraphIdParam, @Res() res: Response): Promise<void> {
-        const graphStream: NodeJS.ReadableStream = await this.kgService.getKnowledgeGraph(params.graphID);
+    async getGraphByName(@Param() name: string, @Res() res: Response): Promise<void> {
+        const graphStream: NodeJS.ReadableStream = await this.kgService.getKnowledgeGraph(name);
         if (!graphStream) {
             throw new NotFoundException();
         }
@@ -115,7 +115,7 @@ export class KnowledgeGraphController {
             await this.kgQueue.add({
                 publish: query.publish,
                 graphID: this.graphID,
-                userID: req.user?.uid || 1
+                userID: req.user?.uid || 2288
             });
         }
         else if (knowledgeGraphExists) {
