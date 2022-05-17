@@ -1,9 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, getConnection, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { TaxaNestedTreeEntry } from './TaxaNestedTreeEntry.entity';
 import { UserTaxonomy } from './UserTaxonomy.entity';
 import { TaxonomicStatus } from './TaxonomicStatus.entity';
 import { TaxaEnumTreeEntry } from './TaxaEnumTreeEntry.entity';
 import { EntityProvider } from '../../entity-provider.class';
+import { TaxonomicUnit } from './TaxonomicUnit.entity';
 
 @Entity('taxauthority')
 export class TaxonomicAuthority extends EntityProvider {
@@ -54,4 +55,14 @@ export class TaxonomicAuthority extends EntityProvider {
 
     @OneToMany(() => TaxaEnumTreeEntry, (taxaenumtree) => taxaenumtree.taxonAuthority)
     enumTreeEntries: Promise<TaxaEnumTreeEntry[]>;
+
+    async getDefaultAuthorityID(): Promise<number> {
+        const db = getConnection();
+        const myRepo = db.getRepository(TaxonomicAuthority);
+        const auth = await myRepo.findOne({
+            isPrimary: 1
+        });
+        return auth.id
+    }
+
 }
