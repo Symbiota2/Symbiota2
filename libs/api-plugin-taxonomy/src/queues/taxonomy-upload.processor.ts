@@ -762,7 +762,7 @@ export class TaxonomyUploadProcessor {
                 }
                 const rankList = statusRankMap.get(taxon.rankID)
                 rankList.push(dbStatus)
-                statusRankMap.set(taxon.rankID, rankList)
+                //statusRankMap.set(taxon.rankID, rankList)
             }
         }
 
