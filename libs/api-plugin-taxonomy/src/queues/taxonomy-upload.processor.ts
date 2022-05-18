@@ -43,9 +43,6 @@ export class TaxonomyUploadProcessor {
     private readonly logger = new Logger(TaxonomyUploadProcessor.name)
     separator = ":"
     taxonFilesPath = "./data/uploads/taxa/taxon"
-    assetsFolderPath = "./apps/ui/src/assets/taxa"
-    problemParentNamesPath = this.assetsFolderPath + "/problemParentNames"
-    problemAcceptedNamesPath = this.assetsFolderPath + "/problemAcceptedNames"
 
     constructor(
         @Inject(TaxonomyUpload.PROVIDER_ID)

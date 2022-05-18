@@ -47,9 +47,7 @@ export async function* csvIterator<RowType>(filePath: string, bufSize = DEFAULT_
             rowBuffer = [];
             stream.resume();
         }
-        else {
-            rowBuffer.push(row);
-        }
+        rowBuffer.push(row);
     }
     yield rowBuffer;
 }
@@ -70,9 +68,7 @@ export async function* csvIteratorWithTrimValues<RowType>(filePath: string, bufS
             rowBuffer = [];
             stream.resume();
         }
-        else {
-            rowBuffer.push(row);
-        }
+        rowBuffer.push(row);
     }
     yield rowBuffer;
 }
@@ -100,9 +96,7 @@ export async function* objectIterator<RowType>(filePath: string, bufSize = DEFAU
             rowBuffer = []
             stream.resume()
         }
-        else {
-            rowBuffer.push(obj)
-        }
+        rowBuffer.push(obj)
     }
 
     yield rowBuffer
