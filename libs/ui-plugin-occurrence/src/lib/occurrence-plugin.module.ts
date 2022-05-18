@@ -35,6 +35,7 @@ import { OccurrenceCreateComponent } from './pages/occurrence-create/occurrence-
 import { OccurrenceEditorComponent } from './components/occurrence-editor/occurrence-editor.component';
 import { OccurrenceFieldComponent } from './components/occurrence-editor/occurrence-field/occurrence-field.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatRadioModule } from '@angular/material/radio';
 import {
     ROUTE_CREATE_OCCURRENCE,
     ROUTE_SEARCH_OCCURRENCES,
@@ -84,6 +85,7 @@ import { SpatialModuleDashboardPage } from './pages/spatial-module-dashboard/spa
         MatNativeDateModule,
         MatOptionModule,
         MatPaginatorModule,
+        MatRadioModule,
         MatSelectModule,
         MatTableModule,
         ReactiveFormsModule,
@@ -149,6 +151,7 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
                 queryParams: { 'collectionID': collectionID }
             };
         });
+
     }
 
     static routes(): Route[] {
@@ -182,6 +185,7 @@ export class OccurrencePlugin extends SymbiotaUiPlugin {
                 component: OccurrenceUploadFieldMapPage
             },
         ];
+
     }
 
     static navBarLinks(): NavBarLink[] {

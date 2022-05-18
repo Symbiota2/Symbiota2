@@ -22,5 +22,7 @@
     "checklist.create.form.checklist.checklists.assigned": "Checklists assigned to your account",
     "checklist.create.form.checklist.inventory.project.administration": "Inventory project administration",
     "checklist.view.display.checklist.list": "All checklists",
-    "checklist.access.lacks.create.permission": "Not logged in or insufficient privileges to create a checklist"
+    "checklist.access.lacks.create.permission": "Not logged in or insufficient privileges to create a checklist",
+    "checklist.access.lacks.upload.permission": "Not logged in or insufficient privileges to upload a checklist",
+    "checklist.access.lacks.access.permission": "Not logged in or insufficient privileges to access this page."
 }

@@ -236,6 +236,14 @@ legend {
     }
 }
 
+.checklist-taxon-form {
+    z-index: 50 !important;
+}
+
+.checklist-upload-report-box {
+    z-index: 100 !important;
+}
+
 @import "~leaflet/dist/leaflet.css";
 @import "~leaflet-draw/dist/leaflet.draw.css";
 

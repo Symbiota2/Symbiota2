@@ -5,6 +5,9 @@ import { TaxonomicStatusDto } from './TaxonomicStatusDto';
 
 @Exclude()
 export class TaxonomicStatusInputDto {
+    constructor(data: Record<string, unknown>) {
+        Object.assign(this, data);
+    }
 
     @ApiProperty()
     @Expose()
