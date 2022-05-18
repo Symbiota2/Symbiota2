@@ -281,6 +281,45 @@ export class OccurrenceController {
         return upload;
     }
 
+    @Post('upload/:iptLink')
+    @HttpCode(HttpStatus.CREATED)
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({
+        summary: "Download a DwCA from an IPT link and upload it."
+    })
+    @ApiFileInput('file')
+    async uploadOccurrenceIPTLink(@Param('iptLink') iptLink: number,): Promise<OccurrenceUpload> {
+        let upload: OccurrenceUpload;
+        const http = require('http'); // or 'https' for https:// URLs
+        const fs = require('fs');
+
+        // Accepts file
+        // Writes file to uploads directory /home/dovahcraft/symbiota2/data/uploads/occurrences
+        // Generates timestamped dir
+        // Moves items with a new unique id/timestamp to top level
+        // Deletes uniqueDir and uneeded items.
+        const currDate = new Date();
+        const timestamp = currDate.getTime();
+        const re = /\s/gi;
+        const fileTimeStamp = currDate.toString().replace(re, "")
+        console.log("Timestamp: " + timestamp);
+
+        let uniqueDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", fileTimeStamp);
+        let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
+
+        const file = fs.createWriteStream(fileTimeStamp + "_IPT.zip");
+        return http.get(iptLink, function (response) {
+            response.pipe(file);
+
+            // after download completed close filestream
+            file.on("finish", () => {
+                file.close();
+                return this.uploadOccurrenceDwCA(file);
+            });
+        });
+    }
+
+
     @Get('upload/:id')
     @ApiOperation({ summary: 'Retrieve an upload by its ID' })
     async getUploadByID(@Param('id') id: number): Promise<OccurrenceUpload> {

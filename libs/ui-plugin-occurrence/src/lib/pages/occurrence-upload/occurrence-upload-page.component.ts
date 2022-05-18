@@ -79,7 +79,34 @@ export class OccurrenceUploadPage implements OnInit {
 
     //Getting dwca from link
     onLinking() {
+        //Filter link and send to backend
+        let testurl: string = "https://osac.oregonstate.edu/ipt/resource?r=osac-lepidoptera-2018-07-01"
+        let newurl: string = testurl.replace("resource", "archive.do")
 
+        console.log("OLD URL: " + testurl)
+        console.log("NEW URL: " + newurl)
+
+        combineLatest([
+            this.collectionID,
+            this.upload.uploadFileIPT(this.fileInput.value).pipe(
+                switchMap(() => this.upload.currentUpload)
+            )
+        ]).pipe(take(1)).subscribe(([collectionID, beginUploadResponse]) => {
+            if (beginUploadResponse !== null) {
+                this.router.navigate(
+                    [ROUTE_UPLOAD_FIELD_MAP],
+                    {
+                        queryParams: {
+                            [Q_PARAM_COLLID]: collectionID,
+                            uploadID: beginUploadResponse.id
+                        }
+                    }
+                );
+            }
+            else {
+                this.alerts.showError('Upload failed');
+            }
+        });
     }
 
     //Uploading dwca
