@@ -38,6 +38,7 @@ import { ChecklistUploadTaxonComponent } from './components/checklist-upload-tax
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChecklistBatchUploadTaxaComponent } from './components/checklist-batch-upload-taxa/checklist-batch-upload-taxa.component';
+// import { AuthGuard } from './guard/auth.guard';
 
 @NgModule({
   imports: [
