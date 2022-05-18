@@ -88,7 +88,7 @@ export class OccurrenceUploadPage implements OnInit {
 
         combineLatest([
             this.collectionID,
-            this.upload.uploadFileIPT(this.fileInput.value).pipe(
+            this.upload.uploadFileIPT(newurl).pipe(
                 switchMap(() => this.upload.currentUpload)
             )
         ]).pipe(take(1)).subscribe(([collectionID, beginUploadResponse]) => {

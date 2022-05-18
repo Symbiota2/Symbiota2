@@ -89,26 +89,18 @@ class UploadBuilder extends OccurrenceQueryBuilder {
 
 class IPTUploadBuilder extends OccurrenceQueryBuilder {
     //private _id: number = null;
-    private _iptUrl: string = null;
 
     // id(id: number): IPTUploadBuilder {
     //     this._id = id;
     //     return this;
     // }
 
-    iptUrl(iptUrl: string): IPTUploadBuilder {
-        this._iptUrl = iptUrl;
-        return this;
-    }
-
     build(): string {
-        this.url.pathname = `${this.url.pathname}/upload`;
+        this.url.pathname = `${this.url.pathname}/upload/iptLink`;
         // if (this._id) {
         //     this.url.pathname += `/${this._id}`;
         // }
-        if (this._iptUrl) {
-            this.url.pathname += `${this._iptUrl}`;
-        }
+
         return super.build();
     }
 }

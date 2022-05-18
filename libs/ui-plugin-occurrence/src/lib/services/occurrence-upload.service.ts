@@ -16,6 +16,7 @@ import {
 import { ApiOccurrenceUpload } from '@symbiota2/data-access';
 import { CollectionService } from '@symbiota2/ui-plugin-collection';
 import { OccurrenceQueryBuilder } from './occurrence-query-builder';
+import { IPTInputDto } from '../dto/occurrence-ipt-input.dto';
 
 
 @Injectable()
@@ -129,21 +130,24 @@ export class OccurrenceUploadService {
         );
     }
 
-    uploadFileIPT(iptUrl: string): Observable<void> {
+    uploadFileIPT(iptLink: string): Observable<void> {
         const url = this.createUrlBuilder()
             .uploadIPT()
-            .iptUrl(iptUrl)
             .build();
+        console.log("URL: " + url);
 
-        const body = new FormData();
-        body.append("iptUrl", iptUrl);
+        const body = new IPTInputDto(iptLink);
+
 
         return this.jwtToken.pipe(
             switchMap((token) => {
-                const query = this.api.queryBuilder(url).fileUpload()
+                const query = this.api.queryBuilder(url)
+                    .post()
                     .addJwtAuth(token)
                     .body(body)
                     .build();
+
+                console.log("QUERY: " + query)
 
                 return this.api.send(query).pipe(
                     catchError((e) => {

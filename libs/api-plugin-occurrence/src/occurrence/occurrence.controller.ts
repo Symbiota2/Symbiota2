@@ -47,6 +47,7 @@ import { IsNull, Not } from 'typeorm';
 import { StorageService } from '@symbiota2/api-storage';
 import { DwCService } from '@symbiota2/api-dwc';
 import extract from 'extract-zip';
+import { IPTInputDto } from './dto/occurrence-ipt-input.dto';
 
 
 type File = Express.Multer.File;
@@ -281,17 +282,18 @@ export class OccurrenceController {
         return upload;
     }
 
-    @Post('upload/:iptLink')
+    @Post('upload/iptLink')
     @HttpCode(HttpStatus.CREATED)
     @UseGuards(JwtAuthGuard)
     @ApiOperation({
         summary: "Download a DwCA from an IPT link and upload it."
     })
-    @ApiFileInput('file')
-    async uploadOccurrenceIPTLink(@Param('iptLink') iptLink: number,): Promise<OccurrenceUpload> {
+    async uploadOccurrenceIPTLink(@Body() iptDto: IPTInputDto): Promise<OccurrenceUpload> {
         let upload: OccurrenceUpload;
-        const http = require('http'); // or 'https' for https:// URLs
+        let iptLink = iptDto.iptLink;
+        const https = require('https'); // or 'https' for https:// URLs
         const fs = require('fs');
+        console.log("Link provided: " + iptLink)
 
         // Accepts file
         // Writes file to uploads directory /home/dovahcraft/symbiota2/data/uploads/occurrences
@@ -307,14 +309,49 @@ export class OccurrenceController {
         let uniqueDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", fileTimeStamp);
         let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
 
-        const file = fs.createWriteStream(fileTimeStamp + "_IPT.zip");
-        return http.get(iptLink, function (response) {
+        const file = fs.createWriteStream(uniqueDir + "_IPT.zip");
+        return https.get(iptLink, function (response) {
             response.pipe(file);
 
             // after download completed close filestream
-            file.on("finish", () => {
+            file.on("finish", async () => {
                 file.close();
-                return this.uploadOccurrenceDwCA(file);
+                // try {
+                //     await extract(file.path, { dir: uniqueDir })
+                //     const files = await fs.promises.readdir(uniqueDir);
+                //     console.log("Files in directory: " + uniqueDir);
+                //     for (var currFile of files) {
+                //         console.log(currFile);
+                //         //Rebuild string with timestamp added to it.
+                //         const fileNameParts = currFile.split('.');
+                //         //Splits fileName before file extension, adding the timestamp between them. 
+                //         let fullFileName: string = fileNameParts[0] + "-" + fileTimeStamp + "." + fileNameParts[1];
+
+                //         fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName), function (err) {
+                //             if (err) throw err;
+                //         });
+                //     }
+
+                //     //Remove the now empty unique directory
+                //     fs.rmSync(uniqueDir, { recursive: true, force: true });
+
+                //     //Get the timestamped occurrences file.
+                //     let occurrencesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
+                //     let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
+                //     const headers = await getCSVFields(occurrenceCsvPath);
+                //     const headerMap = {};
+                //     headers.forEach((h) => headerMap[h] = '');
+
+                //     upload = await this.occurrenceService.createUpload(
+                //         path.resolve(file.path),
+                //         file.mimetype,
+                //         headerMap
+                //     );
+                // } catch (err) {
+                //     // handle any errors
+                //     throw new BadRequestException('DwCA upload not extracted! ' + err);
+                // }
+
             });
         });
     }
@@ -401,3 +438,5 @@ export class OccurrenceController {
         }
     }
 }
+
+
