@@ -37,7 +37,7 @@ export class OccurrenceUploadPage implements OnInit {
     );
 
     fileInput = new FormControl(null);
-    dwcaLink = new FormControl(null);
+
     currentPage = this.currentRoute.queryParamMap.pipe(
         map((params) => {
             const hasPage = params.has(OccurrenceUploadPage.Q_PARAM_PAGE);
@@ -55,6 +55,7 @@ export class OccurrenceUploadPage implements OnInit {
 
     uploadDwcForm = this.fb.group({
         uploadOption: ['link'],
+        iptLink: ['']
     })
 
 
@@ -79,34 +80,36 @@ export class OccurrenceUploadPage implements OnInit {
 
     //Getting dwca from link
     onLinking() {
-        //Filter link and send to backend
-        let testurl: string = "https://osac.oregonstate.edu/ipt/resource?r=osac-lepidoptera-2018-07-01"
-        let newurl: string = testurl.replace("resource", "archive.do")
+        let formUrl = this.uploadDwcForm.get('iptLink').value;
 
-        console.log("OLD URL: " + testurl)
+        //Filter link and send to backend
+        let newurl: string = formUrl.replace("resource", "archive.do")
+
         console.log("NEW URL: " + newurl)
 
         combineLatest([
             this.collectionID,
-            this.upload.uploadFileIPT(newurl).pipe(
-                switchMap(() => this.upload.currentUpload)
-            )
-        ]).pipe(take(1)).subscribe(([collectionID, beginUploadResponse]) => {
-            if (beginUploadResponse !== null) {
-                this.router.navigate(
-                    [ROUTE_UPLOAD_FIELD_MAP],
-                    {
-                        queryParams: {
-                            [Q_PARAM_COLLID]: collectionID,
-                            uploadID: beginUploadResponse.id
+            this.upload.uploadFileIPT(newurl)
+                .pipe(
+                    switchMap(() => this.upload.currentUpload)
+                )
+        ])
+            .pipe(take(1)).subscribe(([collectionID, beginUploadResponse]) => {
+                if (beginUploadResponse !== null) {
+                    this.router.navigate(
+                        [ROUTE_UPLOAD_FIELD_MAP],
+                        {
+                            queryParams: {
+                                [Q_PARAM_COLLID]: collectionID,
+                                uploadID: beginUploadResponse.id
+                            }
                         }
-                    }
-                );
-            }
-            else {
-                this.alerts.showError('Upload failed');
-            }
-        });
+                    );
+                }
+                else {
+                    this.alerts.showError('Upload failed');
+                }
+            });
     }
 
     //Uploading dwca

@@ -316,41 +316,41 @@ export class OccurrenceController {
             // after download completed close filestream
             file.on("finish", async () => {
                 file.close();
-                // try {
-                //     await extract(file.path, { dir: uniqueDir })
-                //     const files = await fs.promises.readdir(uniqueDir);
-                //     console.log("Files in directory: " + uniqueDir);
-                //     for (var currFile of files) {
-                //         console.log(currFile);
-                //         //Rebuild string with timestamp added to it.
-                //         const fileNameParts = currFile.split('.');
-                //         //Splits fileName before file extension, adding the timestamp between them. 
-                //         let fullFileName: string = fileNameParts[0] + "-" + fileTimeStamp + "." + fileNameParts[1];
+                try {
+                    await extract(file.path, { dir: uniqueDir })
+                    const files = await fs.promises.readdir(uniqueDir);
+                    console.log("Files in directory: " + uniqueDir);
+                    for (var currFile of files) {
+                        console.log(currFile);
+                        //Rebuild string with timestamp added to it.
+                        const fileNameParts = currFile.split('.');
+                        //Splits fileName before file extension, adding the timestamp between them. 
+                        let fullFileName: string = fileNameParts[0] + "-" + fileTimeStamp + "." + fileNameParts[1];
 
-                //         fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName), function (err) {
-                //             if (err) throw err;
-                //         });
-                //     }
+                        fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName), function (err) {
+                            if (err) throw err;
+                        });
+                    }
 
-                //     //Remove the now empty unique directory
-                //     fs.rmSync(uniqueDir, { recursive: true, force: true });
+                    //Remove the now empty unique directory
+                    fs.rmSync(uniqueDir, { recursive: true, force: true });
 
-                //     //Get the timestamped occurrences file.
-                //     let occurrencesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
-                //     let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
-                //     const headers = await getCSVFields(occurrenceCsvPath);
-                //     const headerMap = {};
-                //     headers.forEach((h) => headerMap[h] = '');
+                    //Get the timestamped occurrences file.
+                    let occurrencesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
+                    let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
+                    const headers = await getCSVFields(occurrenceCsvPath);
+                    const headerMap = {};
+                    headers.forEach((h) => headerMap[h] = '');
 
-                //     upload = await this.occurrenceService.createUpload(
-                //         path.resolve(file.path),
-                //         file.mimetype,
-                //         headerMap
-                //     );
-                // } catch (err) {
-                //     // handle any errors
-                //     throw new BadRequestException('DwCA upload not extracted! ' + err);
-                // }
+                    upload = await this.occurrenceService.createUpload(
+                        path.resolve(file.path),
+                        file.mimetype,
+                        headerMap
+                    );
+                } catch (err) {
+                    // handle any errors
+                    throw new BadRequestException('DwCA upload not extracted! ' + err);
+                }
 
             });
         });
