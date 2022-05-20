@@ -263,9 +263,9 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
                     parentTaxonID:  parentTaxonID
                 }})
 
-        if (myRecord.length > 0) return; // exists in table
+        // if (myRecord.length > 0) return; // exists in table
 
-        // First find all of the new parent's taxaEnum tree entries
+        // First find the new parent's taxaEnum tree entries
         const newAncestors =
             await this.enumTreeRepository.find({
                 where: {
