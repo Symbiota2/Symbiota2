@@ -8,6 +8,7 @@ import {
     Logger, NotFoundException,
     Param, ParseArrayPipe, Patch,
     Post,
+    Provider,
     Query, Req, Res,
     UploadedFile, UseGuards,
     UseInterceptors
@@ -29,7 +30,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import fs, { createReadStream } from 'fs';
 import {
     ApiFileInput,
-    getCSVFields, withTempDir
+    getCSVFields, getCSVFieldsTabSeperator, withTempDir
 } from '@symbiota2/api-common';
 import { OccurrenceOutputDto } from './dto/occurrence.output.dto';
 import {
@@ -288,73 +289,127 @@ export class OccurrenceController {
     @ApiOperation({
         summary: "Download a DwCA from an IPT link and upload it."
     })
-    async uploadOccurrenceIPTLink(@Body() iptDto: IPTInputDto): Promise<OccurrenceUpload> {
+    async uploadOccurrenceIPTLink(@Body() iptDto: IPTInputDto) {
         let upload: OccurrenceUpload;
         let iptLink = iptDto.iptLink;
-        const https = require('https'); // or 'https' for https:// URLs
-        const fs = require('fs');
+
+        const currDate = new Date();
+        const timestamp = currDate.getTime();
+        const re = /\s/gi;
+        const fileTimeStamp = currDate.toString().replace(re, "")
+
         console.log("Link provided: " + iptLink)
+
+
 
         // Accepts file
         // Writes file to uploads directory /home/dovahcraft/symbiota2/data/uploads/occurrences
         // Generates timestamped dir
         // Moves items with a new unique id/timestamp to top level
         // Deletes uniqueDir and uneeded items.
-        const currDate = new Date();
-        const timestamp = currDate.getTime();
-        const re = /\s/gi;
-        const fileTimeStamp = currDate.toString().replace(re, "")
-        console.log("Timestamp: " + timestamp);
+
 
         let uniqueDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", fileTimeStamp);
         let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
 
         const file = fs.createWriteStream(uniqueDir + "_IPT.zip");
-        return https.get(iptLink, function (response) {
-            response.pipe(file);
 
-            // after download completed close filestream
-            file.on("finish", async () => {
-                file.close();
-                try {
-                    await extract(file.path, { dir: uniqueDir })
-                    const files = await fs.promises.readdir(uniqueDir);
-                    console.log("Files in directory: " + uniqueDir);
-                    for (var currFile of files) {
-                        console.log(currFile);
-                        //Rebuild string with timestamp added to it.
-                        const fileNameParts = currFile.split('.');
-                        //Splits fileName before file extension, adding the timestamp between them. 
-                        let fullFileName: string = fileNameParts[0] + "-" + fileTimeStamp + "." + fileNameParts[1];
+        //File and headers for upload 
+        const headerMap = {};
+        let occurrencesPath: string;
 
-                        fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName), function (err) {
-                            if (err) throw err;
-                        });
+        try {
+            occurrencesPath = await this.get_IPT_Zip(iptLink);
+        }
+        catch (rejectedVal) {
+            throw new BadRequestException('Couldn\'t download archive from IPT link' + rejectedVal);
+        }
+
+        console.log("PATH: " + occurrencesPath);
+
+        //Convert to csv.
+
+
+        const headers = await getCSVFieldsTabSeperator(occurrencesPath);
+        headers.forEach((h) => headerMap[h] = '');
+
+        console.log("HEADERS: " + headers);
+
+
+
+        //Now that we have the files, upload them.
+        return this.occurrenceService.createUpload(
+            path.resolve(occurrencesPath),
+            ".csv",
+            headerMap
+        );
+    }
+    async get_IPT_Zip(iptLink: string): Promise<any> {
+        const currDate = new Date();
+        const timestamp = currDate.getTime();
+        const re = /\s/gi;
+        const fileTimeStamp = currDate.toString().replace(re, "")
+        let uniqueDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", fileTimeStamp);
+        let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
+        const https = require('https'); // or 'https' for https:// URLs
+        const fs = require('fs');
+
+        const file = fs.createWriteStream(uniqueDir + "_IPT.zip");
+        return new Promise((resolve, reject) => {
+            https.get(iptLink, async function (response) {
+                response.pipe(file);
+                // after download completed close filestream
+                file.on("finish", async () => {
+                    file.close();
+                    try {
+                        await extract(file.path, { dir: uniqueDir })
+                        const files = await fs.promises.readdir(uniqueDir);
+                        console.log("Files in directory: " + uniqueDir);
+                        for (var currFile of files) {
+                            console.log(currFile + typeof (currFile));
+                            //Rebuild string with timestamp added to it.
+                            const fileNameParts = currFile.split('.');
+                            //Splits fileName before file extension, adding the timestamp between them. 
+                            let fullFileName: string = fileNameParts[0] + "-" + fileTimeStamp + "." + fileNameParts[1];
+
+                            //Rename to csv. 
+                            if (fileNameParts[1] == "txt") {
+                                console.log("Found csv" + currFile);
+                                let fullFileNameCsv: string = fileNameParts[0] + "-" + fileTimeStamp + ".csv";
+                                fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileNameCsv), function (err) {
+                                    reject(err);
+                                });
+                            }
+                            else {
+                                fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName), function (err) {
+                                    reject(err);
+                                });
+                            }
+
+                        }
+
+                        //Remove the now empty unique directory
+                        fs.rmSync(uniqueDir, { recursive: true, force: true });
+                        fs.rmSync(uniqueDir + "_IPT.zip", { recursive: true, force: true });
+
+                        //Get the timestamped occurrences file.
+                        let occurrencesFName: string = "occurrence" + "-" + fileTimeStamp + "." + "csv";
+                        let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
+                        resolve(occurrenceCsvPath);
+
+                    } catch (err) {
+                        // handle any errors
+                        reject(err);
+                        throw new BadRequestException('Couldn\'t download archive from IPT link' + err);
                     }
 
-                    //Remove the now empty unique directory
-                    fs.rmSync(uniqueDir, { recursive: true, force: true });
-
-                    //Get the timestamped occurrences file.
-                    let occurrencesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
-                    let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
-                    const headers = await getCSVFields(occurrenceCsvPath);
-                    const headerMap = {};
-                    headers.forEach((h) => headerMap[h] = '');
-
-                    upload = await this.occurrenceService.createUpload(
-                        path.resolve(file.path),
-                        file.mimetype,
-                        headerMap
-                    );
-                } catch (err) {
-                    // handle any errors
-                    throw new BadRequestException('DwCA upload not extracted! ' + err);
                 }
+                );
+            })
+        })
 
-            });
-        });
     }
+
 
 
     @Get('upload/:id')
