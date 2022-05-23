@@ -577,6 +577,13 @@ export class TaxaViewerPageComponent implements OnInit {
             // Need to build up list of children names
             let children = []
 
+            /*
+            // Children array is the scientific names of the children
+            children = children.sort(function (a, b) {
+                return (a.name > b.name ? 1 : -1)
+            })
+             */
+
             // Look up the names by their ids
             this.taxaService
                 .findAll(this.taxonomicAuthorityID,{ taxonIDs: childrenTids })
@@ -585,7 +592,7 @@ export class TaxaViewerPageComponent implements OnInit {
 
                     // Sort and format the children as tree nodes
                     const childrenTree = []
-                    children.sort((a,b) => a.scientificName - b.scientificName).forEach((item) => {
+                    children.sort((a,b) => {return (a.scientificName > b.scientificName) ? 1 : -1 }).forEach((item) => {
                         const baseNode: TaxonNode = {
                             name: item.scientificName,
                             taxonID: item.id,
