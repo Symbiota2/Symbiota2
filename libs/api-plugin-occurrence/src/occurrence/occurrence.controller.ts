@@ -150,6 +150,18 @@ export class OccurrenceController {
                 headerMap
             );
         }
+        else if (file.mimetype.startsWith('text/plain')) {
+            const headers = await getCSVFieldsTabSeperator(file.path);
+            const headerMap = {};
+            headers.forEach((h) => headerMap[h] = '');
+
+            upload = await this.occurrenceService.createUpload(
+                path.resolve(file.path),
+                file.mimetype,
+                headerMap
+            );
+        }
+
         else if (file.mimetype.startsWith('application/zip') || file.mimetype.startsWith('application/x-zip-compressed')) {
             const currDate = new Date();
             const timestamp = currDate.getTime();
