@@ -343,7 +343,7 @@ export class OccurrenceController {
             ".csv",
             headerMap
         );
-        //Upload Images
+        //Upload Images TODO
 
 
     }
@@ -387,7 +387,6 @@ export class OccurrenceController {
 
                             //Rename to csv. 
                             if (fileNameParts[1] != "csv") {
-                                console.log("Found csv" + currFile);
                                 let fullFileNameCsv: string = fileNameParts[0] + "-" + fileTimeStamp + ".csv";
                                 fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileNameCsv), function (err) {
                                     reject(err);
@@ -409,47 +408,47 @@ export class OccurrenceController {
                         uploadInfo.occurrencePath = occurrenceCsvPath;
                         //Get the timestamped occurrences file.
                         //Starts with occurrence
-                        // try {
-                        //     let occurrencesFName: string = "occurrence" + "-" + fileTimeStamp + "." + "csv";
-                        //     let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
-                        //     uploadInfo.occurrencePath = occurrenceCsvPath;
-                        // }
-                        // catch (err) {
-                        //     console.log("Does NOT start with occurrence. Trying occurrences.");
-                        // }
-                        // //Starts with occurrences
-                        // try {
-                        //     let occurrencesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
-                        //     let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
-                        //     uploadInfo.occurrencePath = occurrenceCsvPath;
-                        // }
-                        // catch (err) {
-                        //     console.log("Does NOT start with occurrences either. Invalid filename.");
-                        //     reject(err);
-                        // }
+                        try {
+                            let occurrencesFName: string = "occurrence" + "-" + fileTimeStamp + "." + "csv";
+                            let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
+                            uploadInfo.occurrencePath = occurrenceCsvPath;
+                        }
+                        catch (err) {
+                            console.log("Does NOT start with occurrence. Trying occurrences.");
+                        }
+                        //Starts with occurrences
+                        try {
+                            let occurrencesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
+                            let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
+                            uploadInfo.occurrencePath = occurrenceCsvPath;
+                        }
+                        catch (err) {
+                            console.log("Does NOT start with occurrences either. Invalid filename.");
+                            reject(err);
+                        }
 
 
-                        // //Attempt to get the timestamped images file
-                        // //starts with image.
-                        // try {
-                        //     let imagesFName: string = "image" + "-" + fileTimeStamp + "." + "csv";
-                        //     let imageCsvPath: string = path.resolve(extractDir, imagesFName);
-                        //     uploadInfo.imagesPath = imageCsvPath;
-                        // }
-                        // catch (err) {
-                        //     console.log("Does NOT start with image. Trying images.");
-                        // }
+                        //Attempt to get the timestamped images file
+                        //starts with image.
+                        try {
+                            let imagesFName: string = "image" + "-" + fileTimeStamp + "." + "csv";
+                            let imageCsvPath: string = path.resolve(extractDir, imagesFName);
+                            uploadInfo.imagesPath = imageCsvPath;
+                        }
+                        catch (err) {
+                            console.log("Does NOT start with image. Trying images.");
+                        }
 
-                        // try {
-                        //     let imagesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
-                        //     let imageCsvPath: string = path.resolve(extractDir, imagesFName);
-                        //     uploadInfo.imagesPath = imageCsvPath;
-                        // }
-                        // catch (err) {
-                        //     console.log("Does NOT start with images either. Invalid filename for images.");
-                        //     //reject("Invalid image filename, must be named 'image' or 'images' in DwCA" + err);
-                        // }
-
+                        try {
+                            let imagesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
+                            let imageCsvPath: string = path.resolve(extractDir, imagesFName);
+                            uploadInfo.imagesPath = imageCsvPath;
+                        }
+                        catch (err) {
+                            console.log("Does NOT start with images either. Invalid filename for images.");
+                            //reject("Invalid image filename, must be named 'image' or 'images' in DwCA" + err);
+                        }
+                        console.log("UploadInfo occurrence link: " + uploadInfo.occurrencePath + " Mimetype: " + uploadInfo.occurrenceMimeType);
                         //If we got both, return the information
                         resolve(occurrenceCsvPath);
 
