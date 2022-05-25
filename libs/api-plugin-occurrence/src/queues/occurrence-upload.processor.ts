@@ -21,8 +21,9 @@ import {
     QUEUE_ID_COLLECTION_STATS_UPDATE
 } from '@symbiota2/api-plugin-collection';
 import { TaxonFindByMatchingParams } from '../../../api-plugin-taxonomy/src/taxon/dto/taxon-find-parms';
-import { TaxonInputDto, TaxonomicStatusInputDto } from '@symbiota2/ui-plugin-taxonomy';
 import { ApiProperty } from '@nestjs/swagger';
+import { TaxonInputDto } from '../../../api-plugin-taxonomy/src/taxon/dto/TaxonInputDto';
+import { TaxonomicStatusInputDto } from '../../../api-plugin-taxonomy/src/taxonomicStatus/dto/TaxonomicStatusInputDto';
 
 export interface OccurrenceUploadJob {
     uid: number;
@@ -56,8 +57,8 @@ export class OccurrenceUploadProcessor {
         @InjectQueue(QUEUE_ID_COLLECTION_STATS_UPDATE)
         private readonly collectionStatsUpdateQueue: Queue<CollectionStatsUpdateJob>)
     {
-        const authority= new TaxonomicAuthority()
-        this.taxonomicAuthorityID = authority.getDefaultAuthorityID()
+        // const authority= new TaxonomicAuthority()
+        // this.taxonomicAuthorityID = authority.getDefaultAuthorityID()
     }
 
     // TODO: Wrap in a transaction? Right now each chunk goes straight to the database until a failure occurs
@@ -66,6 +67,8 @@ export class OccurrenceUploadProcessor {
      */
     @Process()
     async upload(job: Job<OccurrenceUploadJob>): Promise<void> {
+        const authority= new TaxonomicAuthority()
+        this.taxonomicAuthorityID = await authority.getDefaultAuthorityID()
         // Count the number of processed occurrences
         this.processed = 0;
 
@@ -173,11 +176,13 @@ export class OccurrenceUploadProcessor {
             // properly searchable as a result
             // delete occurrenceData['taxonID'];
             const taxonParams = new TaxonFindByMatchingParams()
-            taxonParams.scientificName = occurrenceData['scientificName']
-            taxonParams.genus = occurrenceData['genus']
-            taxonParams.family = occurrenceData['family']
-            taxonParams.taxonAuthorityID = this.taxonomicAuthorityID
-            occurrenceData['taxonID'] = await this.findOrCreateByMatching(taxonParams)
+            if (occurrenceData['scientificName'] != null) {
+                taxonParams.scientificName = occurrenceData['scientificName']
+                taxonParams.genus = occurrenceData['genus']
+                taxonParams.family = occurrenceData['family']
+                taxonParams.taxonAuthorityID = this.taxonomicAuthorityID
+                occurrenceData['taxonID'] = await this.findOrCreateByMatching(taxonParams)
+            }
 
             // Update
             if (dbOccurrence) {
