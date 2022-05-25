@@ -11,7 +11,7 @@ import {
     TaxaEnumTreeEntry, Taxon, TaxonomicStatus, TaxonomicUnit, TaxonUpload,
     UserNotification, TaxonomyUpload
 } from '@symbiota2/api-database';
-import { DeepPartial, IsNull, Repository } from 'typeorm';
+import { DeepPartial, In, IsNull, Repository } from 'typeorm';
 import { QUEUE_ID_TAXONOMY_UPLOAD } from './taxonomy-upload.queue';
 import { csvIteratorWithTrimValues, objectIterator } from '@symbiota2/api-common';
 import { TaxonService } from '../taxon/taxon.service';
@@ -43,9 +43,6 @@ export class TaxonomyUploadProcessor {
     private readonly logger = new Logger(TaxonomyUploadProcessor.name)
     separator = ":"
     taxonFilesPath = "./data/uploads/taxa/taxon"
-    assetsFolderPath = "./apps/ui/src/assets/taxa"
-    problemParentNamesPath = this.assetsFolderPath + "/problemParentNames"
-    problemAcceptedNamesPath = this.assetsFolderPath + "/problemAcceptedNames"
 
     constructor(
         @Inject(TaxonomyUpload.PROVIDER_ID)
@@ -287,15 +284,15 @@ export class TaxonomyUploadProcessor {
     private async onJSONBatch(job: Job<TaxonomyUploadJob>, upload: TaxonomyUpload, batch: DeepPartial<Taxon>[]) {
 
         // list of all the updates to do to taxon records
-        const taxonUpdates : Taxon[] = []
-        const changedTaxons : Taxon[] = []
+        const taxonUpdates: Taxon[] = []
+        const changedTaxons: Taxon[] = []
         const skippedTaxonsDueToMultipleMatch = job.data.skippedTaxonsDueToMultipleMatch
         const skippedTaxonsDueToMismatchRank = job.data.skippedTaxonsDueToMismatchRank
         const skippedTaxonsDueToMissingName = job.data.skippedTaxonsDueToMissingName
 
         // list of all the updates to do to status records
-        const statusUpdates : TaxonomicStatus[] = []
-        const changedStatuses : TaxonomicStatus[] = []
+        const statusUpdates: TaxonomicStatus[] = []
+        const changedStatuses: TaxonomicStatus[] = []
         const skippedStatusesDueToMultipleMatch = job.data.skippedStatusesDueToMultipleMatch
         const skippedStatusesDueToAcceptedMismatch = job.data.skippedStatusesDueToAcceptedMismatch
         const skippedStatusesDueToParentMismatch = job.data.skippedStatusesDueToParentMismatch
@@ -342,9 +339,9 @@ export class TaxonomyUploadProcessor {
         })
 
         // Map the "good" taxon update row number to the batch row number
-        let batchRowNumber = -1
+        let goodRowNumber = -1
         let taxonRowNumber = 0
-        const taxonRowToBatchRow : Map<number,number> = new Map()
+        const taxonRowToGoodRow: Map<number, number> = new Map()
 
         // We first need the kingdomName
         // foreach field
@@ -358,12 +355,16 @@ export class TaxonomyUploadProcessor {
         // Must have a kingdomName field
         if (!kingdomInRowName) {
             this.logger.error(`Mapping is missing a field for kingdom name! Exiting...`)
-            return
+            return []
         }
 
         // Process the taxon info first
+        // We'll do it in batches to minimize query time
+        // const goodRowsMap = new Map<string,any[]>()
+        const goodRows = []
+        const scinames = []
+
         for (const row of batch) {
-            batchRowNumber += 1
             const taxonData = {}
 
             // Flag to keep track if we skip this row
@@ -415,6 +416,293 @@ export class TaxonomyUploadProcessor {
                 }
 
             }
+            // Check that the required fields are present
+            // Taxon needs a scientific name
+            if (!taxonData["scientificName"]) {
+                if (skippedTaxonsDueToMissingName.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                    skippedTaxonsDueToMissingName.push(row)
+                }
+                this.logger.warn(`Taxon is missing a scientific name! Skipping...`)
+                skip = true
+                continue
+            }
+            // Taxon needs a rank id
+            if (!taxonData["rankID"]) {
+                if (skippedTaxonsDueToMismatchRank.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                    skippedTaxonsDueToMismatchRank.push(row)
+                }
+                this.logger.warn(`Taxon lacks a rank ID (no match in the database to rank name if present)! Skipping...`)
+                skip = true
+                continue
+            }
+
+            // Survived the row
+            if (!skip) {
+                //const name = taxonData["scientificName"]
+                //if (!goodRowsMap.has(name)) {
+                //    goodRowsMap.set(name,[])
+                //}
+                //const a = goodRowsMap.get(name)
+                //a.push(taxonData)
+                goodRows.push(row)
+                scinames.push(taxonData["scientificName"])
+            }
+        }
+
+        // Do the DB query
+        if (scinames.length == 0) {
+            // Nothing to process
+            return []
+        }
+
+        const foundTaxons = await this.taxonRepo.find({
+            where: { scientificName: In(scinames) }
+        })
+
+        // Map the found taxons to list of taxons organized by scientific name
+        const foundMap = new Map<string,any[]>()
+        for (const taxon of foundTaxons) {
+            const name = taxon["scientificName"]
+            if (!foundMap.has(name)) {
+                foundMap.set(name,[])
+            }
+            const a = foundMap.get(name)
+            a.push(taxon)
+        }
+
+        // Run through the batch and match rows
+        for (const taxonData of goodRows) {
+            goodRowNumber += 1
+
+            // Flag to keep track if we skip this row
+            let skip = false
+
+            // Let's try to match the taxon with information about the taxon to
+            // things in the database
+            // If we have a taxon id then let's use that
+            let dbTaxon = null
+
+            const name = taxonData["scientificName"]
+
+            // Meed to match
+            // First let's try to match just on scientific name
+            let testTaxons = []
+            if (foundMap.has(name)) {
+                testTaxons = foundMap.get(name)
+            }
+
+            // See how many things we got back
+            if (testTaxons.length == 0) {
+                // A new scientific name, we'll insert
+            } else if (testTaxons.length == 1) {
+                // An existing unique name, we'll update
+                dbTaxon = testTaxons[0]
+            } else {
+
+                // Expand the match to include kingdom name and author if present
+                let moreTestTaxons = testTaxons
+
+                // Does it have an author?
+                if (moreTestTaxons.length > 1 && taxonData["author"]) {
+                    moreTestTaxons = moreTestTaxons.filter(a => a["author"] = taxonData["author"])
+                }
+                // Does it have a rankID?
+                if (moreTestTaxons.length > 1 && taxonData["rankID"]) {
+                    moreTestTaxons = moreTestTaxons.filter(a => a["rankID"] = taxonData["rankID"])
+                }
+                // Does it have a kingdom name?
+                if (moreTestTaxons.length > 1 && taxonData["kingdomName"]) {
+                    moreTestTaxons = moreTestTaxons.filter(a => a["kingdomName"] = taxonData["kingdomName"])
+                }
+
+                // See how many we got
+                if (moreTestTaxons.length == 0) {
+                    // A new scientific name, we'll insert
+                } else if (moreTestTaxons.length == 1) {
+                    // An existing unique name, we'll update
+                    dbTaxon = moreTestTaxons[0]
+                } else {
+                    // Still ambiguous
+                    if (skippedTaxonsDueToMultipleMatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                        skippedTaxonsDueToMultipleMatch.push(taxonData)
+                    }
+                    this.logger.warn("Skipping row due to multiple mismatch")
+                    skip = true
+                }
+            }
+
+            if (skip) {
+                // Should already be pushed into a skipped list
+            } else {
+                let newRecordFlag = false
+                let changed = false
+                // Do we need to insert?
+                if (!dbTaxon) {
+                    // Need to insert, create a new one
+                    dbTaxon = this.taxonRepo.create(taxonData)
+                    newRecordFlag = true
+                } else {
+                    for (const [k, v] of Object.entries(taxonData)) {
+                        if (k in dbTaxon) {
+                            // this.logger.log(" k and stuff " + v + " other " + dbTaxon[k])
+                            if (dbTaxon[k] != v) {
+                                dbTaxon[k] = v
+                                changed = true
+                            }
+                        }
+                    }
+                }
+                // Update with taxonData information
+                taxonUpdates.push(dbTaxon)
+                taxonRowToGoodRow.set(taxonRowNumber++, goodRowNumber)
+                // Only add to the change queue if actually changed
+                if (changed || newRecordFlag) {
+                    changedTaxons.push(dbTaxon)
+                }
+            }
+
+        }
+
+        /*
+        for (let [name, testTaxons] of foundMap) {
+            let skip = false
+            let dbTaxon = null
+
+            // See how many things we got back
+            if (testTaxons.length == 0) {
+                // A new scientific name, we'll insert
+            } else if (testTaxons.length == 1) {
+                // An existing unique name, we'll update
+                dbTaxon = testTaxons[0]
+            } else {
+
+                for (const goodTaxon of goodRowsMap.get(name)) {
+                    for (const foundTaxon of testTaxons) {
+
+                    }
+                }
+
+                // Does it have an author?
+                if (taxonData["author"]) {
+                    whereClause["author"] = taxonData["author"]
+                }
+                // Does it have a rankID?
+                if (taxonData["rankID"]) {
+                    whereClause["rankID"] = taxonData["rankID"]
+                }
+
+                // Fetch the expanded search
+                const moreTestTaxons = await this.taxonRepo.find({
+                    where: whereClause
+                })
+
+                // See how many we got
+                if (moreTestTaxons.length == 0) {
+                    // A new scientific name, we'll insert
+                } else if (moreTestTaxons.length == 1) {
+                    // An existing unique name, we'll update
+                    dbTaxon = moreTestTaxons[0]
+                } else {
+                    // Still ambiguous
+                    if (skippedTaxonsDueToMultipleMatch.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                        skippedTaxonsDueToMultipleMatch.push(row)
+                    }
+                    this.logger.warn("Skipping row due to multiple mismatch")
+                    skip = true
+                }
+            }
+
+
+            if (skip) {
+                // Should already be pushed into a skipped list
+            } else {
+                let newRecordFlag = false
+                let changed = false
+                // Do we need to insert?
+                if (!dbTaxon) {
+                    // Need to insert, create a new one
+                    dbTaxon = this.taxonRepo.create(taxonData)
+                    newRecordFlag = true
+                } else {
+                    for (const [k, v] of Object.entries(taxonData)) {
+                        if (k in dbTaxon) {
+                            // this.logger.log(" k and stuff " + v + " other " + dbTaxon[k])
+                            if (dbTaxon[k] != v) {
+                                dbTaxon[k] = v
+                                changed = true
+                            }
+                        }
+                    }
+                }
+                // Update with taxonData information
+                taxonUpdates.push(dbTaxon)
+                taxonRowToBatchRow.set(taxonRowNumber++, batchRowNumber)
+                // Only add to the change queue if actually changed
+                if (changed || newRecordFlag) {
+                    changedTaxons.push(dbTaxon)
+                }
+            }
+
+        }
+         */
+
+        // Process the taxon info first
+        /*
+        for (const row of batch) {
+            batchRowNumber += 1
+            const taxonData = {}
+
+            // Flag to keep track if we skip this row
+            let skip = false
+
+            // foreach field
+
+            for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
+
+                // Check to see if csvField is mapped to a db field
+                if (!dbField) {
+                    continue
+                }
+                // Check to make sure that it maps to a database table
+                if (!fieldToTable.has(dbField)) {
+                    continue
+                }
+
+                let csvValue = row[csvField]
+
+                // Check if field is an introduced one
+                if (fieldToTable.get(dbField) == "artificial") {
+
+                    // For taxons we are interested in mapping the rankname to an id
+                    if (dbField == "RankName") {
+                        const kingdomName = row[kingdomInRowName]
+                        const value = csvValue + this.separator + kingdomName
+                        // Map rank name to rank ID
+                        if (rankAndKingdomToIDMap.has(value)) {
+                            // Found the name use the ID
+                            csvValue = rankAndKingdomToIDMap.get(value)
+                        } else {
+                            skip = true
+                            if (skippedTaxonsDueToMismatchRank.length < TaxonomyUploadProcessor.MAX_SKIPPED_BUFFER_SIZE) {
+                                skippedTaxonsDueToMismatchRank.push(row)
+                            }
+                            this.logger.warn(`Taxon does not have a matching rank! Skipping...` + value)
+                            continue
+                        }
+                        taxonData["rankID"] = csvValue == '' ? null : csvValue
+                    } else {
+                        // Skip this field
+                    }
+                } else {
+                    // Skip if the field is not a taxon table field
+                    if (!(fieldToTable.get(dbField) == "taxon")) {
+                        continue
+                    }
+                    taxonData[dbField] = csvValue === '' ? null : csvValue
+                }
+
+            }
+
             // Check that the required fields are present
             // Taxon needs a scientific name
             if (!taxonData["scientificName"]) {
@@ -529,6 +817,7 @@ export class TaxonomyUploadProcessor {
             }
 
         }
+         */
 
         // Save all of the taxons
         //await this.taxonRepo.save(taxonUpdates)
@@ -536,11 +825,29 @@ export class TaxonomyUploadProcessor {
         this.processed += taxonUpdates.length
 
         // Now do the taxonomic status, iterating through the taxonUpdates
+        // First grab refind all the taxons (need ids in case they were inserted)
+        /*
+        const reFoundTaxons = await this.taxonRepo.find({
+            where: { scientificName: In(scinames) }
+        })
+
+        // Map the found taxons to list of taxons organized by scientific name
+        const reFoundMap = new Map<string,any[]>()
+        for (const taxon of reFoundTaxons) {
+            const name = taxon["scientificName"]
+            if (!reFoundMap.has(name)) {
+                reFoundMap.set(name,[])
+            }
+            const a = reFoundMap.get(name)
+            a.push(taxon)
+        }
+         */
+
         const statusRankMap = new Map()
         for (let taxonRowNumber = 0; taxonRowNumber < taxonUpdates.length; taxonRowNumber++) {
             const taxonData = taxonUpdates[taxonRowNumber]
             const statusData = {}
-            const row = batch[taxonRowToBatchRow.get(taxonRowNumber)]
+            const row = goodRows[taxonRowToGoodRow.get(taxonRowNumber)]
             let dbStatus = null
 
             // Flag to keep track if we skip this row
@@ -550,10 +857,15 @@ export class TaxonomyUploadProcessor {
 
             // Does it have an id
             if (taxonData.id) {
-                taxons = await this.taxonRepo.find({
+                taxons = [taxonData] /* await this.taxonRepo.find({
                     where: { id: taxonData.id }
-                })
+                }) */
             } else {
+                // Skip this taxon
+                taxons = []
+            }
+            /*
+            else {
                 // First, let's load the taxon record to get the taxon id
                 const whereClause = { scientificName: taxonData["scientificName"] }
 
@@ -570,6 +882,7 @@ export class TaxonomyUploadProcessor {
                     where: whereClause
                 })
             }
+             */
 
             // Did we find a taxon?
             if (taxons.length != 1) {
@@ -765,7 +1078,7 @@ export class TaxonomyUploadProcessor {
                 }
                 const rankList = statusRankMap.get(taxon.rankID)
                 rankList.push(dbStatus)
-                statusRankMap.set(taxon.rankID, rankList)
+                //statusRankMap.set(taxon.rankID, rankList)
             }
         }
 
@@ -787,7 +1100,6 @@ export class TaxonomyUploadProcessor {
             })
         })
 
-        // this.logger.log("zzzz size of toDo is " + toDo.length)
         for (let status of toDo) {
             this.moveTaxon(status.taxonID,status.taxonAuthorityID,status.parentTaxonID)
         }

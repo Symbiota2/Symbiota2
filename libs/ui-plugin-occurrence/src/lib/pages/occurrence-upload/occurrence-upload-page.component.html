@@ -1,28 +1,104 @@
-<!-- TODO: i18n -->
-<div id="main">
-    <div id="header" fxLayoutAlign="start center" fxLayoutGap="1rem">
-        <ng-container
-            *ngIf="collections.currentCollection | async as collection"
-        >
-            <symbiota2-collection-logo
-                [src]="collection.icon"
-                [collectionID]="collection.id"
-            >
-            </symbiota2-collection-logo>
-        </ng-container>
-        <h1>Occurrence Upload</h1>
+<form id="form" [formGroup]="uploadDwcForm">
+    <div id="main">
+        <div id="header" fxLayoutAlign="start center" fxLayoutGap="1rem">
+            <ng-container *ngIf="collections.currentCollection | async as collection">
+                <symbiota2-collection-logo [src]="collection.icon" [collectionID]="collection.id">
+                </symbiota2-collection-logo>
+            </ng-container>
+            <h1>{{ 'plugins.occurrence.upload.ipt.header' | translate }}</h1>
+        </div>
+        <mat-card id="institution" class="mat-elevation-z0 s2-field" fxLayout="column">
+            <mat-card-title>
+                {{ 'plugins.occurrence.upload.ipt.instruction' | translate }}
+            </mat-card-title>
+            <mat-card class="mat-elevation-z0 s2-field outline">
+                <mat-radio-group formControlName="uploadOption" fxLayout="row">
+                    <mat-radio-button value="link"></mat-radio-button>
+                    <mat-card id="create-inst" class="mat-elevation-z0 s2-field no-padding">
+                        <mat-card-title>
+                            {{
+                            "plugins.occurrence.upload.iptheader"
+                            | translate
+                            }}
+                        </mat-card-title>
+                        <mat-card-subtitle id="ipsubtitle" style="margin-bottom: 4%;">
+                            {{
+                            "plugins.occurrence.upload.iptsubtitle"
+                            | translate
+                            }}
+                        </mat-card-subtitle>
+                        <div id="two-field-row" fxLayout="row" fxLayoutGap="1rem">
+                            <mat-form-field>
+                                <input matInput id="linkInput" placeholder="{{
+                                    'plugins.occurrence.upload.ipt.hint'
+                                        | translate
+                                }}" formControlName="dwcaLink" [formControl]="dwcaLink" />
+
+                            </mat-form-field>
+                            <button mat-flat-button color="primary" id="link_button" (click)="onLinking()"
+                                [disabled]="!linkEnabled">
+                                {{ "plugins.occurrence.upload.ipt.button" | translate }}
+                            </button>
+                            <!--[disabled]="uploadEnabled && !dwcaLink.value"-->
+                        </div>
+                    </mat-card>
+                    <mat-radio-button value="zip"> </mat-radio-button>
+                    <mat-card id="select-inst" class="mat-elevation-z0 s2-field no-padding option">
+                        <mat-card-title>
+                            {{
+                            'plugins.occurrence.upload.dwcheader'
+                            | translate
+                            }}
+                        </mat-card-title>
+                        <mat-card-subtitle>
+                            {{
+                            'plugins.occurrence.upload.dwcsubtitle'
+                            | translate
+                            }}
+                        </mat-card-subtitle>
+
+                        <div class="my2" fxLayout="row" fxLayoutGap="1rem">
+                            <symbiota2-file-upload-field [formControl]="fileInput" [disabled]="!uploadZipEnabled">
+                            </symbiota2-file-upload-field>
+                            <button mat-flat-button color="primary" (click)="onUploadDwca()"
+                                [disabled]="!fileInput.value">
+                                Upload
+                            </button>
+                        </div>
+
+
+                    </mat-card>
+
+                    <mat-radio-button value="csv"> </mat-radio-button>
+                    <mat-card id="upload-csv" class="mat-elevation-z0 s2-field no-padding option">
+                        <mat-card-title>
+                            {{
+                            'plugins.occurrence.upload.csvheader'
+                            | translate
+                            }}
+                        </mat-card-title>
+                        <mat-card-subtitle style="margin-bottom: 1rem;">
+                            {{
+                            'plugins.occurrence.upload.csvsubtitle'
+                            | translate
+                            }}
+                        </mat-card-subtitle>
+
+                        <div class="my2" fxLayout="row" fxLayoutGap="1rem">
+                            <symbiota2-file-upload-field [formControl]="fileInput" [disabled]="!uploadCsvEnabled">
+                            </symbiota2-file-upload-field>
+                            <button mat-flat-button color="primary" (click)="onUploadCsv()"
+                                [disabled]="!fileInput.value">
+                                Upload
+                            </button>
+                        </div>
+
+
+                    </mat-card>
+                </mat-radio-group>
+            </mat-card>
+        </mat-card>
+
+
     </div>
-    <div class="my2" fxLayout="row" fxLayoutGap="1rem">
-        <symbiota2-file-upload-field
-            [formControl]="fileInput"
-        ></symbiota2-file-upload-field>
-        <button
-            mat-flat-button
-            color="primary"
-            (click)="onUpload()"
-            [disabled]="!fileInput.value"
-        >
-            Upload
-        </button>
-    </div>
-</div>
+</form>

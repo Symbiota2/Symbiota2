@@ -716,6 +716,8 @@ export class TaxonService extends BaseService<Taxon>{
         // console.log("sciname field is " + sciNameField)
         try {
             for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
+                // console.log("total records " + totalRecords + " batch size " + batch.length)
+                // console.log("batch " + batch[0][sciNameField] + " " + batch[batch.length-1][sciNameField])
                 for (const row of batch) {
                     totalRecords += 1
 
@@ -735,6 +737,10 @@ export class TaxonService extends BaseService<Taxon>{
 
                     // Check scientific name
                     let fieldVal = null
+                    // console.log(" row  is " + row[sciNameField])
+                    //if (row[sciNameField] == 'Paraboopia') {
+                    //    console.log(" found taxon Paraboopia ")
+                    //}
                     if (row[sciNameField]) {
                         fieldVal = row[sciNameField] + ""
                         taxons.add(fieldVal.trim())
@@ -783,7 +789,6 @@ export class TaxonService extends BaseService<Taxon>{
                 const taxons = await this.taxonRepo.find({ where: { scientificName: key } })
                 if (taxons.length == 0) {
                     problemParentNames.push(key)
-                    // problemParentNamesStream.write(key)
                 }
             }
         }

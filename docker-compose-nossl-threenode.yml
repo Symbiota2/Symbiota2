@@ -31,6 +31,17 @@ services:
       - "${SYMBIOTA2_S3_HOST:-127.0.0.1}:${SYMBIOTA2_S3_PORT1:-9000}:9000"
       - "${SYMBIOTA2_S3_HOST:-127.0.0.1}:${SYMBIOTA2_S3_PORT2:-9001}:9001"
 
+  phpmyadmin:
+    container_name: s2-phpmyadmin
+    image: "phpmyadmin:latest"
+    ports:
+      - "${SYMBIOTA2_PHPMYADMIN_PORT:-8081}:80"
+    environment:
+      PMA_HOST: "mariadb"
+      PMA_PASSWORD: "${SYMBIOTA2_DATABASE_PASSWORD:-password}"
+    restart: "unless-stopped"
+    tty: true
+
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${SYMBIOTA2_ELASTICSEARCH_VERSION:-8.1.2}
     volumes:

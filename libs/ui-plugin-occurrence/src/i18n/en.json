@@ -59,5 +59,15 @@
     "plugins.occurrence.search.taxonCriteria.commonName": "Common name",
     "plugins.occurrence.spatialModule.navbar": "Spatial Module",
     "plugins.occurrence.spatialModuleDashboard.navbar": "Spatial Module Dashboard",
-    "plugins.occurrence.search.navbar": "Occurrence Search"
+    "plugins.occurrence.search.navbar": "Occurrence Search",
+    "plugins.occurrence.upload.ipt.header": "Occurrence Upload DwCA",
+    "plugins.occurrence.upload.ipt.instruction": "Select Option for Adding Darwin Core Archive",
+    "plugins.occurrence.upload.ipt.hint": "DwCA Link",
+    "plugins.occurrence.upload.ipt.button": "Find DwCA",
+    "plugins.occurrence.upload.iptheader": "IPT Upload",
+    "plugins.occurrence.upload.iptsubtitle": "Enter the IPT link for a Darwin Core Archive",
+    "plugins.occurrence.upload.dwcheader": "Upload Darwin Core Archive (.zip)",
+    "plugins.occurrence.upload.dwcsubtitle": "Upload a DwCA from your computer",
+    "plugins.occurrence.upload.csvheader": "Upload Occurrences File (.csv)",
+    "plugins.occurrence.upload.csvsubtitle": "Upload an occurrences csv file from your computer"
 }

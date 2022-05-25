@@ -2,22 +2,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-// import {
-//     TaxonomicAuthorityService,
-//     TaxonomicEnumTreeService,
-//     TaxonomicStatusService,
-//     TaxonomicUnitService,
-//     TaxonService,
-// } from '../../services';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AlertService, UserService } from '@symbiota2/ui-common';
-// import {
-//     TaxonInputDto,
-//     TaxonDescriptionBlockListItem,
-//     TaxonomicStatusInputDto,
-//     TaxonIDAuthorNameItem,
-// } from '../../dto';
 import { plainToClass } from 'class-transformer';
 import { filter } from 'rxjs/operators';
 

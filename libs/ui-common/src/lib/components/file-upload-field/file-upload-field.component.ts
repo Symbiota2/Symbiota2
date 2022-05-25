@@ -24,6 +24,7 @@ type onTouchedListener = () => void;
 })
 export class FileUploadFieldComponent implements ControlValueAccessor {
     @Input() file: File = null;
+    @Input() disabled: Boolean = false;
     @Output() fileChanged = new EventEmitter<File>();
     @ViewChild('fileInput') fileInput: ElementRef = null;
 
