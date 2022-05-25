@@ -181,6 +181,7 @@ export class OccurrenceUploadProcessor {
                 taxonParams.genus = occurrenceData['genus']
                 taxonParams.family = occurrenceData['family']
                 taxonParams.taxonAuthorityID = this.taxonomicAuthorityID
+                taxonParams.kingdom = occurrenceData["kingdom"]
                 occurrenceData['taxonID'] = await this.findOrCreateByMatching(taxonParams)
             }
 
@@ -281,7 +282,7 @@ export class OccurrenceUploadProcessor {
     private async createTaxon(params) {
         const taxon = new TaxonInputDto(
             {
-                kingdomName: params.kingdomName, // get kingdom
+                kingdomName: params.kingdom, // get kingdom
                 rankID: 0, // get species rank
                 scientificName: params.scientificName, // get scientific name
                 author: "",
@@ -300,16 +301,7 @@ export class OccurrenceUploadProcessor {
         const block = await this.taxa.create(taxon)
 
         const names = params.scientificName.split(' ')
-        if (names.length == 1) {
-            await block.setRank("Genus")
-        } else if (names.length == 2) {
-            await block.setRank("Species")
-        } else if (names.length == 3) {
-            await block.setRank("Subspecies")
-        } else {
-            await block.setRank("Variety")
-        }
-        const myTaxon = await this.taxa.save(block)
+
 
         // Let's look up the genus to get the parent
         let taxons = []
@@ -330,6 +322,27 @@ export class OccurrenceUploadProcessor {
         // Even if we found two or more, just get the first one to be the parent
         // No way to further disambiguate
         const parentTaxon = taxons[0]
+
+        // Save the taxon
+        // First check that the kingdom is that of its parent
+        if (block.kingdom == null || block.kingdom == undefined) {
+            block.kingdom = parentTaxon.kingdomName
+        } else {
+            if (block.kingdom != parentTaxon.kingdomName) {
+                // return, don't add the status, not the parent!
+                return
+            }
+        }
+        if (names.length == 1) {
+            await block.setRank("Genus")
+        } else if (names.length == 2) {
+            await block.setRank("Species")
+        } else if (names.length == 3) {
+            await block.setRank("Subspecies")
+        } else {
+            await block.setRank("Variety")
+        }
+        const myTaxon = await this.taxa.save(block)
 
         const status = new TaxonomicStatusInputDto({
             taxonID: myTaxon.id,
