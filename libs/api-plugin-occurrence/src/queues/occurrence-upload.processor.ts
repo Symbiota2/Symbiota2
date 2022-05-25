@@ -176,7 +176,7 @@ export class OccurrenceUploadProcessor {
             // properly searchable as a result
             // delete occurrenceData['taxonID'];
             const taxonParams = new TaxonFindByMatchingParams()
-            if (occurrenceData['scientificName'] != null) {
+            if (occurrenceData['scientificName'] != null && occurrenceData['scientificName'].trim() != "") {
                 taxonParams.scientificName = occurrenceData['scientificName']
                 taxonParams.genus = occurrenceData['genus']
                 taxonParams.family = occurrenceData['family']
@@ -223,17 +223,17 @@ export class OccurrenceUploadProcessor {
     private async findOrCreateByMatching(params: TaxonFindByMatchingParams) {
         const { ...qParams } = params
         let taxons = []
-        if (qParams.taxonAuthorityID) {
+        //if (qParams.taxonAuthorityID) {
             // Have to use the query builder since where filter on nested relations does not work
-            const qb = this.taxa.createQueryBuilder('o')
-                .innerJoin('o.taxonStatuses', 'c')
-                .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
-                .andWhere('o.scientificName = :sciname', {sciname: params.scientificName})
-
-            taxons = await qb.getMany()
-        } else {
+        //    const qb = this.taxa.createQueryBuilder('o')
+        //        .innerJoin('o.taxonStatuses', 'c')
+        //        .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
+        //        .andWhere('o.scientificName = :sciname', {sciname: params.scientificName})
+//
+        //    taxons = await qb.getMany()
+        //} else {
             taxons = await this.taxa.find({ where: { scientificName: params.scientificName } })
-        }
+        //}
 
         // Check to see how many we found
         if (taxons.length == 1) {
@@ -272,6 +272,9 @@ export class OccurrenceUploadProcessor {
                 }
             }
 
+            // Always more than one match
+            return null
+
         }
     }
 
@@ -296,12 +299,26 @@ export class OccurrenceUploadProcessor {
 
         const block = await this.taxa.create(taxon)
 
+        const names = params.scientificName.split(' ')
+        if (names.length == 1) {
+            await block.setRank("Genus")
+        } else if (names.length == 2) {
+            await block.setRank("Species")
+        } else if (names.length == 3) {
+            await block.setRank("Subspecies")
+        } else {
+            await block.setRank("Variety")
+        }
+        const myTaxon = await this.taxa.save(block)
+
         // Let's look up the genus to get the parent
         let taxons = []
         if (params.genus) {
             taxons = await this.taxa.find({ where: { scientificName: params.genus } })
+        } else {
+            taxons = await this.taxa.find({ where: { scientificName: names[0] } })
         }
-        if (taxons.length == 0) {
+        if (taxons.length == 0 && params.family) {
             taxons = await this.taxa.find({ where: { scientificName: params.family } })
         }
 
@@ -315,8 +332,8 @@ export class OccurrenceUploadProcessor {
         const parentTaxon = taxons[0]
 
         const status = new TaxonomicStatusInputDto({
-            taxonID: taxon.id,
-            taxonIDAccepted: taxon.id,
+            taxonID: myTaxon.id,
+            taxonIDAccepted: myTaxon.id,
             taxonAuthorityID: params.taxonAuthorityID,
             parentTaxonID: parentTaxon.id,
             hierarchyStr: null,
@@ -325,8 +342,6 @@ export class OccurrenceUploadProcessor {
             notes: null,
             initialTimestamp: new Date()
         })
-
-        const myTaxon = await this.taxa.save(block)
 
         const myStatus = await this.taxonStatus.create(status)
         await this.taxonStatus.save(myStatus)
