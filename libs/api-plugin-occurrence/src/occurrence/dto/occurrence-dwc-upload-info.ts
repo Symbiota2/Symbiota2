@@ -3,8 +3,8 @@ export class DWCUploadInfo {
     imagesPath: string;
     headers: any;
 
-    constructor(occurrencePath: string, imagesPath: string) {
-        this.occurrencePath = occurrencePath;
-        this.imagesPath = imagesPath;
-    }
+    // constructor(occurrencePath: string, imagesPath: string) {
+    //     this.occurrencePath = occurrencePath;
+    //     this.imagesPath = imagesPath;
+    // }
 }

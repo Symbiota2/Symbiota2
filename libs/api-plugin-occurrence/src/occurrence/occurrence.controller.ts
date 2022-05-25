@@ -49,6 +49,7 @@ import { StorageService } from '@symbiota2/api-storage';
 import { DwCService } from '@symbiota2/api-dwc';
 import extract from 'extract-zip';
 import { IPTInputDto } from './dto/occurrence-ipt-input.dto';
+import { DWCUploadInfo } from './dto/occurrence-dwc-upload-info';
 
 
 type File = Express.Multer.File;
@@ -170,12 +171,13 @@ export class OccurrenceController {
                     //Splits fileName before file extension, adding the timestamp between them. 
                     let fullFileName: string = fileNameParts[0] + "-" + fileTimeStamp + "." + fileNameParts[1];
 
-                    fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName), function (err) {
-                        if (err) throw err;
-                    });
+                    fs.renameSync(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName));
                 }
-
-                //Remove the now empty unique directory
+                // setTimeout(function () {
+                //     console.log("Yo");
+                // }, 5000);
+                // //Remove the now empty unique directory
+                console.log("Yo");
                 fs.rmSync(uniqueDir, { recursive: true, force: true });
 
                 //Get the timestamped occurrences file.
@@ -185,9 +187,12 @@ export class OccurrenceController {
                 const headerMap = {};
                 headers.forEach((h) => headerMap[h] = '');
 
+                console.log("WHATEVER FILE I WAS USING:" + file.path);
+                console.log(file.mimetype);
+
                 upload = await this.occurrenceService.createUpload(
-                    path.resolve(file.path),
-                    file.mimetype,
+                    path.resolve(occurrenceCsvPath),
+                    ".csv",
                     headerMap
                 );
 
@@ -297,27 +302,14 @@ export class OccurrenceController {
         const timestamp = currDate.getTime();
         const re = /\s/gi;
         const fileTimeStamp = currDate.toString().replace(re, "")
-
-        console.log("Link provided: " + iptLink)
-
-
-
-        // Accepts file
-        // Writes file to uploads directory /home/dovahcraft/symbiota2/data/uploads/occurrences
-        // Generates timestamped dir
-        // Moves items with a new unique id/timestamp to top level
-        // Deletes uniqueDir and uneeded items.
-
-
         let uniqueDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", fileTimeStamp);
         let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
-
-        const file = fs.createWriteStream(uniqueDir + "_IPT.zip");
-
-        //File and headers for upload 
+        // const file = fs.createWriteStream(uniqueDir + "_IPT.zip");
         const headerMap = {};
+        let uploadInfo: DWCUploadInfo;
         let occurrencesPath: string;
 
+        //First download the file from a dwca link.
         try {
             occurrencesPath = await this.get_IPT_Zip(iptLink);
         }
@@ -325,38 +317,47 @@ export class OccurrenceController {
             throw new BadRequestException('Couldn\'t download archive from IPT link' + rejectedVal);
         }
 
-        console.log("PATH: " + occurrencesPath);
-
         //Convert to csv.
-
-
+        //TODO: Check if we need a seperator. Should be a try catch or something.
         const headers = await getCSVFieldsTabSeperator(occurrencesPath);
         headers.forEach((h) => headerMap[h] = '');
 
-        console.log("HEADERS: " + headers);
-
-
 
         //Now that we have the files, upload them.
+
+        //Upload Occurrences
         return this.occurrenceService.createUpload(
             path.resolve(occurrencesPath),
             ".csv",
             headerMap
         );
+        //Upload Images
+
+
     }
+
+    //Helper function for IPT upload.
     async get_IPT_Zip(iptLink: string): Promise<any> {
         const currDate = new Date();
         const timestamp = currDate.getTime();
+        let uploadInfo: DWCUploadInfo = new DWCUploadInfo();
         const re = /\s/gi;
         const fileTimeStamp = currDate.toString().replace(re, "")
         let uniqueDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", fileTimeStamp);
         let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
-        const https = require('https'); // or 'https' for https:// URLs
+        const https = require('https');
+        const http = require('http');
+        var httpService = http;
         const fs = require('fs');
+
+        if (iptLink.startsWith("https")) {
+            httpService = https;
+        }
+
 
         const file = fs.createWriteStream(uniqueDir + "_IPT.zip");
         return new Promise((resolve, reject) => {
-            https.get(iptLink, async function (response) {
+            httpService.get(iptLink, async function (response) {
                 response.pipe(file);
                 // after download completed close filestream
                 file.on("finish", async () => {
@@ -373,7 +374,7 @@ export class OccurrenceController {
                             let fullFileName: string = fileNameParts[0] + "-" + fileTimeStamp + "." + fileNameParts[1];
 
                             //Rename to csv. 
-                            if (fileNameParts[1] == "txt") {
+                            if (fileNameParts[1] != "csv") {
                                 console.log("Found csv" + currFile);
                                 let fullFileNameCsv: string = fileNameParts[0] + "-" + fileTimeStamp + ".csv";
                                 fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileNameCsv), function (err) {
@@ -391,11 +392,55 @@ export class OccurrenceController {
                         //Remove the now empty unique directory
                         fs.rmSync(uniqueDir, { recursive: true, force: true });
                         fs.rmSync(uniqueDir + "_IPT.zip", { recursive: true, force: true });
-
-                        //Get the timestamped occurrences file.
                         let occurrencesFName: string = "occurrence" + "-" + fileTimeStamp + "." + "csv";
                         let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
+                        uploadInfo.occurrencePath = occurrenceCsvPath;
+                        //Get the timestamped occurrences file.
+                        //Starts with occurrence
+                        // try {
+                        //     let occurrencesFName: string = "occurrence" + "-" + fileTimeStamp + "." + "csv";
+                        //     let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
+                        //     uploadInfo.occurrencePath = occurrenceCsvPath;
+                        // }
+                        // catch (err) {
+                        //     console.log("Does NOT start with occurrence. Trying occurrences.");
+                        // }
+                        // //Starts with occurrences
+                        // try {
+                        //     let occurrencesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
+                        //     let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
+                        //     uploadInfo.occurrencePath = occurrenceCsvPath;
+                        // }
+                        // catch (err) {
+                        //     console.log("Does NOT start with occurrences either. Invalid filename.");
+                        //     reject(err);
+                        // }
+
+
+                        // //Attempt to get the timestamped images file
+                        // //starts with image.
+                        // try {
+                        //     let imagesFName: string = "image" + "-" + fileTimeStamp + "." + "csv";
+                        //     let imageCsvPath: string = path.resolve(extractDir, imagesFName);
+                        //     uploadInfo.imagesPath = imageCsvPath;
+                        // }
+                        // catch (err) {
+                        //     console.log("Does NOT start with image. Trying images.");
+                        // }
+
+                        // try {
+                        //     let imagesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
+                        //     let imageCsvPath: string = path.resolve(extractDir, imagesFName);
+                        //     uploadInfo.imagesPath = imageCsvPath;
+                        // }
+                        // catch (err) {
+                        //     console.log("Does NOT start with images either. Invalid filename for images.");
+                        //     //reject("Invalid image filename, must be named 'image' or 'images' in DwCA" + err);
+                        // }
+
+                        //If we got both, return the information
                         resolve(occurrenceCsvPath);
+
 
                     } catch (err) {
                         // handle any errors
@@ -407,9 +452,7 @@ export class OccurrenceController {
                 );
             })
         })
-
     }
-
 
 
     @Get('upload/:id')

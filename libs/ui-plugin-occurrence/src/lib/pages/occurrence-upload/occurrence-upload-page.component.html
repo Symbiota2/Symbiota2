@@ -85,10 +85,10 @@
                         </mat-card-subtitle>
 
                         <div class="my2" fxLayout="row" fxLayoutGap="1rem">
-                            <symbiota2-file-upload-field [formControl]="fileInput" [disabled]="!uploadCsvEnabled">
+                            <symbiota2-file-upload-field [formControl]="fileInputCsv" [disabled]="!uploadCsvEnabled">
                             </symbiota2-file-upload-field>
                             <button mat-flat-button color="primary" (click)="onUploadCsv()"
-                                [disabled]="!fileInput.value">
+                                [disabled]="!fileInputCsv.value">
                                 Upload
                             </button>
                         </div>
