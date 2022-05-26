@@ -21,8 +21,9 @@ import {
     QUEUE_ID_COLLECTION_STATS_UPDATE
 } from '@symbiota2/api-plugin-collection';
 import { TaxonFindByMatchingParams } from '../../../api-plugin-taxonomy/src/taxon/dto/taxon-find-parms';
-import { TaxonInputDto, TaxonomicStatusInputDto } from '@symbiota2/ui-plugin-taxonomy';
 import { ApiProperty } from '@nestjs/swagger';
+import { TaxonInputDto } from '../../../api-plugin-taxonomy/src/taxon/dto/TaxonInputDto';
+import { TaxonomicStatusInputDto } from '../../../api-plugin-taxonomy/src/taxonomicStatus/dto/TaxonomicStatusInputDto';
 
 export interface OccurrenceUploadJob {
     uid: number;
@@ -56,8 +57,8 @@ export class OccurrenceUploadProcessor {
         @InjectQueue(QUEUE_ID_COLLECTION_STATS_UPDATE)
         private readonly collectionStatsUpdateQueue: Queue<CollectionStatsUpdateJob>)
     {
-        const authority= new TaxonomicAuthority()
-        this.taxonomicAuthorityID = authority.getDefaultAuthorityID()
+        // const authority= new TaxonomicAuthority()
+        // this.taxonomicAuthorityID = authority.getDefaultAuthorityID()
     }
 
     // TODO: Wrap in a transaction? Right now each chunk goes straight to the database until a failure occurs
@@ -66,6 +67,8 @@ export class OccurrenceUploadProcessor {
      */
     @Process()
     async upload(job: Job<OccurrenceUploadJob>): Promise<void> {
+        const authority= new TaxonomicAuthority()
+        this.taxonomicAuthorityID = await authority.getDefaultAuthorityID()
         // Count the number of processed occurrences
         this.processed = 0;
 
@@ -173,11 +176,14 @@ export class OccurrenceUploadProcessor {
             // properly searchable as a result
             // delete occurrenceData['taxonID'];
             const taxonParams = new TaxonFindByMatchingParams()
-            taxonParams.scientificName = occurrenceData['scientificName']
-            taxonParams.genus = occurrenceData['genus']
-            taxonParams.family = occurrenceData['family']
-            taxonParams.taxonAuthorityID = this.taxonomicAuthorityID
-            occurrenceData['taxonID'] = await this.findOrCreateByMatching(taxonParams)
+            if (occurrenceData['scientificName'] != null && occurrenceData['scientificName'].trim() != "") {
+                taxonParams.scientificName = occurrenceData['scientificName']
+                taxonParams.genus = occurrenceData['genus']
+                taxonParams.family = occurrenceData['family']
+                taxonParams.taxonAuthorityID = this.taxonomicAuthorityID
+                taxonParams.kingdom = occurrenceData["kingdom"]
+                occurrenceData['taxonID'] = await this.findOrCreateByMatching(taxonParams)
+            }
 
             // Update
             if (dbOccurrence) {
@@ -218,17 +224,17 @@ export class OccurrenceUploadProcessor {
     private async findOrCreateByMatching(params: TaxonFindByMatchingParams) {
         const { ...qParams } = params
         let taxons = []
-        if (qParams.taxonAuthorityID) {
+        //if (qParams.taxonAuthorityID) {
             // Have to use the query builder since where filter on nested relations does not work
-            const qb = this.taxa.createQueryBuilder('o')
-                .innerJoin('o.taxonStatuses', 'c')
-                .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
-                .andWhere('o.scientificName = :sciname', {sciname: params.scientificName})
-
-            taxons = await qb.getMany()
-        } else {
+        //    const qb = this.taxa.createQueryBuilder('o')
+        //        .innerJoin('o.taxonStatuses', 'c')
+        //        .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
+        //        .andWhere('o.scientificName = :sciname', {sciname: params.scientificName})
+//
+        //    taxons = await qb.getMany()
+        //} else {
             taxons = await this.taxa.find({ where: { scientificName: params.scientificName } })
-        }
+        //}
 
         // Check to see how many we found
         if (taxons.length == 1) {
@@ -267,13 +273,16 @@ export class OccurrenceUploadProcessor {
                 }
             }
 
+            // Always more than one match
+            return null
+
         }
     }
 
     private async createTaxon(params) {
         const taxon = new TaxonInputDto(
             {
-                kingdomName: params.kingdomName, // get kingdom
+                kingdomName: params.kingdom, // get kingdom
                 rankID: 0, // get species rank
                 scientificName: params.scientificName, // get scientific name
                 author: "",
@@ -291,12 +300,17 @@ export class OccurrenceUploadProcessor {
 
         const block = await this.taxa.create(taxon)
 
+        const names = params.scientificName.split(' ')
+
+
         // Let's look up the genus to get the parent
         let taxons = []
         if (params.genus) {
             taxons = await this.taxa.find({ where: { scientificName: params.genus } })
+        } else {
+            taxons = await this.taxa.find({ where: { scientificName: names[0] } })
         }
-        if (taxons.length == 0) {
+        if (taxons.length == 0 && params.family) {
             taxons = await this.taxa.find({ where: { scientificName: params.family } })
         }
 
@@ -309,9 +323,30 @@ export class OccurrenceUploadProcessor {
         // No way to further disambiguate
         const parentTaxon = taxons[0]
 
+        // Save the taxon
+        // First check that the kingdom is that of its parent
+        if (block.kingdom == null || block.kingdom == undefined) {
+            block.kingdom = parentTaxon.kingdomName
+        } else {
+            if (block.kingdom != parentTaxon.kingdomName) {
+                // return, don't add the status, not the parent!
+                return
+            }
+        }
+        if (names.length == 1) {
+            await block.setRank("Genus")
+        } else if (names.length == 2) {
+            await block.setRank("Species")
+        } else if (names.length == 3) {
+            await block.setRank("Subspecies")
+        } else {
+            await block.setRank("Variety")
+        }
+        const myTaxon = await this.taxa.save(block)
+
         const status = new TaxonomicStatusInputDto({
-            taxonID: taxon.id,
-            taxonIDAccepted: taxon.id,
+            taxonID: myTaxon.id,
+            taxonIDAccepted: myTaxon.id,
             taxonAuthorityID: params.taxonAuthorityID,
             parentTaxonID: parentTaxon.id,
             hierarchyStr: null,
@@ -320,8 +355,6 @@ export class OccurrenceUploadProcessor {
             notes: null,
             initialTimestamp: new Date()
         })
-
-        const myTaxon = await this.taxa.save(block)
 
         const myStatus = await this.taxonStatus.create(status)
         await this.taxonStatus.save(myStatus)

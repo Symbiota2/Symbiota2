@@ -371,11 +371,19 @@ export class Taxon extends EntityProvider {
         for (const ancestor of ancestors) {
             const newRecord : TaxaEnumTreeEntry = await taxaEnumRepo.create()
             newRecord.taxonID = this.id
-            newRecord.parentTaxonID = ancestor.taxonID
+            newRecord.parentTaxonID = ancestor.parentTaxonID
             newRecord.taxonAuthorityID = taxonomicAuthorityID
             newRecord.initialTimestamp = new Date()
             await taxaEnumRepo.save(newRecord)
         }
+
+        const newRecord : TaxaEnumTreeEntry = await taxaEnumRepo.create()
+        newRecord.taxonID = this.id
+        newRecord.parentTaxonID = parent.id
+        newRecord.taxonAuthorityID = taxonomicAuthorityID
+        newRecord.initialTimestamp = new Date()
+        await taxaEnumRepo.save(newRecord)
+
     }
 
     private async ancestorSciName(ancestorRankName: string): Promise<string> {
