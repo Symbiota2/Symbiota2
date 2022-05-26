@@ -55,8 +55,7 @@ export class OccurrenceUploadProcessor {
         @Inject(TaxaEnumTreeEntry.PROVIDER_ID)
         private readonly taxaEnumTree: Repository<TaxaEnumTreeEntry>,
         @InjectQueue(QUEUE_ID_COLLECTION_STATS_UPDATE)
-        private readonly collectionStatsUpdateQueue: Queue<CollectionStatsUpdateJob>)
-    {
+        private readonly collectionStatsUpdateQueue: Queue<CollectionStatsUpdateJob>) {
         // const authority= new TaxonomicAuthority()
         // this.taxonomicAuthorityID = authority.getDefaultAuthorityID()
     }
@@ -67,7 +66,7 @@ export class OccurrenceUploadProcessor {
      */
     @Process()
     async upload(job: Job<OccurrenceUploadJob>): Promise<void> {
-        const authority= new TaxonomicAuthority()
+        const authority = new TaxonomicAuthority()
         this.taxonomicAuthorityID = await authority.getDefaultAuthorityID()
         // Count the number of processed occurrences
         this.processed = 0;
@@ -176,12 +175,15 @@ export class OccurrenceUploadProcessor {
             // properly searchable as a result
             // delete occurrenceData['taxonID'];
             const taxonParams = new TaxonFindByMatchingParams()
+            //Relax type system to extract kingdom.
+            const newRow = <any>occurrenceRow
             if (occurrenceData['scientificName'] != null && occurrenceData['scientificName'].trim() != "") {
                 taxonParams.scientificName = occurrenceData['scientificName']
                 taxonParams.genus = occurrenceData['genus']
                 taxonParams.family = occurrenceData['family']
                 taxonParams.taxonAuthorityID = this.taxonomicAuthorityID
-                taxonParams.kingdom = occurrenceData["kingdom"]
+                //Hack since kingdom is not an occurrence table column.
+                taxonParams.kingdom = newRow['kingdom']
                 occurrenceData['taxonID'] = await this.findOrCreateByMatching(taxonParams)
             }
 
@@ -225,15 +227,15 @@ export class OccurrenceUploadProcessor {
         const { ...qParams } = params
         let taxons = []
         //if (qParams.taxonAuthorityID) {
-            // Have to use the query builder since where filter on nested relations does not work
+        // Have to use the query builder since where filter on nested relations does not work
         //    const qb = this.taxa.createQueryBuilder('o')
         //        .innerJoin('o.taxonStatuses', 'c')
         //        .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
         //        .andWhere('o.scientificName = :sciname', {sciname: params.scientificName})
-//
+        //
         //    taxons = await qb.getMany()
         //} else {
-            taxons = await this.taxa.find({ where: { scientificName: params.scientificName } })
+        taxons = await this.taxa.find({ where: { scientificName: params.scientificName } })
         //}
 
         // Check to see how many we found
@@ -313,7 +315,7 @@ export class OccurrenceUploadProcessor {
         if (taxons.length == 0 && params.family) {
             taxons = await this.taxa.find({ where: { scientificName: params.family } })
         }
-
+        console.log("TAXON LENGTH: " + taxons.length)
         if (taxons.length == 0) {
             // We don't have a parent, skip the rest
             return
@@ -325,10 +327,11 @@ export class OccurrenceUploadProcessor {
 
         // Save the taxon
         // First check that the kingdom is that of its parent
-        if (block.kingdom == null || block.kingdom == undefined) {
-            block.kingdom = parentTaxon.kingdomName
+        console.log("KINGDOM IS: " + block.kingdomName + " PARENT TAXON: " + parentTaxon.kingdomName)
+        if (block.kingdomName == null || block.kingdomName == undefined) {
+            block.kingdomName = parentTaxon.kingdomName
         } else {
-            if (block.kingdom != parentTaxon.kingdomName) {
+            if (block.kingdomName != parentTaxon.kingdomName) {
                 // return, don't add the status, not the parent!
                 return
             }
@@ -343,7 +346,7 @@ export class OccurrenceUploadProcessor {
             await block.setRank("Variety")
         }
         const myTaxon = await this.taxa.save(block)
-
+        console.log("GOT PAST MYTAXON SAVE")
         const status = new TaxonomicStatusInputDto({
             taxonID: myTaxon.id,
             taxonIDAccepted: myTaxon.id,
