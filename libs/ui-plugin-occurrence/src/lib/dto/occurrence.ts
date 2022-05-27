@@ -85,18 +85,31 @@ interface CurationInfo extends Pick<Occurrence, CurationInfoProps> { }
 @Exclude()
 export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurrence> {
     @Expose() associatedCollectors: string;
+    @Expose() associatedOrganisms:string;
+    @Expose() associatedReferences:string;
+    @Expose() associatedSequence: string;
     @Expose() associatedTaxa: string;
     @Expose() basisOfRecord: string;
     @Expose() coordinateUncertaintyInMeters: number;
     @Expose() county: string;
     @Expose() country: string;
+    @Expose() countryCode:string;
     @Expose() cultivationStatus: number;
     @Expose() dataGeneralizations: string;
     @Expose() dateIdentified: Date;
+    @Expose() datasetName:string;
+    @Expose() degreeOfEstablishment: string;
     @Expose() disposition: string;
     @Expose() dynamicProperties: string;
+    @Expose() earliestAgeOrLowestAge: string;
+    @Expose() earliestEonOrLowestEonothem: string;
+    @Expose() earliestEpochOrLowestSeries: string;
+    @Expose() earliestEraOrLowestErathem: string;
+    @Expose() earliestPeriodOrLowestSystem: string;
     @Expose() establishmentMeans: string;
     @Expose() eventDate: Date;
+    @Expose() eventRemarks: string;
+    @Expose() eventTime:string;
     @Expose() family: string;
     @Expose() fieldNotes: string;
     @Expose() fieldNumber: string;
@@ -113,12 +126,14 @@ export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurre
     @Expose() locality: string;
     @Expose() maximumDepthInMeters: number;
     @Expose() maximumElevationInMeters: number;
+    @Expose() measurementRemarks:string;
     @Expose() minimumDepthInMeters: number;
     @Expose() minimumElevationInMeters: number;
     @Expose() municipality: string;
     @Expose() occurrenceGUID: string;
     @Expose() occurrenceRemarks: string;
     @Expose() otherCatalogNumbers: string;
+    @Expose() parentEventID:string;
     @Expose() preparations: string;
     @Expose() processingStatus: string;
     @Expose() recordedByNames: string;
@@ -130,6 +145,7 @@ export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurre
     @Expose() sex: string;
     @Expose() specificEpithet: string;
     @Expose() stateProvince: string;
+    @Expose() subgenus:string;
     @Expose() substrate: string;
     @Expose() typeStatus: string;
     @Expose() verbatimAttributes: string;
@@ -137,7 +153,6 @@ export class Occurrence extends OccurrenceListItem implements Partial<ApiOccurre
     @Expose() verbatimDepth: string;
     @Expose() verbatimElevation: string;
     @Expose() verbatimEventDate: string;
-    @Expose() degreeOfEstablishment: string;
 
     static fromJSON(occurrenceJSON: Record<string, unknown>): Occurrence {
         return plainToClass(

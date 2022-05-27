@@ -62,17 +62,22 @@ export interface ApiOccurrenceList extends ApiListResults<ApiOccurrenceListItem>
 export interface ApiOccurrence extends ApiOccurrenceListItem {
     associatedCollectors: string;
     associatedOccurrences: string;
+    associatedOrganisms: string;
+    associatedReferences: string;
+    associatedSequences: string;
     associatedTaxa: string;
     basisOfRecord: string;
     behavior: string;
     coordinatePrecision: number;
     coordinateUncertaintyInMeters: number | null;
     country: string;
+    countryCode: string;
     county: string;
     cultivationStatus: number | null;
     dataGeneralizations: string;
     datasetID: string;
     dateIdentified: Date | null;
+    datasetName: string;
     dbpk: string;
     disposition: string;
     duplicateQuantity: number | null;
@@ -80,8 +85,15 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     dynamicProperties: string;
     endDayOfYear: number | null;
     establishmentMeans: string;
+    earliestAgeOrLowestAge: string;
+    earliestEonOrLowestEonthem: string;
+    earliestEpochOrLowestSeries: string;
+    earliestEraOrLowestErathem: string;
+    earliestPeriodOrLowestSystem: string;
     eventDate: Date | null;
     eventID: string;
+    eventRemarks: string;
+    eventTime: string;
     family: string;
     fieldNotes: string;
     fieldNumber: string;
@@ -116,6 +128,7 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     locationRemarks: string;
     maximumDepthInMeters: number | null;
     maximumElevationInMeters: number | null;
+    measurementRemarks: string;
     minimumDepthInMeters: number | null;
     minimumElevationInMeters: number | null;
     modified: Date | null;
@@ -125,6 +138,7 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     occurrenceRemarks: string;
     otherCatalogNumbers: string;
     ownerInstitutionCode: string;
+    parentEventID: string;
     preparations: string;
     previousIdentifications: string;
     processingStatus: string;
@@ -141,6 +155,7 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     startDayOfYear: number | null;
     stateProvince: string;
     storageLocation: string;
+    subgenus: string;
     substrate: string;
     taxonRank: string;
     taxonRemarks: string;
