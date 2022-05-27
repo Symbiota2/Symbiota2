@@ -10,7 +10,7 @@ import { Queue } from 'bull';
 import { OccurrenceUploadCleanupJob } from '../queues/occurrence-upload-cleanup.processor';
 import { QUEUE_ID_OCCURRENCE_UPLOAD } from '../queues/occurrence-upload.queue';
 import { OccurrenceUploadJob } from '../queues/occurrence-upload.processor';
-import { BaseService, csvIterator } from '@symbiota2/api-common';
+import { BaseService, csvIterator, csvIteratorTabs, getCsvSeperator } from '@symbiota2/api-common';
 
 type _OccurrenceFindAllItem = Pick<Occurrence, 'id' | 'catalogNumber' | 'taxonID' | 'scientificName' | 'latitude' | 'longitude'>;
 type OccurrenceFindAllItem = _OccurrenceFindAllItem & { collection: ApiCollectionListItem };
@@ -71,12 +71,12 @@ export class OccurrenceService {
         }
 
         if (findAllOpts.taxonSearchCriterion && findAllOpts.taxonSearchStr) {
-            const searchStr = `${ findAllOpts.taxonSearchStr }%`;
+            const searchStr = `${findAllOpts.taxonSearchStr}%`;
             switch (findAllOpts.taxonSearchCriterion) {
                 case ApiTaxonSearchCriterion.taxonID:
                     qb.andWhere(
                         'o.taxonID = :taxonID',
-                        {taxonID: searchStr}
+                        { taxonID: searchStr }
                     )
                     break;
                 case ApiTaxonSearchCriterion.familyOrSciName:
@@ -161,8 +161,8 @@ export class OccurrenceService {
             if (findAllOpts[searchKey]) {
                 qb.andWhere(`o.${searchKey} IS NOT NULL`);
                 qb.andWhere(
-                    `o.${ searchKey } LIKE :searchStr`,
-                    { searchStr: `${ findAllOpts[searchKey] }%` }
+                    `o.${searchKey} LIKE :searchStr`,
+                    { searchStr: `${findAllOpts[searchKey]}%` }
                 );
             }
         }
@@ -365,24 +365,45 @@ export class OccurrenceService {
      * @return Object The value of uniqueField for each row in
      * csvFile along with a count of the null values
      */
-    async countCSVNonNull(csvFile: string, uniqueField: string): Promise<{ uniqueValues: any[], nulls: number }> {
+    async countCSVNonNull(csvFile: string, uniqueField: string, seperator: string = ","): Promise<{ uniqueValues: any[], nulls: number }> {
         const uniqueFieldValues = new Set();
         let nulls = 0;
-
-        try {
-            for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
-                for (const row of batch) {
-                    const fieldVal = row[uniqueField];
-                    if (fieldVal) {
-                        uniqueFieldValues.add(fieldVal);
-                    }
-                    else {
-                        nulls += 1;
+        const detectedSeperator = await getCsvSeperator(csvFile);
+        if (seperator == "tab") {
+            try {
+                for await (const batch of csvIteratorTabs<Record<string, unknown>>(csvFile)) {
+                    for (const row of batch) {
+                        const fieldVal = row[uniqueField];
+                        if (fieldVal) {
+                            uniqueFieldValues.add(fieldVal);
+                        }
+                        else {
+                            nulls += 1;
+                        }
                     }
                 }
+            } catch (e) {
+                throw new Error('Error parsing CSV');
             }
-        } catch (e) {
-            throw new Error('Error parsing CSV');
+        }
+        else {
+            if (seperator == ",") {
+                try {
+                    for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
+                        for (const row of batch) {
+                            const fieldVal = row[uniqueField];
+                            if (fieldVal) {
+                                uniqueFieldValues.add(fieldVal);
+                            }
+                            else {
+                                nulls += 1;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    throw new Error('Error parsing CSV');
+                }
+            }
         }
 
         return { uniqueValues: [...uniqueFieldValues], nulls };

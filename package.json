@@ -78,6 +78,7 @@
     "class-validator": "^0.13.1",
     "cookie-parser": "^1.4.5",
     "csv-parser": "^3.0.0",
+    "csv-string": "^4.1.0",
     "extract-zip": "^2.0.1",
     "helmet": "^4.4.1",
     "image-thumbnail": "^1.0.14",

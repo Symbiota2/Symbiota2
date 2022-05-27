@@ -266,17 +266,43 @@ export class OccurrenceController {
                     //Splits fileName before file extension, adding the timestamp between them. 
                     let fullFileName: string = fileNameParts[0] + "-" + fileTimeStamp + "." + fileNameParts[1];
 
-                    fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName), function (err) {
-                        if (err) throw err;
-                    });
+                    //Rename to csv. 
+                    if (fileNameParts[1] != "csv") {
+                        let fullFileNameCsv: string = fileNameParts[0] + "-" + fileTimeStamp + ".csv";
+                        fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileNameCsv), function (err) {
+                            throw (err);
+                        });
+                    }
+                    else {
+                        fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName), function (err) {
+                            throw (err);
+                        });
+                    }
                 }
 
                 //Remove the now empty unique directory
                 fs.rmSync(uniqueDir, { recursive: true, force: true });
+                let occurrencesFName: string
+                let occurrenceCsvPath: string
 
                 //Get the timestamped occurrences file.
-                let occurrencesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
-                let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
+                try {
+                    console.log('Trying occurrence');
+                    occurrencesFName = "occurrence" + "-" + fileTimeStamp + "." + "csv";
+                    occurrenceCsvPath = path.resolve(extractDir, occurrencesFName);
+                }
+                catch (err) {
+                    console.log("Does NOT start with occurrence. Trying occurrences.");
+                }
+                //Starts with occurrences
+                try {
+                    let occurrencesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
+                    let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
+                }
+                catch (err) {
+                    console.log("Does NOT start with occurrences either. Invalid filename.");
+                    throw new BadRequestException("Invalid filename for occurrences. Must be either occurrence or occurrences.")
+                }
                 const headers = await getCSVFields(occurrenceCsvPath);
                 const headerMap = {};
                 headers.forEach((h) => headerMap[h] = '');
@@ -332,7 +358,14 @@ export class OccurrenceController {
         //Convert to csv.
         //TODO: Check if we need a seperator. Should be a try catch or something.
         const headers = await getCSVFieldsTabSeperator(occurrencesPath);
-        headers.forEach((h) => headerMap[h] = '');
+        var count = 0;
+        headers.forEach((h) => {
+            headerMap[h] = '';
+            console.log("Header " + count + " : " + h);
+            count++;
+        });
+
+        console.log("HEADERS: " + headers)
 
 
         //Now that we have the files, upload them.
@@ -492,11 +525,16 @@ export class OccurrenceController {
         if (!upload) {
             throw new NotFoundException();
         }
-
         const csvOccurrenceUniqueIDs = await this.occurrenceService.countCSVNonNull(
             upload.filePath,
             body.uniqueIDField
         );
+
+        // const csvOccurrenceUniqueIDs = await this.occurrenceService.countCSVNonNull(
+        //     upload.filePath,
+        //     body.uniqueIDField,
+        //     "tab"
+        // );
 
         const dbUniqueIDField = body.fieldMap[body.uniqueIDField];
         const dbOccurrenceUniqueIDs = await this.occurrenceService.countOccurrences(

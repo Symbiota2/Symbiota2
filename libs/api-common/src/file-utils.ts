@@ -28,7 +28,6 @@ export async function getCSVFields(csvFile: string): Promise<string[]> {
 }
 
 export async function getCSVFieldsTabSeperator(csvFile: string): Promise<string[]> {
-    console.log("Called tab service.")
     return new Promise((resolve, reject) => {
         const stream = fs.createReadStream(csvFile);
         stream.pipe(csv({
@@ -54,6 +53,34 @@ export async function fileExists(filePath: string): Promise<boolean> {
     catch (e) {
         return false;
     }
+}
+
+export async function getCsvSeperator<RowType>(filePath: string): Promise<String> {
+    var CSV = require('csv-string');
+    return new Promise((resolve, reject) => {
+        try {
+            var lineReader = require('readline').createInterface({
+                input: require('fs').createReadStream(filePath),
+            });
+            var lineCounter = 0; var wantedLines = [];
+            lineReader.on('line', function (line) {
+                lineCounter++;
+                wantedLines.push(line);
+                if (lineCounter == 1) { lineReader.close(); }
+            });
+            lineReader.on('close', function () {
+                // console.log(wantedLines);
+                // console.log(typeof (wantedLines[0]))
+                // console.log("Detected seperator: " + "\"" + CSV.detect(wantedLines[0]) + "\"")
+                // console.log("Detected seperator sanity check (should be comma): " + CSV.detect("id,test,stuff"))
+                resolve(CSV.detect(wantedLines[0]))
+            });
+        }
+        catch (err) {
+            reject(err)
+        }
+    })
+
 }
 
 export async function* csvIterator<RowType>(filePath: string, bufSize = DEFAULT_ITER_ROWS) {
@@ -92,6 +119,28 @@ export async function* csvIteratorWithTrimValues<RowType>(filePath: string, bufS
     }
     yield rowBuffer;
 }
+
+/*
+Iterator to read tab seperated csv files
+*/
+export async function* csvIteratorTabs<RowType>(filePath: string, bufSize = DEFAULT_ITER_ROWS) {
+    let rowBuffer: RowType[] = [];
+    const stream = fs.createReadStream(filePath).pipe(csv({
+        separator: tabStr
+    }));
+
+    for await (const row of stream) {
+        if (rowBuffer.length >= bufSize) {
+            stream.pause();
+            yield rowBuffer;
+            rowBuffer = [];
+            stream.resume();
+        }
+        rowBuffer.push(row);
+    }
+    yield rowBuffer;
+}
+
 
 /*
 Iterators through a file of JSON objects
