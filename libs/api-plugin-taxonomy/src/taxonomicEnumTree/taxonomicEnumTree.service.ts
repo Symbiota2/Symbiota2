@@ -353,18 +353,28 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
                     taxonID: In(parentIDs)
                 }})
 
-        console.log(" zzzz newAncestors " + newAncestors.length)
+        // console.log(" zzzz newAncestors " + newAncestors.length)
         // Sanity check, don't delete if parent info not found!
         if (newAncestors.length == 0) return
 
+        // console.log("building ancestor map")
         const ancestorMap = new Map()
         for (let ancestor of newAncestors) {
             const parent = ancestor.taxonID
             if (!ancestorMap.has(parent)) {
-                ancestorMap.set(parent,[parent,ancestor.parentTaxonID])
+                // console.log("setting ancestor new " + parent + " " + ancestor.parentTaxonID)
+                if (parent != ancestor.parentTaxonID) {
+                    ancestorMap.set(parent,[parent,ancestor.parentTaxonID])
+                } else {
+                    ancestorMap.set(parent,[ancestor.parentTaxonID])
+                }
+
             } else {
+                // console.log("setting ancestor update " + parent + " " + ancestor.parentTaxonID)
                 const a = ancestorMap.get(parent)
-                a.push(ancestor.parentTaxonID)
+                if (parent != ancestor.parentTaxonID) {
+                    a.push(ancestor.parentTaxonID)
+                }
             }
         }
 
@@ -374,39 +384,46 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
             taxonID: In(taxonIDs)
         })
 
-        console.log(" zzzz did delete " + newAncestors.length)
+        // console.log(" zzzz did delete " + newAncestors.length)
         // Update the enum tree pointing the taxonID to the new parent's ancestors
         const buffer : Partial<TaxaEnumTreeEntry>[] = []
 
-        for (let [ancestorid, nodeids] of Object.entries(ancestorMap)) {
-            for (let taxonID of parentMap.get(ancestorid)) {
-                console.log("creating ancestor entry ")
-                /*
-                const data = this.enumTreeRepository.create({
-                    parentTaxonID: ancestor.parentTaxonID,
-                    taxonID: taxonID,
-                    taxonAuthorityID: taxonAuthorityID,
-                    initialTimestamp: new Date()
-                })
-                 */
-                const data = {
-                    parentTaxonID: +ancestorid, //ancestor.parentTaxonID,
-                    taxonID: taxonID,
-                    taxonAuthorityID: taxonAuthorityID,
-                    initialTimestamp: new Date()
+        for (let ancestorid of ancestorMap.keys()) {
+            const nodeids = ancestorMap.get(ancestorid)
+            // console.log(" ancestors " + ancestorid + " length " + nodeids.length)
+            for (let nodeID of nodeids) {
+                // console.log(" nodes " + nodeID)
+                for (let taxonID of parentMap.get(ancestorid)) {
+                    // console.log("creating ancestor entry " + taxonID)
+                    /*
+                    const data = this.enumTreeRepository.create({
+                        parentTaxonID: ancestor.parentTaxonID,
+                        taxonID: taxonID,
+                        taxonAuthorityID: taxonAuthorityID,
+                        initialTimestamp: new Date()
+                    })
+                     */
+                    const data = {
+                        parentTaxonID: +nodeID, //ancestor.parentTaxonID,
+                        taxonID: taxonID,
+                        taxonAuthorityID: taxonAuthorityID,
+                        initialTimestamp: new Date()
+                    }
+                    /*
+                    const data = new TaxaEnumTreeEntry()
+                    data.parentTaxonID = ancestor.parentTaxonID
+                    data.taxonID = taxonID
+                    data.taxonAuthorityID = taxonAuthorityID
+                    data.initialTimestamp = new Date()
+                     */
+                    buffer.push(data)
                 }
-                /*
-                const data = new TaxaEnumTreeEntry()
-                data.parentTaxonID = ancestor.parentTaxonID
-                data.taxonID = taxonID
-                data.taxonAuthorityID = taxonAuthorityID
-                data.initialTimestamp = new Date()
-                 */
-                buffer.push(data)
             }
+
         }
 
-        // console.log(" zzzz did saves " + newAncestors.length)
+        /*
+        console.log(" zzzz did saves " + newAncestors.length)
         // Add the entry for taxon with the new parent
         for (let [parentID, myIDs] of Object.entries(parentMap)) {
             for (let taxonID of myIDs) {
@@ -420,6 +437,9 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
             }
         }
 
+         */
+
+        // console.log("buffer size " + buffer.length)
         // Save the updates
         //await this.enumTreeRepository.upsert(buffer,[])
         await this.enumTreeRepository.insert(buffer)

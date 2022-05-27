@@ -188,19 +188,14 @@ export class KnowledgeGraphService {
     }
 
 
-    async createKnowledgeGraph(graphID: number, opts = KnowledgeGraphService.DEFAULT_CREATE_ARCHIVE_OPTS): Promise<string> {
+    async createKnowledgeGraph(graphName: string, opts = KnowledgeGraphService.DEFAULT_CREATE_ARCHIVE_OPTS): Promise<string> {
         // Map of graph nodes
         const nodeMap : Map<string,KGGraphNode> = new Map()
 
-        // Get the name of the graph we are creating
-        // console.log("creating " + graphID)
-        let graphName = await this.knowledgeGraphName(graphID)
-
         // Get its tags
         console.log("graph name is " + graphName)
-        graphName = "all"
         const tags = {
-            graphID: graphID.toString(),
+            graphName: graphName,
             public: opts.publish.toString()
         }
 
@@ -327,11 +322,13 @@ export class KnowledgeGraphService {
 
         this.logger.log("Creating knowledge graph ")
 
+        /*
         await this.createGraph(
             graphName,
             nodeMap,
             tags
         )
+         */
 
         return graphName;
     }
@@ -358,55 +355,18 @@ export class KnowledgeGraphService {
         })
 
         return graphNames
-
-                /*
-        const graphKeys = await this.storage.listObjects(KnowledgeGraphService.S3_PREFIX);
-        const graphs = await Promise.all(
-            graphKeys.map(async (k) => {
-                const graphTags = await this.storage.getTags(k.key);
-                const graph = {
-                    objectKey: k.key,
-                    collectionID: -1,
-                    isPublic: false,
-                    updatedAt: new Date(k.updatedAt),
-                    size: k.size
-                };
-                const tagNames = Object.keys(graphTags);
-                if (tagNames.includes('collectionID')) {
-                    graph.collectionID = parseInt(graphTags['collectionID']);
-                }
-                graph.isPublic = (
-                    tagNames.includes('public') &&
-                    graphTags['public'] === 'true'
-                );
-
-                return graph;
-            })
-        );
-
-        return graphs.filter((a) => a.collectionID !== -1).sort((a, b) => {
-            if (a.collectionID > b.collectionID) {
-                return 1;
-            }
-            else if (a.collectionID < b.collectionID) {
-                return -1;
-            }
-            return 0;
-        });
-                 */
     }
 
-    async knowledgeGraphExists(graphID: number): Promise<boolean> {
-        const graphName = await this.knowledgeGraphName(graphID);
-        return await this.storage.hasObject(KnowledgeGraphService.s3Key(graphName));
+    async knowledgeGraphExists(graphName: string): Promise<boolean> {
+        return await this.storage.hasObject(KnowledgeGraphService.s3Key(graphName))
     }
 
-    async publishKnowledgeGraph(graphID: number): Promise<void> {
-        await this.updateKnowledgeGraphTags(graphID, { public: 'true' });
+    async publishKnowledgeGraph(graphName: string): Promise<void> {
+        await this.updateKnowledgeGraphTags(graphName, { public: 'true' });
     }
 
-    async unpublishKnowledgeGraph(graphID: number): Promise<void> {
-        await this.updateKnowledgeGraphTags(graphID, { public: 'false' });
+    async unpublishKnowledgeGraph(graphName: string): Promise<void> {
+        await this.updateKnowledgeGraphTags(graphName, { public: 'false' });
     }
 
     async getKnowledgeGraph(graphName: string): Promise<ReadableStream> {
@@ -422,13 +382,9 @@ export class KnowledgeGraphService {
         return this.storage.getObject(graphName);
     }
 
-    private async updateKnowledgeGraphTags(graphID: number, tags: Record<string, string>): Promise<void> {
-        const graphName = await this.knowledgeGraphName(graphID);
+    private async updateKnowledgeGraphTags(graphName: string, tags: Record<string, string>): Promise<void> {
         const objectKey = KnowledgeGraphService.s3Key(graphName);
         await this.storage.patchTags(objectKey, tags);
     }
 
-    private async knowledgeGraphName(graphID: number): Promise<string> {
-        return `KnowledgeGraph.zip`;
-    }
 }
