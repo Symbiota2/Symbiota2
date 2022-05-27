@@ -50,7 +50,7 @@ export const DEFAULT_DB_USER = 'root';
 export const DEFAULT_DB_PASSWORD = 'password';
 export const DEFAULT_DB_HOST = '127.0.0.1';
 export const DEFAULT_DB_PORT = '3306';
-export const DEFAULT_DB_NAME = 's2clean';
+export const DEFAULT_DB_NAME = 'symbiota';
 export const DEFAULT_DB_PATH = ':memory:';
 
 export const DEFAULT_ENABLE_ELASTICSEARCH = '0';
@@ -75,7 +75,7 @@ export const DEFAULT_SMTP_SENDER = 'noreply@symbiota2.org';
 export const DEFAULT_ENABLE_AUTH = '1';
 
 export const DEFAULT_STORAGE_SERVER = 'http://127.0.0.1:9000';
-export const DEFAULT_STORAGE_USER = 'symbiota2';
+export const DEFAULT_STORAGE_USER = 'root';
 export const DEFAULT_STORAGE_PASSWORD = 'password';
 export const DEFAULT_STORAGE_BUCKET = 'symbiota2';
 // ==================================
