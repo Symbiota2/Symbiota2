@@ -495,6 +495,8 @@ export class TaxonomyUploadProcessor {
                 //}
                 //const a = goodRowsMap.get(name)
                 //a.push(taxonData)
+                // Add the rankID to the row!
+                row["rankID"] = taxonData["rankID"]
                 goodRows.push(row)
                 scinames.push(taxonData["scientificName"])
             }
@@ -556,16 +558,16 @@ export class TaxonomyUploadProcessor {
                 let moreTestTaxons = testTaxons
 
                 // Does it have an author?
-                if (moreTestTaxons.length > 1 && taxonData["author"]) {
-                    moreTestTaxons = moreTestTaxons.filter(a => a["author"] = taxonData["author"])
+                if (moreTestTaxons.length > 1 && taxonData["author"] != undefined) {
+                    moreTestTaxons = moreTestTaxons.filter(a => a["author"] == taxonData["author"])
                 }
                 // Does it have a rankID?
-                if (moreTestTaxons.length > 1 && taxonData["rankID"]) {
-                    moreTestTaxons = moreTestTaxons.filter(a => a["rankID"] = taxonData["rankID"])
+                if (moreTestTaxons.length > 1 && taxonData["rankID"] != undefined) {
+                    moreTestTaxons = moreTestTaxons.filter(a => a["rankID"] == taxonData["rankID"])
                 }
                 // Does it have a kingdom name?
-                if (moreTestTaxons.length > 1 && taxonData["kingdomName"]) {
-                    moreTestTaxons = moreTestTaxons.filter(a => a["kingdomName"] = taxonData["kingdomName"])
+                if (moreTestTaxons.length > 1 && taxonData["kingdomName"] != undefined) {
+                    moreTestTaxons = moreTestTaxons.filter(a => a["kingdomName"] == taxonData["kingdomName"])
                 }
 
                 // See how many we got
@@ -597,10 +599,12 @@ export class TaxonomyUploadProcessor {
                     newRecordFlag = true
                 } else {
                     // console.log(" existing taxon, do not create ")
-                    for (const [k, v] of Object.entries(taxonData)) {
+                    for (const k in taxonData) {
+                        const v = taxonData[k]
+                        //this.logger.log(" taxon k is " + k + " v is " + v + " other " + taxonData[k])
                         if (k in dbTaxon) {
+                            //this.logger.log(" k is " + k + " v is " + v + " other " + dbTaxon[k])
                             if (!artificialColumns.includes(k)) {
-                                // this.logger.log(" k and stuff " + v + " other " + dbTaxon[k])
                                 if (dbTaxon[k] != v) {
                                     dbTaxon[k] = v
                                     changed = true
@@ -952,7 +956,7 @@ export class TaxonomyUploadProcessor {
                     obj["skipMe"] = true
                 }
             }
-            this.logger.warn(`Accepted taxon name to insert does not have a matching taxon! Skipping...`)
+            this.logger.warn(`Accepted taxon name ` + key + `to insert does not have a matching taxon! Skipping...`)
         }
 
         // If there are any keys left in the map we didn't find an accepted name
@@ -964,13 +968,13 @@ export class TaxonomyUploadProcessor {
                     obj["skipMe"] = true
                 }
             }
-            this.logger.warn(`Accepted taxon name to update does not have a matching taxon! Skipping...`)
+            this.logger.warn(`Accepted taxon name  ` + key + `to update does not have a matching taxon! Skipping...`)
         }
 
         // Go through the statusToUpdateLater
         for (let status of statusesToUpdateLater) {
             // These are already DB statuses
-            if (!status.hasOwnProperty("skipMe")) {
+            if (status["skipMe"] == undefined) {
                 statusesToDelete.push(status.taxonID)
                 changedStatuses.push(status)
                 statusUpdates.push(status)
@@ -979,7 +983,7 @@ export class TaxonomyUploadProcessor {
 
         // Go through the statuses to add
         for (let statusData of statusesToAdd) {
-            if (!statusData["skipMe"]) {
+            if (statusData["skipMe"] == undefined) {
                 // Convert status to a dbstatus
                 const status = await this.statusRepo.create(statusData)
 
@@ -1026,6 +1030,7 @@ export class TaxonomyUploadProcessor {
 
     private async moveTaxons(taxonPairs, taxonAuthorityID) {
         // await this.taxaEnumTreeService.moveTaxon(taxonID,taxonAuthorityID,parentTaxonID)
+        // console.log(" moving taxons " + taxonPairs.length)
         await this.taxaEnumTreeService.extendTaxonTreeWithList(taxonPairs, taxonAuthorityID)
     }
 

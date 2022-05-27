@@ -394,7 +394,7 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
             for (let nodeID of nodeids) {
                 // console.log(" nodes " + nodeID)
                 for (let taxonID of parentMap.get(ancestorid)) {
-                    // console.log("creating ancestor entry " + taxonID)
+                    // console.log("creating ancestor entry " + taxonID + " " + nodeID)
                     /*
                     const data = this.enumTreeRepository.create({
                         parentTaxonID: ancestor.parentTaxonID,
