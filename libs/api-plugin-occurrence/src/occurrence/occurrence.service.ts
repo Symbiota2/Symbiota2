@@ -365,11 +365,11 @@ export class OccurrenceService {
      * @return Object The value of uniqueField for each row in
      * csvFile along with a count of the null values
      */
-    async countCSVNonNull(csvFile: string, uniqueField: string, seperator: string = ","): Promise<{ uniqueValues: any[], nulls: number }> {
+    async countCSVNonNull(csvFile: string, uniqueField: string): Promise<{ uniqueValues: any[], nulls: number }> {
         const uniqueFieldValues = new Set();
         let nulls = 0;
         const detectedSeperator = await getCsvSeperator(csvFile);
-        if (seperator == "tab") {
+        if (detectedSeperator == "\t") {
             try {
                 for await (const batch of csvIteratorTabs<Record<string, unknown>>(csvFile)) {
                     for (const row of batch) {
@@ -387,7 +387,7 @@ export class OccurrenceService {
             }
         }
         else {
-            if (seperator == ",") {
+            if (detectedSeperator == ",") {
                 try {
                     for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
                         for (const row of batch) {

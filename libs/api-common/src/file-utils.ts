@@ -27,11 +27,11 @@ export async function getCSVFields(csvFile: string): Promise<string[]> {
     });
 }
 
-export async function getCSVFieldsTabSeperator(csvFile: string): Promise<string[]> {
+export async function getCSVFieldsCustomSeperator(csvFile: string, customSeperator: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
         const stream = fs.createReadStream(csvFile);
         stream.pipe(csv({
-            separator: tabStr
+            separator: customSeperator
         }))
             .on('headers', (headers) => {
                 console.log("Parsing with character")
@@ -55,7 +55,7 @@ export async function fileExists(filePath: string): Promise<boolean> {
     }
 }
 
-export async function getCsvSeperator<RowType>(filePath: string): Promise<String> {
+export async function getCsvSeperator<RowType>(filePath: string): Promise<string> {
     var CSV = require('csv-string');
     return new Promise((resolve, reject) => {
         try {
@@ -69,10 +69,7 @@ export async function getCsvSeperator<RowType>(filePath: string): Promise<String
                 if (lineCounter == 1) { lineReader.close(); }
             });
             lineReader.on('close', function () {
-                // console.log(wantedLines);
-                // console.log(typeof (wantedLines[0]))
-                // console.log("Detected seperator: " + "\"" + CSV.detect(wantedLines[0]) + "\"")
-                // console.log("Detected seperator sanity check (should be comma): " + CSV.detect("id,test,stuff"))
+                console.log("Detected seperator: " + "\"" + CSV.detect(wantedLines[0]) + "\"")
                 resolve(CSV.detect(wantedLines[0]))
             });
         }
