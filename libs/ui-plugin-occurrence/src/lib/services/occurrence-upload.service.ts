@@ -16,6 +16,8 @@ import {
 import { ApiOccurrenceUpload } from '@symbiota2/data-access';
 import { CollectionService } from '@symbiota2/ui-plugin-collection';
 import { OccurrenceQueryBuilder } from './occurrence-query-builder';
+import { IPTInputDto } from '../dto/occurrence-ipt-input.dto';
+
 
 @Injectable()
 export class OccurrenceUploadService {
@@ -128,13 +130,46 @@ export class OccurrenceUploadService {
         );
     }
 
+    uploadFileIPT(iptLink: string): Observable<void> {
+        const url = this.createUrlBuilder()
+            .uploadIPT()
+            .build();
+        console.log("URL: " + url);
+
+        const body = new IPTInputDto(iptLink);
+
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const query = this.api.queryBuilder(url)
+                    .post()
+                    .addJwtAuth(token)
+                    .body(body)
+                    .build();
+
+                console.log("QUERY: " + query)
+
+                return this.api.send(query).pipe(
+                    catchError((e) => {
+                        this.alerts.showError(JSON.stringify(e));
+                        return of(null);
+                    }),
+                );
+            }),
+            tap((uploadResponse) => {
+                this._currentUpload.next(uploadResponse);
+            }),
+            map(() => null)
+        );
+    }
+
     patchFieldMap(uniqueIDField: string) {
         return combineLatest([
             this.collectionID,
             this.jwtToken,
             this.currentUpload,
         ]).pipe(
-            filter(([,, upload]) => upload !== null),
+            filter(([, , upload]) => upload !== null),
             take(1),
             switchMap(([collectionID, token, upload]) => {
                 const url = this.createUrlBuilder()
@@ -168,7 +203,7 @@ export class OccurrenceUploadService {
             this.jwtToken,
             this.currentUpload
         ]).pipe(
-            filter(([,, upload]) => upload !== null),
+            filter(([, , upload]) => upload !== null),
             take(1),
             switchMap(([collectionID, token, upload]) => {
                 let url = this.createUrlBuilder()

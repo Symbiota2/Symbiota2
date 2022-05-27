@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { AlertService } from '@symbiota2/ui-common';
 import { map, switchMap, take, tap } from 'rxjs/operators';
 import { ROUTE_UPLOAD_FIELD_MAP } from '../../routes';
@@ -36,8 +36,9 @@ export class OccurrenceUploadPage implements OnInit {
         map((collection) => collection.id)
     );
 
-    fileInput = new FormControl(null);
-    dwcaLink = new FormControl(null);
+    fileInput = new FormControl({ value: null, disabled: true }, Validators.required);
+    fileInputCsv = new FormControl({ value: null, disabled: true }, Validators.required);
+
     currentPage = this.currentRoute.queryParamMap.pipe(
         map((params) => {
             const hasPage = params.has(OccurrenceUploadPage.Q_PARAM_PAGE);
@@ -55,6 +56,7 @@ export class OccurrenceUploadPage implements OnInit {
 
     uploadDwcForm = this.fb.group({
         uploadOption: ['link'],
+        iptLink: ['']
     })
 
 
@@ -79,7 +81,36 @@ export class OccurrenceUploadPage implements OnInit {
 
     //Getting dwca from link
     onLinking() {
+        let formUrl = this.uploadDwcForm.get('iptLink').value;
 
+        //Filter link and send to backend
+        let newurl: string = formUrl.replace("resource", "archive.do")
+
+        console.log("NEW URL: " + newurl)
+
+        combineLatest([
+            this.collectionID,
+            this.upload.uploadFileIPT(newurl)
+                .pipe(
+                    switchMap(() => this.upload.currentUpload)
+                )
+        ])
+            .pipe(take(1)).subscribe(([collectionID, beginUploadResponse]) => {
+                if (beginUploadResponse !== null) {
+                    this.router.navigate(
+                        [ROUTE_UPLOAD_FIELD_MAP],
+                        {
+                            queryParams: {
+                                [Q_PARAM_COLLID]: collectionID,
+                                uploadID: beginUploadResponse.id
+                            }
+                        }
+                    );
+                }
+                else {
+                    this.alerts.showError('Upload failed');
+                }
+            });
     }
 
     //Uploading dwca
@@ -111,7 +142,7 @@ export class OccurrenceUploadPage implements OnInit {
     onUploadCsv() {
         combineLatest([
             this.collectionID,
-            this.upload.uploadFile(this.fileInput.value).pipe(
+            this.upload.uploadFile(this.fileInputCsv.value).pipe(
                 switchMap(() => this.upload.currentUpload)
             )
         ]).pipe(take(1)).subscribe(([collectionID, beginUploadResponse]) => {
@@ -131,6 +162,15 @@ export class OccurrenceUploadPage implements OnInit {
             }
         });
     }
+
+    canUploadDwc(): boolean {
+        return this.uploadZipEnabled && (this.fileInput.valid);
+    }
+
+    canUploadCsv(): boolean {
+        return this.uploadCsvEnabled && (this.fileInputCsv.valid);
+    }
+
 
     onToggleUploadOption(option: 'link' | 'zip' | 'csv') {
         if (option == 'link') {
