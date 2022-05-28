@@ -75,7 +75,7 @@ export const DEFAULT_SMTP_SENDER = 'noreply@symbiota2.org';
 export const DEFAULT_ENABLE_AUTH = '1';
 
 export const DEFAULT_STORAGE_SERVER = 'http://127.0.0.1:9000';
-export const DEFAULT_STORAGE_USER = 'symbiota2';
+export const DEFAULT_STORAGE_USER = 'root';
 export const DEFAULT_STORAGE_PASSWORD = 'password';
 export const DEFAULT_STORAGE_BUCKET = 'symbiota2';
 // ==================================

@@ -505,6 +505,118 @@ export class Occurrence extends EntityProvider {
     georeferenceProtocol: string;
 
     @Column('varchar', {
+        name: 'degreeOfEstablishment',
+        nullable: true,
+        length: 255,
+    })
+    degreeOfEstablishment: string;
+
+    @Column('varchar', {
+        name: 'associatedSequences',
+        nullable: true,
+        length: 1000,
+    })
+    associatedSequences: string;
+
+    @Column('varchar', {
+        name: 'earliestAgeOrLowestStage',
+        nullable: true,
+        length: 255,
+    })
+    earliestAgeOrLowestStage: string;
+
+    @Column('varchar', {
+        name: 'earliestEonOrLowestEonothem',
+        nullable: true,
+        length: 255,
+    })
+    earliestEonOrLowestEonothem: string;
+
+    @Column('varchar', {
+        name: 'earliestEpochOrLowestSeries',
+        nullable: true,
+        length: 255,
+    })
+    earliestEpochOrLowestSeries: string
+
+    @Column('varchar', {
+        name: 'earliestEraOrLowestErathem',
+        nullable: true,
+        length: 255,
+    })
+    earliestEraOrLowestErathem: string
+
+    @Column('varchar', {
+        name: 'earliestPeriodOrLowestSystem',
+        nullable: true,
+        length: 255,
+    })
+    earliestPeriodOrLowestSystem: string
+
+    @Column('varchar', {
+        name:  ' eventRemarks',
+        nullable: true,
+        length: 255
+    })
+    eventRemarks: string;
+
+    @Column('varchar', {
+        name: 'eventTime',
+        nullable: true,
+        length: 255
+    })
+    eventTime: string;
+
+    @Column('varchar', { 
+        name: 'measurementRemarks',
+        nullable: true,
+        length: 255,
+    })
+    measurementRemarks: string;
+
+    @Column('varchar', {
+        name: 'parentEventID',
+        nullable: true,
+        length: 255,
+    })
+    parentEventID: string;
+
+    @Column('varchar', {
+        name: 'associatedOrganisms',
+        nullable: true,
+        length: 1000,
+    })
+    associatedOrganisms: string;
+
+    @Column('varchar', {
+        name: 'associatedReferences',
+        nullable: true,
+        length: 1000
+    })
+    associatedReferences: string;
+
+    @Column('varchar', {
+        name: 'countryCode',
+        nullable: true,
+        length: 255
+    })
+    countryCode: string;
+
+    @Column('varchar', {
+        name: 'datasetName',
+        nullable: true,
+        length: 255
+    })
+    datasetName: string;
+
+    @Column('varchar', {
+        name: 'subgenus',
+        nullable: true,
+        length: 255
+    })
+    subgenus: string;
+
+    @Column('varchar', {
         name: 'georeferenceSources',
         nullable: true,
         length: 255,
