@@ -85,8 +85,8 @@ export interface ApiOccurrence extends ApiOccurrenceListItem {
     dynamicProperties: string;
     endDayOfYear: number | null;
     establishmentMeans: string;
-    earliestAgeOrLowestAge: string;
-    earliestEonOrLowestEonthem: string;
+    earliestAgeOrLowestStage: string;
+    earliestEonOrLowestEonothem: string;
     earliestEpochOrLowestSeries: string;
     earliestEraOrLowestErathem: string;
     earliestPeriodOrLowestSystem: string;
