@@ -132,40 +132,19 @@ export class OccurrenceController {
     @ApiFileInput('file')
     async uploadOccurrenceFile(@UploadedFile() file: File): Promise<OccurrenceUpload> {
         let upload: OccurrenceUpload;
+        const currDate = new Date();
+        const timestamp = currDate.getTime();
+        const re = /\s/gi;
+        const fileTimeStamp = currDate.toString().replace(re, "")
+        let occurrencesSeperator: string;
+        console.log("Timestamp: " + timestamp);
+
+        let uniqueDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", fileTimeStamp);
+        let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
 
         if (!file) {
             throw new BadRequestException('File not specified');
         }
-        let occurrencesSeperator: string = await getCsvSeperator(file.path);
-        const headers = await getCSVFieldsCustomSeperator(file.path, occurrencesSeperator);
-        const headerMap = {};
-        headers.forEach((h) => headerMap[h] = '');
-
-        upload = await this.occurrenceService.createUpload(
-            path.resolve(file.path),
-            file.mimetype,
-            headerMap
-        );
-        return upload;
-    }
-
-
-    @Post('upload')
-    @HttpCode(HttpStatus.CREATED)
-    @UseInterceptors(FileInterceptor('file'))
-    @UseGuards(JwtAuthGuard)
-    @ApiOperation({
-        summary: "Upload a CSV or DwCA file containing occurrences"
-    })
-    @ApiFileInput('file')
-    async uploadOccurrenceDwCA(@UploadedFile() file: File): Promise<OccurrenceUpload> {
-        let upload: OccurrenceUpload;
-
-        if (!file) {
-            throw new BadRequestException('File not specified');
-        }
-
-        console.log("File mimetype: " + file.mimetype);
 
         if (file.mimetype.startsWith('application/zip') || file.mimetype.startsWith('application/x-zip-compressed')) {
             // Accepts file
@@ -173,84 +152,123 @@ export class OccurrenceController {
             // Generates timestamped dir
             // Moves items with a new unique id/timestamp to top level
             // Deletes uniqueDir and uneeded items.
-            const currDate = new Date();
-            const timestamp = currDate.getTime();
-            const re = /\s/gi;
-            const fileTimeStamp = currDate.toString().replace(re, "")
-            let occurrencesSeperator: string;
-            console.log("Timestamp: " + timestamp);
 
-            let uniqueDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences", fileTimeStamp);
-            let extractDir: string = path.resolve(__dirname, "..", "..", "..", "data", "uploads", "occurrences");
-
-            try {
-                await extract(file.path, { dir: uniqueDir })
-                const files = await fs.promises.readdir(uniqueDir);
-                console.log("Files in directory: " + uniqueDir);
-                for (var currFile of files) {
-                    console.log(currFile);
-                    //Rebuild string with timestamp added to it.
-                    const fileNameParts = currFile.split('.');
-                    //Splits fileName before file extension, adding the timestamp between them. 
-                    let fullFileName: string = fileNameParts[0] + "-" + fileTimeStamp + "." + fileNameParts[1];
-
-                    //Rename to csv. 
-                    if (fileNameParts[1] != "csv") {
-                        let fullFileNameCsv: string = fileNameParts[0] + "-" + fileTimeStamp + ".csv";
-                        fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileNameCsv), function (err) {
-                            throw (err);
-                        });
-                    }
-                    else {
-                        fs.rename(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName), function (err) {
-                            throw (err);
-                        });
-                    }
-                }
-
-                //Remove the now empty unique directory
-                fs.rmSync(uniqueDir, { recursive: true, force: true });
-                let occurrencesFName: string
-                let occurrenceCsvPath: string
-
-                //Get the timestamped occurrences file.
+            if (file.mimetype.startsWith('application/zip') || file.mimetype.startsWith('application/x-zip-compressed')) {
                 try {
-                    console.log('Trying occurrence');
+                    await extract(file.path, { dir: uniqueDir })
+                    const files = await fs.promises.readdir(uniqueDir);
+                    console.log("Files in directory: " + uniqueDir);
+                    for (var currFile of files) {
+                        console.log(currFile);
+                        //Rebuild string with timestamp added to it.
+                        const fileNameParts = currFile.split('.');
+                        //Splits fileName before file extension, adding the timestamp between them. 
+                        let fullFileName: string = fileNameParts[0] + "-" + fileTimeStamp + "." + fileNameParts[1];
+
+                        //Rename to csv. 
+                        if (fileNameParts[1] != "csv") {
+                            let fullFileNameCsv: string = fileNameParts[0] + "-" + fileTimeStamp + ".csv";
+                            fs.renameSync(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileNameCsv));
+                        }
+                        else {
+                            fs.renameSync(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileName));
+                        }
+                    }
+
+                    //Remove the now empty unique directory
+                    fs.rmSync(uniqueDir, { recursive: true, force: true });
+                    let occurrencesFName: string
+                    let occurrenceCsvPath: string
+
+                    //Get the timestamped occurrences file.
                     occurrencesFName = "occurrence" + "-" + fileTimeStamp + "." + "csv";
                     occurrenceCsvPath = path.resolve(extractDir, occurrencesFName);
-                }
-                catch (err) {
-                    console.log("Does NOT start with occurrence. Trying occurrences.");
-                }
-                //Starts with occurrences
-                try {
-                    occurrencesFName = "occurrences" + "-" + fileTimeStamp + "." + "csv";
-                    occurrenceCsvPath = path.resolve(extractDir, occurrencesFName);
-                }
-                catch (err) {
-                    console.log("Does NOT start with occurrences either. Invalid filename.");
-                    throw new BadRequestException("Invalid filename for occurrences. Must be either occurrence or occurrences.")
-                }
-                // Get csv seperator
-                occurrencesSeperator = await getCsvSeperator(occurrenceCsvPath);
+                    if (!fs.existsSync(occurrenceCsvPath)) {
+                        //Try occurrences
+                        console.log('Trying occurrences')
+                        occurrencesFName = "occurrences" + "-" + fileTimeStamp + "." + "csv";
+                        occurrenceCsvPath = path.resolve(extractDir, occurrencesFName);
+                        if (!fs.existsSync(occurrenceCsvPath)) {
+                            throw new BadRequestException("Couldn't find csv file!");
+                        }
+                    }
 
-                //Convert to csv.
-                //TODO: Check if we need a seperator. Should be a try catch or something.
-                const headers = await getCSVFieldsCustomSeperator(occurrenceCsvPath, occurrencesSeperator);
-                const headerMap = {};
-                headers.forEach((h) => headerMap[h] = '');
 
-                upload = await this.occurrenceService.createUpload(
-                    path.resolve(occurrenceCsvPath),
-                    ".csv",
-                    headerMap
-                );
-            } catch (err) {
-                // handle any errors
-                throw new BadRequestException('DwCA upload not extracted! ' + err);
+                    // Get csv seperator if we found a valid occurrences file.
+                    occurrencesSeperator = await getCsvSeperator(occurrenceCsvPath);
+
+
+                    try {
+                        console.log('Trying occurrence');
+
+                        // Get csv seperator
+                        occurrencesSeperator = await getCsvSeperator(occurrenceCsvPath);
+                    }
+                    catch (err) {
+                        console.log("Does NOT start with occurrence. Trying occurrences.");
+                        //Starts with occurrences
+                        try {
+
+                            // Get csv seperator
+                            occurrencesSeperator = await getCsvSeperator(occurrenceCsvPath);
+                        }
+                        catch (err) {
+                            console.log("Does NOT start with occurrences either. Invalid filename.");
+                            throw new BadRequestException("Invalid filename for occurrences. Must be either occurrence or occurrences.")
+                        }
+                    }
+
+
+
+                    console.log("Got seperator.")
+                    //Convert to csv.
+                    //TODO: Check if we need a seperator. Should be a try catch or something.
+                    const headers = await getCSVFieldsCustomSeperator(occurrenceCsvPath, occurrencesSeperator);
+                    const headerMap = {};
+                    headers.forEach((h) => headerMap[h] = '');
+
+                    upload = await this.occurrenceService.createUpload(
+                        path.resolve(occurrenceCsvPath),
+                        ".csv",
+                        headerMap
+                    );
+                } catch (err) {
+                    // handle any errors
+                    throw new BadRequestException('DwCA upload not extracted! ' + err);
+                }
             }
-
         }
+
+        else if (file.mimetype == "text/csv") {
+            let occurrencesSeperator: string = await getCsvSeperator(file.path);
+            const headers = await getCSVFieldsCustomSeperator(file.path, occurrencesSeperator);
+            const headerMap = {};
+            headers.forEach((h) => headerMap[h] = '');
+
+            upload = await this.occurrenceService.createUpload(
+                path.resolve(file.path),
+                file.mimetype,
+                headerMap
+            );
+        }
+        else if (file.mimetype == "text/plain") {
+            //Rebuild string with timestamp added to it.
+            const fileNameParts = file.filename.split('.');
+            //Convert to csv first.
+            let fullFileNameCsv: string = fileNameParts[0] + "-" + fileTimeStamp + ".csv";
+            fs.renameSync(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileNameCsv));
+            let occurrencesSeperator: string = await getCsvSeperator(file.path);
+            const headers = await getCSVFieldsCustomSeperator(file.path, occurrencesSeperator);
+            const headerMap = {};
+            headers.forEach((h) => headerMap[h] = '');
+
+            upload = await this.occurrenceService.createUpload(
+                path.resolve(file.path),
+                file.mimetype,
+                headerMap
+            );
+        }
+
         else {
             await fsPromises.unlink(file.path);
             throw new BadRequestException('Unsupported file type: CSV and DwCA zip files are supported. Uploaded type: ' + file.mimetype);
@@ -375,27 +393,20 @@ export class OccurrenceController {
                         fs.rmSync(uniqueDir + "_IPT.zip", { recursive: true, force: true });
                         let occurrencesFName: string = "occurrence" + "-" + fileTimeStamp + "." + "csv";
                         let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
-                        uploadInfo.occurrencePath = occurrenceCsvPath;
+
                         //Get the timestamped occurrences file.
-                        //Starts with occurrence
-                        try {
-                            let occurrencesFName: string = "occurrence" + "-" + fileTimeStamp + "." + "csv";
-                            let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
-                            uploadInfo.occurrencePath = occurrenceCsvPath;
+                        occurrencesFName = "occurrence" + "-" + fileTimeStamp + "." + "csv";
+                        occurrenceCsvPath = path.resolve(extractDir, occurrencesFName);
+                        if (!fs.existsSync(occurrenceCsvPath)) {
+                            //Try occurrences
+                            console.log('Trying occurrences')
+                            occurrencesFName = "occurrences" + "-" + fileTimeStamp + "." + "csv";
+                            occurrenceCsvPath = path.resolve(extractDir, occurrencesFName);
+                            if (!fs.existsSync(occurrenceCsvPath)) {
+                                throw new BadRequestException("Couldn't find csv file!");
+                            }
                         }
-                        catch (err) {
-                            console.log("Does NOT start with occurrence. Trying occurrences.");
-                        }
-                        //Starts with occurrences
-                        try {
-                            let occurrencesFName: string = "occurrences" + "-" + fileTimeStamp + "." + "csv";
-                            let occurrenceCsvPath: string = path.resolve(extractDir, occurrencesFName);
-                            uploadInfo.occurrencePath = occurrenceCsvPath;
-                        }
-                        catch (err) {
-                            console.log("Does NOT start with occurrences either. Invalid filename.");
-                            reject(err);
-                        }
+                        uploadInfo.occurrencePath = occurrenceCsvPath;
 
 
                         //Attempt to get the timestamped images file

@@ -74,7 +74,10 @@ export async function getCsvSeperator<RowType>(filePath: string): Promise<string
             });
         }
         catch (err) {
+            console.log("Couldn't find seperator")
             reject(err)
+
+            throw err;
         }
     })
 
