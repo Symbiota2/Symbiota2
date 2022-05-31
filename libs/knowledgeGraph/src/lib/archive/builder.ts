@@ -23,7 +23,13 @@ export class KnowledgeGraphBuilder {
         this.graphName = graphName
     }
 
-    async addEntity(name: string, url: string, keys: string[], propertiesMap: Map<string,string>, edgesMap: Map<string, KGEdgeType>, record: any): Promise<void> {
+    async addEntity(writeStream: WriteStream,
+                    name: string,
+                    url: string,
+                    keys: string[],
+                    propertiesMap: Map<string,string>,
+                    edgesMap: Map<string, KGEdgeType>,
+                    record: any): Promise<void> {
         const factory = new DataFactory()
         const SerializerJsonld = require('@rdfjs/serializer-jsonld')
         const serializerJsonld = new SerializerJsonld()
@@ -33,15 +39,6 @@ export class KnowledgeGraphBuilder {
             read: () => {
             }
         })
-
-        /*
-        const allRecordFields = [
-            // This gets the properties
-            ...Object.getOwnPropertyNames(record),
-            // This gets the methods
-            // ...Object.getOwnPropertyNames(record.constructor.prototype)
-        ]
-         */
 
         // First form the key
         const keyValues = []
@@ -67,25 +64,55 @@ export class KnowledgeGraphBuilder {
                 factory.literal(record[property])))
         }
 
+        /*
+        for (let [k, v] of Object.entries(record)) {
+            console.log(" record key is " + k)
+            console.log(" value is " + record["__images__"].length)
+        }
+         */
+
         // Add quads for the edges
         for (let [edge, edgeType] of edgesMap) {
+            // First form the key
+            const edgeKeyValues = []
+            const name = "__" + edge + "__"
+            const records = record[name]
+            for (let i = 0; i < records.length; i++) {
+                for (let k = 0; k < edgeType.keys.length; k++) {
+                    edgeKeyValues.push(records[i][edgeType.keys[k]["propertyName"]])
+                }
 
-            for (let i = 0; i < edgeType.keys.length; i++) {
+                // Generate the ID string
+                const edgeID = edgeKeyValues.join(KnowledgeGraphBuilder.KG_KEY_SEPARATOR)
+                const edgeUrl = KnowledgeGraphBuilder.KG_RDF_HOST + '/' + edgeType.name + '#' + edgeID
 
+                // Add a quad for the node
+                input.push(factory.quad(
+                    factory.namedNode( myUrl ),
+                    factory.namedNode(edgeType.url),
+                    factory.namedNode( edgeUrl)))
             }
-            /*
-            const edgeName =
-            input.push(factory.quad(
-                factory.namedNode( myUrl ),
-                factory.namedNode(url),
-                factory.literal(record[property])))
 
+
+            /*
+                console.log(" key is " + Object.keys(edgeType.keys[i]))
+                console.log(" key is " + edgeType.keys[i]["propertyName"])
+                console.log(" key is " + edgeType.keys[i]["givenDatabaseName"])
              */
         }
 
         const output = serializerJsonld.import(input)
+        // const content = await getStream.array(serializer.import(input))
+
+        //output.pipe(writeStream)
+
+        writeStream.on('error', (err) => {
+            console.log("Writestream error " + err);
+        });
 
         output.on('data', jsonld => {
+            writeStream.write("asfd asdff sfdjlksfdjlksa jsfdjksfdjk sdajksfdjlkjsfdd sdkjjlk")
+            //console.log("written " + writeStream.bytesWritten)
             console.log(jsonld)
         })
 
@@ -119,11 +146,11 @@ export class KnowledgeGraphBuilder {
 
     async build(archivePath: string) {
 
-        const metaPath = pathJoin(this.tmpDir, 'meta.xml');
+        //const metaPath = pathJoin(this.tmpDir, 'meta.xml');
 
-        const metaXML = ""
+        //const metaXML = ""
 
-        await fsPromises.writeFile(metaPath, metaXML);
+        //await fsPromises.writeFile(metaPath, metaXML);
         //await zipFiles(archivePath, [metaPath, ...csvFiles]);
     }
 

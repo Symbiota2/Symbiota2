@@ -10,7 +10,7 @@ import {
 import { withTempDir } from '@symbiota2/api-common';
 import { AppConfigService } from '@symbiota2/api-config';
 import { join as pathJoin } from 'path';
-import { createReadStream } from 'fs';
+import { createReadStream, createWriteStream } from 'fs';
 import { Collection, Occurrence } from '@symbiota2/api-database';
 import ReadableStream = NodeJS.ReadableStream;
 import { getKGNode, getKGProperty, getKGEdge, KnowledgeGraphBuilder, KGPropertyType } from '@symbiota2/knowledgeGraph';
@@ -52,7 +52,7 @@ export class KnowledgeGraphService {
     private static readonly DEFAULT_CREATE_ARCHIVE_OPTS: CreateGraphOpts = {
         publish: false
     };
-    private static readonly REGEX_SPACE_REPLACE = new RegExp(/\s/g)
+    // private static readonly REGEX_SPACE_REPLACE = new RegExp(/\s/g)
     private readonly logger = new Logger(KnowledgeGraphService.name)
     // private serializerJsonld = new SerializerJsonLD()
     // private rdf = new DataModel()
@@ -66,87 +66,82 @@ export class KnowledgeGraphService {
     }
 
     // TODO: Redact sensitive localities
-    private async createGraph<T>(
+    private async createGraph(
         graphName: string,
         nodeMap: Map<string,KGGraphNode>,
         objectTags = {}
     ) {
         const db = getConnection()
+        const dataDir = await this.appConfig.dataDir()
+        const uploadPath = KnowledgeGraphService.s3Key(graphName)
         const kgBuilder = new KnowledgeGraphBuilder(graphName)
 
-        // Let's process each kind of node
-        for (let [key, value] of nodeMap) {
-            // console.log("key is " + key)
-            // console.log("target is " + value.meta)
+        return new Promise<void>((resolve, reject) => {
+            withTempDir(dataDir, async (tmpDir) => {
+                try {
 
-            // get the repository
-            const repo = db.getRepository(value.meta.target)
-            try {
-                let offset = 0;
-                let entities = await repo.find({
-                    //...findOpts,
-                    take: KnowledgeGraphService.DB_LIMIT,
-                    skip: offset
-                });
-                // console.log("entities size is " + entities.length)
-                while (entities.length > 0) {
-                    await Promise.all(entities.map((o) => kgBuilder
-                        .addEntity(value.meta.targetName, value.url, value.keys, value.properties, value.edges, o)));
-                    offset += entities.length;
-                    entities = await repo.find({
-                        // ...findOpts,
-                        take: KnowledgeGraphService.DB_LIMIT,
-                        skip: offset
-                    });
+                    const graphPath = pathJoin(tmpDir, graphName)
+                    const writeStream = createWriteStream(graphPath)
+
+                    // Let's process each kind of node
+                    for (let [key, value] of nodeMap) {
+                        // console.log("key is " + key)
+                        // console.log("target is " + value.meta)
+
+                        // get the repository
+                        const repo = db.getRepository(value.meta.target)
+                        let offset = 0
+                        const edges = []
+                        // console.log( " edge length is " + value.edges.keys())
+                        for (let edge of value.edges.keys()) {
+                            // console.log("edge is " + edge)
+                            edges.push(edge)
+                        }
+
+                        let entities = await repo.find({
+                            //...findOpts,
+                            relations: edges,
+                            take: KnowledgeGraphService.DB_LIMIT,
+                            skip: offset
+                        });
+
+                        // console.log("entities size is " + entities.length)
+                        while (entities.length > 0) {
+                            await Promise.all(entities.map((o) => kgBuilder
+                                .addEntity(
+                                    writeStream,
+                                    value.meta.targetName,
+                                    value.url,
+                                    value.keys,
+                                    value.properties,
+                                    value.edges,
+                                    o)));
+                            offset += entities.length;
+                            break
+                            entities = await repo.find({
+                                // ...findOpts,
+                                take: KnowledgeGraphService.DB_LIMIT,
+                                skip: offset
+                            });
+                        }
+                    }
+
+                    await writeStream.close()
+                    console.log("here")
+                    console.log(createReadStream(graphPath).read(50))
+                    console.log("done")
+                    // await kgBuilder.build(graphPath);
+                    await this.storage.putObject(uploadPath, createReadStream(graphPath), objectTags);
+
+                    resolve()
+
+                } catch (e) {
+                    this.logger.log("Error building graph " + graphName + " error is " + e)
+                    reject(e)
                 }
-            } catch (e) {
-                console.log(e)
-                // reject(e);
-            }
-
-            }
-
-            /*
-        const factory = new DataFactory()
-        const SerializerJsonld = require('@rdfjs/serializer-jsonld')
-        const serializerJsonld = new SerializerJsonld()
-
-        const input = new Readable({
-            objectMode: true,
-            read: () => {
-
-            }
+            })
         })
 
-        const output = serializerJsonld.import(input)
-
-        output.on('data', jsonld => {
-            console.log(jsonld)
-        })
-
-        input.push(factory.quad(
-            factory.namedNode('http://example.org/sheldon-cooper'),
-            factory.namedNode('http://schema.org/givenName'),
-            factory.literal('Sheldon')))
-        input.push(factory.quad(
-            factory.namedNode('http://example.org/sheldon-cooper'),
-            factory.namedNode('http://schema.org/familyName'),
-            factory.literal('Cooper')))
-        input.push(factory.quad(
-            factory.namedNode('http://example.org/sheldon-cooper'),
-            factory.namedNode('http://schema.org/knows'),
-            factory.namedNode('http://example.org/amy-farrah-fowler')))
-
-        input.push(factory.quad(
-            factory.namedNode('http://example.org/son-cooper'),
-            factory.namedNode('http://schema.org/givenName'),
-            factory.literal('Sheldon')))
-
-        input.push(null)
-
-             */
-
-        return
         /*
         const dataDir = await this.appConfig.dataDir();
         const kgBuilder = new KnowledgeGraphBuilder(entityCls, dataDir);
@@ -187,13 +182,11 @@ export class KnowledgeGraphService {
          */
     }
 
-
     async createKnowledgeGraph(graphName: string, opts = KnowledgeGraphService.DEFAULT_CREATE_ARCHIVE_OPTS): Promise<string> {
         // Map of graph nodes
         const nodeMap : Map<string,KGGraphNode> = new Map()
 
         // Get its tags
-        console.log("graph name is " + graphName)
         const tags = {
             graphName: graphName,
             public: opts.publish.toString()
@@ -208,9 +201,6 @@ export class KnowledgeGraphService {
                 // This type has been decorated as a KG node
                 // Get a list of its columns
                 const columns : ColumnMetadata[] = entityMeta.columns
-                // for (let i = 0; i < columns.length; i++) {
-                //    console.log( " column "+ i + " " + columns[i].propertyName)
-                // }
 
                 // Process the object associated with the node type
                 // Is the current graph in this type?
@@ -227,7 +217,6 @@ export class KnowledgeGraphService {
                     return
                 }
 
-                console.log(" Setting node map " + entityMeta.targetName)
                 // Set up the mapping
                 const propertyMapValues = new Map<string, string>()
                 const edgeMapValues = new Map<string, KGEdgeType>()
@@ -274,21 +263,6 @@ export class KnowledgeGraphService {
                 for (let index in entityMeta.relations) {
                     const relationMeta : RelationMetadata = entityMeta.relations[index]
                     linkMap.set(relationMeta.propertyName, relationMeta)
-                    /*
-                    console.log("relation " + relationMeta.inverseEntityMetadata.target.name
-                        + " " + relationMeta.propertyName
-                        + " " + relationMeta.foreignKeys.length
-                        + " " + relationMeta.buildInverseSidePropertyPath()
-                    + " " + relationMeta.buildPropertyPath())
-                    const ids = relationMeta.inverseEntityMetadata.primaryColumns
-                    // console.log(" keys key is " + entityMeta.name)
-                    const resolvedKeys = []
-                    // Get the names of the columns for the primary key
-                    for (let key in ids) {
-                        // console.log(" key " + propertyMap)
-                        resolvedKeys.push(columns[key].propertyName)
-                    }
-                     */
                 }
 
                 // process the edges
@@ -322,13 +296,11 @@ export class KnowledgeGraphService {
 
         this.logger.log("Creating knowledge graph ")
 
-        /*
         await this.createGraph(
             graphName,
             nodeMap,
             tags
         )
-         */
 
         return graphName;
     }
