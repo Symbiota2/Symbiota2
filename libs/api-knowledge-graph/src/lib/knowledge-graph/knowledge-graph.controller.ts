@@ -28,7 +28,6 @@ import { KnowledgeGraphGenerateJob } from './queues/knowledge-graph-generate.pro
 @ApiTags('Knowledge Graph')
 @Controller('knowledge-graph')
 export class KnowledgeGraphController {
-    graphID : number = 1  // Dummy placeholder at present
 
     constructor(
         @InjectQueue(QUEUE_ID_GENERATE_KNOWLEDGE_GRAPH)
@@ -45,8 +44,8 @@ export class KnowledgeGraphController {
             return new KnowledgeGraph({
                 graph: name,
                 ...graph,
-            });
-        });
+            })
+        })
     }
 
     @Get(':graphName')
@@ -103,7 +102,11 @@ export class KnowledgeGraphController {
         }
          */
 
-        const knowledgeGraphExists = await this.kgService.knowledgeGraphExists(this.graphID);
+        console.log("Graph name is " + query.name)
+        for (const [k,v] of Object.entries(query)) {
+            console.log(" k is " + k + " " +v)
+        }
+        const knowledgeGraphExists = await this.kgService.knowledgeGraphExists(query.name);
 
         if (!knowledgeGraphExists || query.refresh) {
             if (await this.jobIsRunning()) {
@@ -114,16 +117,16 @@ export class KnowledgeGraphController {
 
             await this.kgQueue.add({
                 publish: query.publish,
-                graphID: this.graphID,
+                graphName: query.name,
                 userID: req.user?.uid || 2288
             });
         }
         else if (knowledgeGraphExists) {
             if (query.publish) {
-                await this.kgService.publishKnowledgeGraph(this.graphID);
+                await this.kgService.publishKnowledgeGraph(query.name);
             }
             else {
-                await this.kgService.unpublishKnowledgeGraph(this.graphID);
+                await this.kgService.unpublishKnowledgeGraph(query.name);
             }
         }
         else {

@@ -386,13 +386,17 @@ export class TaxonController {
     @ApiOperation({ summary: 'Retrieve the potential problems in the upload. You must choose by kind of problem by setting the "kind" field. Potential choices are 1 (problem rows), 2 (problem accepted names), 3 (problem parent names), and 4 (problem ranks).' })
     async getresults(@Param('kind') kind: number) : Promise<string[]> {
         if (kind == 1) {
-            return await this.taxa.getProblemUploadRows()
+            const rows = await this.taxa.getProblemUploadRows()
+            return rows
         } else if (kind == 2) {
-            return await this.taxa.getProblemAcceptedNames()
+            const rows = await this.taxa.getProblemAcceptedNames()
+            return rows
         } else if (kind == 3) {
-            return await this.taxa.getProblemParentNames()
+            const rows = await this.taxa.getProblemParentNames()
+            return rows
         } else if (kind == 4) {
-            return await this.taxa.getProblemRanks()
+            const rows = await this.taxa.getProblemRanks()
+            return rows
         } else {
             throw new BadRequestException(" The kind is out of the range 1 to 4 it is " + kind)
         }

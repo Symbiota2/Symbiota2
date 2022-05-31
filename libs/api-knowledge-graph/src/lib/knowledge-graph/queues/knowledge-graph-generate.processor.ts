@@ -12,7 +12,7 @@ import { KnowledgeGraphService } from '../knowledge-graph.service';
 
 export interface KnowledgeGraphGenerateJob {
     userID: number;
-    graphID: number;
+    graphName: string;
     publish: boolean;
 }
 
@@ -30,7 +30,7 @@ export class KnowledgeGraphGenerateProcessor {
             `Generating knowledge graph ...`
         );
         await this.knowledgeGraphService.createKnowledgeGraph(
-            job.data.graphID,
+            job.data.graphName,
             { publish: job.data.publish }
         );
     }

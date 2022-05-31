@@ -222,4 +222,69 @@ export class OccurrenceOutputDto extends OccurrenceListItem {
     @ApiProperty()
     @Expose()
     recordEnteredBy: string;
+
+    @ApiProperty()
+    @Expose()
+    degreeOfEstablishment: string;
+
+    @ApiProperty()
+    @Expose()
+    associatedSequences: string;
+
+    @ApiProperty()
+    @Expose()
+    earliestAgeOrLowestAge: string;
+
+    @ApiProperty()
+    @Expose()
+    earliestEonOrLowestEonothem: string;
+
+    @ApiProperty()
+    @Expose()
+    earliestEpochOrLowestSeries: string;
+
+    @ApiProperty()
+    @Expose()
+    earliestEraOrLowestErathem: string;
+
+    @ApiProperty()
+    @Expose()
+    earliestPeriodOrLowestSystem: string;
+
+    @ApiProperty()
+    @Expose()
+    eventRemarks: string;
+
+    @ApiProperty()
+    @Expose()
+    eventTime: string;
+
+    @ApiProperty()
+    @Expose()
+    measurementRemarks: string;
+
+    @ApiProperty()
+    @Expose()
+    parentEventID: string;
+
+    @ApiProperty()
+    @Expose()
+    associatedOrganisms: string;
+
+    @ApiProperty()
+    @Expose()
+    associatedReferences: string;
+
+    @ApiProperty()
+    @Expose()
+    countryCode: string;
+
+    @ApiProperty()
+    @Expose()
+    datasetName: string;
+
+    @ApiProperty()
+    @Expose()
+    subgenus: string;
+
 }

@@ -30,7 +30,7 @@ export class TaxonService extends BaseService<Taxon>{
     public static readonly problemParentNamesPath = path.join(TaxonService.dataFolderPath, "problemParentNames")
     public static readonly problemAcceptedNamesPath = path.join(TaxonService.dataFolderPath, "problemAcceptedNames")
     public static readonly problemRanksPath = path.join(TaxonService.dataFolderPath, "problemRanks")
-    public static readonly skippedTaxonsDueToMultipleMatchPath = path.join(TaxonService.dataFolderPath, "taxonsMultipleMath")
+    public static readonly skippedTaxonsDueToMultipleMatchPath = path.join(TaxonService.dataFolderPath, "taxonsMultipleMatch")
     public static readonly skippedTaxonsDueToMismatchRankPath = path.join(TaxonService.dataFolderPath, "taxonsMismatch")
     public static readonly skippedTaxonsDueToMissingNamePath = path.join(TaxonService.dataFolderPath, "taxonsMissing")
 
@@ -627,35 +627,25 @@ export class TaxonService extends BaseService<Taxon>{
             ]
 
         const myList = []
-        for (const key in result) {
-            await myList.push(this.getStringData(TaxonService.s3Key(key)))
+        for (const key of result) {
+            const row = await TaxonService.s3Key(key)
+            const value = await this.getStringData(row)
+            if (value != null) {
+                myList.push(value)
+            }
         }
-        /*
-        await result.forEach((key) => {
-            myList.push(this.getStringData(TaxonService.s3Key(key)))
-        })
-
-        result.map((key) => {
-            this.getStringData(TaxonService.s3Key(key))
-        })
-
-         */
         return myList
     }
 
     private async getStringData(key): Promise<string> {
-        // console.log(" get string data " + key)
         // See if there exists such an object
         const exists = await this.storageService.hasObject(key)
         if (!exists) {
-            return ""
+            return null
         }
-
-        // console.log(" here ")
 
         // Fetch the object if it exists
         const buffer = await this.storageService.getData(key)
-        // console.log(" buffer is " + buffer.toString())
         return buffer.toString()
     }
 
@@ -713,11 +703,8 @@ export class TaxonService extends BaseService<Taxon>{
         let nullRankNames = 0
         let totalRecords = 0
 
-        // console.log("sciname field is " + sciNameField)
         try {
             for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
-                // console.log("total records " + totalRecords + " batch size " + batch.length)
-                // console.log("batch " + batch[0][sciNameField] + " " + batch[batch.length-1][sciNameField])
                 for (const row of batch) {
                     totalRecords += 1
 
@@ -737,10 +724,6 @@ export class TaxonService extends BaseService<Taxon>{
 
                     // Check scientific name
                     let fieldVal = null
-                    // console.log(" row  is " + row[sciNameField])
-                    //if (row[sciNameField] == 'Paraboopia') {
-                    //    console.log(" found taxon Paraboopia ")
-                    //}
                     if (row[sciNameField]) {
                         fieldVal = row[sciNameField] + ""
                         taxons.add(fieldVal.trim())
