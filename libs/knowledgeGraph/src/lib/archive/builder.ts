@@ -23,22 +23,14 @@ export class KnowledgeGraphBuilder {
         this.graphName = graphName
     }
 
-    async addEntity(writeStream: WriteStream,
+    async addEntity(input,
+                    factory,
                     name: string,
                     url: string,
                     keys: string[],
                     propertiesMap: Map<string,string>,
                     edgesMap: Map<string, KGEdgeType>,
                     record: any): Promise<void> {
-        const factory = new DataFactory()
-        const SerializerJsonld = require('@rdfjs/serializer-jsonld')
-        const serializerJsonld = new SerializerJsonld()
-
-        const input = new Readable({
-            objectMode: true,
-            read: () => {
-            }
-        })
 
         // First form the key
         const keyValues = []
@@ -64,13 +56,6 @@ export class KnowledgeGraphBuilder {
                 factory.literal(record[property])))
         }
 
-        /*
-        for (let [k, v] of Object.entries(record)) {
-            console.log(" record key is " + k)
-            console.log(" value is " + record["__images__"].length)
-        }
-         */
-
         // Add quads for the edges
         for (let [edge, edgeType] of edgesMap) {
             // First form the key
@@ -93,53 +78,7 @@ export class KnowledgeGraphBuilder {
                     factory.namedNode( edgeUrl)))
             }
 
-
-            /*
-                console.log(" key is " + Object.keys(edgeType.keys[i]))
-                console.log(" key is " + edgeType.keys[i]["propertyName"])
-                console.log(" key is " + edgeType.keys[i]["givenDatabaseName"])
-             */
         }
-
-        const output = serializerJsonld.import(input)
-        // const content = await getStream.array(serializer.import(input))
-
-        //output.pipe(writeStream)
-
-        writeStream.on('error', (err) => {
-            console.log("Writestream error " + err);
-        });
-
-        output.on('data', jsonld => {
-            writeStream.write("asfd asdff sfdjlksfdjlksa jsfdjksfdjk sdajksfdjlkjsfdd sdkjjlk")
-            //console.log("written " + writeStream.bytesWritten)
-            console.log(jsonld)
-        })
-
-        input.push(null)
-
-        /*
-        // Map dwcRecordType --> writeStream
-        if (!this.fileMap.has(recordType)) {
-            const filePath = pathJoin(this.tmpDir, `${ encodeURIComponent(record.constructor.name) }.csv`);
-            const csvStream = createWriteStream(filePath);
-            csvStream.write(this.csvHeaderLine(recordType));
-            this.fileMap.set(recordType, csvStream);
-        }
-
-        const fileStream = this.fileMap.get(recordType);
-        const csvLine = await this.recordToCSVLine(recordType, record);
-        await new Promise<void>((resolve) => {
-            const keepWriting = fileStream.write(csvLine);
-            if (keepWriting) {
-                resolve();
-            }
-            else {
-                fileStream.once('drain', () => resolve());
-            }
-        })
-
-         */
 
         return;
     }

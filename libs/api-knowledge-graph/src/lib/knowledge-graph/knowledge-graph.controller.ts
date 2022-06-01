@@ -53,7 +53,7 @@ export class KnowledgeGraphController {
     @ApiResponse({
         status: HttpStatus.OK,
         content: {
-            'application/zip': {
+            'application/json': {
                 schema: {
                     type: 'string',
                     format: 'binary'
@@ -61,7 +61,7 @@ export class KnowledgeGraphController {
             }
         }
     })
-    async getGraphByName(@Param() name: string, @Res() res: Response): Promise<void> {
+    async getGraphByName(@Param('graphName') name: string, @Res() res: Response): Promise<void> {
         const graphStream: NodeJS.ReadableStream = await this.kgService.getKnowledgeGraph(name);
         if (!graphStream) {
             throw new NotFoundException();
@@ -86,13 +86,12 @@ export class KnowledgeGraphController {
 
     @Put('')
     @ApiOperation({ summary: 'Create or publish a knowledge graph' })
-    //@ApiBearerAuth()
-    //@UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     async createKnowledgeGraph(
         @Req() req: AuthenticatedRequest,
         @Query() query: UpdateGraphQuery): Promise<void> {
 
-        /*
         const [isSuperAdmin] = await Promise.all([
             TokenService.isSuperAdmin(req.user)
         ]);
@@ -100,12 +99,7 @@ export class KnowledgeGraphController {
         if (!(isSuperAdmin)) {
             throw new ForbiddenException();
         }
-         */
 
-        console.log("Graph name is " + query.name)
-        for (const [k,v] of Object.entries(query)) {
-            console.log(" k is " + k + " " +v)
-        }
         const knowledgeGraphExists = await this.kgService.knowledgeGraphExists(query.name);
 
         if (!knowledgeGraphExists || query.refresh) {

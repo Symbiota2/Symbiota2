@@ -16,6 +16,8 @@ import ReadableStream = NodeJS.ReadableStream;
 import { getKGNode, getKGProperty, getKGEdge, KnowledgeGraphBuilder, KGPropertyType } from '@symbiota2/knowledgeGraph';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
+import { DataFactory } from 'rdf-data-factory';
+import { Readable } from 'stream';
 // import { RDF } from '@rdfjs/data-model';
 // import { SerializerJsonLD } from '@rdfjs/serializer-jsonld'
 // import { DataFactory } from 'rdf-data-factory'
@@ -54,8 +56,6 @@ export class KnowledgeGraphService {
     };
     // private static readonly REGEX_SPACE_REPLACE = new RegExp(/\s/g)
     private readonly logger = new Logger(KnowledgeGraphService.name)
-    // private serializerJsonld = new SerializerJsonLD()
-    // private rdf = new DataModel()
 
     constructor(
         private readonly appConfig: AppConfigService,
@@ -75,6 +75,15 @@ export class KnowledgeGraphService {
         const dataDir = await this.appConfig.dataDir()
         const uploadPath = KnowledgeGraphService.s3Key(graphName)
         const kgBuilder = new KnowledgeGraphBuilder(graphName)
+        const factory = new DataFactory()
+        const SerializerJsonld = require('@rdfjs/serializer-jsonld')
+        const serializerJsonld = new SerializerJsonld()
+
+        const input = new Readable({
+            objectMode: true,
+            read: () => {
+            }
+        })
 
         return new Promise<void>((resolve, reject) => {
             withTempDir(dataDir, async (tmpDir) => {
@@ -82,19 +91,30 @@ export class KnowledgeGraphService {
 
                     const graphPath = pathJoin(tmpDir, graphName)
                     const writeStream = createWriteStream(graphPath)
+                    const output = serializerJsonld.import(input)
+
+                    writeStream.on('error', (err) => {
+                        console.log("Writestream error " + err);
+                    });
+
+                    output.on('data', jsonld => {
+                        writeStream.write(JSON.stringify(jsonld))
+                        //console.log(jsonld)
+                    })
+
+                    output.on('end', () => {
+                        writeStream.close()
+                    })
 
                     // Let's process each kind of node
                     for (let [key, value] of nodeMap) {
-                        // console.log("key is " + key)
-                        // console.log("target is " + value.meta)
 
                         // get the repository
                         const repo = db.getRepository(value.meta.target)
                         let offset = 0
                         const edges = []
-                        // console.log( " edge length is " + value.edges.keys())
+
                         for (let edge of value.edges.keys()) {
-                            // console.log("edge is " + edge)
                             edges.push(edge)
                         }
 
@@ -105,11 +125,11 @@ export class KnowledgeGraphService {
                             skip: offset
                         });
 
-                        // console.log("entities size is " + entities.length)
                         while (entities.length > 0) {
                             await Promise.all(entities.map((o) => kgBuilder
                                 .addEntity(
-                                    writeStream,
+                                    input,
+                                    factory,
                                     value.meta.targetName,
                                     value.url,
                                     value.keys,
@@ -117,22 +137,18 @@ export class KnowledgeGraphService {
                                     value.edges,
                                     o)));
                             offset += entities.length;
-                            break
+
                             entities = await repo.find({
                                 // ...findOpts,
+                                relations: edges,
                                 take: KnowledgeGraphService.DB_LIMIT,
                                 skip: offset
                             });
                         }
                     }
 
-                    await writeStream.close()
-                    console.log("here")
-                    console.log(createReadStream(graphPath).read(50))
-                    console.log("done")
-                    // await kgBuilder.build(graphPath);
+                    input.emit("end")
                     await this.storage.putObject(uploadPath, createReadStream(graphPath), objectTags);
-
                     resolve()
 
                 } catch (e) {
@@ -142,44 +158,6 @@ export class KnowledgeGraphService {
             })
         })
 
-        /*
-        const dataDir = await this.appConfig.dataDir();
-        const kgBuilder = new KnowledgeGraphBuilder(entityCls, dataDir);
-        const uploadPath = KnowledgeGraphService.s3Key(graphName);
-
-        return new Promise<void>((resolve, reject) => {
-            withTempDir(dataDir, async (tmpDir) => {
-                try {
-                    let offset = 0;
-                    let entities = await repo.find({
-                        ...findOpts,
-                        take: KnowledgeGraphService.DB_LIMIT,
-                        skip: offset
-                    });
-
-                    while (entities.length > 0) {
-                        await Promise.all(entities.map((o) => kgBuilder.addRecord(o)));
-                        offset += entities.length;
-                        entities = await repo.find({
-                            ...findOpts,
-                            take: KnowledgeGraphService.DB_LIMIT,
-                            skip: offset
-                        });
-                    }
-
-                    const graphPath = pathJoin(tmpDir, graphName);
-                    await kgBuilder.build(graphPath);
-                    await this.storage.putObject(uploadPath, createReadStream(graphPath), objectTags);
-
-                    resolve();
-
-                } catch (e) {
-                    reject(e);
-                }
-            });
-        });
-
-         */
     }
 
     async createKnowledgeGraph(graphName: string, opts = KnowledgeGraphService.DEFAULT_CREATE_ARCHIVE_OPTS): Promise<string> {
