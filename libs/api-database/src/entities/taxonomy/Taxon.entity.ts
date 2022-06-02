@@ -441,6 +441,10 @@ export class Taxon extends EntityProvider {
     }
 
     @DwCField(DWC_FIELD_TAXON_RANK)
+    @KGProperty([
+        { graph: "all", url: 'http://purl.org/ontology/wo/TaxonRank' },
+        { graph: "taxonomy", url: 'http://purl.org/ontology/wo/TaxonRank' }
+    ])
     async rankName(): Promise<string> {
         const rank = await this.getRank();
         if (!rank) {
