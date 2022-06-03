@@ -274,6 +274,45 @@
         }
       }
     },
+      "ui-plugin-i18n": {
+          "projectType": "library",
+          "root": "libs/ui-plugin-i18n",
+          "sourceRoot": "libs/ui-plugin-i18n/src",
+          "prefix": "symbiota2",
+          "targets": {
+              "build": {
+                  "executor": "@nrwl/angular:package",
+                  "options": {
+                      "tsConfig": "libs/ui-plugin-i18n/tsconfig.lib.json",
+                      "project": "libs/ui-plugin-i18n/ng-package.json"
+                  },
+                  "configurations": {
+                      "production": {
+                          "tsConfig": "libs/ui-plugin-i18n/tsconfig.lib.prod.json"
+                      }
+                  }
+              },
+              "lint": {
+                  "executor": "@nrwl/linter:eslint",
+                  "options": {
+                      "lintFilePatterns": [
+                          "libs/ui-plugin-i18n/src/**/*.ts",
+                          "libs/ui-plugin-i18n/src/**/*.html"
+                      ]
+                  }
+              },
+              "test": {
+                  "executor": "@nrwl/jest:jest",
+                  "outputs": [
+                      "coverage/libs/ui-plugin-i18n"
+                  ],
+                  "options": {
+                      "jestConfig": "libs/ui-plugin-i18n/jest.config.js",
+                      "passWithNoTests": true
+                  }
+              }
+          }
+      },
     "ui-plugin-image": {
       "projectType": "library",
       "root": "libs/ui-plugin-image",
@@ -312,6 +351,45 @@
           }
         }
       }
+    },
+    "ui-plugin-knowledge-graph": {
+        "projectType": "library",
+        "root": "libs/ui-plugin-knowledge-graph",
+        "sourceRoot": "libs/ui-plugin-knowledge-graph/src",
+        "prefix": "symbiota2",
+        "targets": {
+            "build": {
+                "executor": "@nrwl/angular:package",
+                "options": {
+                    "tsConfig": "libs/ui-plugin-knowledge-graph/tsconfig.lib.json",
+                    "project": "libs/ui-plugin-knowledge-graph/ng-package.json"
+                },
+                "configurations": {
+                    "production": {
+                        "tsConfig": "libs/ui-plugin-knowledge-graph/tsconfig.lib.prod.json"
+                    }
+                }
+            },
+            "lint": {
+                "executor": "@nrwl/linter:eslint",
+                "options": {
+                    "lintFilePatterns": [
+                        "libs/ui-plugin-knowledge-graph/src/**/*.ts",
+                        "libs/ui-plugin-knowledge-graph/src/**/*.html"
+                    ]
+                }
+            },
+            "test": {
+                "executor": "@nrwl/jest:jest",
+                "outputs": [
+                    "coverage/libs/ui-plugin-knowledge-graph"
+                ],
+                "options": {
+                    "jestConfig": "libs/ui-plugin-knowledge-graph/jest.config.js",
+                    "passWithNoTests": true
+                }
+            }
+        }
     },
     "ui-plugin-taxonomy": {
       "projectType": "library",
@@ -599,6 +677,46 @@
         }
       }
     },
+      "api-plugin-i18n": {
+          "root": "libs/api-plugin-i19n",
+          "sourceRoot": "libs/api-plugin-i18n/src",
+          "projectType": "library",
+          "targets": {
+              "lint": {
+                  "executor": "@nrwl/linter:eslint",
+                  "options": {
+                      "lintFilePatterns": [
+                          "libs/api-plugin-i18n/**/*.ts"
+                      ]
+                  }
+              },
+              "test": {
+                  "executor": "@nrwl/jest:jest",
+                  "outputs": [
+                      "coverage/libs/api-plugin-ii18n"
+                  ],
+                  "options": {
+                      "jestConfig": "libs/api-plugin-i18n/jest.config.js",
+                      "passWithNoTests": true
+                  }
+              },
+              "build": {
+                  "executor": "@nrwl/node:package",
+                  "outputs": [
+                      "{options.outputPath}"
+                  ],
+                  "options": {
+                      "outputPath": "dist/libs/api-plugin-i18n",
+                      "tsConfig": "libs/api-plugin-i18n/tsconfig.lib.json",
+                      "packageJson": "libs/api-plugin-i18n/package.json",
+                      "main": "libs/api-plugin-i18n/src/index.ts",
+                      "assets": [
+                          "libs/api-plugin-i18n/*.md"
+                      ]
+                  }
+              }
+          }
+      },
     "api-plugin-image": {
       "root": "libs/api-plugin-image",
       "sourceRoot": "libs/api-plugin-image/src",

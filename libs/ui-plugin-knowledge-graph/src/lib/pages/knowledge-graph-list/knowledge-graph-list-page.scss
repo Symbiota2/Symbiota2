@@ -1,0 +1,33 @@
+#main{
+    margin: 1rem;
+}
+
+.mat-list .mat-list-item {
+    height: 10px; /* default is 72px */
+    font-size: 11px;
+}
+
+#buttons {
+    margin-top: 1rem;
+
+    button {
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+
+    button:first-child {
+        margin-left: 0;
+    }
+}
+
+.expansion-panel {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.symbiota2-panel-class {
+    width:20px;
+    max-width:20px;
+    font-size: 10px;
+}
+

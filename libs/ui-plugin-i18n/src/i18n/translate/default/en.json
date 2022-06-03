@@ -1,0 +1,6 @@
+{
+    "plugins.i18n.name": "i18n",
+    "i18n.editable.text.enter": "Enter the edited value",
+    "i18n.editable.text.cancel.button": "Cancel",
+    "i18n.editable.text.save.button": "Save"
+}

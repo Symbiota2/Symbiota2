@@ -14,6 +14,11 @@ This project was uses [Nx](https://nx.dev), [Angular](https://angular.io), and [
 
 [Tutorial on writing a Symbiota2 UI page](./docs/tutorials/simpleWebPage.md)
 
+[Documentation on language translation in Sybmiota2](./docs/translations.md)
+
+[Getting started using Elasticsearch in Sybmiota2](./docs/elasticsearch.md)
+
+
 How to get an instance running on a Linux box:
 
 1. Install docker (`sudo apt install docker-compose`)
@@ -22,7 +27,7 @@ How to get an instance running on a Linux box:
 4. Install nx development environment (`npm i npx`)
 5. Start Symbiota dependencies (`sudo docker-compose up -d`)
 6. Launch npm environment (`npx`)
-7. Launch Symbviota front-end server (`nx serve ui`)
+7. Launch Symbiota front-end server (`nx serve ui`)
 8. Go to the web-address that now appears in your terminal window. Congratulations! You're running Symbiota2!
 
 ## Environment
@@ -151,21 +156,27 @@ The UI uses [ngx-translate's http loader](http://www.ngx-translate.com/) to load
 
 1. Run `npm run i18n:init libs/<my-plugin>/src/i18n` to initialize an internationalization directory.
 
-2. Edit the internationalization files based on language
+2. Create a default language file `libs/<my-plugin>/src/i18n/translate/default`.
+The file should be a two letter language prefix (known to Google translate) with
+a suffix of `.json`.  For example if you want to use English as the default to 
+translate to other files, then create the file `libs/<my-plugin>/src/i18n/translate/default/en.json`
 
-3. Use ngx-translate's
+3. Edit the language file as needed.
+
+4. (See below about getting a Google API translation key first). Run `npm run i18n:translate libs/<my-plugin>` to translate the default language
+to the other languages in the project.  This will generate files in `npm run i18n:init libs/<my-plugin>/src/i18n/translate/default/generated`
+for the other languages in the project.
+Alternatively use ngx-translate's
    [translate pipe or translation service](https://github.com/ngx-translate/core#5-use-the-service-the-pipe-or-the-directive)
    to create language-independent text in the UI.
-4. Run `npm run i18n` to merge all core & plugin internationalization files into [apps/ui/src/assets/i18n](./apps/ui/src/assets/i18n)
+7. Run `npm run i18n` to merge all core & plugin internationalization files into [apps/ui/src/assets/i18n](./apps/ui/src/assets/i18n)
    where angular can serve them.
-
-Run `npm run i18n:clean` to delete all merged translation files.
 
 Symbiota2 has support for refreshing all translations using the Google Translate API provided by Google Cloud.
 
-1. Acquire the API key from S2 Google Drive folder to use the Google Cloud instance and place it into a file named "gCloudTranslateKey.txt" in the bin directory of symbiota2 project structure.
+1. Acquire the API key from S2 Google Drive folder to use the Google Cloud instance and place it into a file named `gCloudTranslateKey.txt` in the `bin` directory of symbiota2 project structure.
 
-2. Run `node perform-translations.js <plugin directory names>` where plugin directory names is a list of one or more of the following options:
+2. Run `npm run i18n:translate` to translate all files or `npm run i18n:translate <plugin directory names>` where plugin directory names is a list of one or more of the following options:
 
     - ui-plugin-collection
     - ui-plugin-image
@@ -176,7 +187,7 @@ Symbiota2 has support for refreshing all translations using the Google Translate
 
 Example command to translate the ui-plugin-collection and ui-plugin-image i18n files:
 
-`node perform-translations.js ui-plugin-collection ui-plugin-image`
+`npm run i18n:translate ui-plugin-collection ui-plugin-image`
 
 ## Build
 
