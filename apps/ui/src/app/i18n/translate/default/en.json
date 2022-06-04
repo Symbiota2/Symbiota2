@@ -12,6 +12,8 @@
 	"core.layout.header.topnav.home_link": "Home",
 	"core.layout.header.topnav.images_link": "Images",
 	"core.layout.header.topnav.login_link": "Login",
+    "core.layout.header.topnav.edit_button" : "Edit",
+    "core.layout.header.topnav.noedit_button" : "View",
 	"core.layout.header.topnav.logout_link": "Logout",
 	"core.layout.header.topnav.menu_button": "Menu",
 	"core.layout.header.topnav.my_profile_link": "My Profile",
