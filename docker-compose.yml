@@ -25,8 +25,8 @@ services:
     image: "quay.io/minio/minio:RELEASE.2021-09-24T00-24-24Z"
     container_name: s2-storage
     environment:
-      MINIO_ROOT_USER: ${SYMBIOTA2_MINIO_ROOT_USER:-symbiota2}
-      MINIO_ROOT_PASSWORD: ${SYMBIOTA2_MINIO_ROOT_PASSWORD:-password}
+      MINIO_ROOT_USER: ${SYMBIOTA2_STORAGE_USER:-symbiota2}
+      MINIO_ROOT_PASSWORD: ${SYMBIOTA2_STORAGE_PASSWORD:-password}
     command: "server /data --console-address ':9001'"
     volumes: ["s3:/data"]
     ports:
