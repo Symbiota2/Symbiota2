@@ -6,14 +6,4 @@ export class UpdateGraphQuery {
     @ApiProperty({ required: true })
     @IsOptional()
     name: string;
-
-    @ApiProperty({ required: false })
-    @IsBoolean()
-    @IsOptional()
-    publish: boolean;
-
-    @ApiProperty({ required: false })
-    @IsBoolean()
-    @IsOptional()
-    refresh: boolean;
 }

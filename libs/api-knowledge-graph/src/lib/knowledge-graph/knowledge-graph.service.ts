@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { StorageService } from '@symbiota2/api-storage';
+import { S3Object, StorageService } from '@symbiota2/api-storage';
 import {
     EntityMetadata,
     EntityTarget,
@@ -18,6 +18,7 @@ import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
 import { DataFactory } from 'rdf-data-factory';
 import { Readable } from 'stream';
+import { KnowledgeGraph } from './dto/knowledge-graph';
 // import { RDF } from '@rdfjs/data-model';
 // import { SerializerJsonLD } from '@rdfjs/serializer-jsonld'
 // import { DataFactory } from 'rdf-data-factory'
@@ -283,11 +284,11 @@ export class KnowledgeGraphService {
         return graphName;
     }
 
-    async listGraphs(): Promise<{ name: string }[]> {
+    async listGraphs(): Promise<KnowledgeGraph[]> {
         // Look at the metadata to build up a list of graph names
         const db = getConnection()
         const graphNames = []
-        db.entityMetadatas.forEach((entityMeta) => {
+        for (const entityMeta of db.entityMetadatas) {
             const nodeType = getKGNode(entityMeta.target)
 
             if (nodeType) {
@@ -296,19 +297,41 @@ export class KnowledgeGraphService {
                 // Process the object associated with the node type
                 // Is the current graph in this type?
                 let nodeValue = null
+                const objs = await this.knowledgeGraphListObjects()
+                const objMap = new Map<string, S3Object>()
+                for (const obj of objs) {
+                    objMap.set(obj.key, obj)
+                }
                 for (let i = 0; i < nodeType.length; i++) {
-                    if (!graphNames.includes(nodeType[i].graph)) {
-                        graphNames.push({name: nodeType[i].graph})
+                    const name = nodeType[i].graph
+                    const mapKey = KnowledgeGraphService.s3Key(name)
+                    if (objMap.has(mapKey)) {
+                        const obj = objMap.get(mapKey)
+                        graphNames.push(new KnowledgeGraph({
+                            name: name,
+                            updatedAt: obj.updatedAt,
+                            size: obj.size
+                        }))
+                    } else {
+                        graphNames.push(new KnowledgeGraph({
+                            name: name,
+                            updatedAt: null,
+                            size: null
+                        }))
                     }
                 }
             }
-        })
+        }
 
         return graphNames
     }
 
     async knowledgeGraphExists(graphName: string): Promise<boolean> {
         return await this.storage.hasObject(KnowledgeGraphService.s3Key(graphName))
+    }
+
+    async knowledgeGraphListObjects(): Promise<S3Object[]> {
+        return await this.storage.listObjects(KnowledgeGraphService.S3_PREFIX)
     }
 
     async publishKnowledgeGraph(graphName: string): Promise<void> {
@@ -328,8 +351,10 @@ export class KnowledgeGraphService {
         return null;
     }
 
-    private retrieveGraph(graphName: string): ReadableStream {
-        return this.storage.getObject(graphName);
+    public deleteKnowledgeGraph(graphName: string) {
+        const objectKey = KnowledgeGraphService.s3Key(graphName);
+
+        return this.storage.deleteObject(objectKey);
     }
 
     private async updateKnowledgeGraphTags(graphName: string, tags: Record<string, string>): Promise<void> {

@@ -6,12 +6,6 @@ import { KnowledgeGraphQueryBuilder } from './knowledge-graph-query-builder'
 import { KNOWLEDGE_GRAPH_API_BASE } from '../../routes';
 import { KnowledgeGraphListItem } from '../../dto';
 
-interface FindAllParams {
-    imageIDs: number[]
-    taxonIDs: number[]
-    limit?: number
-}
-
 @Injectable()
 export class KnowledgeGraphService {
     private jwtToken = this.user.currentUser.pipe(map((user) => user.token))
@@ -41,16 +35,14 @@ export class KnowledgeGraphService {
     }
 
     /**
-     * sends request to api to create an image record
-     * @param image - the image to create
-     * @returns Observable of response from api casted as `ImageListItem`
-     * will be the created taxon
+     * sends request to api to list all of the knowledge graphs
+     * @param none - no params
+     * @returns Observable of response from api casted as KnowledgeGraphListItem[]
      * @returns `of(null)` if does not have editing permission or api errors
      */
-    findAll(params?: FindAllParams): Observable<KnowledgeGraphListItem[]> {
+    list(): Observable<KnowledgeGraphListItem[]> {
         const url = this.createQueryBuilder()
             .findAll()
-            .imageIDs(params? params.imageIDs : [])
             .build()
 
         const query = this.apiClient.queryBuilder(url).get().build();
@@ -60,6 +52,75 @@ export class KnowledgeGraphService {
                     return KnowledgeGraphListItem.fromJSON(o);
                 }))
             )
+    }
+
+    /**
+     * sends request to api to build a graph
+     * @param name - the graph to build
+     * @returns Observable of response from api casted as `string`
+     * @returns `of(null)` if does not have editing permission or api errors
+     */
+    build(name: string): Observable<string> {
+
+        const url = this.createQueryBuilder().create()
+            .name(name)
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const query = this.apiClient.queryBuilder(url)
+                    .addJwtAuth(token)
+                    .post()
+                    .build()
+
+                return this.apiClient.send(query).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((response) => {
+                        if (response === null) {
+                            return null
+                        }
+                        return "done";
+                    })
+                )
+            })
+        )
+    }
+
+
+    /**
+     * sends request to api to delete a graph
+     * @param name - the name of the graph to delete
+     * @returns Observable of response from api casted as `string`
+     * @returns `of(null)` if taxon does not exist or does not have editing permission or api errors
+     */
+    delete(name): Observable<string> {
+        const url = this.createQueryBuilder()
+            .delete()
+            .name(name)
+            .build()
+
+        return this.jwtToken.pipe(
+            switchMap((token) => {
+                const req = this.apiClient
+                    .queryBuilder(url)
+                    .delete()
+                    .addJwtAuth(token)
+                    .build()
+
+                return this.apiClient.send(req).pipe(
+                    catchError((e) => {
+                        console.error(e)
+                        return of(null)
+                    }),
+                    map((blockJson) => {
+                        return "success"
+                    })
+                )
+            })
+        )
     }
 
 }

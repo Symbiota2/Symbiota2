@@ -1,1 +1,1 @@
-export const Q_PARAM_IDS = 'id[]'
+export const Q_PARAM_NAME = 'name'

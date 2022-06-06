@@ -42,6 +42,12 @@ import { CollectionPlugin } from '@symbiota2/ui-plugin-collection';
 import {
     KNOWLEDGE_GRAPH_LIST_ROUTE
 } from './routes';
+import {
+    BuildGraphDialogComponent,
+    DeleteGraphDialogComponent,
+    DownloadGraphDialogComponent,
+    RebuildGraphDialogComponent
+} from './components';
 
 @NgModule({
     imports: [
@@ -78,6 +84,10 @@ import {
     ],
     declarations: [
         KnowledgeGraphListPage,
+        DeleteGraphDialogComponent,
+        BuildGraphDialogComponent,
+        RebuildGraphDialogComponent,
+        DownloadGraphDialogComponent,
 //        FilterPipe
     ],
     providers: [

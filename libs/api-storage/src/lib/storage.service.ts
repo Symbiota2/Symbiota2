@@ -11,7 +11,7 @@ import {
     PutObjectRequest, PutObjectTaggingRequest, Tag
 } from 'aws-sdk/clients/s3';
 
-interface S3Object {
+export interface S3Object {
     key: string;
     updatedAt: Date;
     size: number;

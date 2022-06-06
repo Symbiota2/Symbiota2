@@ -6,37 +6,10 @@ import { filter } from 'rxjs/operators';
 import { AlertService, ApiClientService, UserService } from '@symbiota2/ui-common';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { KNOWLEDGE_GRAPH_API_BASE } from '../../routes';
-
-export interface ImageInfo {
-    id: number
-    taxonID: number | null
-    url: string
-    thumbnailUrl: string
-    originalUrl: string
-    archiveUrl: string
-    photographerName: string
-    photographerUID: number | null
-    type: string
-    format: string
-    caption: string
-    owner: string
-    sourceUrl: string
-    referenceUrl: string
-    copyright: string
-    rights: string
-    accessRights: string
-    locality: string
-    occurrenceID: number | null
-    notes: string
-    anatomy: string
-    username: string
-    sourceIdentifier: string
-    mediaMD5: string
-    dynamicProperties: string
-    sortSequence: number
-    initialTimestamp: Date
-}
+import { KnowledgeGraphListItem } from '../../dto';
+import { EditableTextDialogComponent } from '@symbiota2/ui-plugin-i18n';
+import { DeleteGraphDialogComponent } from '../../components/delete-graph-dialog/delete-graph-dialog.component';
+import { BuildGraphDialogComponent, DownloadGraphDialogComponent, RebuildGraphDialogComponent } from '../../components';
 
 @Component({
     selector: 'knowledge-graph-list',
@@ -45,12 +18,10 @@ export interface ImageInfo {
 })
 
 export class KnowledgeGraphListPage implements OnInit {
-    imageID: string
-
     userID : number = null
     userCanEdit: boolean = false
-
-    imageAPIUrl = null
+    graphs : KnowledgeGraphListItem[] = []
+    graphsToBuild : KnowledgeGraphListItem[] = []
 
     constructor(
         private readonly userService: UserService,
@@ -59,15 +30,23 @@ export class KnowledgeGraphListPage implements OnInit {
         private router: Router,
         private formBuilder: FormBuilder,
         private readonly translate: TranslateService,
-        public dialog: MatDialog,
-        private readonly apiClient: ApiClientService,
-        private currentRoute: ActivatedRoute
-    ) { }
+        public dialog: MatDialog
+    ) {
+    }
 
     /*
     Called when Angular starts
     */
     ngOnInit() {
+        this.knowledgeGraphService.list().subscribe((g) => {
+            g.forEach((graph) => {
+                if (graph.updatedAt == null) {
+                    this.graphsToBuild.push(graph)
+                } else {
+                    this.graphs.push(graph)
+                }
+            })
+        })
         this.userService.currentUser
             .pipe(filter((user) => user !== null))
             .subscribe((user) => {
@@ -76,6 +55,61 @@ export class KnowledgeGraphListPage implements OnInit {
             })
     }
 
+    doDownload(name) {
+        const dialogRef = this.dialog.open(DownloadGraphDialogComponent, {
+            width: '90%',
+            data: name,
+
+        })
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result.event != 'zzzCancel') {
+                console.log("downloading the graph " + name)
+            }
+        })
+    }
+
+    doDelete(name) {
+        const dialogRef = this.dialog.open(DeleteGraphDialogComponent, {
+            width: '90%',
+            data: name,
+
+        })
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result.event != 'zzzCancel') {
+                console.log("deleting the graph " + name)
+            }
+        })
+    }
+
+    doBuild(name) {
+        const dialogRef = this.dialog.open(BuildGraphDialogComponent, {
+            width: '90%',
+            data: name,
+
+        })
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result.event != 'zzzCancel') {
+                console.log("building the graph " + name)
+            }
+        })
+    }
+
+    doRebuild(name) {
+        const dialogRef = this.dialog.open(RebuildGraphDialogComponent, {
+            width: '90%',
+            data: name,
+
+        })
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result.event != 'zzzCancel') {
+                console.log("rebuilding the graph " + name)
+            }
+        })
+    }
 
     /*
     Internal routine to encapsulate the show error message at the bottom in case something goes awry
