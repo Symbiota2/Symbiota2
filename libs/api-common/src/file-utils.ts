@@ -10,6 +10,7 @@ import { join as pathJoin, basename } from 'path';
 import * as readline from 'readline';
 
 const DEFAULT_ITER_ROWS = 1024;
+const tabStr = "\t";
 export type InsideTempDirCallback<T> = (string) => Promise<T>;
 
 export async function getCSVFields(csvFile: string): Promise<string[]> {
@@ -21,6 +22,25 @@ export async function getCSVFields(csvFile: string): Promise<string[]> {
                 stream.destroy();
                 resolve(headers);
             }).on('error', (err) => {
+                reject(err);
+            });
+    });
+}
+
+export async function getCSVFieldsTabSeperator(csvFile: string): Promise<string[]> {
+    console.log("Called tab service.")
+    return new Promise((resolve, reject) => {
+        const stream = fs.createReadStream(csvFile);
+        stream.pipe(csv({
+            separator: tabStr
+        }))
+            .on('headers', (headers) => {
+                console.log("Parsing with character")
+                stream.pause();
+                stream.destroy();
+                resolve(headers);
+            }).on('error', (err) => {
+                console.log("Parsing error: " + err);
                 reject(err);
             });
     });
@@ -47,9 +67,7 @@ export async function* csvIterator<RowType>(filePath: string, bufSize = DEFAULT_
             rowBuffer = [];
             stream.resume();
         }
-        else {
-            rowBuffer.push(row);
-        }
+        rowBuffer.push(row);
     }
     yield rowBuffer;
 }
@@ -70,9 +88,7 @@ export async function* csvIteratorWithTrimValues<RowType>(filePath: string, bufS
             rowBuffer = [];
             stream.resume();
         }
-        else {
-            rowBuffer.push(row);
-        }
+        rowBuffer.push(row);
     }
     yield rowBuffer;
 }
@@ -100,9 +116,7 @@ export async function* objectIterator<RowType>(filePath: string, bufSize = DEFAU
             rowBuffer = []
             stream.resume()
         }
-        else {
-            rowBuffer.push(obj)
-        }
+        rowBuffer.push(obj)
     }
 
     yield rowBuffer

@@ -201,6 +201,23 @@
                         <mat-option value="es">Spanish</mat-option>
                         <mat-option value="ur">Urdu</mat-option>
                     </mat-select>
+
+                    <div *ngIf='editing' fxLayoutGap="0.5rem">
+                        <button mat-button (click)="turnOffEditing()">
+                            {{
+                            'core.layout.header.topnav.edit_button'
+                                | translate
+                            }}
+                        </button>
+                    </div>
+                    <div *ngIf='!editing' fxLayoutGap="0.5rem">
+                        <button mat-button (click)="turnOnEditing()">
+                            {{
+                            'core.layout.header.topnav.noedit_button'
+                                | translate
+                            }}
+                        </button>
+                    </div>
                 </div>
             </div>
         </mat-toolbar>

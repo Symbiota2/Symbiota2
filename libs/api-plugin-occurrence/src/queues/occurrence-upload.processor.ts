@@ -10,7 +10,7 @@ import { Inject, Logger } from '@nestjs/common';
 import {
     CollectionStat,
     Occurrence,
-    OccurrenceUpload, TaxaEnumTreeEntry, Taxon, TaxonomicUnit,
+    OccurrenceUpload, TaxaEnumTreeEntry, Taxon, TaxonomicAuthority, TaxonomicStatus, TaxonomicUnit,
     UserNotification
 } from '@symbiota2/api-database';
 import { DeepPartial, Repository } from 'typeorm';
@@ -20,6 +20,10 @@ import {
     CollectionStatsUpdateJob,
     QUEUE_ID_COLLECTION_STATS_UPDATE
 } from '@symbiota2/api-plugin-collection';
+import { TaxonFindByMatchingParams } from '../../../api-plugin-taxonomy/src/taxon/dto/taxon-find-parms';
+import { ApiProperty } from '@nestjs/swagger';
+import { TaxonInputDto } from '../../../api-plugin-taxonomy/src/taxon/dto/TaxonInputDto';
+import { TaxonomicStatusInputDto } from '../../../api-plugin-taxonomy/src/taxonomicStatus/dto/TaxonomicStatusInputDto';
 
 export interface OccurrenceUploadJob {
     uid: number;
@@ -31,6 +35,7 @@ export interface OccurrenceUploadJob {
 export class OccurrenceUploadProcessor {
     private processed = 0;
     private readonly logger = new Logger(OccurrenceUploadProcessor.name);
+    private taxonomicAuthorityID
 
     constructor(
         @Inject(OccurrenceUpload.PROVIDER_ID)
@@ -43,12 +48,18 @@ export class OccurrenceUploadProcessor {
         private readonly collectionStats: Repository<CollectionStat>,
         @Inject(Taxon.PROVIDER_ID)
         private readonly taxa: Repository<Taxon>,
+        @Inject(TaxonomicStatus.PROVIDER_ID)
+        private readonly taxonStatus: Repository<Taxon>,
         @Inject(TaxonomicUnit.PROVIDER_ID)
         private readonly taxonRanks: Repository<TaxonomicUnit>,
         @Inject(TaxaEnumTreeEntry.PROVIDER_ID)
         private readonly taxaEnumTree: Repository<TaxaEnumTreeEntry>,
         @InjectQueue(QUEUE_ID_COLLECTION_STATS_UPDATE)
-        private readonly collectionStatsUpdateQueue: Queue<CollectionStatsUpdateJob>) { }
+        private readonly collectionStatsUpdateQueue: Queue<CollectionStatsUpdateJob>)
+    {
+        // const authority= new TaxonomicAuthority()
+        // this.taxonomicAuthorityID = authority.getDefaultAuthorityID()
+    }
 
     // TODO: Wrap in a transaction? Right now each chunk goes straight to the database until a failure occurs
     /**
@@ -56,6 +67,8 @@ export class OccurrenceUploadProcessor {
      */
     @Process()
     async upload(job: Job<OccurrenceUploadJob>): Promise<void> {
+        const authority= new TaxonomicAuthority()
+        this.taxonomicAuthorityID = await authority.getDefaultAuthorityID()
         // Count the number of processed occurrences
         this.processed = 0;
 
@@ -132,7 +145,7 @@ export class OccurrenceUploadProcessor {
             }
 
             // Field the database field that cooresponds to the user-defined csv field
-            // that uniquely identifies each row in the csv. This could be something like 'id' or 
+            // that uniquely identifies each row in the csv. This could be something like 'id' or
             // 'catalogNumber'.
             const dbIDField = upload.fieldMap[upload.uniqueIDField];
             const currenceOccurrenceUniqueValue = occurrenceData[dbIDField];
@@ -161,7 +174,16 @@ export class OccurrenceUploadProcessor {
             // occurrence
             // So right now any occurrence csv uploads WILL NOT be properly linked to Taxonomy, and not
             // properly searchable as a result
-            delete occurrenceData['taxonID'];
+            // delete occurrenceData['taxonID'];
+            const taxonParams = new TaxonFindByMatchingParams()
+            if (occurrenceData['scientificName'] != null && occurrenceData['scientificName'].trim() != "") {
+                taxonParams.scientificName = occurrenceData['scientificName']
+                taxonParams.genus = occurrenceData['genus']
+                taxonParams.family = occurrenceData['family']
+                taxonParams.taxonAuthorityID = this.taxonomicAuthorityID
+                taxonParams.kingdom = occurrenceData["kingdom"]
+                occurrenceData['taxonID'] = await this.findOrCreateByMatching(taxonParams)
+            }
 
             // Update
             if (dbOccurrence) {
@@ -187,6 +209,159 @@ export class OccurrenceUploadProcessor {
         let logMsg = `Processing uploads for collectionID ${job.data.collectionID} `;
         logMsg += `(${new Intl.NumberFormat().format(this.processed)} processed)...`;
         this.logger.log(logMsg);
+    }
+
+    /**
+     * Find the taxons that match a given plethora of information about the taxon
+     * Set find params using the 'TaxonFindNamesParams'
+     * @param params - the 'TaxonFindByMatchingParams'
+     * @returns Observable of response from api casted as `number`
+     * will be the found taxon
+     * @returns `of(null)` if api errors
+     * @see Taxon
+     * @see TaxonFindByMatchingParams
+     */
+    private async findOrCreateByMatching(params: TaxonFindByMatchingParams) {
+        const { ...qParams } = params
+        let taxons = []
+        //if (qParams.taxonAuthorityID) {
+            // Have to use the query builder since where filter on nested relations does not work
+        //    const qb = this.taxa.createQueryBuilder('o')
+        //        .innerJoin('o.taxonStatuses', 'c')
+        //        .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
+        //        .andWhere('o.scientificName = :sciname', {sciname: params.scientificName})
+//
+        //    taxons = await qb.getMany()
+        //} else {
+            taxons = await this.taxa.find({ where: { scientificName: params.scientificName } })
+        //}
+
+        // Check to see how many we found
+        if (taxons.length == 1) {
+            // Found exactly one, good, let's use it
+            return taxons[0].id
+        } else if (taxons.length == 0) {
+            // Create
+            return this.createTaxon(params)
+        } else {
+            // Found more than one.  Let's process these to narrow to at most one.
+            // Fist, use kingdom
+            if (params.kingdom) {
+                taxons = taxons.filter((taxon) => {
+                    return taxon.kingdom == params.kingdom
+                })
+                if (taxons.length == 1) {
+                    // Found exactly one, good, let's use it
+                    return taxons[0].id
+                } else if (taxons.length == 0) {
+                    // Create
+                    return this.createTaxon(params)
+                }
+            }
+
+            // Next try the family
+            if (params.family) {
+                taxons = taxons.filter((taxon) => {
+                    return taxon.family == params.family
+                })
+                if (taxons.length == 1) {
+                    // Found exactly one, good, let's use it
+                    return taxons[0].id
+                } else if (taxons.length == 0) {
+                    // Create
+                    return this.createTaxon(params)
+                }
+            }
+
+            // Always more than one match
+            return null
+
+        }
+    }
+
+    private async createTaxon(params) {
+        const taxon = new TaxonInputDto(
+            {
+                kingdomName: params.kingdom, // get kingdom
+                rankID: 0, // get species rank
+                scientificName: params.scientificName, // get scientific name
+                author: "",
+                phyloSortSequence: 50,
+                status: "",
+                source: "",
+                notes: "",
+                hybrid: "",
+                securityStatus: 0,
+                lastModifiedUID: null,
+                lastModifiedTimestamp: new Date(),
+                initialTimestamp: new Date()
+            }
+        )
+
+        const block = await this.taxa.create(taxon)
+
+        const names = params.scientificName.split(' ')
+
+
+        // Let's look up the genus to get the parent
+        let taxons = []
+        if (params.genus) {
+            taxons = await this.taxa.find({ where: { scientificName: params.genus } })
+        } else {
+            taxons = await this.taxa.find({ where: { scientificName: names[0] } })
+        }
+        if (taxons.length == 0 && params.family) {
+            taxons = await this.taxa.find({ where: { scientificName: params.family } })
+        }
+
+        if (taxons.length == 0) {
+            // We don't have a parent, skip the rest
+            return
+        }
+
+        // Even if we found two or more, just get the first one to be the parent
+        // No way to further disambiguate
+        const parentTaxon = taxons[0]
+
+        // Save the taxon
+        // First check that the kingdom is that of its parent
+        if (block.kingdom == null || block.kingdom == undefined) {
+            block.kingdom = parentTaxon.kingdomName
+        } else {
+            if (block.kingdom != parentTaxon.kingdomName) {
+                // return, don't add the status, not the parent!
+                return
+            }
+        }
+        if (names.length == 1) {
+            await block.setRank("Genus")
+        } else if (names.length == 2) {
+            await block.setRank("Species")
+        } else if (names.length == 3) {
+            await block.setRank("Subspecies")
+        } else {
+            await block.setRank("Variety")
+        }
+        const myTaxon = await this.taxa.save(block)
+
+        const status = new TaxonomicStatusInputDto({
+            taxonID: myTaxon.id,
+            taxonIDAccepted: myTaxon.id,
+            taxonAuthorityID: params.taxonAuthorityID,
+            parentTaxonID: parentTaxon.id,
+            hierarchyStr: null,
+            family: params.family,
+            unacceptabilityReason: null,
+            notes: null,
+            initialTimestamp: new Date()
+        })
+
+        const myStatus = await this.taxonStatus.create(status)
+        await this.taxonStatus.save(myStatus)
+
+        // Let's take care of the taxa enum tree
+        await myTaxon.setAncestors(this.taxaEnumTree, this.taxonomicAuthorityID, parentTaxon)
+
     }
 
     private async onCSVComplete(uid: number, collectionID: number) {

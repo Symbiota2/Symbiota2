@@ -8,20 +8,18 @@ import {
     TaxonomyUploadFieldMap,
     TaxonVernacular
 } from '@symbiota2/api-database';
-import { In, Like, Repository, Raw, getCustomRepository } from 'typeorm';
+import { Repository, Raw } from 'typeorm';
 import { BaseService, csvIterator } from '@symbiota2/api-common';
-import { DwCArchiveParser, dwcCoreID, getDwcField, isDwCID } from '@symbiota2/dwc';
-import { TaxonFindAllParams, TaxonFindNamesParams } from './dto/taxon-find-parms';
+import { DwCArchiveParser, getDwcField } from '@symbiota2/dwc';
+import { TaxonFindAllParams, TaxonFindByMatchingParams, TaxonFindNamesParams } from './dto/taxon-find-parms';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { QUEUE_ID_TAXONOMY_UPLOAD_CLEANUP } from '../queues/taxonomy-upload-cleanup.queue';
 import { TaxonomyUploadCleanupJob } from '../queues/taxonomy-upload-cleanup.processor';
 import { QUEUE_ID_TAXONOMY_UPLOAD } from '../queues/taxonomy-upload.queue';
 import { TaxonomyUploadJob } from '../queues/taxonomy-upload.processor';
-//import fs, { createReadStream } from 'fs';
 import { StorageService } from '@symbiota2/api-storage';
 import path from 'path';
-//import { ElasticsearchRepository } from './elasticsearch.repository';
 
 @Injectable()
 export class TaxonService extends BaseService<Taxon>{
@@ -32,7 +30,7 @@ export class TaxonService extends BaseService<Taxon>{
     public static readonly problemParentNamesPath = path.join(TaxonService.dataFolderPath, "problemParentNames")
     public static readonly problemAcceptedNamesPath = path.join(TaxonService.dataFolderPath, "problemAcceptedNames")
     public static readonly problemRanksPath = path.join(TaxonService.dataFolderPath, "problemRanks")
-    public static readonly skippedTaxonsDueToMultipleMatchPath = path.join(TaxonService.dataFolderPath, "taxonsMultipleMath")
+    public static readonly skippedTaxonsDueToMultipleMatchPath = path.join(TaxonService.dataFolderPath, "taxonsMultipleMatch")
     public static readonly skippedTaxonsDueToMismatchRankPath = path.join(TaxonService.dataFolderPath, "taxonsMismatch")
     public static readonly skippedTaxonsDueToMissingNamePath = path.join(TaxonService.dataFolderPath, "taxonsMissing")
 
@@ -87,12 +85,14 @@ export class TaxonService extends BaseService<Taxon>{
         const qb = this.taxonRepo.createQueryBuilder('o')
             .where("true")
 
+        /*  Since we are looking for names, we don't care about the authority
         if (qParams.taxonAuthorityID) {
             // Have to use query builder since filter on nested relations does not work
             qb.innerJoin('o.taxonStatuses', 'c')
                 .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
 
         }
+         */
 
         if (qParams.id) {
             qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
@@ -139,63 +139,6 @@ export class TaxonService extends BaseService<Taxon>{
     }
 
     /**
-     * Find all of the taxons possibly using an array of ids and
-     * a taxonomic authority ID, and include the authors with the result
-     * Can also limit the number fetched and use an offset.
-     * Set find params using the 'TaxonFindNamesParams'
-     * @param params - the 'TaxonFindNamesParams'
-     * @returns Observable of response from api casted as `Taxon[]`
-     * will be the found statements
-     * @returns `of(null)` if api errors
-     * @see Taxon
-     * @see TaxonFindNamesParams
-     */
-    /*
-    async findAllScientificNamesPlusAuthors(params?: TaxonFindNamesParams): Promise<Taxon[]> {
-        const { limit,...qParams } = params
-        if (qParams.taxonAuthorityID) {
-            const qb = this.taxonRepo.createQueryBuilder('o')
-                .select([
-                    'o.scientificName',
-                    'o.id',
-                    'o.author'
-                ])
-                .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
-                .innerJoin('o.taxonStatuses', 'c')
-                .where(
-                    'c.taxonAuthorityID = :authorityID',
-                    { authorityID: params.taxonAuthorityID }
-                )
-
-            if (qParams.id) {
-                qb.andWhere(
-                    'o.id IN (:...taxonIDs)',
-                    {taxonIDs: params.id}
-                )
-            }
-
-            if (qParams.partialName) {
-                qb.andWhere(
-                    'o.scientificName LIKE :name',
-                    {name: params.partialName + '%'}
-                )
-            }
-            return await qb.getMany()
-        } else {
-            return (qParams.id)?
-                await this.taxonRepo.find({
-                    select: ["scientificName", "id", "author"],
-                    where: { id: In(params.id) },
-                    take: TaxonFindAllParams.MAX_LIMIT})
-                : await this.taxonRepo.find({
-                    select: ["scientificName", "id", "author"],
-                    take: TaxonFindAllParams.MAX_LIMIT
-                })
-        }
-    }
-     */
-
-    /**
      * Find all of the scientific names of taxons possibly using filters in TaxonFindNamesParams
      * Set find params using the 'TaxonFindNamesParams'
      * @param params - the 'TaxonFindNamesParams'
@@ -218,10 +161,12 @@ export class TaxonService extends BaseService<Taxon>{
             .where("true")
 
         // See if we need to join with taxonomic status table
+        /*
         if (qParams.taxonAuthorityID) {
             qb.leftJoin('o.taxonStatuses', 'c')
                 .andWhere('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
         }
+         */
 
         // See if we need to join with images table
         if (qParams.withImages) {
@@ -247,208 +192,6 @@ export class TaxonService extends BaseService<Taxon>{
         return await qb.getMany()
     }
 
-    /**
-     * Find all of the scientific names of taxons but only if the name has an image
-     * possibly using an array of ids and a taxonomic authority ID
-     * Set find params using the 'TaxonFindNamesParams'
-     * @param params - the 'TaxonFindNamesParams'
-     * @returns Observable of response from api casted as `Taxon[]`
-     * will be the found statements
-     * @returns `of(null)` if api errors
-     * @see Taxon
-     * @see TaxonFindNamesParams
-     */
-    /*`
-    async findAllScientificNamesWithImages(params?: TaxonFindNamesParams): Promise<Taxon[]> {
-        const { limit,...qParams } = params
-
-        if (qParams.taxonAuthorityID) {
-            const qb = this.taxonRepo.createQueryBuilder('o')
-                .select([
-                    'o.id','o.scientificName'
-                ])
-                .distinct(true)
-                .limit(params.limit || TaxonFindNamesParams.MAX_LIMIT) // TODO: set up a better way to lmiit
-                .innerJoin('o.taxonStatuses', 'c')
-                .innerJoin('o.images', 'k')
-                .where('c.taxonAuthorityID = :authorityID', { authorityID: params.taxonAuthorityID })
-
-            if (qParams.partialName) {
-                qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
-            }
-            if (qParams.id) {
-                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
-            }
-            return await qb.getMany()
-        } else {
-            return (qParams.id)?
-                await this.taxonRepo.find({
-                    select: ["id","scientificName"],
-                    relations: ["images"],
-                    where: { id: In(params.id) },
-                    take: TaxonFindAllParams.MAX_LIMIT})
-                : await this.taxonRepo.find({
-                    select: ["id","scientificName"],
-                    relations: ["images"],
-                    take: TaxonFindAllParams.MAX_LIMIT
-                })
-        }
-    }
-*/
-
-    /**
-     * Project the sciname from the taxa table for the rank of family using possibly
-     * a list of taxaIDs and an authority ID
-     * Set find params using the 'TaxonFindNamesParams'
-     * @param params - the 'TaxonFindNamesParams'
-     * @returns Observable of response from api casted as `Taxon[]`
-     * will be the found statements
-     * @returns `of(null)` if api errors
-     * @see Taxon
-     * @see TaxonFindNamesParams
-     */
-    /*
-    async findFamilyNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
-        const { limit,...qParams } = params
-
-        if (qParams.taxonAuthorityID) {
-            const qb = this.taxonRepo.createQueryBuilder('o')
-                .select([
-                    'o.scientificName', 'o.id'
-                ])
-                .innerJoin('o.taxonStatuses', 'c')
-                .where('c.taxonAuthorityID = :authorityID',
-                    { authorityID: params.taxonAuthorityID })
-                .andWhere('c.rankID = :rankID',
-                    { rankID: 140 }) // [TODO Get the actual family rank id]
-
-            if (qParams.partialName) {
-                qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
-            }
-            if (qParams.id) {
-                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
-            }
-            return await qb.getMany()
-        } else {
-            return (qParams.id)?
-                await this.taxonRepo.find({
-                    select: ["scientificName", "id"],
-                    where: { id: In(params.id), rankID: 140 } // [TODO Get the actual family rank id]
-                })
-                : await this.taxonRepo.find({
-                    select: ["scientificName","id"],
-                    where: { rankID: 140 } // [TODO Get the actual family rank id]
-                })
-        }
-    }
-*/
-    /**
-     * Project the sciname from the taxa table for the rank of genus using possibly
-     * a list of taxaIDs and an authority ID
-     * Set find params using the 'TaxonFindNamesParams'
-     * @param params - the 'TaxonFindNamesParams'
-     * @returns Observable of response from api casted as `Taxon[]`
-     * will be the found statements
-     * @returns `of(null)` if api errors
-     * @see Taxon
-     * @see TaxonFindNamesParams
-     */
-    /*
-    async findGenusNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
-        const { limit,...qParams } = params
-
-        if (qParams.taxonAuthorityID) {
-            const qb = this.taxonRepo.createQueryBuilder('o')
-                .select([
-                    'o.scientificName','o.id'
-                ])
-                .innerJoin('o.taxonStatuses', 'c')
-                .where('c.taxonAuthorityID = :authorityID',
-                    { authorityID: params.taxonAuthorityID })
-                .andWhere('c.rankID = :rankID',
-                    { rankID: 180 }) // [TODO Get the actual genus rank id]
-
-            if (qParams.partialName) {
-                qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
-            }
-            if (qParams.id) {
-                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
-            }
-            return await qb.getMany()
-        } else {
-            return (qParams.id)?
-                await this.taxonRepo.find({
-                    select: ["scientificName", "id"],
-                    where: { id: In(params.id), rankID: 180 } // [TODO Get the actual genus rank id]
-                })
-                : await this.taxonRepo.find({
-                    select: ["scientificName","id"],
-                    where: { rankID: 180 } // [TODO Get the actual genus rank id]
-                })
-        }
-    }
-*/
-    /**
-     * Project the sciname from the taxa table for the rank of species using possibly
-     * a list of taxaIDs and an authority ID
-     * Set find params using the 'TaxonFindNamesParams'
-     * @param params - the 'TaxonFindNamesParams'
-     * @returns Observable of response from api casted as `Taxon[]`
-     * will be the found statements
-     * @returns `of(null)` if api errors
-     * @see Taxon
-     * @see TaxonFindNamesParams
-     */
-    /*
-    async findSpeciesNames(params?: TaxonFindNamesParams): Promise<Taxon[]> {
-        const { limit,...qParams } = params
-
-        if (qParams.taxonAuthorityID) {
-            const qb = this.taxonRepo.createQueryBuilder('o')
-                .select([
-                    'o.scientificName', 'o.id'
-                ])
-                .innerJoin('o.taxonStatuses', 'c')
-                .where('c.taxonAuthorityID = :authorityID',
-                    { authorityID: params.taxonAuthorityID })
-                .andWhere('c.rankID = :rankID',
-                    { rankID: 220 }) // [TODO Get the actual genus rank id]
-
-            if (qParams.partialName) {
-                qb.andWhere('o.scientificName LIKE :name', {name: params.partialName + '%'})
-            }
-            if (qParams.id) {
-                qb.andWhere('o.id IN (:...taxonIDs)', {taxonIDs: params.id})
-            }
-            return await qb.getMany()
-        } else {
-            return (qParams.id)?
-                (qParams.partialName)?
-                    await this.taxonRepo.find({
-                        select: ["scientificName", "id"],
-                        where: { id: In(params.id),
-                            rankID: 220, // [TODO Get the actual genus rank id]
-                            scientificName: Like(params.partialName + '%') }
-                    })
-                    : await this.taxonRepo.find({
-                        select: ["scientificName", "id"],
-                        where: { id: In(params.id), rankID: 220 } // [TODO Get the actual genus rank id]
-                    })
-                : (qParams.partialName)?
-                    await this.taxonRepo.find({
-                        select: ["scientificName","id"],
-                        where: {
-                            rankID: 220, // [TODO Get the actual genus rank id]
-                            scientificName: Like(params.partialName + '%')
-                        }
-                    })
-                    : await this.taxonRepo.find({
-                        select: ["scientificName","id"],
-                        where: { rankID: 220 } // [TODO Get the actual genus rank id]
-                    })
-        }
-    }
-*/
     /**
      * Find the taxons that match a given scientific name, possibly using an authority id
      * Set find params using the 'TaxonFindNamesParams'
@@ -627,35 +370,25 @@ export class TaxonService extends BaseService<Taxon>{
             ]
 
         const myList = []
-        for (const key in result) {
-            await myList.push(this.getStringData(TaxonService.s3Key(key)))
+        for (const key of result) {
+            const row = await TaxonService.s3Key(key)
+            const value = await this.getStringData(row)
+            if (value != null) {
+                myList.push(value)
+            }
         }
-        /*
-        await result.forEach((key) => {
-            myList.push(this.getStringData(TaxonService.s3Key(key)))
-        })
-
-        result.map((key) => {
-            this.getStringData(TaxonService.s3Key(key))
-        })
-
-         */
         return myList
     }
 
     private async getStringData(key): Promise<string> {
-        // console.log(" get string data " + key)
         // See if there exists such an object
         const exists = await this.storageService.hasObject(key)
         if (!exists) {
-            return ""
+            return null
         }
-
-        // console.log(" here ")
 
         // Fetch the object if it exists
         const buffer = await this.storageService.getData(key)
-        // console.log(" buffer is " + buffer.toString())
         return buffer.toString()
     }
 
@@ -713,7 +446,6 @@ export class TaxonService extends BaseService<Taxon>{
         let nullRankNames = 0
         let totalRecords = 0
 
-        // console.log("sciname field is " + sciNameField)
         try {
             for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
                 for (const row of batch) {
@@ -772,10 +504,6 @@ export class TaxonService extends BaseService<Taxon>{
         const problemAcceptedNames = []
         const problemRanks = []
 
-        //const problemParentNamesStream = fs.createWriteStream(problemParentNamesPath)
-        //const problemAcceptedNamesStream = fs.createWriteStream(problemAcceptedNamesPath)
-        //const problemRanksStream = fs.createWriteStream(problemRanksPath)
-
         // Check to see if the parent names exist
         for (let key of parentTaxons.keys()) {
             if (!taxons.has(key)) {
@@ -783,7 +511,6 @@ export class TaxonService extends BaseService<Taxon>{
                 const taxons = await this.taxonRepo.find({ where: { scientificName: key } })
                 if (taxons.length == 0) {
                     problemParentNames.push(key)
-                    // problemParentNamesStream.write(key)
                 }
             }
         }
@@ -1049,7 +776,6 @@ export class TaxonService extends BaseService<Taxon>{
      * this would be the genus Agapostemon. etc.
      */
     async linkTaxonToAncestors(taxon: Taxon, directParentTaxon: Taxon): Promise<void> {
-        // TODO: Get rid of taxonomic authorities?
         // Create a tree entry for the taxon & its direct parent and save it to the database
         const directParentTreeEntry = this.treeRepo.create({
             taxonAuthorityID: 1,

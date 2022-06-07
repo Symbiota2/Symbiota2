@@ -38,8 +38,8 @@ export class NavbarComponent implements OnInit {
 
     pluginLinks$ = this.plugins.navBarLinks$;
     currentUser$ = this.userService.currentUser;
-    notifications$ = this.userService.notifications;
-    notificationCount$ = this.userService.notificationCount;
+    notifications = this.userService.notifications;
+    notificationCount = this.userService.notificationCount;
 
     readonly ROUTE_HOME = HomePage.ROUTE;
     readonly ROUTE_PROFILE = ROUTE_USER_PROFILE;
@@ -49,6 +49,7 @@ export class NavbarComponent implements OnInit {
     toolMenu: NavBarLink;
     user: User;
     isSuperAdmin: Boolean;
+    editing = false
 
     constructor(
         private readonly userService: UserService,
@@ -108,7 +109,7 @@ export class NavbarComponent implements OnInit {
                  ]);
              })
          );
- 
+
          // get plugin categories
          this.linkCategories().subscribe((categories) => {
              // get category links
@@ -165,6 +166,16 @@ export class NavbarComponent implements OnInit {
 
     useLanguage(language: string) {
         this.translate.use(language);
+    }
+
+    turnOnEditing() {
+        this.editing = true
+        //this.translate.use(language);
+    }
+
+    turnOffEditing() {
+        this.editing = false
+        //this.translate.use(language);
     }
 
     clearNotifications() {

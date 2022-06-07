@@ -1,0 +1,15 @@
+<div fxLayout="row wrap">
+    <div class="form-field w-8">
+        <mat-form-field>
+            <mat-label>{{'symbiota2.editable.text.enter' | translate}}</mat-label>
+            <input matInput
+                   [value]="textValue"
+                   [(ngModel)]="textValue"
+                   [ngModelOptions]="{standalone: true}" >
+        </mat-form-field>
+    </div>
+</div>
+<div mat-dialog-actions>
+    <button mat-button mat-raised-button color="primary" (click)="doAction()">{{'symbiota2.editable.text.save.button' | translate}}</button>
+    <button mat-button (click)="closeDialog()" mat-raised-button color="warn">{{'symbiota2.editable.text.cancel.button' | translate}}</button>
+</div>

@@ -8,21 +8,13 @@ export class KnowledgeGraph {
 
     @ApiProperty()
     @Expose()
-    graphID: number;
+    name: string
 
     @ApiProperty()
     @Expose()
-    graph: string;
+    updatedAt: Date | null
 
     @ApiProperty()
     @Expose()
-    isPublic: boolean;
-
-    @ApiProperty()
-    @Expose()
-    updatedAt: Date;
-
-    @ApiProperty()
-    @Expose()
-    size: number;
+    size: number | null
 }

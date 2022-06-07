@@ -115,8 +115,8 @@ export class ImageController {
     async imageSearch(@Query() searchParams: ImageSearchParams): Promise<ImageAndTaxonDto[]> {
         const images = await this.myService.imageSearch(searchParams)
         const result = []
-        let taxonSkip : boolean = false
-        let occurrenceSkip : boolean = false
+        let taxonSkip: boolean = false
+        let occurrenceSkip: boolean = false
         let previousTaxonID = -1
         let previousOccurrenceID = -1
         for (const image of images) {
@@ -163,8 +163,8 @@ export class ImageController {
     @ApiOperation({
         summary: "Retrieve an image from the image library using the filename it was stored under."
     })
-    async getFile(@Param('fileName') fileName : string, @Res() res): Promise<any> {
-        res.sendFile(fileName, { root: ImageService.imageLibraryFolder});
+    async getFile(@Param('fileName') fileName: string, @Res() res): Promise<any> {
+        res.sendFile(fileName, { root: ImageService.imageLibraryFolder });
     }
 
     @Post('imglib')
@@ -185,8 +185,7 @@ export class ImageController {
     // @UseGuards(SuperAdminGuard)
     async uploadImglib(
         @Req() request: AuthenticatedRequest,
-        @UploadedFile() file: File) : Promise<string[]>
-    {
+        @UploadedFile() file: File): Promise<string[]> {
         if (!this.canEdit(request)) {
             throw new ForbiddenException()
         }
@@ -194,7 +193,7 @@ export class ImageController {
         if (!file.mimetype.startsWith('image/')) {
             throw new BadRequestException('Invalid Image');
         }
-        return await this.myService.fromFileToLocalStorage(file.originalname, path.join(ImageService.imageUploadFolder,file.filename), file.mimetype)
+        return await this.myService.fromFileToLocalStorage(file.originalname, path.join(ImageService.imageUploadFolder, file.filename), file.mimetype)
     }
 
     @Post('upload/storage/single')
@@ -214,8 +213,7 @@ export class ImageController {
     // @UseGuards(SuperAdminGuard)
     async uploadStorageSingle(
         @Req() request: AuthenticatedRequest,
-        @UploadedFile() file: File)
-    {
+        @UploadedFile() file: File) {
         if (!this.canEdit(request)) {
             throw new ForbiddenException()
         }
@@ -339,7 +337,6 @@ export class ImageController {
             throw new BadRequestException('File not specified');
         }
 
-        console.log(" mime is " + file.mimetype)
         if (file.mimetype.startsWith('application/zip') ||
             file.mimetype.startsWith('application/x-zip-compressed')) {
             //const headers = await getCSVFields(file.path);

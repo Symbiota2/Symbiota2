@@ -6,9 +6,7 @@ import { ImageQueryBuilder } from './image-query-builder'
 import { PhotographerInfoListItem } from '../../dto/PhotographerInfoListItem';
 import { ImageListItem } from '../../dto';
 import { ImageInputDto } from '../../dto/ImageInputDto';
-import { ApiTaxonomyUpload } from '../../../../../ui-plugin-taxonomy/src/lib/services/taxonomyUpload/taxonomy-upload.service';
 import { ImageAndTaxonListItem } from '../../dto/ImageAndTaxonListItem';
-import { IMAGE_API_BASE } from '../../routes';
 
 interface FindAllParams {
     imageIDs: number[]

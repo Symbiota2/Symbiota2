@@ -71,8 +71,8 @@ export class CollectionNewCollectionComponent implements OnInit {
         rights: ['', Validators.required],
         aggregators: [true],
         icon: ['', Validators.maxLength(250)],
-        type: ['', Validators.required, Validators.maxLength(45)],
-        management: ['', Validators.required, Validators.maxLength(45)],
+        type: ['', Validators.required],
+        management: ['', Validators.required],
         instOption: ['select']
     });
 

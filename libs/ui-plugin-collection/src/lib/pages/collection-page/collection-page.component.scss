@@ -1,26 +1,26 @@
 @import "/apps/ui/src/styles/theme.import.scss";
 
-#main{
+#main {
     box-shadow: inset 0px 150px 0 0 $primaryColor;
     -webkit-box-shadow: inset 0px 150px 0 0 $primaryColor;
 }
 
-#body{
-    width: 800px;
+#body {
+    width: 900px;
 }
 
-#logo{
+#logo {
     background-color: white;
     border: $primaryColor solid 2px;
     border-radius: 50%;
 }
 
-.name_inst{
+.name_inst {
     margin-left: 1rem;
     height: 128px;
 }
 
-.col-header{
+.col-header {
     margin-top: 65px;
 }
 
@@ -67,13 +67,13 @@
     }
 }
 
-.primaryLink{
-    color:white !important;
+.primaryLink {
+    color: white !important;
     background-color: $primaryColor;
     border: none;
 }
 
-#collectionLink{
+#collectionLink {
     color: $primaryColor;
     font-size: 12px;
     font-weight: 400;
@@ -81,27 +81,27 @@
     margin-right: 1rem;
 }
 
-#collectionLink:hover{
+#collectionLink:hover {
     text-decoration: none;
 }
 
-.collection-mat-card{
+.collection-mat-card {
     padding-top: 12px;
     color: #6C6C6C;
     min-height: 150px;
 
-    mat-card-title{
+    mat-card-title {
         color: $accentColor;
         font-size: 18px;
         font-weight: 400;
         margin-bottom: 1rem;
 
-        mat-icon{
+        mat-icon {
             padding-right: .5rem;
         }
     }
 
-    mat-card-content{
+    mat-card-content {
         padding-left: 1rem;
         font-weight: 300;
     }
@@ -117,8 +117,8 @@
     height: 200px;
     color: white;
     background-color: $primaryColor;
-    
-    mat-card-title{
+
+    mat-card-title {
         color: white;
     }
 }
@@ -134,7 +134,7 @@
     height: fit-content;
     vertical-align: middle;
 
-    mat-icon{
-        font-size:large;
+    mat-icon {
+        font-size: large;
     }
 }

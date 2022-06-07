@@ -12,6 +12,7 @@ import { DatabaseModule } from '@symbiota2/api-database';
 import { DwCModule } from '@symbiota2/api-dwc';
 import { KnowledgeGraphModule } from '../../../libs/api-knowledge-graph/src/lib/knowledge-graph.module';
 import { ChecklistModule } from '@symbiota2/api-plugin-checklist';
+import { I18nModule } from '@symbiota2/api-plugin-i18n'
 
 
 const ENABLED_PLUGINS = [
@@ -24,6 +25,7 @@ const ENABLED_PLUGINS = [
     DwCModule,
     KnowledgeGraphModule,
     CollectionModule,
+    I18nModule,
 ];
 
 /**

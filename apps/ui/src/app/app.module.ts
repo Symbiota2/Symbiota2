@@ -47,6 +47,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { UserlistComponent } from './components/userlist/userlist.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { PermissionFormComponent } from './components/permission-form/permission-form.component';
+import { I18nPlugin } from '@symbiota2/ui-plugin-i18n';
+import { KnowledgeGraphPlugin } from '@symbiota2/ui-plugin-knowledge-graph';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -54,6 +56,8 @@ const PLUGINS = [
     TaxonomyPlugin,
     ImagePlugin,
     ChecklistPlugin,
+    I18nPlugin,
+    KnowledgeGraphPlugin,
 ];
 
 /**
