@@ -1,9 +1,14 @@
 import { Exclude, Expose, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Taxon } from '@symbiota2/api-database';
 
 
 @Exclude()
 export class TaxonInputDto {
+
+    constructor(taxa: Partial<TaxonInputDto>) {
+        Object.assign(this, taxa);
+    }
 
     @ApiProperty()
     @Expose()

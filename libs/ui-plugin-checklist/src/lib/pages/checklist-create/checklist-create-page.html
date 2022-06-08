@@ -3,11 +3,11 @@
       <h1>{{ "checklist.create.form.checklist.title" | translate }}</h1>
     </div>
   
-    <!-- <div *ngIf="!userCanEdit" class="my2" fxLayout="row" fxLayoutGap="1rem">
-      {{"checklist.create.lacks.create.permission" | translate}}
-    </div> -->
-    <!-- <div *ngIf="userCanEdit" class="my2" fxLayout="row" fxLayoutGap="1rem"> -->
-      <div class="my2" fxLayout="row" fxLayoutGap="1rem">
+    <div *ngIf="!userCanEdit" class="my2" fxLayout="row" fxLayoutGap="1rem">
+      {{"checklist.access.lacks.create.permission" | translate}}
+    </div>
+    <div *ngIf="userCanEdit" class="my2" fxLayout="row" fxLayoutGap="1rem">
+      <!-- <div class="my2" fxLayout="row" fxLayoutGap="1rem"> -->
       <div mat-dialog-content>
         <form class="example-form">
           <mat-form-field class="example-full-width" appearance="fill">

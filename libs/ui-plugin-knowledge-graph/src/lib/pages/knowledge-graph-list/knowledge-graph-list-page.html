@@ -1,0 +1,82 @@
+<div id='main'>
+    <div>
+        <h1>{{"knowledge.graph.list.title" | translate}}</h1>
+    </div>
+
+
+    <div *ngIf='graphs.length > 0'>
+        <b style='font-size:125%'>
+            {{"knowledge.graph.graphs.created.title" | translate}}
+        </b>
+        <table id="graphs">
+            <tr>
+                <th>
+                    {{'knowledge.graph.table.name.header' | translate}}
+                </th>
+                <th>
+                    {{'knowledge.graph.table.updatedAt.header' | translate}}
+                </th>
+                <th>
+                    {{'knowledge.graph.table.size.header' | translate}}
+                </th>
+                <th>
+                    {{'knowledge.graph.table.actions.header' | translate}}
+                </th>
+            </tr>
+            <tr *ngFor='let graph of graphs'>
+                <td>
+                    {{graph.name}}
+                </td>
+                <td>
+                    {{graph.updatedAt}}
+                </td>
+                <td>
+                    {{graph.size}}
+                </td>
+                <td>
+                    <button mat-button mat-raised-button color="primary" (click)="doDownload(graph.name)">
+                        {{'knowledge.graph.download.action.label' | translate}}
+                    </button>
+                    &nbsp;
+                    <button  *ngIf='userCanEdit' mat-button (click)="doDelete(graph.name)" mat-raised-button color="warn">
+                        {{'knowledge.graph.delete.action.label' | translate}}
+                    </button>
+                    &nbsp;
+                    <button  *ngIf='userCanEdit' mat-button (click)="doRebuild(graph.name)" mat-raised-button>
+                        {{'knowledge.graph.rebuild.action.label' | translate}}
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <p>
+        &nbsp;
+    </p>
+    <div *ngIf='graphsToBuild.length > 0'>
+        <b style='font-size:125%'>
+            {{"knowledge.graph.graphs.to.create.title" | translate}}
+        </b>
+        <table id="graphs">
+            <tr>
+                <th>
+                    {{'knowledge.graph.table.name.header' | translate}}
+                </th>
+                <th *ngIf='userCanEdit'>
+                    {{'knowledge.graph.table.actions.header' | translate}}
+                </th>
+            </tr>
+            <tr *ngFor='let graph of graphsToBuild'>
+                <td>
+                    {{graph.name}}
+                </td>
+                <td *ngIf='userCanEdit'>
+                    <button mat-button mat-raised-button color="primary" (click)="doBuild(graph.name)">
+                        {{'knowledge.graph.build.action.label' | translate}}
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>

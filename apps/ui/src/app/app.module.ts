@@ -40,11 +40,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { SitemapUnorderedListComponent } from './components/sitemap-unordered-list/sitemap-unordered-list.component';
 import { UserlistPageComponent } from './pages/userlist-page/userlist-page.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { UserlistComponent } from './components/userlist/userlist.component';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { PermissionFormComponent } from './components/permission-form/permission-form.component';
+import { I18nPlugin } from '@symbiota2/ui-plugin-i18n';
+import { KnowledgeGraphPlugin } from '@symbiota2/ui-plugin-knowledge-graph';
 
 const PLUGINS = [
     CollectionPlugin,
@@ -52,6 +56,8 @@ const PLUGINS = [
     TaxonomyPlugin,
     ImagePlugin,
     ChecklistPlugin,
+    I18nPlugin,
+    KnowledgeGraphPlugin,
 ];
 
 /**
@@ -78,6 +84,7 @@ const PLUGINS = [
         SitemapUnorderedListComponent,
         UserlistPageComponent,
         UserlistComponent,
+        PermissionFormComponent,
     ],
     imports: [
         MatToolbarModule,
@@ -101,6 +108,7 @@ const PLUGINS = [
         ...PLUGINS,
         DragDropModule,
         MatExpansionModule,
+        MatGridListModule,
     ],
     bootstrap: [AppComponent]
 })

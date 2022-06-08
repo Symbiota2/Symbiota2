@@ -8,7 +8,7 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
-    
+
   },
   "exclude": ["**/*.spec.ts"],
   "include": ["**/*.ts"]

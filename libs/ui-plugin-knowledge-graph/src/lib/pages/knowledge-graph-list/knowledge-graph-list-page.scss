@@ -1,0 +1,56 @@
+#main{
+    margin: 1rem;
+}
+
+.mat-list .mat-list-item {
+    height: 10px; /* default is 72px */
+    font-size: 11px;
+}
+
+#buttons {
+    margin-top: 1rem;
+
+    button {
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+
+    button:first-child {
+        margin-left: 0;
+    }
+}
+
+.expansion-panel {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.symbiota2-panel-class {
+    width:20px;
+    max-width:20px;
+    font-size: 10px;
+}
+
+#graphs {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#graphs td, #graphs th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#graphs tr:nth-child(even){background-color: #f2f2f2;}
+
+#graphs tr:hover {background-color: #ddd;}
+
+#graphs th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #04AA6D;
+    color: white;
+}
+

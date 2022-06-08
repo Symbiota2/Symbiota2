@@ -9,7 +9,9 @@
       "targets": {
         "build": {
           "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/apps/api",
             "main": "apps/api/src/main.ts",
@@ -40,12 +42,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/api/**/*.ts"]
+            "lintFilePatterns": [
+              "apps/api/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/api"],
+          "outputs": [
+            "coverage/apps/api"
+          ],
           "options": {
             "jestConfig": "apps/api/jest.config.js",
             "passWithNoTests": true
@@ -62,17 +68,27 @@
         "build": {
           "executor": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": ["class-transformer"],
+            "allowedCommonJsDependencies": [
+              "class-transformer",
+              "validator"
+            ],
             "outputPath": "dist/apps/ui",
             "index": "apps/ui/src/index.html",
             "main": "apps/ui/src/main.ts",
             "polyfills": "apps/ui/src/polyfills.ts",
             "tsConfig": "apps/ui/tsconfig.app.json",
             "aot": true,
-            "assets": ["apps/ui/src/favicon.ico", "apps/ui/src/assets"],
-            "styles": ["apps/ui/src/styles.scss"],
+            "assets": [
+              "apps/ui/src/favicon.ico",
+              "apps/ui/src/assets"
+            ],
+            "styles": [
+              "apps/ui/src/styles.scss"
+            ],
             "stylePreprocessorOptions": {
-              "includePaths": ["apps/ui/src/"]
+              "includePaths": [
+                "apps/ui/src/"
+              ]
             },
             "scripts": []
           },
@@ -128,12 +144,17 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/ui/src/**/*.ts", "apps/ui/src/**/*.html"]
+            "lintFilePatterns": [
+              "apps/ui/src/**/*.ts",
+              "apps/ui/src/**/*.html"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/ui"],
+          "outputs": [
+            "coverage/apps/ui"
+          ],
           "options": {
             "jestConfig": "apps/ui/jest.config.js",
             "passWithNoTests": true
@@ -162,7 +183,9 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/ui-e2e/**/*.{js,ts}"]
+            "lintFilePatterns": [
+              "apps/ui-e2e/**/*.{js,ts}"
+            ]
           }
         }
       }
@@ -196,7 +219,9 @@
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/ui-common"],
+          "outputs": [
+            "coverage/libs/ui-common"
+          ],
           "options": {
             "jestConfig": "libs/ui-common/jest.config.js",
             "passWithNoTests": true
@@ -240,7 +265,9 @@
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/ui-plugin-occurrence"],
+          "outputs": [
+            "coverage/libs/ui-plugin-occurrence"
+          ],
           "options": {
             "jestConfig": "libs/ui-plugin-occurrence/jest.config.js",
             "passWithNoTests": true
@@ -248,6 +275,45 @@
         }
       }
     },
+      "ui-plugin-i18n": {
+          "projectType": "library",
+          "root": "libs/ui-plugin-i18n",
+          "sourceRoot": "libs/ui-plugin-i18n/src",
+          "prefix": "symbiota2",
+          "targets": {
+              "build": {
+                  "executor": "@nrwl/angular:package",
+                  "options": {
+                      "tsConfig": "libs/ui-plugin-i18n/tsconfig.lib.json",
+                      "project": "libs/ui-plugin-i18n/ng-package.json"
+                  },
+                  "configurations": {
+                      "production": {
+                          "tsConfig": "libs/ui-plugin-i18n/tsconfig.lib.prod.json"
+                      }
+                  }
+              },
+              "lint": {
+                  "executor": "@nrwl/linter:eslint",
+                  "options": {
+                      "lintFilePatterns": [
+                          "libs/ui-plugin-i18n/src/**/*.ts",
+                          "libs/ui-plugin-i18n/src/**/*.html"
+                      ]
+                  }
+              },
+              "test": {
+                  "executor": "@nrwl/jest:jest",
+                  "outputs": [
+                      "coverage/libs/ui-plugin-i18n"
+                  ],
+                  "options": {
+                      "jestConfig": "libs/ui-plugin-i18n/jest.config.js",
+                      "passWithNoTests": true
+                  }
+              }
+          }
+      },
     "ui-plugin-image": {
       "projectType": "library",
       "root": "libs/ui-plugin-image",
@@ -277,13 +343,54 @@
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/ui-plugin-image"],
+          "outputs": [
+            "coverage/libs/ui-plugin-image"
+          ],
           "options": {
             "jestConfig": "libs/ui-plugin-image/jest.config.js",
             "passWithNoTests": true
           }
         }
       }
+    },
+    "ui-plugin-knowledge-graph": {
+        "projectType": "library",
+        "root": "libs/ui-plugin-knowledge-graph",
+        "sourceRoot": "libs/ui-plugin-knowledge-graph/src",
+        "prefix": "symbiota2",
+        "targets": {
+            "build": {
+                "executor": "@nrwl/angular:package",
+                "options": {
+                    "tsConfig": "libs/ui-plugin-knowledge-graph/tsconfig.lib.json",
+                    "project": "libs/ui-plugin-knowledge-graph/ng-package.json"
+                },
+                "configurations": {
+                    "production": {
+                        "tsConfig": "libs/ui-plugin-knowledge-graph/tsconfig.lib.prod.json"
+                    }
+                }
+            },
+            "lint": {
+                "executor": "@nrwl/linter:eslint",
+                "options": {
+                    "lintFilePatterns": [
+                        "libs/ui-plugin-knowledge-graph/src/**/*.ts",
+                        "libs/ui-plugin-knowledge-graph/src/**/*.html"
+                    ]
+                }
+            },
+            "test": {
+                "executor": "@nrwl/jest:jest",
+                "outputs": [
+                    "coverage/libs/ui-plugin-knowledge-graph"
+                ],
+                "options": {
+                    "jestConfig": "libs/ui-plugin-knowledge-graph/jest.config.js",
+                    "passWithNoTests": true
+                }
+            }
+        }
     },
     "ui-plugin-taxonomy": {
       "projectType": "library",
@@ -314,7 +421,9 @@
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/ui-plugin-taxonomy"],
+          "outputs": [
+            "coverage/libs/ui-plugin-taxonomy"
+          ],
           "options": {
             "jestConfig": "libs/ui-plugin-taxonomy/jest.config.js",
             "passWithNoTests": true
@@ -327,9 +436,13 @@
       "root": "libs/ui-plugin-collection",
       "sourceRoot": "libs/ui-plugin-collection/src",
       "prefix": "symbiota2",
-      "styles": ["apps/ui/src/styles.scss"],
+      "styles": [
+        "apps/ui/src/styles.scss"
+      ],
       "stylePreprocessorOptions": {
-        "includePaths": ["apps/ui/src/"]
+        "includePaths": [
+          "apps/ui/src/"
+        ]
       },
       "targets": {
         "build": {
@@ -355,7 +468,9 @@
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/ui-plugin-collection"],
+          "outputs": [
+            "coverage/libs/ui-plugin-collection"
+          ],
           "options": {
             "jestConfig": "libs/ui-plugin-collection/jest.config.js",
             "passWithNoTests": true
@@ -371,12 +486,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-common/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-common/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-common"],
+          "outputs": [
+            "coverage/libs/api-common"
+          ],
           "options": {
             "jestConfig": "libs/api-common/jest.config.js",
             "passWithNoTests": true
@@ -384,13 +503,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/api-common",
             "tsConfig": "libs/api-common/tsconfig.lib.json",
             "packageJson": "libs/api-common/package.json",
             "main": "libs/api-common/src/index.ts",
-            "assets": ["libs/api-common/*.md"]
+            "assets": [
+              "libs/api-common/*.md"
+            ]
           }
         }
       }
@@ -403,12 +526,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-config/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-config/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-config"],
+          "outputs": [
+            "coverage/libs/api-config"
+          ],
           "options": {
             "jestConfig": "libs/api-config/jest.config.js",
             "passWithNoTests": true
@@ -416,13 +543,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/api-config",
             "tsConfig": "libs/api-config/tsconfig.lib.json",
             "packageJson": "libs/api-config/package.json",
             "main": "libs/api-config/src/index.ts",
-            "assets": ["libs/api-config/*.md"]
+            "assets": [
+              "libs/api-config/*.md"
+            ]
           }
         }
       }
@@ -435,12 +566,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-database/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-database/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-database"],
+          "outputs": [
+            "coverage/libs/api-database"
+          ],
           "options": {
             "jestConfig": "libs/api-database/jest.config.js",
             "passWithNoTests": true
@@ -448,13 +583,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/api-database",
             "tsConfig": "libs/api-database/tsconfig.lib.json",
             "packageJson": "libs/api-database/package.json",
             "main": "libs/api-database/src/index.ts",
-            "assets": ["libs/api-database/*.md"]
+            "assets": [
+              "libs/api-database/*.md"
+            ]
           }
         }
       }
@@ -467,12 +606,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-auth/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-auth/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-auth"],
+          "outputs": [
+            "coverage/libs/api-auth"
+          ],
           "options": {
             "jestConfig": "libs/api-auth/jest.config.js",
             "passWithNoTests": true
@@ -480,13 +623,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/api-auth",
             "tsConfig": "libs/api-auth/tsconfig.lib.json",
             "packageJson": "libs/api-auth/package.json",
             "main": "libs/api-auth/src/index.ts",
-            "assets": ["libs/api-auth/*.md"]
+            "assets": [
+              "libs/api-auth/*.md"
+            ]
           }
         }
       }
@@ -499,12 +646,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-plugin-collection/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-plugin-collection/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-plugin-collection"],
+          "outputs": [
+            "coverage/libs/api-plugin-collection"
+          ],
           "options": {
             "jestConfig": "libs/api-plugin-collection/jest.config.js",
             "passWithNoTests": true
@@ -512,17 +663,61 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/api-plugin-collection",
             "tsConfig": "libs/api-plugin-collection/tsconfig.lib.json",
             "packageJson": "libs/api-plugin-collection/package.json",
             "main": "libs/api-plugin-collection/src/index.ts",
-            "assets": ["libs/api-plugin-collection/*.md"]
+            "assets": [
+              "libs/api-plugin-collection/*.md"
+            ]
           }
         }
       }
     },
+      "api-plugin-i18n": {
+          "root": "libs/api-plugin-i19n",
+          "sourceRoot": "libs/api-plugin-i18n/src",
+          "projectType": "library",
+          "targets": {
+              "lint": {
+                  "executor": "@nrwl/linter:eslint",
+                  "options": {
+                      "lintFilePatterns": [
+                          "libs/api-plugin-i18n/**/*.ts"
+                      ]
+                  }
+              },
+              "test": {
+                  "executor": "@nrwl/jest:jest",
+                  "outputs": [
+                      "coverage/libs/api-plugin-ii18n"
+                  ],
+                  "options": {
+                      "jestConfig": "libs/api-plugin-i18n/jest.config.js",
+                      "passWithNoTests": true
+                  }
+              },
+              "build": {
+                  "executor": "@nrwl/node:package",
+                  "outputs": [
+                      "{options.outputPath}"
+                  ],
+                  "options": {
+                      "outputPath": "dist/libs/api-plugin-i18n",
+                      "tsConfig": "libs/api-plugin-i18n/tsconfig.lib.json",
+                      "packageJson": "libs/api-plugin-i18n/package.json",
+                      "main": "libs/api-plugin-i18n/src/index.ts",
+                      "assets": [
+                          "libs/api-plugin-i18n/*.md"
+                      ]
+                  }
+              }
+          }
+      },
     "api-plugin-image": {
       "root": "libs/api-plugin-image",
       "sourceRoot": "libs/api-plugin-image/src",
@@ -531,12 +726,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-plugin-image/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-plugin-image/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-plugin-image"],
+          "outputs": [
+            "coverage/libs/api-plugin-image"
+          ],
           "options": {
             "jestConfig": "libs/api-plugin-image/jest.config.js",
             "passWithNoTests": true
@@ -544,13 +743,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/api-plugin-image",
             "tsConfig": "libs/api-plugin-image/tsconfig.lib.json",
             "packageJson": "libs/api-plugin-image/package.json",
             "main": "libs/api-plugin-image/src/index.ts",
-            "assets": ["libs/api-plugin-image/*.md"]
+            "assets": [
+              "libs/api-plugin-image/*.md"
+            ]
           }
         }
       }
@@ -563,12 +766,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-plugin-taxonomy/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-plugin-taxonomy/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-plugin-taxonomy"],
+          "outputs": [
+            "coverage/libs/api-plugin-taxonomy"
+          ],
           "options": {
             "jestConfig": "libs/api-plugin-taxonomy/jest.config.js",
             "passWithNoTests": true
@@ -576,13 +783,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/api-plugin-taxonomy",
             "tsConfig": "libs/api-plugin-taxonomy/tsconfig.lib.json",
             "packageJson": "libs/api-plugin-taxonomy/package.json",
             "main": "libs/api-plugin-taxonomy/src/index.ts",
-            "assets": ["libs/api-plugin-taxonomy/*.md"]
+            "assets": [
+              "libs/api-plugin-taxonomy/*.md"
+            ]
           }
         }
       }
@@ -595,12 +806,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-plugin-occurrence/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-plugin-occurrence/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-plugin-occurrence"],
+          "outputs": [
+            "coverage/libs/api-plugin-occurrence"
+          ],
           "options": {
             "jestConfig": "libs/api-plugin-occurrence/jest.config.js",
             "passWithNoTests": true
@@ -608,13 +823,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/api-plugin-occurrence",
             "tsConfig": "libs/api-plugin-occurrence/tsconfig.lib.json",
             "packageJson": "libs/api-plugin-occurrence/package.json",
             "main": "libs/api-plugin-occurrence/src/index.ts",
-            "assets": ["libs/api-plugin-occurrence/*.md"]
+            "assets": [
+              "libs/api-plugin-occurrence/*.md"
+            ]
           }
         }
       }
@@ -627,12 +846,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/data-access/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/data-access/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/data-access"],
+          "outputs": [
+            "coverage/libs/data-access"
+          ],
           "options": {
             "jestConfig": "libs/data-access/jest.config.js",
             "passWithNoTests": true
@@ -640,13 +863,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/data-access",
             "tsConfig": "libs/data-access/tsconfig.lib.json",
             "packageJson": "libs/data-access/package.json",
             "main": "libs/data-access/src/index.ts",
-            "assets": ["libs/data-access/*.md"]
+            "assets": [
+              "libs/data-access/*.md"
+            ]
           }
         }
       }
@@ -659,12 +886,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-plugin-geography/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-plugin-geography/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-plugin-geography"],
+          "outputs": [
+            "coverage/libs/api-plugin-geography"
+          ],
           "options": {
             "jestConfig": "libs/api-plugin-geography/jest.config.js",
             "passWithNoTests": true
@@ -701,7 +932,9 @@
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/ui-plugin-geography"],
+          "outputs": [
+            "coverage/libs/ui-plugin-geography"
+          ],
           "options": {
             "jestConfig": "libs/ui-plugin-geography/jest.config.js",
             "passWithNoTests": true
@@ -717,12 +950,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/dwc/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/dwc/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/dwc"],
+          "outputs": [
+            "coverage/libs/dwc"
+          ],
           "options": {
             "jestConfig": "libs/dwc/jest.config.js",
             "passWithNoTests": true
@@ -730,13 +967,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/dwc",
             "tsConfig": "libs/dwc/tsconfig.lib.json",
             "packageJson": "libs/dwc/package.json",
             "main": "libs/dwc/src/index.ts",
-            "assets": ["libs/dwc/*.md"]
+            "assets": [
+              "libs/dwc/*.md"
+            ]
           }
         }
       }
@@ -749,12 +990,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/knowledgeGraph/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/knowledgeGraph/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/knowledgeGraph"],
+          "outputs": [
+            "coverage/libs/knowledgeGraph"
+          ],
           "options": {
             "jestConfig": "libs/knowledgeGraph/jest.config.js",
             "passWithNoTests": true
@@ -762,13 +1007,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/knowledgeGraph",
             "tsConfig": "libs/knowledgeGraph/tsconfig.lib.json",
             "packageJson": "libs/knowledgeGraph/package.json",
             "main": "libs/knowledgeGraph/src/index.ts",
-            "assets": ["libs/knowledgeGraph/*.md"]
+            "assets": [
+              "libs/knowledgeGraph/*.md"
+            ]
           }
         }
       }
@@ -781,12 +1030,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-email/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-email/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-email"],
+          "outputs": [
+            "coverage/libs/api-email"
+          ],
           "options": {
             "jestConfig": "libs/api-email/jest.config.js",
             "passWithNoTests": true
@@ -802,12 +1055,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-storage/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-storage/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-storage"],
+          "outputs": [
+            "coverage/libs/api-storage"
+          ],
           "options": {
             "jestConfig": "libs/api-storage/jest.config.js",
             "passWithNoTests": true
@@ -823,12 +1080,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-dwc/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-dwc/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-dwc"],
+          "outputs": [
+            "coverage/libs/api-dwc"
+          ],
           "options": {
             "jestConfig": "libs/api-dwc/jest.config.js",
             "passWithNoTests": true
@@ -865,7 +1126,9 @@
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/ui-plugin-checklist"],
+          "outputs": [
+            "coverage/libs/ui-plugin-checklist"
+          ],
           "options": {
             "jestConfig": "libs/ui-plugin-checklist/jest.config.js",
             "passWithNoTests": true
@@ -880,24 +1143,32 @@
       "targets": {
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/api-plugin-checklist",
             "tsConfig": "libs/api-plugin-checklist/tsconfig.lib.json",
             "packageJson": "libs/api-plugin-checklist/package.json",
             "main": "libs/api-plugin-checklist/src/index.ts",
-            "assets": ["libs/api-plugin-checklist/*.md"]
+            "assets": [
+              "libs/api-plugin-checklist/*.md"
+            ]
           }
         },
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/api-plugin-checklist/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/api-plugin-checklist/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/api-plugin-checklist"],
+          "outputs": [
+            "coverage/libs/api-plugin-checklist"
+          ],
           "options": {
             "jestConfig": "libs/api-plugin-checklist/jest.config.js",
             "passWithNoTests": true

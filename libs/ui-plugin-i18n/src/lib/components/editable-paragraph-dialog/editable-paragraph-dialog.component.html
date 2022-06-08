@@ -1,0 +1,11 @@
+<div>
+    <quill-editor
+        [formControl]="control"
+        [placeholder]="''"
+    >
+    </quill-editor>
+</div>
+<div mat-dialog-actions>
+    <button mat-button mat-raised-button color="primary" (click)="doAction()">{{'symbiota2.editable.text.save.button' | translate}}</button>
+    <button mat-button (click)="closeDialog()" mat-raised-button color="warn">{{'symbiota2.editable.text.cancel.button' | translate}}</button>
+</div>

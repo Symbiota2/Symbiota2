@@ -1,0 +1,20 @@
+{
+    "plugins.knowledge.graph.name": "Knowledge graphs",
+    "core.layout.header.topnav.knowledge.graph.list" : "List",
+    "knowledge.graph.list.title": "List of Knowledge Graphs",
+    "knowledge.graph.cancel.action.label" : "Cancel",
+    "knowledge.graph.delete.action.label" : "Delete",
+    "knowledge.graph.download.action.label" : "Download",
+    "knowledge.graph.build.action.label" : "Build",
+    "knowledge.graph.rebuild.action.label" : "Rebuild",
+    "knowledge.graph.table.size.header" : "Size (in bytes)",
+    "knowledge.graph.table.updatedAt.header" : "When created",
+    "knowledge.graph.table.name.header" : "Name",
+    "knowledge.graph.table.actions.header" : "Action",
+    "knowledge.graph.graphs.created.title": "Existing Graphs",
+    "knowledge.graph.graphs.to.create.title": "Graphs not yet Created",
+    "knowledge.graph.delete.message": "Confirm delete of the graph named ",
+    "knowledge.graph.download.message": "Confirm download of the graph named ",
+    "knowledge.graph.build.message": "Confirm build of the graph named ",
+    "knowledge.graph.rebuild.message": "Confirm rebuild of the graph named "
+}

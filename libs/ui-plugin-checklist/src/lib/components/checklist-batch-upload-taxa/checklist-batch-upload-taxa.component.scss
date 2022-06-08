@@ -1,0 +1,71 @@
+.container {
+    width: 100%;
+    padding: 1rem 0;
+    min-height: 100vh;
+}
+
+.row {
+    width: 96vw;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.checklist-batch-upload-card {
+    min-height: 100vh;
+}
+
+// .checklist-taxon-form {
+//     display: none;
+// }
+
+// .checklist-batch-upload-card:not(.checklist-upload-report-box) .checklist-taxon-form {
+//     display: block;
+// }
+
+.taxonomic-resolution {
+    outline:none;
+    outline: 0;
+}
+
+.csv-intro {
+    margin-top: 1rem;
+    margin-left: 0;
+}
+
+.csv-intro > ul {
+    margin-left: 0;
+    margin-bottom: 1rem;
+}
+
+.csv-intro > ul > li {
+    margin-left: 2rem;
+}
+
+.checklist-upload-report-box {
+    position: absolute;
+    top: 6rem;
+    left: 0;
+    right: 0;
+    min-height: 80vh;
+    box-shadow: 0px 2px 3px 3px rgba(0,0,0, .3);
+    border-radius: 4px;
+    padding: 2rem;
+    padding-top: 3rem;
+    padding-bottom: 7rem;
+    background-color: #f1f1f1;
+}
+
+// .overlay {
+//     z-index: 50;
+//     position: fixed;
+//     top: 0;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     background-color: pink;
+// }
+
+// .checklist-taxon-form:not(.checklist-batch-upload-card) .overlay {
+//     display: none !important;
+// }
+

@@ -1,0 +1,7 @@
+<div fxLayout="row wrap">
+    {{'knowledge.graph.build.message' | translate}} &nbsp;<b>{{name}}</b>.
+</div>
+<div mat-dialog-actions>
+    <button mat-button mat-raised-button color="primary" (click)="doAction()">{{'knowledge.graph.build.action.label' | translate}}</button>
+    <button mat-button (click)="closeDialog()" mat-raised-button color="warn">{{'knowledge.graph.cancel.action.label' | translate}}</button>
+</div>

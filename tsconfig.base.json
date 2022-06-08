@@ -23,6 +23,8 @@
         "libs/ui-plugin-collection/src/index.ts"
       ],
       "@symbiota2/ui-plugin-image": ["libs/ui-plugin-image/src/index.ts"],
+        "@symbiota2/ui-plugin-i18n": ["libs/ui-plugin-i18n/src/index.ts"],
+        "@symbiota2/ui-plugin-knowledge-graph": ["libs/ui-plugin-knowledge-graph/src/index.ts"],
       "@symbiota2/ui-plugin-taxonomy": ["libs/ui-plugin-taxonomy/src/index.ts"],
       "@symbiota2/api-common": ["libs/api-common/src/index.ts"],
       "@symbiota2/api-config": ["libs/api-config/src/index.ts"],
@@ -34,6 +36,7 @@
       "@symbiota2/api-plugin-occurrence": [
         "libs/api-plugin-occurrence/src/index.ts"
       ],
+        "@symbiota2/api-plugin-i18n": ["libs/api-plugin-i18n/src/index.ts"],
       "@symbiota2/api-plugin-image": ["libs/api-plugin-image/src/index.ts"],
       "@symbiota2/api-plugin-taxonomy": [
         "libs/api-plugin-taxonomy/src/index.ts"

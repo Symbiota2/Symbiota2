@@ -1,6 +1,6 @@
 import {
     BadRequestException,
-    Controller, ForbiddenException,
+    Controller, Delete, ForbiddenException,
     Get, HttpStatus,
     NotFoundException,
     Param,
@@ -24,11 +24,11 @@ import { Queue } from 'bull';
 import { KnowledgeGraphService } from './knowledge-graph.service';
 import { QUEUE_ID_GENERATE_KNOWLEDGE_GRAPH } from './queues/knowledge-graph-generate.queue';
 import { KnowledgeGraphGenerateJob } from './queues/knowledge-graph-generate.processor';
+import { TaxonDto } from '../../../../api-plugin-taxonomy/src/taxon/dto/TaxonDto';
 
 @ApiTags('Knowledge Graph')
 @Controller('knowledge-graph')
 export class KnowledgeGraphController {
-    graphID : number = 1  // Dummy placeholder at present
 
     constructor(
         @InjectQueue(QUEUE_ID_GENERATE_KNOWLEDGE_GRAPH)
@@ -36,25 +36,27 @@ export class KnowledgeGraphController {
         private readonly kgService: KnowledgeGraphService) { }
 
     @Get('')
-    @ApiOperation({ summary: 'Retrieve the list of publicly-available Knowledge Graphs for this portal' })
-    async getPublishedGraphs(): Promise<KnowledgeGraph[]> {
+    @ApiOperation({ summary: 'Retrieve the list of Knowledge Graphs for this portal' })
+    @ApiResponse({ status: HttpStatus.OK, type: KnowledgeGraph, isArray: true })
+    async getGraphs(): Promise<KnowledgeGraph[]> {
         const graphs = await this.kgService.listGraphs();
 
         return graphs.map((a) => {
-            const { objectKey, ...graph } = a;
+            //const { name, ...graph } = a;
             return new KnowledgeGraph({
-                graph: basename(objectKey),
-                ...graph,
-            });
-        });
+                name: a.name,
+                updatedAt: a.updatedAt,
+                size: a.size
+            })
+        })
     }
 
-    @Get(':graphID')
-    @ApiOperation({ summary: 'Retrieve the publicly-available knowledge graph for a given graphID' })
+    @Get(':graphName')
+    @ApiOperation({ summary: 'Download the knowledge graph for a given name' })
     @ApiResponse({
         status: HttpStatus.OK,
         content: {
-            'application/zip': {
+            'application/json': {
                 schema: {
                     type: 'string',
                     format: 'binary'
@@ -62,8 +64,8 @@ export class KnowledgeGraphController {
             }
         }
     })
-    async getGraphByID(@Param() params: KnowledgeGraphIdParam, @Res() res: Response): Promise<void> {
-        const graphStream: NodeJS.ReadableStream = await this.kgService.getKnowledgeGraph(params.graphID);
+    async getGraphByName(@Param('graphName') name: string, @Res() res: Response): Promise<void> {
+        const graphStream: NodeJS.ReadableStream = await this.kgService.getKnowledgeGraph(name);
         if (!graphStream) {
             throw new NotFoundException();
         }
@@ -84,56 +86,59 @@ export class KnowledgeGraphController {
         });
     }
 
-
-    @Put('')
-    @ApiOperation({ summary: 'Create or publish a knowledge graph' })
-    //@ApiBearerAuth()
-    //@UseGuards(JwtAuthGuard)
+    @Put(':graphName')
+    @ApiOperation({ summary: 'Build or rebuild a knowledge graph' })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     async createKnowledgeGraph(
         @Req() req: AuthenticatedRequest,
-        @Query() query: UpdateGraphQuery): Promise<void> {
+        @Param('graphName') name: string): Promise<void> {
 
-        /*
         const [isSuperAdmin] = await Promise.all([
             TokenService.isSuperAdmin(req.user)
         ]);
 
         if (!(isSuperAdmin)) {
-            throw new ForbiddenException();
+            throw new ForbiddenException()
         }
-         */
 
-        const knowledgeGraphExists = await this.kgService.knowledgeGraphExists(this.graphID);
+        if (await this.jobIsRunning()) {
+            throw new BadRequestException(
+                `A knowledge graph job is already running`
+            )
+        }
 
-        if (!knowledgeGraphExists || query.refresh) {
-            if (await this.jobIsRunning()) {
-                throw new BadRequestException(
-                    `A knowledge graph job is already running`
-                );
-            }
+        await this.kgQueue.add({
+            publish: true,
+            graphName: name,
+            userID: req.user?.uid
+        })
 
-            await this.kgQueue.add({
-                publish: query.publish,
-                graphID: this.graphID,
-                userID: req.user?.uid || 1
-            });
-        }
-        else if (knowledgeGraphExists) {
-            if (query.publish) {
-                await this.kgService.publishKnowledgeGraph(this.graphID);
-            }
-            else {
-                await this.kgService.unpublishKnowledgeGraph(this.graphID);
-            }
-        }
-        else {
-            throw new NotFoundException("Graph not found")
-        }
     }
 
     private async jobIsRunning(): Promise<boolean> {
         const jobs = await this.kgQueue.getJobs(['active', 'waiting']);
         //const matchingJobs = jobs.filter((j) => j.data.collectionID === collectionID);
         return jobs.length > 0;
+    }
+
+    @Delete(':graphName')
+    @ApiOperation({ summary: 'Delete a knowledge graph' })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    async deleteKnowledgeGraph(
+        @Req() req: AuthenticatedRequest,
+        @Param('graphName') name: string): Promise<void> {
+
+        const [isSuperAdmin] = await Promise.all([
+            TokenService.isSuperAdmin(req.user)
+        ]);
+
+        if (!(isSuperAdmin)) {
+            throw new ForbiddenException()
+        }
+
+        await this.kgService.deleteKnowledgeGraph(name);
+
     }
 }

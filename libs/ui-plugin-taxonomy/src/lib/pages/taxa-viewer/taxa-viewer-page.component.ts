@@ -277,7 +277,9 @@ export class TaxaViewerPageComponent implements OnInit {
                                 .subscribe((taxonStatii) => {
                                     // Need a list of the children tids to fetch their names
                                     const childrenTids = []
-                                    taxonStatii.forEach(function (rec) {
+                                    taxonStatii
+                                        .filter((a) => a.taxonID != taxonID)
+                                        .forEach(function (rec) {
                                         const acceptedId = rec.taxonIDAccepted
                                         if (rec.taxonID !== acceptedId) {
                                             // This is a synonym
@@ -415,6 +417,7 @@ export class TaxaViewerPageComponent implements OnInit {
             .findAncestorTaxons(taxonid, this.taxonomicAuthorityID)
             .subscribe((ancTaxa) => {
                 const newTree = ancTaxa
+                    .filter((a) => a.id != taxonid)
                     .sort(function (a, b) {
                         return b.rankID - a.rankID;
                     })
@@ -554,7 +557,9 @@ export class TaxaViewerPageComponent implements OnInit {
             this.taxonomicAuthorityID).subscribe((taxonStatus) => {
 
             // For each one found, add its list of taxon ids to the children list
-            taxonStatus.forEach(function(rec) {
+            taxonStatus
+                .filter((a) => a.taxonID != node.taxonID)
+                .forEach(function(rec) {
                 childrenTids = childrenTids.concat(rec.taxonID.toString())
             })
 
@@ -572,6 +577,13 @@ export class TaxaViewerPageComponent implements OnInit {
             // Need to build up list of children names
             let children = []
 
+            /*
+            // Children array is the scientific names of the children
+            children = children.sort(function (a, b) {
+                return (a.name > b.name ? 1 : -1)
+            })
+             */
+
             // Look up the names by their ids
             this.taxaService
                 .findAll(this.taxonomicAuthorityID,{ taxonIDs: childrenTids })
@@ -580,7 +592,7 @@ export class TaxaViewerPageComponent implements OnInit {
 
                     // Sort and format the children as tree nodes
                     const childrenTree = []
-                    children.sort((a,b) => a.scientificName - b.scientificName).forEach((item) => {
+                    children.sort((a,b) => {return (a.scientificName > b.scientificName) ? 1 : -1 }).forEach((item) => {
                         const baseNode: TaxonNode = {
                             name: item.scientificName,
                             taxonID: item.id,
@@ -616,7 +628,9 @@ export class TaxaViewerPageComponent implements OnInit {
             this.taxonomicEnumTreeService.findDescendants(taxon.id, this.taxonomicAuthorityID).subscribe((taxonET) => {
 
                 // For each one found, add its list of taxon ids to the children list
-                taxonET.forEach(function(rec) {
+                taxonET
+                    .filter((a) => node.taxonID != a.taxonID)
+                    .forEach(function(rec) {
                     descTids = descTids.concat(rec.taxonID.toString())
                 })
 

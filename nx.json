@@ -48,6 +48,12 @@
     "ui-plugin-image": {
       "tags": []
     },
+      "ui-plugin-i18n": {
+          "tags": []
+      },
+      "ui-plugin-knowledge-graph": {
+          "tags": []
+      },
     "api-common": {
       "tags": []
     },
@@ -66,6 +72,9 @@
     "api-plugin-occurrence": {
       "tags": []
     },
+      "api-plugin-i18n": {
+          "tags": []
+      },
     "api-plugin-image": {
       "tags": []
     },

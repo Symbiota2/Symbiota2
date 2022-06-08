@@ -1,0 +1,61 @@
+<div class="container">
+    <div class="row">
+        <mat-card class="checklist-taxa-card">
+            <div class="checklist-detail">
+              <h1>{{ checklist?.name }}</h1>
+              <p>Authors:
+                <span>{{ checklist?.authors }}</span>
+              </p>
+              
+              <p>Citation:
+                <span>{{ 'some text might go here to show' }}</span>
+              </p>
+              
+              <p><a (click)="showmore = !showmore" class="showmore">{{ showmore ? 'Show less' : 'Show more' }}</a></p>
+            </div>
+
+            <div *ngIf="showmore">
+              <p>Locality:
+                <span>{{ checklist?.locality }}</span>
+              </p>
+              
+              <p>Abstract:
+                <span>{{ checklist?.abstract }}</span>
+              </p>
+              
+              <p>Notes:
+                <span>{{ checklist?.notes }}</span>
+              </p>
+              
+            </div>
+            <!-- <mat-card-content>
+              <mat-card-title>Taxon will be listed here</mat-card-title>
+            </mat-card-content> -->
+            <div class="access-links" *ngIf="upload_taxon_link_access">
+                <!-- <a class="edit-species-list"(click)="showUploadTaxon()" >spp</a> -->
+                <button *ngIf="userCanEdit" style="float: right" mat-icon-button
+                        
+                        matTooltip="Edit Species List"
+                        matTooltipClass="example-tooltip-red"
+                        aria-label="Edit Species List"
+                        matTooltipHideDelay="100"
+                        class="example-button"
+    
+                    >
+                    <mat-icon color="primary" (click)="openDialog('uploadTaxon')"
+                      >edit</mat-icon
+                    >
+                    <span>spp</span>
+                  </button>
+            </div>
+        </mat-card>
+        <div class="checklist-list-container">
+            <div class="checklist-list">
+                <checklist-list-taxa></checklist-list-taxa>
+            </div>
+            <div class="checklist-upload-taxon-container" *ngIf="upload_taxon_access">
+                <checklist-upload-taxon></checklist-upload-taxon>
+            </div>
+        </div>
+    </div>
+</div>

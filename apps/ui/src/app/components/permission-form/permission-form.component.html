@@ -1,0 +1,66 @@
+<form name="form" id="permsForm" [formGroup]="permsForm" (submit)="onSubmit()">
+    <mat-grid-list cols="2" rowHeight="100px" columnWidth="100px">
+        <mat-grid-tile class="perms-row" id="SitePerms" [rowspan]=1.5>
+
+            <div>
+                <ul>
+                    <li>
+                        <h3>Sitewide Permissions</h3>
+                    </li>
+                    <li>
+                        <mat-checkbox formControlName="SuperAdmin" class="site-perm" name="SuperAdmin">
+                            Super
+                            Administrator</mat-checkbox>
+                    </li>
+                    <li>
+                        <mat-checkbox formControlName="Taxonomy" class="site-perm">
+                            Taxonomy Editor</mat-checkbox>
+                    </li>
+                    <li>
+                        <mat-checkbox formControlName="TaxonProfile" class="site-perm">
+                            Taxonomy
+                            Profile
+                            Editor
+                        </mat-checkbox>
+                    </li>
+                    <li>
+                        <mat-checkbox formControlName="KeyAdmin" class="site-perm">
+                            Identification Key Administrator</mat-checkbox>
+                    </li>
+                    <li>
+                        <mat-checkbox formControlName="KeyEditor" class="site-perm">
+                            Identification Key Editor</mat-checkbox>
+                    </li>
+                </ul>
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile class="perms-row" id="OccurrencePerms" [rowspan]=1.5>
+            <div>
+                <ul>
+                    <li>
+                        <h3>Occurrence Management Permissions</h3>
+                    </li>
+                    <li>
+                        <mat-checkbox formControlName="RareSppAdmin" class="site-perm">
+                            Rare Species Administrator (can add/remove species)
+                        </mat-checkbox>
+                    </li>
+                    <li>
+                        <mat-checkbox formControlName="RareSppReader" class="site-perm">Can
+                            read
+                            Rare Species
+                            data
+                            for all collections
+                        </mat-checkbox>
+                    </li>
+                </ul>
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile class="perms-row" id="SubmitRow" [rowspan]=.5>
+            <div id="submit-div">
+                <button mat-raised-button color="primary" ng-disabled="permsForm.pristine" type="submit">Update
+                    Permissions</button>
+            </div>
+        </mat-grid-tile>
+    </mat-grid-list>
+</form>

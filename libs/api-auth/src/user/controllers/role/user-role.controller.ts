@@ -55,7 +55,7 @@ export class UserRoleController {
 
         const role = await this.roleRepo.create({ uid, ...roleData });
         await this.roleRepo.save(role);
-
+        console.log("Saved role");
         const allRoles = await this.roleRepo.find({ uid });
         return allRoles.map((role) => new RoleOutputDto(role));
     }
