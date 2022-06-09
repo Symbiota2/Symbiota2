@@ -2,5 +2,8 @@
     "plugins.i18n.name": "i18n",
     "i18n.editable.text.enter": "Enter the edited value",
     "i18n.editable.text.cancel.button": "Cancel",
-    "i18n.editable.text.save.button": "Save"
+    "i18n.editable.text.save.button": "Save",
+    "i18n.editable.save.worked.message" : "The value was updated successfully.",
+    "i18n.editable.save.error.message" : "There was a problem updating the value.",
+    "i18n.editable.translatable.label" : "This text should be translated to other languages."
 }

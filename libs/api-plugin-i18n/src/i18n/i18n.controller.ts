@@ -23,6 +23,8 @@ import { Image } from '@symbiota2/api-database';
 import path from 'path';
 import { DeleteResult } from 'typeorm';
 import { I18nInputDto } from './dto/I18nInputDto'
+import { TaxonDescriptionStatementFindAllParams } from '../../../api-plugin-taxonomy/src/taxonDescriptionStatement/dto/taxonDescriptionStatement-find-all.input.dto';
+import { I18nInputParams } from './dto/I18InputParams';
 
 type File = Express.Multer.File
 const fsPromises = fs.promises;
@@ -40,26 +42,36 @@ export class I18nController {
         return isSuperAdmin || isEditor
     }
 
-    @Post()
+    @Patch()
     @ApiOperation({
         summary: "Modify a i18n key/value pair, translating the modification into the various languages."
     })
     // @ApiBearerAuth()
     // @UseGuards(JwtAuthGuard)
-    @ApiResponse({ type: String })
+    @ApiResponse({ type: I18nInputDto })
     //@SerializeOptions({ groups: ['single'] })
-    @ApiBody({ type: I18nInputDto, isArray: true })
+    //@ApiBody({ type: I18nInputDto, isArray: true })
     /**
      @see - @link ImageInputDto
      **/
     async modify(
         // @Req() request: AuthenticatedRequest,
-        @Body(new ParseArrayPipe({ items: I18nInputDto })) data: I18nInputDto[]
-    ): Promise<I18nInputDto[]> {
+        // @Body(new ParseArrayPipe({ items: I18nInputDto })) data: I18nInputDto[]
+        @Query() inputParams: I18nInputParams
+    ): Promise<I18nInputDto> {
         // if (!this.canEdit(request)) {
         //    throw new ForbiddenException()
         //}
 
+        console.log(" language is " + inputParams.language)
+        console.log(" key is " + inputParams.key)
+        console.log(" value is " + inputParams.value)
+        console.log(" translatable is " + inputParams.translatable)
+        const data = new I18nInputDto()
+        data.language = inputParams.language
+        data.key = inputParams.key
+        data.value = inputParams.value
+        data.translatable = inputParams.translatable
         const result = await this.myService.modify(data)
         return result
     }

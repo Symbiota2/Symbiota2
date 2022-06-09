@@ -13,7 +13,8 @@ export class BuildGraphDialogComponent {
 
     constructor(
         @Optional() @Inject(MAT_DIALOG_DATA) public data: string,
-        public dialogRef: MatDialogRef<BuildGraphDialogComponent>
+        public dialogRef: MatDialogRef<BuildGraphDialogComponent>,
+        private readonly translate: TranslateService,
         )
     {
         this.name = data

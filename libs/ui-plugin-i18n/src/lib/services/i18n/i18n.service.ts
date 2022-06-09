@@ -64,7 +64,7 @@ export class I18nService {
                 const req = this.apiClient
                     .queryBuilder(url.build())
                     .patch()
-                    .addJwtAuth(token)
+                    // .addJwtAuth(token)
                     .build()
 
                 return this.apiClient.send(req).pipe(

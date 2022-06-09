@@ -1,6 +1,4 @@
-import {
-    Q_PARAM_NAME
-} from '../../../constants';
+import { Q_PARAM_NAME} from '../../../constants';
 import { KNOWLEDGE_GRAPH_API_BASE } from '../../routes';
 
 export class KnowledgeGraphQueryBuilder {

@@ -2,8 +2,9 @@ import { Component, Inject, Optional, Input } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core'
 import { filter } from 'rxjs/operators';
-import { UserService } from '@symbiota2/ui-common';
+import { AlertService, UserService } from '@symbiota2/ui-common';
 import { EditableParagraphDialogComponent } from '../editable-paragraph-dialog/editable-paragraph-dialog.component';
+import { I18nService } from '../../services';
 
 @Component({
     selector: 'symbiota2-editable-paragraph',
@@ -23,23 +24,30 @@ import { EditableParagraphDialogComponent } from '../editable-paragraph-dialog/e
 export class EditableParagraphComponent {
     @Input() key = '';
     userID : number = null
-    userCanEdit = true
+    userCanEdit = false
+    userIsEditing: boolean = false
+    currentUser = this.userService.currentUser
+    user
 
     constructor(
         private readonly userService: UserService,
+        private readonly i18nService: I18nService,
+        private readonly alertService: AlertService,
+        private readonly translate: TranslateService,
         // @Optional() is used to prevent error if no data is passed
         public dialog: MatDialog,
-        // @Optional() @Inject(MAT_DIALOG_DATA) public data: CommonNameInfo
     )
     {
     }
 
     ngOnInit() {
-        this.userService.currentUser
+        this.userService.iAmEditing.subscribe(x => this.userIsEditing = x);
+        this.currentUser
             .pipe(filter((user) => user !== null))
             .subscribe((user) => {
+                this.user = user
                 this.userID = user.uid
-                this.userCanEdit = user.canEditTaxon(user.uid)
+                this.userCanEdit = user.canEditProject(user.uid)
             })
     }
 
@@ -57,10 +65,39 @@ export class EditableParagraphComponent {
         // in the dialog box text box.
         dialogRef.afterClosed().subscribe(result => {
             if (result.event != 'zzzCancel') {
-                const editedValue = result.event;
-                this.key= editedValue;
+                const returnCode =
+                    this.i18nService
+                        .update(
+                            this.translate.currentLang,
+                            this.key,
+                            result.value,
+                            result.translatable)
+                        .subscribe()
+                if (returnCode == null) {
+                    this.showError("i18n.editable.save.error.message")
+                } else {
+                    this.translate.set(this.key, result.value, this.translate.currentLang)
+                    this.showMessage("i18n.editable.save.worked.message")
+                }
             }
         })
     }
 
+    /*
+     Internal routine to encapsulate the show error message at the bottom in case something goes awry
+     */
+    private showError(s) {
+        this.translate.get(s).subscribe((r)  => {
+            this.alertService.showError(r)
+        })
+    }
+
+    /*
+    Internal routine to encapsulate the show message at the bottom to confirm things actually happened
+    */
+    private showMessage(s) {
+        this.translate.get(s).subscribe((r)  => {
+            this.alertService.showMessage(r)
+        })
+    }
 }

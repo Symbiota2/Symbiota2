@@ -12,7 +12,7 @@ import { FormControl } from '@angular/forms';
 //it is essentially a simplified version of dialog box components already in the program
 export class EditableParagraphDialogComponent {
     @Input() control: FormControl
-    currentLanguage = ""
+    translatable = true
     constructor(
         @Optional() @Inject(MAT_DIALOG_DATA) public data: string,
         public dialogRef: MatDialogRef<EditableParagraphDialogComponent>,
@@ -23,7 +23,6 @@ export class EditableParagraphDialogComponent {
 
     ngOnInit() {
         this.control = this.control ?? new FormControl()
-        this.currentLanguage = this.translate.currentLang
         this.translate.get(this.data).subscribe((value) => {
             this.control.setValue(value)
         })
@@ -33,17 +32,14 @@ export class EditableParagraphDialogComponent {
     //and the html text element and it's contents are returned to the editable field
     //component giving it the information that it needs to edit the text
     doAction(){
-        //this.dialogRef.close({event:document.getElementById("action")})
-        this.currentLanguage = this.translate.currentLang
-        console.log(this.control.value)
-        this.dialogRef.close({event: this.control.value})
+        this.dialogRef.close({event: "Save", value: this.control.value, translata: this.translatable})
     }
 
     //This is what is triggered when the user hits cancel. The box simply closes and the cancel
     //text is return to the editable field component, letting it know that nothing should be
     //done
     closeDialog(){
-        this.dialogRef.close({event:'zzzCancel'})
+        this.dialogRef.close({event:'zzzCancel', value: "", translata: this.translatable})
     }
 
 }

@@ -17,7 +17,7 @@ import { HomePage } from '../../pages/home/home.component';
 import { ApiUserNotification } from '@symbiota2/data-access';
 import { NotificationDialog } from './notification-dialog/notification-dialog.component';
 import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { filter, map, shareReplay } from 'rxjs/operators';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { customLinksEnd, customLinksStart, superAdminLinks } from './custom-navbarlinks';
 
@@ -50,6 +50,7 @@ export class NavbarComponent implements OnInit {
     user: User;
     isSuperAdmin: Boolean;
     editing = false
+    canEdit = false
 
     constructor(
         private readonly userService: UserService,
@@ -63,8 +64,11 @@ export class NavbarComponent implements OnInit {
 
     ngOnInit(): void {
         //Check if superAdmin
-        this.currentUser$.subscribe(user => {
+        this.currentUser$
+            .pipe(filter((user) => user !== null))
+            .subscribe(user => {
             this.user = user;
+            this.canEdit = user.canEditProject(user.uid)
             if (this.user && user.isSuperAdmin()) {
                 // create new categories
                 this.pluginLinks$ = this.pluginLinks$.pipe(
@@ -97,6 +101,8 @@ export class NavbarComponent implements OnInit {
                 // get category links
             });
         });
+
+
 
         /* // create new categories
          this.pluginLinks$ = this.pluginLinks$.pipe(
@@ -170,11 +176,19 @@ export class NavbarComponent implements OnInit {
 
     turnOnEditing() {
         this.editing = true
+        this.userService.setIAMEditing()
         //this.translate.use(language);
     }
 
     turnOffEditing() {
         this.editing = false
+        this.userService.setIAMViewing()
+        /*
+        this.currentUser$.subscribe((user) => {
+            user.setIAMViewing()
+        })
+
+         */
         //this.translate.use(language);
     }
 

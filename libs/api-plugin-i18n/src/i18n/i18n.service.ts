@@ -51,38 +51,50 @@ export class I18nService {
      * @param data The data to update
      * @return I18nInputDto The updated data or null (not found or api error)
      */
-    async modify(data: I18nInputDto[]): Promise<I18nInputDto[]> {
+    async modify(pair: I18nInputDto): Promise<I18nInputDto> {
         try {
-            for (let pair of data) {
-                // First load the reverse key lookup
-                if (pair.language == null || pair.key == null || pair.value == null || pair.key == "" || pair.value == "") {
-                    this.logger.warn("I18n service trying to update key/value pair, but missing information, key: " + pair.key + " value: " + pair.value + " language: " + pair.language)
-                }  else {
-                    const language = pair.language
-                    const fileName = path.join("apps", "ui", "src", "assets", "i18n", "reversed." + language + ".json")
-                    console.log("filename is " + fileName)
-                    const reverseLookup = JSON.parse(fs.readFileSync(fileName).toString())
-                    // Do we have a key
-                    if (reverseLookup[pair.key] != undefined) {
-                        // Glob the original file
-                        const dir = reverseLookup[pair.key]
-                        const destDir = path.dirname(dir)
-                        const destFileName = pair.translatable ?
-                            path.join(destDir, "modifications", language + ".json")
-                            : path.basename(destDir) == "translate" ?
-                                path.join(path.dirname(destDir), "notranslate", language + ".json")
-                                : path.join(destDir, language + ".json")
-                        const lookup = fs.existsSync(destFileName) ?
-                            JSON.parse(fs.readFileSync(destFileName).toString())
-                            : {}
-                        // Set the updated pair
-                        lookup[pair.key] = pair.value
-                        // Write the updated file
-                        fs.writeFileSync(destFileName, JSON.stringify(lookup,null,4))
-                        this.logger.log("updated " + pair.key + " to " + pair.value + " in " + destFileName)
+            // First load the reverse key lookup
+            if (pair.language == null || pair.key == null || pair.value == null || pair.key == "" || pair.value == "") {
+                this.logger.warn("I18n service trying to update key/value pair, but missing information, key: " + pair.key + " value: " + pair.value + " language: " + pair.language)
+                return null
+            }  else {
+                const language = pair.language
+                console.log("language is " + language)
+                const fileName = path.join("apps", "ui", "src", "assets", "i18n", "reversed." + language + ".json")
+                console.log("filename is " + fileName)
+                const reverseLookup = JSON.parse(fs.readFileSync(fileName).toString())
+                // Do we have a key
+                if (reverseLookup[pair.key] != undefined) {
+                    // Glob the original file
+                    const dir = reverseLookup[pair.key]
+                    const destDir = path.dirname(dir)
+                    const destFileName = pair.translatable ?
+                        path.join(destDir, "modifications", language + ".json")
+                        : path.basename(destDir) == "translate" ?
+                            path.join(path.dirname(destDir), "notranslate", language + ".json")
+                            : path.join(destDir, language + ".json")
+                    const lookup = fs.existsSync(destFileName) ?
+                        JSON.parse(fs.readFileSync(destFileName).toString())
+                        : {}
+                    // Set the updated pair
+                    lookup[pair.key] = pair.value
+                    // Write the updated file
+                    fs.writeFileSync(destFileName, JSON.stringify(lookup,null,4))
+                    this.logger.log("updated " + pair.key + " to " + pair.value + " in " + destFileName)
+
+                    // Now update the asset
+                    const assetFileName = path.join("apps", "ui", "src", "assets", "i18n", language + ".json")
+                    const keyMap = JSON.parse(fs.readFileSync(assetFileName).toString())
+                    if (keyMap[pair.key] != undefined) {
+                        keyMap[pair.key] = pair.value
+                        fs.writeFileSync(assetFileName, JSON.stringify(keyMap,null,4))
                     } else {
                         this.logger.warn("I18n service trying to update key " + pair.key + " but key was not found.")
+                        return null
                     }
+                    return pair
+                } else {
+                    this.logger.warn("I18n service trying to update key " + pair.key + " but key was not found.")
                 }
             }
         }

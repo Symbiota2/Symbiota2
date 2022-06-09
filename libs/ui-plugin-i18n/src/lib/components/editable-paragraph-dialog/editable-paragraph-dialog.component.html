@@ -6,6 +6,11 @@
     </quill-editor>
 </div>
 <div mat-dialog-actions>
-    <button mat-button mat-raised-button color="primary" (click)="doAction()">{{'symbiota2.editable.text.save.button' | translate}}</button>
-    <button mat-button (click)="closeDialog()" mat-raised-button color="warn">{{'symbiota2.editable.text.cancel.button' | translate}}</button>
+    <button mat-button mat-raised-button color="primary" (click)="doAction()">{{'i18n.editable.text.save.button' | translate}}</button>
+    <button mat-button (click)="closeDialog()" mat-raised-button color="warn">{{'i18n.editable.text.cancel.button' | translate}}</button>
+</div>
+<br/>
+<div>
+    <mat-checkbox class="example-margin" [(ngModel)]='translatable'
+    >{{"i18n.editable.translatable.label" | translate}}</mat-checkbox>
 </div>

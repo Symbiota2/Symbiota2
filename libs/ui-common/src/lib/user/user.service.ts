@@ -51,6 +51,16 @@ export class UserService {
     private notificationDeleted = new EventEmitter<void>();
     private roleDeleted = new EventEmitter<void>();
 
+    public iAmEditing = new BehaviorSubject<boolean>(false);
+
+    public setIAMEditing() {
+        this.iAmEditing.next(true)
+    }
+
+    public setIAMViewing() {
+        this.iAmEditing.next(false)
+    }
+
     /**
      * The currently logged in user
      */

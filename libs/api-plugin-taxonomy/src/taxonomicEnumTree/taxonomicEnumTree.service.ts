@@ -329,7 +329,7 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
      * @return void
      */
     async extendTaxonTreeWithList(taxonPairs, taxonAuthorityID) {
-        const taxonIDs = []
+        let taxonIDs = []
         const parentIDs = []
         const parentMap = new Map()
         for (let pair of taxonPairs) {
@@ -344,6 +344,9 @@ export class TaxonomicEnumTreeService extends BaseService<TaxaEnumTreeEntry>{
                 parentMap.set(parentID,[taxonID])
             }
         }
+
+        // Just in case a duplicate taxonID sneaks in, don't think it should!
+        taxonIDs = [...new Set(taxonIDs)];
 
         // First find the new parent's taxaEnum tree entries
         const newAncestors =

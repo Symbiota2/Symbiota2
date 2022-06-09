@@ -4,7 +4,13 @@ a page doesn't change the appearance other than adding a button. The button trig
 the openDialog method, which opens the editable text dialog component-->
 <div>
     {{key | translate}}
-        <button *ngIf='userCanEdit' mat-icon-button>
-            <mat-icon color="primary" (click)="openDialog()">edit</mat-icon>
+    <span *ngIf='currentUser | async as user'>
+        <span *ngIf='user.canEditProject(user.uid)'>
+            <span *ngIf='userIsEditing' fxLayoutGap="0.5rem">
+        <button  mat-icon-button>
+            <mat-icon [ngStyle]="{'color':'blue'}" (click)="openDialog()">edit</mat-icon>
         </button>
+                </span>
+        </span>
+    </span>
 </div>

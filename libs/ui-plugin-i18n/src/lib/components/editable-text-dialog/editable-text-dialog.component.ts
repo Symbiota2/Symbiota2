@@ -13,14 +13,14 @@ import { TranslateService } from '@ngx-translate/core'
 //it is essentially a simplified version of dialog box components already in the program
 export class EditableTextDialogComponent {
     textValue = ""
-    currentLanguage = ""
+    translatable = true
     constructor(
         @Optional() @Inject(MAT_DIALOG_DATA) public data: string,
         public dialogRef: MatDialogRef<EditableTextDialogComponent>,
         private readonly translate: TranslateService,
         )
     {
-        this.currentLanguage = translate.currentLang
+        // this.currentLanguage = translate.currentLang
         translate.get(this.data).subscribe((value) => {
             this.textValue = value
         })
@@ -31,14 +31,14 @@ export class EditableTextDialogComponent {
     //component giving it the information that it needs to edit the text
     doAction(){
         //this.dialogRef.close({event:document.getElementById("action")})
-        this.dialogRef.close({event: this.textValue})
+        this.dialogRef.close({event: "Save", value: this.textValue, translata: this.translatable})
     }
 
     //This is what is triggered when the user hits cancel. The box simply closes and the cancel
     //text is return to the editable field component, letting it know that nothing should be
     //done
     closeDialog(){
-        this.dialogRef.close({event:'zzzCancel'})
+        this.dialogRef.close({event:'zzzCancel', value: "", translata: this.translatable})
     }
 
 }

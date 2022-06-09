@@ -61,7 +61,7 @@ class UploadBuilder extends I18nQueryBuilder {
     }
 
     build(): string {
-        this.url.pathname = `${this.url.pathname}/upload`;
+        this.url.pathname = `${this.url.pathname}`;
         if (this._language) {
             this.url.searchParams.append(Q_PARAM_LANGUAGE, this._language);
         }
