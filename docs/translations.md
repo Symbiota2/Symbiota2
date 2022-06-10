@@ -41,11 +41,13 @@ the title would be rendered as follows.
     <h1>Visor de taxonomía</h1>
 
 ## Editable and Translatable fields
-To provide more control for site managers, Symbiota2 also supports editable translations.  To set up an editable field, use the `symbiota2-editable-text` component.  The component takes as input a `key` and for users that have text-editing permission will allow a user to open an editing dialog (using a pencil button).  For example the component can be used as follows to allow editing of the taxonomy viewer title.
+To provide more control for site managers, Symbiota2 also supports editable translations.  To set up an editable field, use either the `symbiota2-editable-text` or `symbiota2-editable-paragraph` components.  The components are the same except that the text component supports a single line of text, while the paragraph component can be used to edit an entire paragraph (it uses the Quill rich-text editor package).  Each component takes as input a `key` and for users that have text-editing permission will allow a user to open an editing dialog (using a blue pencil button).  The blue pencil button will only be present if a user has permission to edit the project and only if `Edit` mode is selected.  After logging in the navbar will display an `Edit` button to indicate that the user should activate the button to get permission to `Edit` the translatable fields in a page.  Select `View` to switch to `View` mode.
+
+As an example of the use of an editable field consider the HTML code in a component to allow editing of the taxonomy viewer title.
 
     <h1><symbiota2-editable-text key='taxonomy.profiler.entry.title'></symbiota2-editable-text></h1>
 
-If the user does not have permission to edit (or editing is turned off) then the component will convert to the non-editable, translatable representation of the title.  But if permitted editing will be turned.
+If the user does not have permission to edit (or editing is turned off) then the component will convert to the non-editable, translatable representation of the title.  But if permitted editing will be turned (and a blue pencil will appear).
 ## Where are the language JSON files?
 The language JSON files are local to each plugin (and in various common UI directories).  In the taxonomy UI plugin they are located in the directory.
 
