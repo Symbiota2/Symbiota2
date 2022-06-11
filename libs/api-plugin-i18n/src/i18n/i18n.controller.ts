@@ -66,12 +66,12 @@ export class I18nController {
         console.log(" language is " + inputParams.language)
         console.log(" key is " + inputParams.key)
         console.log(" value is " + inputParams.value)
-        console.log(" translatable is " + inputParams.translatable)
+        console.log(" translatable is " + typeof inputParams.translatable + " " + inputParams.translatable)
         const data = new I18nInputDto()
         data.language = inputParams.language
         data.key = inputParams.key
         data.value = inputParams.value
-        data.translatable = inputParams.translatable
+        data.translatable = inputParams.translatable == 1? true : false
         const result = await this.myService.modify(data)
         return result
     }

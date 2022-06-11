@@ -10,6 +10,7 @@ import {
     ApiUserRoleName
 } from '@symbiota2/data-access';
 import { UserRole } from './user-role.class';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 
 export class User {
     @Expose({ name: "sub" })
@@ -30,6 +31,14 @@ export class User {
     public readonly firstName: string;
     public readonly lastName: string;
     public readonly token: string;
+
+    /*
+    public isEditing() : Observable<boolean> {
+        return of(this.iAmEditing)
+    }
+     */
+
+
 
     static fromJSON(obj: Record<string, unknown>): User {
         return plainToClass(User, obj);

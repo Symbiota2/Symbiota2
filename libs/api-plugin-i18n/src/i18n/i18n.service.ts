@@ -68,11 +68,26 @@ export class I18nService {
                     // Glob the original file
                     const dir = reverseLookup[pair.key]
                     const destDir = path.dirname(dir)
+                    console.log("dir " + dir + " " + destDir)
+                    // Need to determine where the current file resides
+                    let destFileName = ""
+                    if (path.basename(dir) == "notranslate") {
+                        // Currently not translated
+                        destFileName = pair.translatable ?
+                            path.join(destDir, "translate", "modifications", language + ".json")
+                            : path.join(dir, language + ".json")
+                    } else {
+                        destFileName = pair.translatable ?
+                            path.join(destDir, "modifications", language + ".json")
+                            : path.join(path.dirname(destDir), "notranslate", language + ".json")
+                    }
+            /*
                     const destFileName = pair.translatable ?
                         path.join(destDir, "modifications", language + ".json")
                         : path.basename(destDir) == "translate" ?
                             path.join(path.dirname(destDir), "notranslate", language + ".json")
                             : path.join(destDir, language + ".json")
+              */
                     const lookup = fs.existsSync(destFileName) ?
                         JSON.parse(fs.readFileSync(destFileName).toString())
                         : {}

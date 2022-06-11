@@ -22,7 +22,9 @@ import { I18nService } from '../../services';
 // operation
 
 export class EditableParagraphComponent {
-    @Input() key = '';
+    @Input() key = ''
+    @Input() params = ""
+    @Input() hide = false
     userID : number = null
     userCanEdit = false
     userIsEditing: boolean = false

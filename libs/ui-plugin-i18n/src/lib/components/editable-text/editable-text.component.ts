@@ -25,6 +25,7 @@ import { I18nService } from '../../services';
 
 export class EditableTextComponent {
     @Input() key = '';
+    @Input() params = ""
     @Input() hide = false
     userID : number = null
     userCanEdit = false

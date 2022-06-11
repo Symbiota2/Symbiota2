@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional } from 'class-validator';
+import { IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { BaseFindAllParams } from '@symbiota2/api-common';
 
@@ -19,8 +19,12 @@ export class I18nInputParams extends BaseFindAllParams {
     @IsOptional()
     value: string;
 
-    @ApiProperty({ name: 'translatable', type: Boolean, required: true })
-    @Type(() => Boolean )
+
+    @Min(0)
+    @Max(1)
+    @ApiProperty({ name: 'translatable', type: Number, required: true })
+    @Type(() => Number )
+    @IsInt({ each: true })
     @IsOptional()
-    translatable: boolean;
+    translatable: number
 }

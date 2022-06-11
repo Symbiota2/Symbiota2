@@ -205,17 +205,17 @@
                     <div *ngIf='currentUser$ | async as user'>
                         <div *ngIf='user.canEditProject(user.uid)'>
                             <div *ngIf='editing' fxLayoutGap="0.5rem">
-                                <button mat-button (click)="turnOffEditing()">
+                                <button mat-button id='view-button' (click)="turnOffEditing()">
                                     {{
-                                    'core.layout.header.topnav.edit_button'
+                                    'core.layout.header.topnav.noedit_button'
                                         | translate
                                     }}
                                 </button>
                             </div>
                             <div *ngIf='!editing' fxLayoutGap="0.5rem">
-                                <button mat-button (click)="turnOnEditing()">
+                                <button mat-button id='edit-button'  (click)="turnOnEditing()">
                                     {{
-                                    'core.layout.header.topnav.noedit_button'
+                                    'core.layout.header.topnav.edit_button'
                                         | translate
                                     }}
                                 </button>

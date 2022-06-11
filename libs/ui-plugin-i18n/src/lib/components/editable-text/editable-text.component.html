@@ -2,7 +2,8 @@
 in to make sure that switching a normal text field to an editable text on
 a page doesn't change the appearance other than adding a button. The button triggers
 the openDialog method, which opens the editable text dialog component-->
-<span *ngIf='!hide'>{{key | translate}}</span>
+<span *ngIf='!hide && params==""'>{{key | translate}}</span>
+<span *ngIf='!hide && params!=""'>{{key | translate: params}}</span>
 <span *ngIf='currentUser | async as user'>
     <span *ngIf='user.canEditProject(user.uid)'>
         <span *ngIf='userIsEditing' fxLayoutGap="0.5rem">

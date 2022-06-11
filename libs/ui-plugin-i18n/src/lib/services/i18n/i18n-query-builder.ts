@@ -71,9 +71,7 @@ class UploadBuilder extends I18nQueryBuilder {
         if (this._value) {
             this.url.searchParams.append(Q_PARAM_VALUE, this._value);
         }
-        if (this._translatable) {
-            this.url.searchParams.append(Q_PARAM_TRANSLATABLE, this._translatable.toString());
-        }
+        this.url.searchParams.append(Q_PARAM_TRANSLATABLE, this._translatable? "1": "0");
         return super.build();
     }
 }

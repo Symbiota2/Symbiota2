@@ -12,11 +12,11 @@
         }}"
     />
     <h1 *ngIf="title">
-        {{ 'core.layout.home.title_line' | translate: { title: title } }}
+        <symbiota2-editable-text key='core.layout.home.title_line' params='{ "title": "{{title}}" }'></symbiota2-editable-text>
     </h1>
 
-    <p>{{ 'core.layout.home.para_one' | translate }}</p>
+    <p><symbiota2-editable-paragraph key='core.layout.home.para_one'></symbiota2-editable-paragraph></p>
 
-    <p>{{ 'core.layout.home.para_two' | translate }}</p>
+    <p><symbiota2-editable-paragraph key='core.layout.home.para_two'></symbiota2-editable-paragraph></p>
 
 </div>
