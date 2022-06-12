@@ -236,6 +236,7 @@ export class TaxaViewerPageComponent implements OnInit {
     Find the children and ancestors for the given taxonID
      */
     private buildTree(taxonID: number) {
+        // console.log("buildTree " + taxonID)
         let children = []
         const childrenSynonyms = new Map<number, number[]>()
         const childrenSynonymNameMap = new Map<string, number[]>()
@@ -304,7 +305,7 @@ export class TaxaViewerPageComponent implements OnInit {
                                         // There are no children
 
                                         // Fetch synonyms
-                                        this.fetchSynonyms(taxon.id, baseNode)
+                                        this.fetchSynonyms(taxon.id, baseNode, true)
                                         return
                                     }
 
@@ -369,7 +370,7 @@ export class TaxaViewerPageComponent implements OnInit {
                                             baseNode.expanded = true
 
                                             //this.fetchAncestors(taxonID,baseNode)
-                                            this.fetchSynonyms(taxonID, baseNode)
+                                            this.fetchSynonyms(taxonID, baseNode, true)
                                         })
                                 })
                         })
@@ -385,11 +386,13 @@ export class TaxaViewerPageComponent implements OnInit {
     /*
     Grab the synonyms for the current node and then go on and grab the ancestors
      */
-    private fetchSynonyms(taxonid, baseNode) {
+    private fetchSynonyms(taxonid, baseNode, alsoAncestors) {
+        // console.log("fetching synonyms " + baseNode.name)
         this.taxonomicStatusService.findSynonyms(baseNode.taxonID,this.taxonomicAuthorityID)
             .subscribe( (syn) => {
             let synonymList = []
             syn.forEach(function(synonym) {
+                // console.log(" finding synonym " + synonym.taxon.scientificName)
                 // Add the synonym to a list of synonyms
                 const synonymItem: TaxonNode = {
                     name: synonym.taxon.scientificName,
@@ -410,10 +413,14 @@ export class TaxaViewerPageComponent implements OnInit {
 
             // Add to children of the baseNode
             synonymList.forEach((syn) => {
+                // console.log(" adding " + syn.name)
                 baseNode.children.unshift(syn)
             })
             // Fetch ancestors
-            this.fetchAncestors(taxonid,baseNode)
+                if (alsoAncestors) {
+                    this.fetchAncestors(taxonid,baseNode)
+                }
+                this.refreshTree()
         })
     }
 
@@ -422,6 +429,7 @@ export class TaxaViewerPageComponent implements OnInit {
      */
     private fetchAncestors(taxonid, baseNode) {
 
+        // console.log(" Fetch ancesctors " + baseNode.name)
         // Find the ancestors
         this.taxonomicEnumTreeService
             .findAncestorTaxons(taxonid, this.taxonomicAuthorityID)
@@ -548,7 +556,7 @@ export class TaxaViewerPageComponent implements OnInit {
     Repaint the taxonomy tree in the browser
      */
     private refreshTree() {
-        console.log("refreshing tree")
+        // console.log("refreshing tree")
         // Cache the current tree
         const tree = this.dataSource.data
         // Trigger a change to the tree
@@ -558,7 +566,7 @@ export class TaxaViewerPageComponent implements OnInit {
     }
 
     private findChildren(node: TaxonNode) {
-        console.log(" finding children of " + node.name)
+        // console.log(" finding children of " + node.name)
         // Build the children, first get the children
         const taxonID = node.taxonID
         node.children = []
@@ -573,7 +581,7 @@ export class TaxaViewerPageComponent implements OnInit {
                 taxonStatii
                     .filter((a) => a.taxonID != taxonID)
                     .forEach(function (rec) {
-                        console.log(" taxon id is and accepted " + rec.taxonID + " " + rec.taxonIDAccepted)
+                        // console.log(" taxon id is and accepted " + rec.taxonID + " " + rec.taxonIDAccepted)
                         const acceptedId = rec.taxonIDAccepted
                         if (rec.taxonID !== acceptedId) {
                             // This is a synonym
@@ -595,7 +603,7 @@ export class TaxaViewerPageComponent implements OnInit {
                     // There are no children
 
                     // Fetch synonyms
-                    this.fetchSynonyms(taxonID, node)
+                    this.fetchSynonyms(taxonID, node, false)
                     return
                 }
 
@@ -656,12 +664,13 @@ export class TaxaViewerPageComponent implements OnInit {
                             node.children.push(childItem)
                         })
 
-                        console.log(" I am expanded ")
+                        // console.log(" I am expanded ")
                         node.synonym = false
                         node.expanded = true
 
-                        //this.fetchAncestors(taxonID,baseNode)
-                        this.fetchSynonyms(taxonID, node)
+                        //this.fetchAncestors(taxonID,baseNode) zzzz
+                        this.fetchSynonyms(taxonID, node, false)
+                        //this.refreshTree()
                     })
             })
     }
@@ -822,10 +831,19 @@ export class TaxaViewerPageComponent implements OnInit {
         )
         return node
     }
-    @ViewChild('tree') tree
+
+    // @ViewChild('tree') tree
 
     loadChildren(node: TaxonNode) : void {
-        this.findChildren(node)
+        if (node.expanded) {
+            node.expanded = false
+            this.refreshTree()
+        } else {
+            node.expanded = true
+            this.findChildren(node)
+            this.treeControl.collapse(node)
+            this.treeControl.expand(node)
+        }
         // this.refreshTree()
     }
 
