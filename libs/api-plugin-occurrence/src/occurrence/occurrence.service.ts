@@ -369,7 +369,7 @@ export class OccurrenceService {
         const uniqueFieldValues = new Set();
         let nulls = 0;
         const detectedSeperator = await getCsvSeperator(csvFile);
-        if (detectedSeperator == "\t") {
+        if (detectedSeperator == '\t') {
             try {
                 for await (const batch of csvIteratorTabs<Record<string, unknown>>(csvFile)) {
                     for (const row of batch) {
@@ -387,7 +387,7 @@ export class OccurrenceService {
             }
         }
         else {
-            if (detectedSeperator == ",") {
+            if (detectedSeperator == ',') {
                 try {
                     for await (const batch of csvIterator<Record<string, unknown>>(csvFile)) {
                         for (const row of batch) {

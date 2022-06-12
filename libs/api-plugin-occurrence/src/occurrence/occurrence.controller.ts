@@ -239,29 +239,11 @@ export class OccurrenceController {
             }
         }
 
-        else if (file.mimetype == "text/csv") {
+        else if (file.mimetype == "text/csv" || file.mimetype == "text/plain") {
             let occurrencesSeperator: string = await getCsvSeperator(file.path);
             const headers = await getCSVFieldsCustomSeperator(file.path, occurrencesSeperator);
             const headerMap = {};
             headers.forEach((h) => headerMap[h] = '');
-
-            upload = await this.occurrenceService.createUpload(
-                path.resolve(file.path),
-                file.mimetype,
-                headerMap
-            );
-        }
-        else if (file.mimetype == "text/plain") {
-            //Rebuild string with timestamp added to it.
-            const fileNameParts = file.filename.split('.');
-            //Convert to csv first.
-            let fullFileNameCsv: string = fileNameParts[0] + "-" + fileTimeStamp + ".csv";
-            fs.renameSync(path.resolve(uniqueDir, currFile), path.resolve(extractDir, fullFileNameCsv));
-            let occurrencesSeperator: string = await getCsvSeperator(file.path);
-            const headers = await getCSVFieldsCustomSeperator(file.path, occurrencesSeperator);
-            const headerMap = {};
-            headers.forEach((h) => headerMap[h] = '');
-
             upload = await this.occurrenceService.createUpload(
                 path.resolve(file.path),
                 file.mimetype,

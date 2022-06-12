@@ -10,7 +10,7 @@ import { join as pathJoin, basename } from 'path';
 import * as readline from 'readline';
 
 const DEFAULT_ITER_ROWS = 1024;
-const tabStr = "\t";
+const tabStr = '\t';
 export type InsideTempDirCallback<T> = (string) => Promise<T>;
 
 export async function getCSVFields(csvFile: string): Promise<string[]> {
@@ -27,14 +27,13 @@ export async function getCSVFields(csvFile: string): Promise<string[]> {
     });
 }
 
-export async function getCSVFieldsCustomSeperator(csvFile: string, customSeperator: string): Promise<string[]> {
+export async function getCSVFieldsCustomSeperator(csvFile: string, customSeperator: string = ','): Promise<string[]> {
     return new Promise((resolve, reject) => {
         const stream = fs.createReadStream(csvFile);
         stream.pipe(csv({
             separator: customSeperator
         }))
             .on('headers', (headers) => {
-                console.log("Parsing with character")
                 stream.pause();
                 stream.destroy();
                 resolve(headers);
@@ -130,6 +129,30 @@ export async function* csvIteratorTabs<RowType>(filePath: string, bufSize = DEFA
     }));
 
     for await (const row of stream) {
+
+        if (rowBuffer.length >= bufSize) {
+            stream.pause();
+            yield rowBuffer;
+            rowBuffer = [];
+            stream.resume();
+        }
+        rowBuffer.push(row);
+    }
+    yield rowBuffer;
+}
+
+
+/*
+Iterator to read tab seperated csv files
+*/
+export async function* csvIteratorCustomSeperator<RowType>(filePath: string, customSeperator: string = ',', bufSize = DEFAULT_ITER_ROWS) {
+    let rowBuffer: RowType[] = [];
+    const stream = fs.createReadStream(filePath).pipe(csv({
+        separator: customSeperator
+    }));
+
+    for await (const row of stream) {
+
         if (rowBuffer.length >= bufSize) {
             stream.pause();
             yield rowBuffer;

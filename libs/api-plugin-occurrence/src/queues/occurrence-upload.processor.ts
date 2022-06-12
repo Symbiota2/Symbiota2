@@ -15,7 +15,7 @@ import {
 } from '@symbiota2/api-database';
 import { DeepPartial, Repository } from 'typeorm';
 import { QUEUE_ID_OCCURRENCE_UPLOAD } from './occurrence-upload.queue';
-import { csvIterator } from '@symbiota2/api-common';
+import { csvIterator, csvIteratorCustomSeperator, csvIteratorTabs, getCsvSeperator } from '@symbiota2/api-common';
 import {
     CollectionStatsUpdateJob,
     QUEUE_ID_COLLECTION_STATS_UPDATE
@@ -24,6 +24,7 @@ import { TaxonFindByMatchingParams } from '../../../api-plugin-taxonomy/src/taxo
 import { ApiProperty } from '@nestjs/swagger';
 import { TaxonInputDto } from '../../../api-plugin-taxonomy/src/taxon/dto/TaxonInputDto';
 import { TaxonomicStatusInputDto } from '../../../api-plugin-taxonomy/src/taxonomicStatus/dto/TaxonomicStatusInputDto';
+import { type } from 'node:os';
 
 export interface OccurrenceUploadJob {
     uid: number;
@@ -80,7 +81,8 @@ export class OccurrenceUploadProcessor {
 
         // Parse the csv in batches
         let error: Error = null;
-        for await (const batch of csvIterator<DeepPartial<Occurrence>>(upload.filePath)) {
+        let seperator: string = await getCsvSeperator(upload.filePath);
+        for await (const batch of csvIteratorCustomSeperator<DeepPartial<Occurrence>>(upload.filePath, seperator)) {
             try {
                 await this.onCSVBatch(job, upload, batch);
             } catch (e) {
@@ -90,7 +92,10 @@ export class OccurrenceUploadProcessor {
         }
 
         if (error) {
-            await job.moveToFailed(error)
+            console.log("\n================\nJOB FAILED Err Name: " + error.name + + "Err message: " + error.message + "\n=======================\n");
+            // if (!error.message.startsWith("WARN_DATA_TRUNCATED"))
+            return;
+            //     await job.moveToFailed(error)
         }
         else {
             try {
@@ -125,83 +130,113 @@ export class OccurrenceUploadProcessor {
         const allOccurrenceUpdates = [];
 
         // For each csv row
+        let rowCount = 0;
         for (const occurrenceRow of batch) {
-            const occurrenceData = {};
+            try {
+                const occurrenceData = {};
+                // Find the csv field and cooresponding csv field defined by the user in the Upload's
+                // fieldMap. See patchUploadFieldMap() in libs/api-plugin-occurrence/src/occurrence/occurrence.service.ts
+                console.log(rowCount);
+                for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
+                    // If the csvField wasn't mapped to a dbField, skip it
+                    if (!dbField) {
+                        continue;
+                    }
+                    // Grab the value of the csvField from the csv
+                    const csvValue = occurrenceRow[csvField];
+                    // console.log("MIN ELEVATION: " + occurrenceRow["minimumElevationInMeters"]);
+                    // console.log("MIN ELEVATION TYPE: " + typeof (occurrenceRow["minimumElevationInMeters"]));
+                    //  console.log("CSV Field: " + csvField + " CSV VALUE: " + csvValue + "VALUE TYPE: " + typeof (csvValue));
 
-            // Find the csv field and cooresponding csv field defined by the user in the Upload's
-            // fieldMap. See patchUploadFieldMap() in libs/api-plugin-occurrence/src/occurrence/occurrence.service.ts
-            for (const [csvField, dbField] of Object.entries(upload.fieldMap)) {
-                // If the csvField wasn't mapped to a dbField, skip it
-                if (!dbField) {
+                    // If the value's truthy, store it in the Occurrence entity. If not, store
+                    // null in the Occurrence entity
+                    if (csvField == "coordinateUncertaintyInMeters") {
+                        //console.log("Scientific Name: " + occurrenceRow["scientificName"])
+                        //console.log("Coord uncertainty TYPE: " + typeof (occurrenceRow["coordinateUncertaintyInMeters"]));
+                        occurrenceData[dbField] = csvValue === '' ? null : Number(csvValue);
+                        // console.log("Coord uncertainty type after conversion: " + typeof (occurrenceData[csvField]))
+                    }
+
+                    else if (csvField == "minimumElevationInMeters") {
+                        //console.log("Scientific Name: " + occurrenceRow["scientificName"])
+                        //console.log("Min elevation TYPE: " + typeof (occurrenceRow["minimumElevationInMeters"]));
+                        occurrenceData[dbField] = csvValue === '' ? null : Number(csvValue);
+                        if (occurrenceData[dbField] != null)
+                            console.log("\n==========\nMIN ELEVATION VALUE: " + occurrenceData[dbField] +
+                                " Min elevation type after conversion: " + typeof (occurrenceData[csvField]))
+                    }
+
+                    // else {
+                    occurrenceData[dbField] = csvValue === '' ? null : csvValue;
+                    // }
+                }
+
+                // Field the database field that cooresponds to the user-defined csv field
+                // that uniquely identifies each row in the csv. This could be something like 'id' or
+                // 'catalogNumber'.
+                const dbIDField = upload.fieldMap[upload.uniqueIDField];
+                const currenceOccurrenceUniqueValue = occurrenceData[dbIDField];
+
+                // Without a unique value for the row, skip it
+                if (!currenceOccurrenceUniqueValue) {
                     continue;
                 }
-                // Grab the value of the csvField from the csv
-                const csvValue = occurrenceRow[csvField];
 
-                // If the value's truthy, store it in the Occurrence entity. If not, store
-                // null in the Occurrence entity
-                occurrenceData[dbField] = csvValue === '' ? null : csvValue;
-            }
+                // Hard code based on job's collection ID
+                occurrenceData['collectionID'] = job.data.collectionID;
 
-            // Field the database field that cooresponds to the user-defined csv field
-            // that uniquely identifies each row in the csv. This could be something like 'id' or
-            // 'catalogNumber'.
-            const dbIDField = upload.fieldMap[upload.uniqueIDField];
-            const currenceOccurrenceUniqueValue = occurrenceData[dbIDField];
+                // Find any existing occurrence in the database with an id that matches the value for
+                // uniqueIDField. It'll be updated instead of a new one being created.
+                const dbOccurrence = await this.occurrences.findOne({
+                    [dbIDField]: currenceOccurrenceUniqueValue
+                });
 
-            // Without a unique value for the row, skip it
-            if (!currenceOccurrenceUniqueValue) {
-                continue;
-            }
+                // We need to get rid of this; If it's already in the db, then
+                // dbOccurrence has it; If it's not, we'll generate a new one
+                delete occurrenceData['id'];
 
-            // Hard code based on job's collection ID
-            occurrenceData['collectionID'] = job.data.collectionID;
-
-            // Find any existing occurrence in the database with an id that matches the value for
-            // uniqueIDField. It'll be updated instead of a new one being created.
-            const dbOccurrence = await this.occurrences.findOne({
-                [dbIDField]: currenceOccurrenceUniqueValue
-            });
-
-            // We need to get rid of this; If it's already in the db, then
-            // dbOccurrence has it; If it's not, we'll generate a new one
-            delete occurrenceData['id'];
-
-            // NOTE This should also be generated, but currently we don't have the functionality to:
-            // a) Create a new Taxon based on the occurrence csv fields and link it to the TaxaEnumTree
-            // b) Find an existing Taxon based on the occurrence csv fields and link it to the created/updated
-            // occurrence
-            // So right now any occurrence csv uploads WILL NOT be properly linked to Taxonomy, and not
-            // properly searchable as a result
-            // delete occurrenceData['taxonID'];
-            const taxonParams = new TaxonFindByMatchingParams()
-            //Relax type system to extract kingdom.
-            const newRow = <any>occurrenceRow
-            if (occurrenceData['scientificName'] != null && occurrenceData['scientificName'].trim() != "") {
-                taxonParams.scientificName = occurrenceData['scientificName']
-                taxonParams.genus = occurrenceData['genus']
-                taxonParams.family = occurrenceData['family']
-                taxonParams.taxonAuthorityID = this.taxonomicAuthorityID
-                //Hack since kingdom is not an occurrence table column.
-                taxonParams.kingdom = newRow['kingdom']
-                occurrenceData['taxonID'] = await this.findOrCreateByMatching(taxonParams)
-            }
-
-            // Update
-            if (dbOccurrence) {
-                // If we found a matching occurrence, use the csv data to update its fields
-                for (const [k, v] of Object.entries(occurrenceData)) {
-                    if (k in dbOccurrence) {
-                        dbOccurrence[k] = v;
-                    }
+                // NOTE This should also be generated, but currently we don't have the functionality to:
+                // a) Create a new Taxon based on the occurrence csv fields and link it to the TaxaEnumTree
+                // b) Find an existing Taxon based on the occurrence csv fields and link it to the created/updated
+                // occurrence
+                // So right now any occurrence csv uploads WILL NOT be properly linked to Taxonomy, and not
+                // properly searchable as a result
+                // delete occurrenceData['taxonID'];
+                const taxonParams = new TaxonFindByMatchingParams()
+                //Relax type system to extract kingdom.
+                const newRow = <any>occurrenceRow
+                if (occurrenceData['scientificName'] != null && occurrenceData['scientificName'].trim() != "") {
+                    taxonParams.scientificName = occurrenceData['scientificName']
+                    taxonParams.genus = occurrenceData['genus']
+                    taxonParams.family = occurrenceData['family']
+                    taxonParams.taxonAuthorityID = this.taxonomicAuthorityID
+                    //Hack since kingdom is not an occurrence table column.
+                    taxonParams.kingdom = newRow['kingdom']
+                    occurrenceData['taxonID'] = await this.findOrCreateByMatching(taxonParams)
                 }
-                allOccurrenceUpdates.push(dbOccurrence);
+                rowCount++;
+
+                // Update
+                if (dbOccurrence) {
+                    // If we found a matching occurrence, use the csv data to update its fields
+                    for (const [k, v] of Object.entries(occurrenceData)) {
+                        if (k in dbOccurrence) {
+                            dbOccurrence[k] = v;
+                        }
+                    }
+                    allOccurrenceUpdates.push(dbOccurrence);
+                }
+                // Insert
+                else {
+                    const occurrence = this.occurrences.create(occurrenceData);
+                    allOccurrenceUpdates.push(occurrence);
+                }
             }
-            // Insert
-            else {
-                const occurrence = this.occurrences.create(occurrenceData);
-                allOccurrenceUpdates.push(occurrence);
+            catch (error) {
+                console.log("\n==============================\nERRORRRRRRRRRRRR: current minelevation: " + occurrenceRow["minimumElevationInMeters"] + "\n======================================\n")
+                throw error
             }
+
         }
 
         // Save all of the edits for this batch
